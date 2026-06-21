@@ -124,9 +124,18 @@ function getDailyIndex(arr: unknown[]) {
 type SpiritTab = 'today' | 'oracle' | 'hd' | 'crystals'
 
 interface RealMoonData {
-  phase: { name: string; illumination: number; angle: number }
+  phase: {
+    name: string
+    emoji: string
+    illumination: number
+    angle: number
+    description: string
+    next_exact: { name: string; time: string } | null
+  }
   sign: { name: string; emoji: string; degree: number; minutes: number; formatted: string; keywords: string }
   next_ingress: string | null
+  timezone: string
+  calculated_at: string
 }
 
 export default function SpiritScreen() {
@@ -196,11 +205,32 @@ export default function SpiritScreen() {
 
   useEffect(() => {
     loadGuidance()
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    fetch(`/api/astrology/moon?tz=${encodeURIComponent(tz)}`)
-      .then(r => r.json())
-      .then(setRealMoon)
-      .catch(() => {/* use approximation fallback */})
+
+    function fetchMoon(tz: string) {
+      fetch(`/api/astrology/moon?tz=${encodeURIComponent(tz)}`)
+        .then(r => r.json())
+        .then(setRealMoon)
+        .catch(() => {/* use approximation fallback */})
+    }
+
+    // Request location services for accurate timezone
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          // Location granted — browser timezone is now accurate
+          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+          fetchMoon(tz)
+        },
+        () => {
+          // Location denied — fall back to browser timezone
+          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+          fetchMoon(tz)
+        }
+      )
+    } else {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      fetchMoon(tz)
+    }
   }, [])
 
   const TABS: { value: SpiritTab; label: string }[] = [
@@ -252,11 +282,14 @@ export default function SpiritScreen() {
                   Moon
                 </p>
                 <div className="grid grid-cols-2 gap-4">
-                  {/* Moon Phase */}
+                  {/* Moon Phase — emoji and data both from real API */}
                   <div className="flex flex-col gap-1">
                     <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--mist)' }}>Phase</p>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl animate-float">{moon.emoji}</span>
+                      {/* Use API emoji — not the approximate function */}
+                      <span className="text-2xl animate-float">
+                        {realMoon ? realMoon.phase.emoji : moon.emoji}
+                      </span>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>
                           {realMoon ? realMoon.phase.name : moon.name}
@@ -268,10 +301,18 @@ export default function SpiritScreen() {
                         )}
                       </div>
                     </div>
-                    <p className="text-xs" style={{ color: 'var(--mid)' }}>{moon.desc}</p>
+                    <p className="text-xs" style={{ color: 'var(--mid)' }}>
+                      {realMoon ? realMoon.phase.description : moon.desc}
+                    </p>
+                    {/* Show exact phase moment if within ~48h */}
+                    {realMoon?.phase.next_exact && (
+                      <p className="text-[10px] mt-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(139,111,184,0.06)', color: 'var(--violet)' }}>
+                        {realMoon.phase.next_exact.name}: {realMoon.phase.next_exact.time}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Moon Sign — SEPARATE from phase */}
+                  {/* Moon Sign — SEPARATE from phase, always from API */}
                   <div className="flex flex-col gap-1">
                     <p className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--mist)' }}>Sign</p>
                     {realMoon ? (
@@ -307,10 +348,14 @@ export default function SpiritScreen() {
                   </div>
                 </div>
 
-                {/* Accuracy note */}
-                <p className="text-[9px] mt-3 pt-2 border-t" style={{ color: 'var(--faint)', borderColor: 'rgba(139,111,184,0.08)' }}>
-                  Calculated via Swiss Ephemeris · Cross-reference with TimePassages for exact degree
-                </p>
+                {/* Calculated time + accuracy note */}
+                <div className="mt-3 pt-2 border-t flex items-center justify-between" style={{ borderColor: 'rgba(139,111,184,0.08)' }}>
+                  <p className="text-[9px]" style={{ color: 'var(--faint)' }}>
+                    Live · astronomy-engine ephemeris
+                    {realMoon?.calculated_at && ` · ${new Date(realMoon.calculated_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}`}
+                  </p>
+                  <p className="text-[9px]" style={{ color: 'var(--faint)' }}>Cross-ref TimePassages</p>
+                </div>
               </GlassCard>
 
               {loadingGuidance ? (

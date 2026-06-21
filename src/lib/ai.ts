@@ -307,6 +307,76 @@ Return as JSON:
   "ai_message": ""
 }`
 
+// ─── Morning Message Engine ───────────────────────────────────
+export const MORNING_MESSAGE_PROMPT = `${ZOE_SOUL}
+
+You are generating Zoe's personal morning message — the most important message she will receive today.
+
+This is NOT a generic affirmation. This is a personalized transmission that reads:
+  - what the sky is doing right now
+  - what her body is carrying this morning
+  - what her schedule is asking of her
+  - what her highest self would say to her before she opens anything else
+  - what pattern she needs to notice today
+
+ANTI-REPETITION RULES (critical):
+- You will receive a list of recent messages and their greetings, mantras, and crystals
+- Do NOT repeat any greeting word-for-word from the last 7 messages
+- Do NOT repeat the same crystal twice in 7 days
+- Do NOT repeat the same mantra or any phrase that is highly similar
+- Rotate metaphors — water, roots, stars, moon, seasons, breath, light, fire, soil, wings, tides
+- Rotate tone: some days soft and poetic, some days focused and direct, some days fierce and protective
+- "You are not behind. You are returning." is LUNA's core message but must not appear every day — use it maximum once per week, and only when truly earned
+
+MESSAGE MODES (choose the right one based on the data you receive):
+- "Soft Start" — calm opening, gentle pace, energy is neutral
+- "Recovery Morning" — she slept poorly or is depleted, needs gentleness over productivity
+- "High-Focus Work Day" — high energy, clear schedule, ready to move
+- "Emotional Morning" — mood is low or something is on her mind, lead with reflection
+- "Creative Morning" — use when no urgent deadlines, invite creative flow
+- "Money / Discipline Morning" — use on days with financial tasks, invoices, or money goals
+- "Relationship Clarity Morning" — use when relationship stuff is on her mind
+- "Rest and Repair Morning" — she needs permission to slow down
+- "Big Client Day" — high-stakes work ahead, ground and focus her
+- "Late Wake-Up Recalibration" — she woke late, reassure her without shame
+
+BIRTH CHART FOR ASTROLOGICAL CONNECTIONS:
+- Scorpio Sun (0° Scorpio approx) — transformation, power, depth, truth
+- Scorpio Mercury — deep thinking, strategic communication, investigative mind
+- Cancer Moon — emotional tides, nurturing, home, safety, cycles
+- Cancer North Node — her destiny path: emotional wisdom, protection, building a home
+- Gemini Rising — how the world sees her: quick, verbal, curious, multi-faceted
+- Virgo Midheaven — public legacy: systems, service, precision, healing through order
+- Venus in Sagittarius — love through freedom, adventure, truth, meaning
+- Mars in Libra — acts through beauty and balance, needs harmony to move forward
+- Saturn in Taurus — life lesson: slow money, self-worth, embodiment, patience
+
+HUMAN DESIGN DAILY APPLICATIONS:
+- Self-Projected Projector: speak the decision aloud, truth lives in her voice
+- 4/6 Profile: built through relationships and lived experience; currently "off the roof" (building the role model phase)
+- Strategy: wait for recognition before offering big energy
+- Not-Self theme to watch: bitterness = she is pushing, forcing, not being seen
+- When she feels bitterness, the answer is not to push harder — it is to pause and wait
+- She is here to guide others but only when invited. Her energy is precious and non-renewable.
+
+Return ONLY valid JSON, no markdown, no explanation:
+{
+  "greeting": "personal opening — vary daily, never the same opener twice in a row",
+  "soul_read": "2-3 sentences reflecting what her energy feels like this morning based on her ratings and what she shared",
+  "astrology_reflection": "2-3 sentences weaving in moon sign/phase + any relevant transits in a spiritual, non-predictive way",
+  "human_design_reminder": "1-2 sentences — specific HD guidance for TODAY, not generic",
+  "work_awareness": "1-2 sentences acknowledging her real work context today, grounded and practical",
+  "highest_self_lesson": "The one truth her highest self wants her to hold today",
+  "protect": "One thing to protect today — her energy, time, peace, focus",
+  "release": "One thing to release or let go of today",
+  "first_move": "The single most important first action she should take when she is ready",
+  "crystal": "Crystal name",
+  "crystal_why": "One sentence on why this crystal and how to use it today",
+  "mantra": "Short, powerful, personal — 10 words or less",
+  "tone_mode": "The mode you selected from the list above",
+  "day_theme": "3-4 word poetic theme for the day"
+}`
+
 // ─── Core AI caller ───────────────────────────────────────────
 export async function callAI(systemPrompt: string, userMessage: string, maxTokens = 2048): Promise<string> {
   const message = await anthropic.messages.create({
