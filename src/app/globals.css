@@ -168,13 +168,20 @@ body {
 
 /* ─── Desktop overrides ─────────────────────────────────────── */
 @media (min-width: 1024px) {
-  /* No bottom nav on desktop — reset padding */
   .pb-nav { padding-bottom: 3rem; }
+}
 
-  /* Subtle scrollbar for desktop sidebar */
-  aside::-webkit-scrollbar       { width: 4px; }
-  aside::-webkit-scrollbar-track { background: transparent; }
-  aside::-webkit-scrollbar-thumb { background: rgba(139,111,184,0.15); border-radius: 4px; }
+/* ─── Dark glass card (desktop CarPlay) ─────────────────────────────── */
+.dark-card {
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  transition: background 0.2s ease;
+}
+.dark-card:hover {
+  background: rgba(255,255,255,0.08);
 }
 
 /* ─── Recording dot ─────────────────────────────────────────── */
