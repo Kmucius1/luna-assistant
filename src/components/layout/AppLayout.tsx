@@ -21,12 +21,12 @@ export function AppLayout({ children, noPad, className, darkDesktop }: AppLayout
         // Always centered with a readable max-width
         'mx-auto w-full',
         'max-w-xl',           // Mobile: 576px — breathing room without feeling cramped
-        'lg:max-w-3xl',       // Desktop: 768px — comfortable reading width, not wall-to-wall
+        'lg:max-w-5xl',       // Desktop: 1024px — wider than the dock so tiles breathe
         'lg:pt-16',
         // Padding — horizontal breathing room
-        noPad ? '' : 'px-6 lg:px-10',
+        noPad ? '' : 'px-4 lg:px-12',
         // Bottom spacing
-        'pb-nav lg:pb-[100px]',
+        'pb-nav lg:pb-[120px]',
         className ?? '',
       ].join(' ')}>
         <div className="animate-page-enter content-enter">

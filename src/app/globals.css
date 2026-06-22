@@ -113,8 +113,12 @@
 html, body { height: 100%; }
 
 html {
-  /* text-xs ≈ 14.25px, text-sm ≈ 16.625px, text-base ≈ 19px */
-  font-size: 19px;
+  /* Mobile: 17px base. Desktop bumped down from 19px for proper proportions */
+  font-size: 17px;
+}
+
+@media (min-width: 1024px) {
+  html { font-size: 15px; }
 }
 
 body {
