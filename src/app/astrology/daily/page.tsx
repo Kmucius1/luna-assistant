@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { RefreshCw, AlertCircle } from 'lucide-react'
+import { useLocation } from '@/hooks/useLocation'
 
 interface DailyGuidance {
   horoscope:       string
@@ -104,17 +105,21 @@ export default function DailyReadingPage() {
   const [data,    setData]    = useState<DailyGuidance | null>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(false)
+  const location = useLocation()
 
-  const today = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long', month: 'long', day: 'numeric',
-  }).format(new Date())
+  const today = location.localDate
+    || new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
 
   const fetchGuidance = useCallback(async (refresh = false) => {
     setLoading(true)
     setError(false)
     try {
-      const url = refresh ? '/api/astrology/daily-guidance?refresh=1' : '/api/astrology/daily-guidance'
-      const res = await fetch(url)
+      const tz   = encodeURIComponent(location.tz)
+      const time = encodeURIComponent(location.localTime)
+      const date = encodeURIComponent(location.localDate)
+      const base = `/api/astrology/daily-guidance?tz=${tz}&time=${time}&date=${date}`
+      const url  = refresh ? `${base}&refresh=1` : base
+      const res  = await fetch(url)
       if (!res.ok) throw new Error('non-2xx')
       const json = await res.json() as DailyGuidance
       setData(json)
@@ -123,9 +128,12 @@ export default function DailyReadingPage() {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [location.tz, location.localTime, location.localDate])
 
-  useEffect(() => { fetchGuidance() }, [fetchGuidance])
+  useEffect(() => {
+    // Wait until we have the local time before fetching
+    if (location.localTime) fetchGuidance()
+  }, [location.localTime, fetchGuidance])
 
   return (
     <div className="min-h-screen bg-app">

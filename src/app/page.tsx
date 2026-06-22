@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { GrowthAnalytics } from '@/components/ui/GrowthAnalytics'
+import { useLocation } from '@/hooks/useLocation'
 import { format } from 'date-fns'
 import {
   Sparkles, Moon, BriefcaseIcon, Mic, MessageCircle,
@@ -142,11 +143,12 @@ function Tile({
 
 export default function SanctuaryPage() {
   const [mounted, setMounted] = useState(false)
+  const location = useLocation()
   useEffect(() => { setMounted(true) }, [])
   if (!mounted) return null
 
-  const hour     = new Date().getHours()
-  const today    = format(new Date(), 'EEEE, MMMM d')
+  const hour     = location.localHour   // always client's real local hour
+  const today    = location.localDate ? location.localDate.split(',').slice(0,2).join(',') : format(new Date(), 'EEEE, MMMM d')
   const greeting = getTimeGreeting(hour)
   const moon     = getMoonPhase()
   const lunaNow  = getLunaNow(hour, moon)

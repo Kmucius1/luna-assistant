@@ -66,10 +66,13 @@ export function SmartInput({
     if (loadingSug) return
     setLoadingSug(true)
     try {
+      const tz = typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
+      const localDate = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
+      const localTime = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
       const res = await fetch('/api/ai/suggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ context, history: history.slice(-3), type: patternType }),
+        body: JSON.stringify({ context, history: history.slice(-3), type: patternType, tz, localDate, localTime }),
       })
       if (res.ok) {
         const { suggestions } = await res.json()

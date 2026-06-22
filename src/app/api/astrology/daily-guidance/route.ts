@@ -26,10 +26,17 @@ export interface DailyGuidance {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const refresh = searchParams.get('refresh') === '1'
+    const refresh   = searchParams.get('refresh') === '1'
+    // Client passes its local timezone + time so the reading is accurate
+    const clientTz  = searchParams.get('tz')    || 'America/New_York'
+    const localTime = searchParams.get('time')  || ''   // e.g. "7:42 PM"
+    const localDate = searchParams.get('date')  || ''   // e.g. "Sunday, June 22, 2025"
 
     const now    = new Date()
-    const dateKey = now.toISOString().slice(0, 10) // YYYY-MM-DD
+    // Use client's local date as cache key so the reading resets at midnight for Zoe, not at UTC midnight
+    const dateKey = localDate
+      ? localDate.replace(/[^a-zA-Z0-9]/g, '_')
+      : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
 
     // Serve from cache unless refresh requested or TTL expired (1 hr)
     if (!refresh) {
@@ -51,8 +58,13 @@ export async function GET(req: NextRequest) {
       `${t.transiting} ${t.type} natal ${t.natal} (${t.natalSign} ${t.natalDegree}°) — orb ${t.orb}° — ${t.interpretation}`
     ).join('\n')
 
-    const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' })
+    // Always use client's timezone for display so we don't tell Claude it's 2 AM when it's 10 PM
+    const dateStr = localDate || new Intl.DateTimeFormat('en-US', {
+      timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    }).format(now)
+    const timeStr = localTime || new Intl.DateTimeFormat('en-US', {
+      timeZone: clientTz, hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short',
+    }).format(now)
 
     // ── Prompt ─────────────────────────────────────────────────────────────
     const userPrompt = `Today is ${dateStr} at ${timeStr}.

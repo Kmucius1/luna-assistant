@@ -5,6 +5,7 @@ import { Sun, ArrowRight, Sparkles, ChevronLeft, Moon } from 'lucide-react'
 import { format } from 'date-fns'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { addPattern } from '@/lib/patterns'
+import { useLocation } from '@/hooks/useLocation'
 
 type CheckInType = 'morning' | 'midday' | 'night'
 
@@ -66,6 +67,7 @@ interface CheckInData {
 type Step = 'wake' | 'sleep' | 'energy' | 'mood' | 'dream' | 'feeling' | 'support' | 'goal' | 'result'
 
 export default function MorningCheckIn() {
+  const location = useLocation()
   const [checkInType, setCheckInType] = useState<CheckInType>('morning')
   const [step, setStep] = useState<Step>('wake')
   const [data, setData] = useState<CheckInData>({
@@ -95,7 +97,7 @@ export default function MorningCheckIn() {
       const res = await fetch('/api/ai/daily-brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ checkIn: data, type: checkInType }),
+        body: JSON.stringify({ checkIn: data, type: checkInType, tz: location.tz, localTime: location.localTime }),
       })
       aiResult = await res.json()
       setResult(aiResult)
@@ -125,7 +127,9 @@ export default function MorningCheckIn() {
     }
   }
 
-  const today = format(new Date(), 'EEEE, MMMM d')
+  const today = location.localDate
+    ? location.localDate.split(',').slice(0,2).join(',')
+    : format(new Date(), 'EEEE, MMMM d')
 
   function SliderInput({ label, value, onChange }: { label: string; value: number; onChange: (n: number) => void }) {
     return (

@@ -40,7 +40,11 @@ export async function POST(request: NextRequest) {
     } = body
 
     const auto_mode = selectMode(sleep_rating, energy_rating, mood_rating, support_need, wake_time)
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+    // Use client's local timezone if provided so date is correct for Zoe (not UTC)
+    const clientTz = (body.tz as string) || 'America/New_York'
+    const today = new Intl.DateTimeFormat('en-US', {
+      timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric',
+    }).format(new Date())
 
     // ── Build the recent message history context ──────────────
     const recentHistory = recent_messages.length > 0

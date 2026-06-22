@@ -3,16 +3,21 @@ import Anthropic from '@anthropic-ai/sdk'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-const LUNA_CONTEXT = `You are generating suggestion chips for Zoe Taylor Herstich's personal AI assistant LUNA.
+function buildLunaContext(tz?: string, localDate?: string, localTime?: string): string {
+  const clientTz = tz || 'America/New_York'
+  const dateStr = localDate || new Intl.DateTimeFormat('en-US', { timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
+  const timeStr = localTime || new Intl.DateTimeFormat('en-US', { timeZone: clientTz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
+  return `You are generating suggestion chips for Zoe Taylor Herstich's personal AI assistant LUNA.
 Zoe is: Scorpio Sun 22°, Cancer Moon 4°, Gemini Rising 12°, Mercury Scorpio, Venus Sagittarius, Mars Libra.
 Human Design: Self-Projected Projector, 4/6 profile. Clarity comes through her voice/speaking.
 She runs Ad-Vantage Media Agency and DRYP Digital. USF student. Creative, emotionally intelligent, truth-seeking.
-Current date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-Current hour: ${new Date().getHours()}
+Current date: ${dateStr}
+Current local time: ${timeStr}
 
 Generate SHORT, honest, specific options she can TAP to answer the question.
 Each option should be 2-7 words. Raw, real, not generic.
 Return ONLY a JSON array of 5 strings. No other text.`
+}
 
 const CONTEXT_PRESETS: Record<string, string[]> = {
   // Morning
@@ -49,7 +54,8 @@ function matchPreset(context: string): string[] | null {
 
 export async function POST(req: NextRequest) {
   try {
-    const { context, history = [], type = 'general' } = await req.json()
+    const { context, history = [], type = 'general', tz, localDate, localTime } = await req.json()
+    const LUNA_CONTEXT = buildLunaContext(tz as string | undefined, localDate as string | undefined, localTime as string | undefined)
 
     // Check for preset (fast path)
     const preset = matchPreset(context)
