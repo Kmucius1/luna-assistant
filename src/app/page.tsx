@@ -737,6 +737,7 @@ export default function SanctuaryPage() {
   const [activePage,  setActivePage]  = useState(0)
   const [searchOpen,  setSearchOpen]  = useState(false)
   const [quoteSlide,  setQuoteSlide]  = useState(0)
+  const [isDesktop,   setIsDesktop]   = useState(false)
 
   // Shared state — lifted from page components
   const [guidance,    setGuidance]    = useState<GuidanceData | null>(null)
@@ -751,6 +752,9 @@ export default function SanctuaryPage() {
 
   useEffect(() => {
     setMounted(true)
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024)
+    checkDesktop()
+    window.addEventListener('resize', checkDesktop)
 
     // Quote auto-rotate
     const id = setInterval(() => setQuoteSlide(i => (i + 1) % QUOTES.length), 6000)
@@ -784,7 +788,10 @@ export default function SanctuaryPage() {
       })
       .catch(() => setDataLoaded(true))
 
-    return () => clearInterval(id)
+    return () => {
+      clearInterval(id)
+      window.removeEventListener('resize', checkDesktop)
+    }
   }, [])
 
   const handleScroll = useCallback(() => {
@@ -814,23 +821,34 @@ export default function SanctuaryPage() {
 
   return (
     <div style={{
-      position: 'fixed', top: 0, bottom: 0,
-      left: '50%', transform: 'translateX(-50%)',
-      width: '100%', maxWidth: 860,
+      position: 'fixed',
+      top:    isDesktop ? 56  : 0,
+      bottom: isDesktop ? 80  : 0,
+      left:   isDesktop ? 0   : '50%',
+      right:  isDesktop ? 0   : undefined,
+      transform: isDesktop ? 'none' : 'translateX(-50%)',
+      width: '100%',
+      maxWidth: isDesktop ? '100%' : 860,
       overflow: 'hidden',
       background: 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)',
     }}>
       {/* Ambient glows */}
-      <div style={{ position: 'absolute', top: -80, right: -60, width: 300, height: 300, borderRadius: '50%', pointerEvents: 'none',
+      <div style={{ position: 'absolute', top: -80, right: -60, width: isDesktop ? 600 : 300, height: isDesktop ? 600 : 300, borderRadius: '50%', pointerEvents: 'none',
         background: 'radial-gradient(circle, rgba(139,111,184,0.13) 0%, transparent 70%)', filter: 'blur(45px)', zIndex: 0 }} />
       <div style={{ position: 'absolute', bottom: 100, left: -40, width: 240, height: 240, borderRadius: '50%', pointerEvents: 'none',
         background: 'radial-gradient(circle, rgba(70,40,160,0.09) 0%, transparent 70%)', filter: 'blur(40px)', zIndex: 0 }} />
 
-      {/* Top bar */}
-      <TopBar timeStr={timeStr} dateStr={dateStr} moon={moon} onSearch={() => setSearchOpen(true)} />
+      {/* Top bar — mobile only, desktop uses DesktopHeader */}
+      {!isDesktop && <TopBar timeStr={timeStr} dateStr={dateStr} moon={moon} onSearch={() => setSearchOpen(true)} />}
 
-      {/* Pages — between topbar (62px) and dock area (112px from bottom) */}
-      <div style={{ position: 'absolute', top: 62, left: 0, right: 0, bottom: 112, zIndex: 1 }}>
+      {/* Pages */}
+      <div style={{
+        position: 'absolute',
+        top:    isDesktop ? 0  : 62,
+        left:   0, right: 0,
+        bottom: isDesktop ? 16 : 112,
+        zIndex: 1,
+      }}>
         <div
           ref={scrollRef}
           onScroll={handleScroll}
@@ -856,8 +874,8 @@ export default function SanctuaryPage() {
         </div>
       </div>
 
-      {/* Page dots — 6 dots */}
-      <div style={{ position: 'absolute', bottom: 102, left: 0, right: 0, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, zIndex: 2 }}>
+      {/* Page dots */}
+      <div style={{ position: 'absolute', bottom: isDesktop ? 4 : 102, left: 0, right: 0, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, zIndex: 2 }}>
         {[0,1,2,3,4,5].map(i => (
           <button key={i} onClick={() => goToPage(i)} style={{
             width: activePage === i ? 18 : 5, height: 5, borderRadius: 3, padding: 0, border: 'none', cursor: 'pointer',
@@ -867,8 +885,8 @@ export default function SanctuaryPage() {
         ))}
       </div>
 
-      {/* Dock */}
-      <Dock activePage={activePage} onPageChange={goToPage} />
+      {/* Dock — mobile only, desktop uses DesktopTabBar */}
+      {!isDesktop && <Dock activePage={activePage} onPageChange={goToPage} />}
 
       {searchOpen && <LunaSearchOverlay onClose={() => setSearchOpen(false)} />}
     </div>

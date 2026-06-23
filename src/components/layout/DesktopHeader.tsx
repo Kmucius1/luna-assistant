@@ -68,10 +68,10 @@ export function DesktopHeader() {
     <header
       className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center"
       style={{
-        background: 'var(--header-bg)',
+        background: 'rgba(10, 8, 28, 0.94)',
         backdropFilter: 'blur(32px)',
         WebkitBackdropFilter: 'blur(32px)',
-        borderBottom: '1px solid var(--header-border)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
 
       {/* Left — LUNA wordmark */}
