@@ -1,6 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk'
+import Groq from 'groq-sdk'
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! })
 
 // ─── Zoe's core identity ──────────────────────────────────────
 export const ZOE_SOUL = `
@@ -534,34 +534,29 @@ Return ONLY valid JSON:
   "tags": ["tag1", "tag2", "tag3"]
 }`
 
-// ─── Core AI caller with retry ────────────────────────────────
+// ─── Core AI caller with retry (Groq — free tier) ─────────────
 export async function callAI(systemPrompt: string, userMessage: string, maxTokens = 2048): Promise<string> {
   const MAX_RETRIES = 3
   let lastErr: Error | null = null
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
-      const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
+      const completion = await groq.chat.completions.create({
+        model: 'llama-3.3-70b-versatile',
         max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userMessage }],
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: userMessage  },
+        ],
       })
-      const content = message.content[0]
-      if (content.type === 'text') return content.text
-      throw new Error('Unexpected response type from AI')
+      const text = completion.choices[0]?.message?.content
+      if (text) return text
+      throw new Error('Empty response from AI')
     } catch (err) {
       lastErr = err instanceof Error ? err : new Error(String(err))
-      const msg  = lastErr.message.toLowerCase()
-      const isOverloaded = msg.includes('529') || msg.includes('overloaded') || msg.includes('overload')
-      const isRateLimit  = msg.includes('429') || msg.includes('rate limit')
-      const isTransient  = isOverloaded || isRateLimit
-      // Credit / billing errors — don't retry, re-throw with clean message
-      if (msg.includes('credit') || msg.includes('billing') || msg.includes('402') || msg.includes('insufficient')) {
-        throw new Error('LUNA_AI_UNAVAILABLE')
-      }
-      if (!isTransient || attempt === MAX_RETRIES - 1) break
-      // Exponential backoff: 1s, 2s
+      const msg = lastErr.message.toLowerCase()
+      const isRateLimit = msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')
+      if (!isRateLimit || attempt === MAX_RETRIES - 1) break
       await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
     }
   }
