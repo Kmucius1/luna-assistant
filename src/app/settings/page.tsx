@@ -133,6 +133,11 @@ function OAuthBanner() {
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
             {ERROR_MESSAGES[error ?? ''] ?? `Error: ${error} — see fix below.`}
           </p>
+          {params.get('reason') && (
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 6, fontFamily: 'monospace', background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: 6 }}>
+              {decodeURIComponent(params.get('reason')!)}
+            </p>
+          )}
         </div>
         <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }}><X className="h-4 w-4" /></button>
       </div>

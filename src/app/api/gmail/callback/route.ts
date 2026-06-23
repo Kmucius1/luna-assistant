@@ -16,7 +16,9 @@ export async function GET(req: NextRequest) {
     await storeGmailTokens({ ...tokens, email: profile.emailAddress })
     return NextResponse.redirect(`${appUrl}/settings?connected=${encodeURIComponent(profile.emailAddress)}`)
   } catch (err) {
-    console.error('Gmail OAuth callback error:', err)
-    return NextResponse.redirect(`${appUrl}/settings?error=gmail_failed`)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('Gmail OAuth callback error:', msg)
+    const reason = encodeURIComponent(msg.slice(0, 200))
+    return NextResponse.redirect(`${appUrl}/settings?error=gmail_failed&reason=${reason}`)
   }
 }
