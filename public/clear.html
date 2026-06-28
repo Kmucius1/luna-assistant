@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clearing cache…</title>
+  <style>
+    body { background: #08041a; color: #C4A9E8; font-family: system-ui, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0; text-align: center; padding: 20px; box-sizing: border-box; }
+    h2 { font-size: 22px; margin-bottom: 12px; }
+    p  { font-size: 14px; color: rgba(255,255,255,0.5); }
+  </style>
+</head>
+<body>
+  <h2>✦ Clearing old cache…</h2>
+  <p>One moment — you'll be redirected to LUNA automatically.</p>
+  <script>
+    async function clear() {
+      try {
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch(e) {}
+      window.location.replace('/');
+    }
+    clear();
+  </script>
+</body>
+</html>
