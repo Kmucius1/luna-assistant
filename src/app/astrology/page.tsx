@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import { Star, ChevronRight, RefreshCw, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
@@ -522,10 +523,22 @@ function TabDeepDive() {
 export default function AstrologyPage() {
   const [tab, setTab] = useState<AstroTab>('cosmic')
 
+  const astroPages = [
+    { id: 'cosmic',    label: '✨ Cosmic',    content: <TabCosmic /> },
+    { id: 'moon',      label: '🌙 Moon',      content: <TabMoon /> },
+    { id: 'transits',  label: '🪐 Transits',  content: <TabTransits /> },
+    { id: 'chart',     label: '⭕ Chart',      content: <TabChart /> },
+    { id: 'spirit',    label: '🪷 Spirit',     content: <TabSpirit /> },
+    { id: 'crystals',  label: '🔮 Crystals',  content: <TabCrystals /> },
+    { id: 'love',      label: '💗 Love',      content: <TabLove /> },
+    { id: 'forecasts', label: '📅 Forecasts', content: <TabForecasts /> },
+    { id: 'deep',      label: '🌌 Deep Dive', content: <TabDeepDive /> },
+  ]
+
   return (
     <AppLayout>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingTop: 8 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
         <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.25)' }}>
           <Star className="h-5 w-5" style={{ color: '#C4A9E8' }} strokeWidth={1.6} />
         </div>
@@ -535,26 +548,7 @@ export default function AstrologyPage() {
         </div>
       </div>
 
-      {/* Tab pills */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(8,4,26,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, paddingBottom: 10, marginBottom: 18, marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {ASTRO_TABS.map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer', background: tab === t.id ? 'rgba(139,111,184,0.22)' : 'transparent', border: `1px solid ${tab === t.id ? 'rgba(139,111,184,0.4)' : 'rgba(255,255,255,0.07)'}`, color: tab === t.id ? '#C4A9E8' : 'rgba(255,255,255,0.4)', flexShrink: 0, transition: 'all 0.18s' }}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {tab === 'cosmic'    && <TabCosmic />}
-      {tab === 'moon'      && <TabMoon />}
-      {tab === 'transits'  && <TabTransits />}
-      {tab === 'chart'     && <TabChart />}
-      {tab === 'spirit'    && <TabSpirit />}
-      {tab === 'crystals'  && <TabCrystals />}
-      {tab === 'love'      && <TabLove />}
-      {tab === 'forecasts' && <TabForecasts />}
-      {tab === 'deep'      && <TabDeepDive />}
+      <CategoryPager pages={astroPages} />
     </AppLayout>
   )
 }

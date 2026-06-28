@@ -532,6 +532,16 @@ input[type="range"]::-webkit-slider-thumb {
   from { transform: translateY(18px); opacity: 0; }
   to   { transform: translateY(0);    opacity: 1; }
 }
+@keyframes pagerSlideRight {
+  from { transform: translateX(22px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes pagerSlideLeft {
+  from { transform: translateX(-22px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+.pager-enter-right { animation: pagerSlideRight 0.22s cubic-bezier(0.4,0,0.2,1) both; }
+.pager-enter-left  { animation: pagerSlideLeft  0.22s cubic-bezier(0.4,0,0.2,1) both; }
 @keyframes cardEntrance {
   from { transform: translateY(24px) scale(0.97); opacity: 0; }
   to   { transform: translateY(0)    scale(1);    opacity: 1; }

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Search, Bell, Sun, Moon, Zap, Settings, LogOut } from 'lucide-react'
-import { format } from 'date-fns'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/theme'
@@ -44,9 +44,11 @@ export function DesktopHeader() {
   useEffect(() => {
     function tick() {
       const now = new Date()
-      setTime(format(now, 'h:mm'))
-      setAmpm(format(now, 'a'))
-      setDate(format(now, 'EEE, MMM d'))
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York'
+      const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(undefined, { ...opts, timeZone: tz }).format(now)
+      setTime(fmt({ hour: 'numeric', minute: '2-digit', hour12: true }).replace(/[AP]M/i, '').trim())
+      setAmpm(fmt({ hour: 'numeric', hour12: true }).match(/[AP]M/i)?.[0] ?? '')
+      setDate(fmt({ weekday: 'short', month: 'short', day: 'numeric' }))
       setSeconds(now.getSeconds())
     }
     tick()

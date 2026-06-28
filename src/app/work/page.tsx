@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import { Briefcase, Clock, ExternalLink, Check, RefreshCw, AlertCircle, ChevronRight, Loader2, Mail, Calendar, DollarSign, Users } from 'lucide-react'
 import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
@@ -439,40 +440,31 @@ export default function WorkPage() {
     setDone(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }
 
+  const workPages = [
+    { id: 'command',  label: '⚡ Command',  content: <TabCommand tasks={tasks} stats={stats} loading={loading} /> },
+    { id: 'calendar', label: '📅 Calendar', content: <TabCalendar /> },
+    { id: 'email',    label: '✉️ Email',    content: <TabEmail /> },
+    { id: 'tasks',    label: '✅ Tasks',    content: <TabTasks tasks={tasks} stats={stats} loading={loading} error={error} done={done} toggle={toggle} onSync={load} tab={taskFilter} setTab={setTaskFilter} /> },
+    { id: 'clients',  label: '👥 Clients',  content: <TabClients /> },
+    { id: 'money',    label: '💰 Money',    content: <TabMoney /> },
+  ]
+
   return (
-    <div className="min-h-screen bg-app overflow-x-hidden">
-      <AppLayout>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18, paddingTop: 8 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,196,218,0.12)', border: '1px solid rgba(168,196,218,0.2)' }}>
-            <Briefcase className="h-5 w-5" style={{ color: 'var(--lunar, #A8C4DA)' }} strokeWidth={1.6} />
-          </div>
-          <div>
-            <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1, white)' }}>Work</h1>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-              {loading ? 'Syncing…' : error ? 'Couldn\'t reach DRYP CRM' : `${tasks.filter(t => !done.has(t.id)).length} open tasks`}
-            </p>
-          </div>
+    <AppLayout>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,196,218,0.12)', border: '1px solid rgba(168,196,218,0.2)' }}>
+          <Briefcase className="h-5 w-5" style={{ color: '#A8C4DA' }} strokeWidth={1.6} />
         </div>
-
-        {/* Tab pills */}
-        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(8,4,26,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingTop: 10, paddingBottom: 10, marginBottom: 18, marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 }}>
-          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {WORK_TABS.map(t => (
-              <button key={t.id} onClick={() => setActiveTab(t.id)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer', background: activeTab === t.id ? 'rgba(168,196,218,0.14)' : 'transparent', border: `1px solid ${activeTab === t.id ? 'rgba(168,196,218,0.28)' : 'rgba(255,255,255,0.07)'}`, color: activeTab === t.id ? '#A8C4DA' : 'rgba(255,255,255,0.4)', flexShrink: 0, transition: 'all 0.18s' }}>
-                {t.label}
-              </button>
-            ))}
-          </div>
+        <div>
+          <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>Work</h1>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+            {loading ? 'Syncing…' : error ? 'Couldn\'t reach DRYP CRM' : `${tasks.filter(t => !done.has(t.id)).length} open tasks`}
+          </p>
         </div>
+      </div>
 
-        {activeTab === 'command'  && <TabCommand tasks={tasks} stats={stats} loading={loading} />}
-        {activeTab === 'calendar' && <TabCalendar />}
-        {activeTab === 'email'    && <TabEmail />}
-        {activeTab === 'tasks'    && <TabTasks tasks={tasks} stats={stats} loading={loading} error={error} done={done} toggle={toggle} onSync={load} tab={taskFilter} setTab={setTaskFilter} />}
-        {activeTab === 'clients'  && <TabClients />}
-        {activeTab === 'money'    && <TabMoney />}
-      </AppLayout>
-    </div>
+      <CategoryPager pages={workPages} accentColor="#A8C4DA" />
+    </AppLayout>
   )
 }

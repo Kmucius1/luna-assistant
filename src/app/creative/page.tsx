@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import {
   Sparkles, Star, Scissors, ShirtIcon, Image, BookOpen, Gem, Plus,
   ChevronDown, ChevronRight, Check, RotateCcw, Wand2, Camera,
@@ -1188,80 +1189,30 @@ export default function AtelierPage() {
     }
   }
 
+  const creativePages = [
+    { id: 'oracle',      label: "✨ Today's Style",   content: <OracleSection /> },
+    { id: 'closet',      label: '👗 Closet',           content: <ClosetSection /> },
+    { id: 'inspiration', label: '🖼 Inspiration',      content: <InspirationSection /> },
+    { id: 'projects',    label: '🧵 Sewing',           content: <ProjectsSection /> },
+    { id: 'studio',      label: '🤖 Generated',        content: <StudioSection /> },
+    { id: 'vault',       label: '💎 Fashion Vault',    content: <VaultSection /> },
+    { id: 'shopping',    label: '🛍 Wishlist',         content: <ShoppingSection /> },
+  ]
+
   return (
     <AppLayout>
-      {/* Mobile */}
-      <div className="lg:hidden min-h-screen bg-app">
-        <div className="px-4 pt-6 pb-4">
-          <p className="text-xs font-semibold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-3)' }}>
-            LUNA
-          </p>
-          <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Atelier</h1>
-          <p className="text-sm mt-0.5" style={{ color: 'var(--text-3)' }}>Your fashion world, fully yours.</p>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.2)' }}>
+          <Scissors className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
         </div>
-
-        {/* Section nav */}
-        <div className="px-4 mb-5">
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-            {SECTIONS.map(sec => {
-              const Icon = sec.icon
-              const active = activeSection === sec.id
-              return (
-                <button key={sec.id}
-                  onClick={() => setActiveSection(sec.id)}
-                  className="flex-shrink-0 flex items-center gap-1.5 rounded-full px-4 py-2.5 font-semibold text-sm transition-all"
-                  style={{
-                    background: active ? 'linear-gradient(135deg, #8B6FB8, #6A4F9B)' : 'var(--surface)',
-                    color: active ? '#fff' : 'var(--text-2)',
-                    border: active ? 'none' : '1px solid var(--surface-border)',
-                  }}>
-                  <Icon className="w-3.5 h-3.5" />
-                  {sec.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Section content */}
-        <div className="px-4 pb-32">
-          {renderSection()}
+        <div>
+          <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>Creative</h1>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Your fashion world, fully yours.</p>
         </div>
       </div>
 
-      {/* Desktop */}
-      <div className="hidden lg:flex min-h-screen bg-app">
-        {/* Sidebar */}
-        <div className="w-56 flex-shrink-0 pt-6 px-4 pb-6 flex flex-col gap-1 sticky top-0 h-screen overflow-y-auto"
-          style={{ borderRight: '1px solid var(--surface-border)' }}>
-          <div className="mb-5 px-2">
-            <p className="text-xs font-semibold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-3)' }}>LUNA</p>
-            <h1 className="font-display text-xl font-bold" style={{ color: 'var(--text-1)' }}>Atelier</h1>
-          </div>
-          {SECTIONS.map(sec => {
-            const Icon = sec.icon
-            const active = activeSection === sec.id
-            return (
-              <button key={sec.id}
-                onClick={() => setActiveSection(sec.id)}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3 font-semibold text-sm transition-all text-left w-full"
-                style={{
-                  background: active ? 'rgba(139,111,184,0.15)' : 'transparent',
-                  color: active ? 'var(--violet)' : 'var(--text-2)',
-                  border: active ? '1px solid rgba(139,111,184,0.2)' : '1px solid transparent',
-                }}>
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                {sec.label}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 max-w-2xl mx-auto px-6 py-6 pb-12 overflow-y-auto">
-          {renderSection()}
-        </div>
-      </div>
+      <CategoryPager pages={creativePages} />
     </AppLayout>
   )
 }

@@ -19,10 +19,10 @@ export function AppLayout({ children, noPad, className, darkDesktop }: AppLayout
       {/* Main content */}
       <main className={[
         'mx-auto w-full',
-        'max-w-[860px]',          // Mobile/tablet: 860px feels right
-        'lg:max-w-[1200px]',      // Desktop: 1200px — proper bento grid, side margins on 1440p+
+        'max-w-[1120px]',
+        
         'lg:pt-16',
-        noPad ? '' : 'px-5 lg:px-12',
+        noPad ? '' : 'px-6 md:px-8 lg:px-10',
         'pb-nav lg:pb-[120px]',
         className ?? '',
       ].join(' ')}>

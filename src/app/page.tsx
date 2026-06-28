@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import { Calendar, ChevronRight, Sparkles, Star, Scissors, DollarSign, Moon, Target, BookOpen, Brain, RotateCcw } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -390,23 +391,16 @@ export default function HomePage() {
 
   useEffect(() => { loadData() }, [loadData])
 
+  const homePages = [
+    { id: 'today',    label: 'Today',    content: <PageToday greeting={greeting} moon={moon} guidance={guidance} gLoading={gLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} /> },
+    { id: 'energy',   label: 'Energy',   content: <PageEnergy /> },
+    { id: 'previews', label: 'Previews', content: <PagePreviews moon={moon} guidance={guidance} gLoading={gLoading} /> },
+    { id: 'weekly',   label: 'Weekly',   content: <PageWeekly guidance={guidance} gLoading={gLoading} /> },
+  ]
+
   return (
     <AppLayout>
-      {/* Sub-page pills */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 10, background: 'rgba(8,4,26,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingTop: 12, paddingBottom: 10, marginBottom: 18, marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {HOME_PAGES.map(p => (
-            <button key={p.id} onClick={() => setPage(p.id)} style={{ padding: '7px 16px', borderRadius: 20, fontSize: 13, fontWeight: 700, whiteSpace: 'nowrap', cursor: 'pointer', background: page === p.id ? 'rgba(139,111,184,0.22)' : 'transparent', border: `1px solid ${page === p.id ? 'rgba(139,111,184,0.4)' : 'rgba(255,255,255,0.09)'}`, color: page === p.id ? '#C4A9E8' : 'rgba(255,255,255,0.4)', transition: 'all 0.18s ease', flexShrink: 0 }}>
-              {p.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {page === 'today'    && <PageToday greeting={greeting} moon={moon} guidance={guidance} gLoading={gLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />}
-      {page === 'energy'   && <PageEnergy />}
-      {page === 'previews' && <PagePreviews moon={moon} guidance={guidance} gLoading={gLoading} />}
-      {page === 'weekly'   && <PageWeekly guidance={guidance} gLoading={gLoading} />}
+      <CategoryPager pages={homePages} />
     </AppLayout>
   )
 }

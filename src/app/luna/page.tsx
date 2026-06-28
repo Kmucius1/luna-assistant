@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import {
   Sparkles, Mic, MessageCircle, BookOpen, Star, Archive,
   Send, ChevronRight, ArrowRight, RotateCcw, Pause
@@ -97,45 +98,12 @@ export default function LunaPage() {
   const prompt = JOURNAL_PROMPTS[getTodayIndex(JOURNAL_PROMPTS)]
   const highestSelf = HIGHEST_SELF_MOVES[getTodayIndex(HIGHEST_SELF_MOVES)]
 
-  return (
-    <div className="bg-app min-h-screen">
-      <AppLayout noPad>
-        <div className="lg:max-w-2xl lg:mx-auto lg:pt-20 lg:pb-[110px]">
-        <div className="pt-12 pb-nav flex flex-col min-h-screen lg:min-h-0">
+  const PAGE_IDS: LunaPage[] = ['chat', 'dictate', 'messages', 'journal', 'self', 'vault']
+  const lunaPageIndex = PAGE_IDS.indexOf(page)
 
-          {/* Header */}
-          <div className="px-4 mb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--violet)' }}>LUNA</p>
-            </div>
-            <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1)' }}>
-              Talk. Process. Decide.
-            </h1>
-          </div>
-
-          {/* Sub-page tabs — horizontally scrollable */}
-          <div className="px-4 mb-4">
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-              {PAGES.map(p => (
-                <button key={p.id} onClick={() => setPage(p.id)}
-                  className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition-all"
-                  style={page === p.id
-                    ? { background: 'var(--violet)', color: 'white' }
-                    : { background: 'var(--surface)', color: 'var(--text-2)', border: '1px solid var(--surface-border)' }
-                  }>
-                  <span>{p.emoji}</span> {p.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Page content */}
-          <div className="flex-1 px-4 overflow-y-auto">
-
-            {/* ── Chat ── */}
-            {page === 'chat' && (
-              <div className="flex flex-col h-full">
+  const lunaPages = [
+    { id: 'chat', label: '✦ Chat', content: (
+      <div className="flex flex-col h-full">
                 {/* Starter prompts */}
                 {messages.length <= 1 && (
                   <div className="mb-4 flex flex-wrap gap-2">
@@ -186,11 +154,9 @@ export default function LunaPage() {
                   </button>
                 </div>
               </div>
-            )}
-
-            {/* ── Dictate ── */}
-            {page === 'dictate' && (
-              <div className="space-y-4">
+    ) },
+    { id: 'dictate', label: '🎙 Dictate', content: (
+      <div className="space-y-4">
                 <div className="rounded-2xl p-5 text-center"
                   style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
                   <button onClick={() => setDictating(d => !d)}
@@ -230,11 +196,9 @@ export default function LunaPage() {
                   </Link>
                 </div>
               </div>
-            )}
-
-            {/* ── Messages ── */}
-            {page === 'messages' && (
-              <div className="space-y-4">
+    ) },
+    { id: 'messages', label: '💬 Messages', content: (
+      <div className="space-y-4">
                 <div className="rounded-2xl p-4"
                   style={{ background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))', border: '1px solid rgba(139,111,184,0.2)' }}>
                   <p className="text-xs font-bold mb-2" style={{ color: '#C4A9E8' }}>Communication Coach</p>
@@ -287,11 +251,9 @@ export default function LunaPage() {
                   </button>
                 </Link>
               </div>
-            )}
-
-            {/* ── Journal ── */}
-            {page === 'journal' && (
-              <div className="space-y-4">
+    ) },
+    { id: 'journal', label: '📓 Journal', content: (
+      <div className="space-y-4">
                 <div className="rounded-2xl p-4"
                   style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
                   <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Today&apos;s prompt</p>
@@ -327,11 +289,9 @@ export default function LunaPage() {
                   </Link>
                 </div>
               </div>
-            )}
-
-            {/* ── Highest Self ── */}
-            {page === 'self' && (
-              <div className="space-y-4">
+    ) },
+    { id: 'self', label: '🌟 Highest Self', content: (
+      <div className="space-y-4">
                 <div className="rounded-2xl p-5 relative overflow-hidden"
                   style={{
                     background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))',
@@ -370,11 +330,9 @@ export default function LunaPage() {
                   </button>
                 </Link>
               </div>
-            )}
-
-            {/* ── Vault ── */}
-            {page === 'vault' && (
-              <div className="space-y-4">
+    ) },
+    { id: 'vault', label: '🗄 Vault', content: (
+      <div className="space-y-4">
                 <div className="rounded-2xl p-4"
                   style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
                   <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Park something</p>
@@ -427,12 +385,27 @@ export default function LunaPage() {
                   </button>
                 </Link>
               </div>
-            )}
+    ) },
+  ]
 
-          </div>
+  return (
+    <AppLayout>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.2)' }}>
+          <Sparkles className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
         </div>
+        <div>
+          <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>LUNA</h1>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Talk. Process. Decide.</p>
         </div>
-      </AppLayout>
-    </div>
+      </div>
+
+      <CategoryPager
+        pages={lunaPages}
+        activeIndex={lunaPageIndex}
+        onChangeIndex={(i) => setPage(PAGE_IDS[i])}
+      />
+    </AppLayout>
   )
 }
