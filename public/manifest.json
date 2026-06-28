@@ -1,0 +1,16 @@
+{
+  "name": "LUNA",
+  "short_name": "LUNA",
+  "description": "Your personal AI operating system",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08041a",
+  "theme_color": "#08041a",
+  "icons": [
+    {
+      "src": "/globe.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
