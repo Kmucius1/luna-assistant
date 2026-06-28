@@ -385,7 +385,7 @@ export default function HomePage() {
       .then(r => r.json()).then(d => setGuidance(d)).catch(() => {}).finally(() => setGLoading(false))
     fetch('/api/home/summary')
       .then(r => r.json())
-      .then(d => { if (d.calendar) setCalEvents(d.calendar); if (d.tasks) setTopTasks(d.tasks) })
+      .then(d => { if (d.calendar?.today) setCalEvents(d.calendar.today); if (d.tasks?.top) setTopTasks(d.tasks.top) })
       .catch(() => {}).finally(() => setDataLoaded(true))
   }, [])
 
