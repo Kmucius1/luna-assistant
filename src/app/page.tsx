@@ -249,7 +249,7 @@ function PagePreviews({ moon, guidance, gLoading }: { moon: typeof MOON_PHASES[0
         </div>
       </Link>
 
-      <Link href="/atelier" style={{ textDecoration: 'none' }}>
+      <Link href="/creative" style={{ textDecoration: 'none' }}>
         <div style={{ ...GLASS, padding: '16px 18px', background: 'rgba(90,60,40,0.10)', border: '1px solid rgba(201,160,100,0.18)', cursor: 'pointer' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>

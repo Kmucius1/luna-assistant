@@ -9,7 +9,7 @@ const TABS = [
   { href: '/work',      label: 'Work',      icon: Briefcase },
   { href: '/luna',      label: 'LUNA',      icon: Sparkles  },
   { href: '/astrology', label: 'Astrology', icon: Star      },
-  { href: '/atelier',   label: 'Atelier',   icon: Scissors  },
+  { href: '/creative',  label: 'Creative',  icon: Scissors  },
 ]
 
 export function DesktopTabBar() {
