@@ -10,7 +10,6 @@ export interface CPage {
 interface Props {
   pages: CPage[]
   accentColor?: string
-  /** controlled mode: external index */
   activeIndex?: number
   onChangeIndex?: (i: number) => void
 }
@@ -19,6 +18,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const touchX = useRef(0)
+  const touchY = useRef(0)
   const animKey = useRef(0)
 
   const isControlled = activeIndex !== undefined
@@ -33,8 +33,6 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
     else setInternalActive(i)
   }
 
-  const touchY = useRef(0)
-
   function onTouchStart(e: React.TouchEvent) {
     touchX.current = e.touches[0].clientX
     touchY.current = e.touches[0].clientY
@@ -43,7 +41,6 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
   function onTouchEnd(e: React.TouchEvent) {
     const dx = touchX.current - e.changedTouches[0].clientX
     const dy = touchY.current - e.changedTouches[0].clientY
-    // Require 80px horizontal swipe that is clearly more horizontal than vertical (2.5:1)
     if (Math.abs(dx) < 80) return
     if (Math.abs(dx) < Math.abs(dy) * 2.5) return
     if (dx > 0) goTo(Math.min(active + 1, pages.length - 1))
@@ -54,10 +51,13 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
   const accentFaint = `${accentColor}38`
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-      {/* Tab pills — sticky */}
+    <div
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+    >
       <div style={{
-        position: 'sticky', top: 0, zIndex: 10,
+        flexShrink: 0,
         background: 'rgba(8,4,26,0.92)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
@@ -65,7 +65,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         paddingTop: 10, paddingBottom: 10,
         marginLeft: -24, marginRight: -24,
         paddingLeft: 24, paddingRight: 24,
-        marginBottom: 20,
+        marginBottom: 16,
       }}>
         <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {pages.map((p, i) => {
@@ -95,26 +95,25 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         </div>
       </div>
 
-      {/* Active page — animates on switch */}
-      <div
-        key={`${active}-${animKey.current}`}
-        className={animClass}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        style={{ flex: 1 }}
-      >
-        {pages[active]?.content}
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+        <div
+          key={`${active}-${animKey.current}`}
+          className={animClass}
+          style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingBottom: 24 }}
+        >
+          {pages[active]?.content}
+        </div>
       </div>
 
-      {/* Dot indicators */}
       {pages.length > 1 && (
         <div style={{
+          flexShrink: 0,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           gap: 6,
-          paddingTop: 24,
-          paddingBottom: 8,
+          paddingTop: 10,
+          paddingBottom: 10,
         }}>
           {pages.map((_, i) => (
             <button

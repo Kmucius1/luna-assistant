@@ -7,9 +7,10 @@ const TAB_ROUTES = ['/', '/work', '/luna', '/astrology', '/creative']
 interface SwipeContainerProps {
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
 }
 
-export function SwipeContainer({ children, className }: SwipeContainerProps) {
+export function SwipeContainer({ children, className, style }: SwipeContainerProps) {
   const router = useRouter()
   const pathname = usePathname()
   const tx = useRef(0)
@@ -33,7 +34,7 @@ export function SwipeContainer({ children, className }: SwipeContainerProps) {
   }
 
   return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className={className}>
+    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className={className} style={style}>
       {children}
     </div>
   )

@@ -5,35 +5,48 @@ import { SwipeContainer } from './SwipeContainer'
 
 interface AppLayoutProps {
   children: React.ReactNode
+  noScroll?: boolean
   noPad?: boolean
   className?: string
-  darkDesktop?: boolean
 }
 
-export function AppLayout({ children, noPad, className, darkDesktop }: AppLayoutProps) {
+export function AppLayout({ children, noScroll, noPad, className }: AppLayoutProps) {
   return (
-    <SwipeContainer className="min-h-screen bg-app">
-      {/* Desktop top header — hidden on mobile/tablet */}
+    <SwipeContainer
+      className="bg-app"
+      style={{ height: '100dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+    >
       <DesktopHeader />
 
-      {/* Main content */}
-      <main className={[
-        'mx-auto w-full',
-        'max-w-[1120px]',
-        
-        'lg:pt-16',
-        noPad ? '' : 'px-6 md:px-8 lg:px-10',
-        'pb-nav lg:pb-[120px]',
-        className ?? '',
-      ].join(' ')}>
-        <div className="animate-page-enter content-enter">
-          {children}
-        </div>
+      <main
+        className={['mx-auto w-full max-w-[1120px] lg:pt-16', className ?? ''].join(' ')}
+        style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+      >
+        {noScroll ? (
+          <div
+            className={noPad ? '' : 'px-4 md:px-6'}
+            style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
+          >
+            {children}
+          </div>
+        ) : (
+          <div
+            className={noPad ? '' : 'px-4 md:px-8 lg:px-10'}
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+              paddingBottom: 'calc(var(--nav-h, 80px) + 32px + env(safe-area-inset-bottom, 0px))',
+            }}
+          >
+            <div className="animate-page-enter content-enter">
+              {children}
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Mobile bottom nav */}
       <BottomNav />
-      {/* Desktop bottom tab bar */}
       <DesktopTabBar />
     </SwipeContainer>
   )

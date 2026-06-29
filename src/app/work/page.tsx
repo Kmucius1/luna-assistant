@@ -1,23 +1,23 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
+import { CategoryPager } from '@/components/ui/CategoryPager'
 import {
-  Briefcase, Clock, ExternalLink, Check, AlertCircle, ChevronRight,
-  Loader2, Mail, Calendar, DollarSign, Users, RefreshCw, Zap,
+  Briefcase, Clock, Check, AlertCircle,
+  Loader2, Mail, Calendar, Users, RefreshCw, Zap,
   CheckSquare, CreditCard, BarChart2, Target, Lightbulb, Building2,
   FileText, ArrowUpDown,
 } from 'lucide-react'
 import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function dueDateLabel(dateStr?: string): { label: string; color: string; urgent: boolean } {
   if (!dateStr) return { label: '', color: 'rgba(255,255,255,0.3)', urgent: false }
   const d = new Date(dateStr); const now = new Date()
   const dDay = new Date(d); dDay.setHours(0,0,0,0)
   const today = new Date(now); today.setHours(0,0,0,0)
   const diff = Math.round((dDay.getTime() - today.getTime()) / 86_400_000)
-  if (diff < 0)   return { label: `Overdue`, color: '#E05E5E', urgent: true }
+  if (diff < 0)   return { label: 'Overdue',  color: '#E05E5E', urgent: true }
   if (diff === 0) return { label: 'Due today', color: '#E08B4A', urgent: true }
   if (diff === 1) return { label: 'Tomorrow',  color: '#C9A96E', urgent: false }
   return { label: d.toLocaleDateString('en-US',{month:'short',day:'numeric'}), color: 'rgba(255,255,255,0.3)', urgent: false }
@@ -39,7 +39,6 @@ const LABEL: React.CSSProperties = {
   textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)',
 }
 
-// ─── App grid sections ────────────────────────────────────────────────────────
 const WORK_APPS = [
   {
     section: 'Inbox + Schedule', color: '#A8C4DA',
@@ -70,7 +69,6 @@ const WORK_APPS = [
   },
 ]
 
-// ─── Inline task card ─────────────────────────────────────────────────────────
 function TaskRow({ task, done, onToggle }: { task: DryphubTask; done: boolean; onToggle: () => void }) {
   const due    = dueDateLabel(task.due_date)
   const pColor = PRIORITY_COLORS[task.priority ?? 'low']
@@ -91,7 +89,6 @@ function TaskRow({ task, done, onToggle }: { task: DryphubTask; done: boolean; o
   )
 }
 
-// ─── App icon card ────────────────────────────────────────────────────────────
 function AppCard({ icon: Icon, label, href, color, desc, external }: { icon: React.ElementType; label: string; href: string; color: string; desc: string; external?: boolean }) {
   const inner = (
     <div style={{
@@ -124,7 +121,6 @@ function AppCard({ icon: Icon, label, href, color, desc, external }: { icon: Rea
   return <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link>
 }
 
-// ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function WorkPage() {
   const [tasks,   setTasks]   = useState<DryphubTask[]>([])
   const [stats,   setStats]   = useState<{ openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null>(null)
@@ -146,110 +142,103 @@ export default function WorkPage() {
     setDone(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
   }
 
-  const activeTasks    = tasks.filter(t => t.status !== 'done' && !done.has(t.id))
-  const highPriority   = activeTasks.filter(t => t.priority === 'critical' || t.priority === 'high').sort(sortPriority)
-  const todayBoundary  = new Date(); todayBoundary.setHours(0,0,0,0)
-  const dueTodayTasks  = activeTasks.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); d.setHours(0,0,0,0); return d <= todayBoundary }).sort(sortPriority)
+  const activeTasks   = tasks.filter(t => t.status !== 'done' && !done.has(t.id))
+  const highPriority  = activeTasks.filter(t => t.priority === 'critical' || t.priority === 'high').sort(sortPriority)
+  const todayBoundary = new Date(); todayBoundary.setHours(0,0,0,0)
+  const dueTodayTasks = activeTasks.filter(t => { if (!t.due_date) return false; const d = new Date(t.due_date); d.setHours(0,0,0,0); return d <= todayBoundary }).sort(sortPriority)
+
+  const urgentTasks = [...highPriority.slice(0, 2), ...dueTodayTasks.filter(t => !highPriority.find(h => h.id === t.id)).slice(0, 2)]
+
+  const overviewContent = (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, paddingTop: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,196,218,0.12)', border: '1px solid rgba(168,196,218,0.2)' }}>
+            <Briefcase style={{ width: 20, height: 20, color: '#A8C4DA' }} strokeWidth={1.6} />
+          </div>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: 'white', lineHeight: 1.1 }}>Work</h1>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
+              {loading ? 'Syncing…' : error ? "Couldn't reach DRYP" : `${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''}`}
+            </p>
+          </div>
+        </div>
+        <button onClick={load} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+          {loading ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <RefreshCw style={{ width: 12, height: 12 }} />}
+          Sync
+        </button>
+      </div>
+
+      {(stats || loading) && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
+          {[
+            { label: 'Open',    value: loading ? '—' : String(stats?.openTasks ?? activeTasks.length), color: 'white' },
+            { label: 'Today',   value: loading ? '—' : String(stats?.dueToday ?? 0),    color: (stats?.dueToday ?? 0) > 0 ? '#E08B4A' : 'white' },
+            { label: 'Week',    value: loading ? '—' : String(stats?.dueThisWeek ?? 0), color: 'white' },
+            { label: 'At-risk', value: loading ? '—' : String(stats?.atRiskCount ?? 0), color: (stats?.atRiskCount ?? 0) > 0 ? '#E05E5E' : 'white' },
+          ].map(s => (
+            <div key={s.label} style={{ ...GLASS, borderRadius: 14, padding: '12px 8px', textAlign: 'center' }}>
+              <p style={{ fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</p>
+              <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', marginTop: 4 }}>{s.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && !loading && (
+        <div style={{ ...GLASS, padding: '14px 16px', display: 'flex', gap: 10, background: 'rgba(224,94,94,0.06)', border: '1px solid rgba(224,94,94,0.18)', marginBottom: 14 }}>
+          <AlertCircle style={{ width: 18, height: 18, color: '#E05E5E', flexShrink: 0 }} />
+          <div>
+            <p style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>DRYP CRM unavailable</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Tasks couldn't load. Tap Sync to retry.</p>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div style={{ ...GLASS, overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <p style={{ ...LABEL, color: '#E08B4A99' }}>Needs attention</p>
+            <Link href="/tasks" style={{ fontSize: 11, color: 'rgba(168,196,218,0.5)', textDecoration: 'none' }}>All tasks →</Link>
+          </div>
+          {urgentTasks.length > 0
+            ? urgentTasks.map(task => (
+                <TaskRow key={task.id} task={task} done={done.has(task.id)} onToggle={() => toggle(task.id)} />
+              ))
+            : (
+              <div style={{ padding: '20px', textAlign: 'center' }}>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)' }}>All clear — nothing urgent</p>
+              </div>
+            )
+          }
+        </div>
+      )}
+    </div>
+  )
+
+  const appsContent = (
+    <div>
+      {WORK_APPS.map(section => (
+        <div key={section.section} style={{ marginBottom: 24 }}>
+          <p style={{ ...LABEL, color: section.color + '80', marginBottom: 10 }}>{section.section}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            {section.apps.map(app => (
+              <AppCard key={app.href} {...app} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  const workPages = [
+    { id: 'overview', label: 'Overview', content: overviewContent },
+    { id: 'apps',     label: 'Apps',     content: appsContent },
+  ]
 
   return (
-    <AppLayout noPad className="pt-16">
-      <div style={{ padding: '20px 16px 180px' }}>
-
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,196,218,0.12)', border: '1px solid rgba(168,196,218,0.2)' }}>
-              <Briefcase style={{ width: 20, height: 20, color: '#A8C4DA' }} strokeWidth={1.6} />
-            </div>
-            <div>
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: 'white', lineHeight: 1.1 }}>Work</h1>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>
-                {loading ? 'Syncing…' : error ? "Couldn't reach DRYP" : `${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''}`}
-              </p>
-            </div>
-          </div>
-          <button onClick={load} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
-            {loading ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <RefreshCw style={{ width: 12, height: 12 }} />}
-            Sync
-          </button>
-        </div>
-
-        {/* Stats */}
-        {(stats || loading) && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 20 }}>
-            {[
-              { label: 'Open',      value: loading ? '—' : String(stats?.openTasks ?? activeTasks.length),   color: 'white' },
-              { label: 'Today',     value: loading ? '—' : String(stats?.dueToday ?? 0),    color: (stats?.dueToday ?? 0) > 0 ? '#E08B4A' : 'white' },
-              { label: 'Week',      value: loading ? '—' : String(stats?.dueThisWeek ?? 0), color: 'white' },
-              { label: 'At-risk',   value: loading ? '—' : String(stats?.atRiskCount ?? 0), color: (stats?.atRiskCount ?? 0) > 0 ? '#E05E5E' : 'white' },
-            ].map(s => (
-              <div key={s.label} style={{ ...GLASS, borderRadius: 14, padding: '12px 8px', textAlign: 'center' }}>
-                <p style={{ fontSize: 22, fontWeight: 800, color: s.color, lineHeight: 1 }}>{s.value}</p>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', marginTop: 4 }}>{s.label}</p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Error state */}
-        {error && !loading && (
-          <div style={{ ...GLASS, padding: '14px 16px', display: 'flex', gap: 10, background: 'rgba(224,94,94,0.06)', border: '1px solid rgba(224,94,94,0.18)', marginBottom: 18 }}>
-            <AlertCircle style={{ width: 18, height: 18, color: '#E05E5E', flexShrink: 0 }} />
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'white' }}>DRYP CRM unavailable</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Tasks couldn't load. Tap Sync to retry.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Priority tasks */}
-        {!loading && !error && (highPriority.length > 0 || dueTodayTasks.length > 0) && (
-          <div style={{ ...GLASS, marginBottom: 28, overflow: 'hidden' }}>
-            <div style={{ padding: '12px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <p style={{ ...LABEL, color: '#E08B4A99' }}>Needs attention</p>
-              <Link href="/tasks" style={{ fontSize: 11, color: 'rgba(168,196,218,0.5)', textDecoration: 'none' }}>All tasks →</Link>
-            </div>
-            {[...highPriority.slice(0, 3), ...dueTodayTasks.filter(t => !highPriority.find(h => h.id === t.id)).slice(0, 2)].map(task => (
-              <TaskRow key={task.id} task={task} done={done.has(task.id)} onToggle={() => toggle(task.id)} />
-            ))}
-            {highPriority.length === 0 && dueTodayTasks.length === 0 && (
-              <div style={{ padding: '20px', textAlign: 'center' }}>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)' }}>All clear — nothing urgent 🌙</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* App sections */}
-        {WORK_APPS.map(section => (
-          <div key={section.section} style={{ marginBottom: 26 }}>
-            <p style={{ ...LABEL, color: section.color + '80', marginBottom: 12 }}>{section.section}</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-              {section.apps.map(app => (
-                <AppCard key={app.href} {...app} />
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {/* DRYP CRM quick links */}
-        <div style={{ background: 'rgba(201,169,110,0.05)', border: '1px solid rgba(201,169,110,0.13)', borderRadius: 16, padding: '14px 16px' }}>
-          <p style={{ ...LABEL, color: 'rgba(201,169,110,0.55)', marginBottom: 12 }}>Open in DRYP CRM</p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {[
-              ['My Tasks',  'https://dryphub.com/tasks'],
-              ['Clients',   'https://dryphub.com/accounts'],
-              ['Outreach',  'https://dryphub.com/outreach'],
-              ['Dashboard', 'https://dryphub.com'],
-            ].map(([label, href]) => (
-              <a key={label} href={href} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '7px 13px', borderRadius: 10, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', color: 'rgba(201,169,110,0.8)', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
-                {label} <ExternalLink style={{ width: 11, height: 11 }} />
-              </a>
-            ))}
-          </div>
-        </div>
-
-      </div>
+    <AppLayout noScroll className="pt-16">
+      <CategoryPager pages={workPages} accentColor="#A8C4DA" />
     </AppLayout>
   )
 }

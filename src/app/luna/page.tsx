@@ -118,7 +118,7 @@ export default function LunaPage() {
                 )}
 
                 {/* Messages */}
-                <div className="space-y-3 mb-4 flex-1">
+                <div className="space-y-3 mb-4" style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
                   {messages.map((msg, i) => (
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className="max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed"
@@ -389,7 +389,7 @@ export default function LunaPage() {
   ]
 
   return (
-    <AppLayout>
+    <AppLayout noScroll>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
         <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.2)' }}>
