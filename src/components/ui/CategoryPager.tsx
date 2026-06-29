@@ -5,6 +5,7 @@ export interface CPage {
   id: string
   label: string
   content: ReactNode
+  noScroll?: boolean
 }
 
 interface Props {
@@ -103,7 +104,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         <div
           key={`${active}-${animKey.current}`}
           className={animClass}
-          style={{ height: '100%', overflowY: pageNoScroll ? 'hidden' : 'auto', overflowX: 'hidden', paddingBottom: pageNoScroll ? 0 : 24 }}
+          style={{ height: '100%', overflowY: (pages[active]?.noScroll ?? pageNoScroll) ? 'hidden' : 'auto', overflowX: 'hidden', paddingBottom: (pages[active]?.noScroll ?? pageNoScroll) ? 0 : 24 }}
         >
           {pages[active]?.content}
         </div>

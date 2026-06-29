@@ -2,14 +2,14 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Briefcase, MessageCircle, Moon, Compass } from 'lucide-react'
+import { Home, Briefcase, MessageCircle, Moon, LayoutGrid } from 'lucide-react'
 
 const TABS = [
   { href: '/',          label: 'Home',      icon: Home          },
   { href: '/work',      label: 'Work',      icon: Briefcase     },
   { href: '/luna',      label: 'LUNA',      icon: MessageCircle },
   { href: '/astrology', label: 'Astrology', icon: Moon          },
-  { href: '/explore',   label: 'Explore',   icon: Compass       },
+  { href: '/explore',   label: 'Explore',   icon: LayoutGrid    },
 ]
 
 export function DesktopTabBar() {
