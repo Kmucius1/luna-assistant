@@ -237,7 +237,7 @@ export default function WorkPage() {
   ]
 
   return (
-    <AppLayout noScroll className="pt-16">
+    <AppLayout noScroll>
       <CategoryPager pages={workPages} accentColor="#A8C4DA" />
     </AppLayout>
   )

@@ -48,20 +48,20 @@ const CATEGORIES = [
 
 function AppGrid({ apps }: { apps: AppDef[] }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
       {apps.map(app => (
         <Link key={app.label} href={app.href} style={{ textDecoration: 'none' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '12px 4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 2px' }}>
             <div style={{
-              width: 52, height: 52, borderRadius: 16, flexShrink: 0,
-              background: `rgba(255,255,255,0.05)`,
-              border: `1px solid rgba(255,255,255,0.09)`,
+              width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.09)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22,
+              fontSize: 20,
             }}>
               {app.emoji}
             </div>
-            <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 1.3 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.55)', textAlign: 'center', lineHeight: 1.2, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {app.label}
             </span>
           </div>
@@ -99,20 +99,18 @@ export default function ExplorePage() {
     id: cat.id,
     label: cat.label,
     content: (
-      <div style={{ paddingTop: 4 }}>
+      <div style={{ paddingTop: 4, display: 'flex', flexDirection: 'column', height: '100%' }}>
         <SearchBar value={query} onChange={setQuery} />
-        <AppGrid apps={filtered ?? cat.apps} />
+        <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+          <AppGrid apps={filtered ?? cat.apps} />
+        </div>
       </div>
     ),
   }))
 
   return (
-    <AppLayout noScroll className="pt-0 lg:pt-16">
-      <div style={{ padding: '8px 0 4px', flexShrink: 0 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>Explore</h1>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 2 }}>All of your apps in one place</p>
-      </div>
-      <div style={{ flex: 1, overflow: 'hidden', marginTop: 8 }}>
+    <AppLayout noScroll>
+      <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <CategoryPager pages={pages} accentColor="#8B6FB8" />
       </div>
     </AppLayout>
