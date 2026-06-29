@@ -6,7 +6,7 @@ import { CategoryPager } from '@/components/ui/CategoryPager'
 import {
   Calendar, ChevronRight, Sparkles, Star, Scissors, DollarSign, Moon, Target,
   BookOpen, Brain, RotateCcw, MessageSquare, Briefcase, Heart, Gem, Feather,
-  Clock, BarChart2, CreditCard, Users, Mail, CheckSquare, Zap, Sunset,
+  Clock, BarChart2, CreditCard, Users, Mail, CheckSquare, Zap, Sunset, Check, Loader2,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -203,11 +203,11 @@ const APP_SECTIONS = [
     label: 'WORK', color: '#A8C4DA',
     apps: [
       { icon: Zap,         label: 'Command',       href: '/work',             color: '#A8C4DA' },
-      { icon: Calendar,    label: 'Calendar',      href: '/work?tab=calendar',color: '#8AAEC8' },
-      { icon: Mail,        label: 'Email',         href: '/work?tab=email',   color: '#7A9EB8' },
-      { icon: CheckSquare, label: 'Tasks',         href: '/work?tab=tasks',   color: '#6A8EA8' },
-      { icon: Users,       label: 'Clients',       href: '/work?tab=clients', color: '#5A7E98' },
-      { icon: DollarSign,  label: 'Money',         href: '/work?tab=money',   color: '#C9A96E' },
+      { icon: Calendar,    label: 'Calendar',      href: '/calendar',         color: '#8AAEC8' },
+      { icon: Mail,        label: 'Email',         href: '/email',            color: '#7A9EB8' },
+      { icon: CheckSquare, label: 'Tasks',         href: '/tasks',            color: '#6A8EA8' },
+      { icon: Users,       label: 'Clients',       href: '/dryp-hub',         color: '#5A7E98' },
+      { icon: DollarSign,  label: 'Money',         href: '/money/transactions', color: '#C9A96E' },
     ],
   },
   {
@@ -293,20 +293,59 @@ const MOODS = [
 ]
 const BODY_NEEDS = ['Rest', 'Water', 'Movement', 'Sunlight', 'Food', 'Quiet', 'Connection', 'Focus']
 
-function PageEnergy() {
-  const [mood,   setMood]   = useState<string | null>(null)
-  const [body,   setBody]   = useState<string | null>(null)
-  const [energy, setEnergy] = useState<number | null>(null)
-  const [mode,   setMode]   = useState<'normal' | 'recovery' | 'rush'>('normal')
+const MODES = [
+  { id: 'normal'   as const, label: '✦ Normal',   bg: 'rgba(139,111,184,0.12)', border: 'rgba(139,111,184,0.3)', color: '#C4A9E8', hint: '' },
+  { id: 'recovery' as const, label: '🌿 Recovery', bg: 'rgba(90,138,90,0.12)',   border: 'rgba(90,138,90,0.3)',   color: '#8AB88A', hint: 'Rest first. Protect your energy. Do only what truly matters.' },
+  { id: 'rush'     as const, label: '⚡ Rush',      bg: 'rgba(201,120,60,0.12)',  border: 'rgba(201,120,60,0.3)',  color: '#C9A96E', hint: 'High output mode. Triage ruthlessly. Block distractions. Move fast.' },
+]
 
-  const MODES = [
-    { id: 'normal'   as const, label: '✦ Normal',   bg: 'rgba(139,111,184,0.12)', border: 'rgba(139,111,184,0.3)', color: '#C4A9E8' },
-    { id: 'recovery' as const, label: '🌿 Recovery', bg: 'rgba(90,138,90,0.12)',   border: 'rgba(90,138,90,0.3)',   color: '#8AB88A' },
-    { id: 'rush'     as const, label: '⚡ Rush',      bg: 'rgba(201,120,60,0.12)',  border: 'rgba(201,120,60,0.3)',  color: '#C9A96E' },
-  ]
+function PageEnergy() {
+  const [mood,     setMood]     = useState<string | null>(null)
+  const [body,     setBody]     = useState<string[]>([])
+  const [energy,   setEnergy]   = useState<number | null>(null)
+  const [mode,     setMode]     = useState<'normal' | 'recovery' | 'rush'>('normal')
+  const [feeling,  setFeeling]  = useState('')
+  const [onMind,   setOnMind]   = useState('')
+  const [saving,   setSaving]   = useState(false)
+  const [saved,    setSaved]    = useState(false)
+  const [saveErr,  setSaveErr]  = useState(false)
+
+  const activeMode = MODES.find(m => m.id === mode)!
+
+  function toggleBody(n: string) {
+    setBody(prev => prev.includes(n) ? prev.filter(x => x !== n) : [...prev, n])
+  }
+
+  async function handleSave() {
+    setSaving(true); setSaved(false); setSaveErr(false)
+    try {
+      const res = await fetch('/api/check-ins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'midday',
+          energyRating: energy,
+          moodRating: null,
+          feeling: [mood, ...body].filter(Boolean).join(', ') || feeling || null,
+          onMind: onMind || null,
+          supportNeed: mode !== 'normal' ? mode : null,
+          aiResponse: { mode, mood, bodyNeeds: body, energyLevel: energy, feeling, onMind },
+        }),
+      })
+      if (!res.ok) throw new Error('failed')
+      setSaved(true)
+      setTimeout(() => setSaved(false), 4000)
+    } catch {
+      setSaveErr(true)
+      setTimeout(() => setSaveErr(false), 4000)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      {/* Mode */}
       <div style={{ ...GLASS, padding: '14px 18px' }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 10 }}>Today's Mode</p>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -316,10 +355,10 @@ function PageEnergy() {
             </button>
           ))}
         </div>
-        {mode === 'recovery' && <p style={{ fontSize: 12, color: 'rgba(138,184,138,0.7)', marginTop: 8, lineHeight: 1.5 }}>Rest first. Protect your energy. Do only what truly matters.</p>}
-        {mode === 'rush'     && <p style={{ fontSize: 12, color: 'rgba(201,169,110,0.7)', marginTop: 8, lineHeight: 1.5 }}>High output mode. Triage ruthlessly. Block distractions. Move fast.</p>}
+        {activeMode.hint && <p style={{ fontSize: 12, color: activeMode.color + 'B3', marginTop: 8, lineHeight: 1.5 }}>{activeMode.hint}</p>}
       </div>
 
+      {/* Energy level */}
       <div style={{ ...GLASS, padding: '14px 18px' }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 10 }}>Energy Level</p>
         <div style={{ display: 'flex', gap: 5 }}>
@@ -331,11 +370,12 @@ function PageEnergy() {
         </div>
       </div>
 
+      {/* Mood */}
       <div style={{ ...GLASS, padding: '14px 18px' }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 10 }}>Mood</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
           {MOODS.map(m => (
-            <button key={m.label} onClick={() => setMood(m.label)} style={{ padding: '10px 4px', borderRadius: 12, border: `1px solid ${mood === m.label ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: mood === m.label ? 'rgba(139,111,184,0.15)' : 'rgba(255,255,255,0.04)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <button key={m.label} onClick={() => setMood(mood === m.label ? null : m.label)} style={{ padding: '10px 4px', borderRadius: 12, border: `1px solid ${mood === m.label ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: mood === m.label ? 'rgba(139,111,184,0.15)' : 'rgba(255,255,255,0.04)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
               <span style={{ fontSize: 20 }}>{m.emoji}</span>
               <span style={{ fontSize: 10, fontWeight: 600, color: mood === m.label ? '#C4A9E8' : 'rgba(255,255,255,0.4)' }}>{m.label}</span>
             </button>
@@ -343,16 +383,64 @@ function PageEnergy() {
         </div>
       </div>
 
+      {/* Body needs */}
       <div style={{ ...GLASS, padding: '14px 18px' }}>
         <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 10 }}>Body Needs</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {BODY_NEEDS.map(n => (
-            <button key={n} onClick={() => setBody(body === n ? null : n)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: `1px solid ${body === n ? 'rgba(168,196,218,0.4)' : 'rgba(255,255,255,0.09)'}`, background: body === n ? 'rgba(168,196,218,0.12)' : 'transparent', color: body === n ? '#A8C4DA' : 'rgba(255,255,255,0.4)' }}>
+            <button key={n} onClick={() => toggleBody(n)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: `1px solid ${body.includes(n) ? 'rgba(168,196,218,0.4)' : 'rgba(255,255,255,0.09)'}`, background: body.includes(n) ? 'rgba(168,196,218,0.12)' : 'transparent', color: body.includes(n) ? '#A8C4DA' : 'rgba(255,255,255,0.4)' }}>
               {n}
             </button>
           ))}
         </div>
       </div>
+
+      {/* How are you feeling + what's on your mind */}
+      <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 8 }}>How are you feeling?</p>
+          <input
+            value={feeling}
+            onChange={e => setFeeling(e.target.value)}
+            placeholder="In your own words…"
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+          />
+        </div>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 8 }}>What's on your mind?</p>
+          <textarea
+            value={onMind}
+            onChange={e => setOnMind(e.target.value)}
+            placeholder="Anything taking up space in your head…"
+            rows={3}
+            style={{ width: '100%', padding: '10px 14px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'white', fontSize: 13, outline: 'none', resize: 'none', lineHeight: 1.5, boxSizing: 'border-box' }}
+          />
+        </div>
+      </div>
+
+      {/* Save button */}
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        style={{
+          padding: '14px 24px', borderRadius: 16,
+          border: `1px solid ${saved ? 'rgba(138,184,138,0.3)' : saveErr ? 'rgba(224,94,94,0.25)' : 'rgba(139,111,184,0.3)'}`,
+          background: saved ? 'rgba(138,184,138,0.22)' : saveErr ? 'rgba(224,94,94,0.18)' : 'rgba(139,111,184,0.22)',
+          color: saved ? '#8AB88A' : saveErr ? '#E05E5E' : '#C4A9E8',
+          fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          transition: 'background 0.2s',
+        }}
+      >
+        {saving
+          ? <><Loader2 style={{ width: 16, height: 16 }} className="animate-spin" /> Saving…</>
+          : saved
+          ? <><Check style={{ width: 16, height: 16 }} /> Saved to LUNA memory</>
+          : saveErr
+          ? 'Something went wrong — tap to retry'
+          : 'Save check-in'
+        }
+      </button>
     </div>
   )
 }
