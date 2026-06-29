@@ -2,7 +2,7 @@
 import { useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
-const TAB_ROUTES = ['/', '/work', '/luna', '/astrology', '/creative']
+const TAB_ROUTES = ['/', '/work', '/luna', '/astrology', '/explore']
 
 interface SwipeContainerProps {
   children: React.ReactNode

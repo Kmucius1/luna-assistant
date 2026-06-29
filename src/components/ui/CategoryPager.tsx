@@ -12,9 +12,10 @@ interface Props {
   accentColor?: string
   activeIndex?: number
   onChangeIndex?: (i: number) => void
+  hidePills?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex }: Props) {
+export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const touchX = useRef(0)
@@ -56,7 +57,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
       onTouchEnd={onTouchEnd}
       style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
     >
-      <div style={{
+      {!hidePills && <div style={{
         flexShrink: 0,
         background: 'rgba(8,4,26,0.92)',
         backdropFilter: 'blur(24px)',
@@ -93,7 +94,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
             )
           })}
         </div>
-      </div>
+      </div>}
 
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
         <div

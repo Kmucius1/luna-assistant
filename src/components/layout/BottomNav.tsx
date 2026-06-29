@@ -1,14 +1,14 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Briefcase, Sparkles, Star, Scissors } from 'lucide-react'
+import { Home, Briefcase, MessageCircle, Moon, Compass } from 'lucide-react'
 
 const TABS = [
-  { href: '/',          label: 'Home',      icon: Home      },
-  { href: '/work',      label: 'Work',      icon: Briefcase },
-  { href: '/luna',      label: 'LUNA',      icon: Sparkles  },
-  { href: '/astrology', label: 'Astrology', icon: Star      },
-  { href: '/creative',  label: 'Creative',  icon: Scissors  },
+  { href: '/',          label: 'Home',      icon: Home          },
+  { href: '/work',      label: 'Work',      icon: Briefcase     },
+  { href: '/luna',      label: 'LUNA',      icon: MessageCircle },
+  { href: '/astrology', label: 'Astrology', icon: Moon          },
+  { href: '/explore',   label: 'Explore',   icon: Compass       },
 ]
 
 function isActive(pathname: string, href: string) {
@@ -21,48 +21,52 @@ export function BottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-0 left-0 right-0 z-40"
+      className="lg:hidden fixed bottom-4 left-4 right-4 z-50"
       style={{
-        height: 'var(--nav-h)',
-        background: 'var(--nav-bg)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderTop: '1px solid var(--nav-border)',
+        borderRadius: 36,
+        border: '1px solid rgba(255,255,255,0.09)',
+        background: 'rgba(10,6,28,0.88)',
+        backdropFilter: 'blur(28px)',
+        WebkitBackdropFilter: 'blur(28px)',
+        boxShadow: '0 0 48px rgba(100,60,200,0.18), 0 2px 24px rgba(0,0,0,0.5)',
+      }}
+    >
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: 2, padding: '10px 10px',
       }}>
-      <div className="flex items-center h-full max-w-xl mx-auto px-1">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(pathname, href)
           return (
-            <Link key={href} href={href}
-              className="flex flex-col items-center justify-center flex-1 py-1 relative"
-              style={{ minHeight: 56 }}>
-
-              {active && (
-                <div className="absolute inset-x-1 inset-y-1 rounded-2xl"
-                  style={{
-                    background: 'rgba(139,111,184,0.15)',
-                    border: '1px solid rgba(139,111,184,0.20)',
-                    transition: 'opacity 0.2s ease',
-                  }} />
-              )}
-
-              <div className="relative z-10 flex flex-col items-center gap-0.5">
-                <Icon className="h-5 w-5"
-                  style={{
-                    color: active ? 'var(--violet)' : 'var(--tab-inactive-text)',
-                    strokeWidth: active ? 2.2 : 1.6,
-                    transition: 'color 0.2s, stroke-width 0.2s',
-                  }} />
-                <span style={{
-                  fontSize: 9,
-                  fontWeight: active ? 700 : 500,
-                  color: active ? 'var(--violet)' : 'var(--tab-inactive-text)',
-                  transition: 'color 0.2s, font-weight 0.2s',
-                  lineHeight: 1,
-                }}>
-                  {label}
-                </span>
-              </div>
+            <Link
+              key={href}
+              href={href}
+              style={{
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                padding: '8px 4px 6px',
+                borderRadius: 26,
+                textDecoration: 'none',
+                background: active ? 'rgba(124,58,237,0.28)' : 'transparent',
+                boxShadow: active ? '0 0 20px rgba(139,92,246,0.30)' : 'none',
+                transition: 'all 0.18s ease',
+              }}
+            >
+              <Icon
+                style={{
+                  width: 22, height: 22,
+                  color: active ? '#C4A9E8' : 'rgba(255,255,255,0.38)',
+                  strokeWidth: active ? 2 : 1.5,
+                  transition: 'color 0.18s',
+                }}
+              />
+              <span style={{
+                fontSize: 10, marginTop: 4, fontWeight: active ? 700 : 500,
+                color: active ? 'white' : 'rgba(255,255,255,0.35)',
+                letterSpacing: '0.01em',
+              }}>
+                {label}
+              </span>
             </Link>
           )
         })}
