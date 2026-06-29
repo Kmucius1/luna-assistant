@@ -268,7 +268,7 @@ export default function SettingsPage() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 16px 120px' }}>
+        <div style={{ padding: '20px 16px 180px' }}>
 
           {/* Page title */}
           <div style={{ marginBottom: 20 }}>

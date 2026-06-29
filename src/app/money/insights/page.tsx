@@ -45,7 +45,7 @@ export default function InsightsPage() {
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 16px 120px' }}>
+        <div style={{ padding: '20px 16px 180px' }}>
 
           <div style={{ marginBottom: 24 }}>
             <h1 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'var(--font-display, sans-serif)', marginBottom: 4 }}>Money Insights</h1>

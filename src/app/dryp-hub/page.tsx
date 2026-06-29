@@ -88,7 +88,7 @@ export default function DryphubPage() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '0 0 120px' }}>
+        <div style={{ padding: '0 0 180px' }}>
 
           {/* Header */}
           <div style={{ padding: '20px 20px 0' }}>

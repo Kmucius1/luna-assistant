@@ -234,7 +234,7 @@ export default function TarotPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg, #0f0a1a 0%, #12101f 50%, #0a0f18 100%)' }}>
       <AppLayout noPad>
-        <div style={{ padding: '64px 16px 120px' }}>
+        <div style={{ padding: '64px 16px 180px' }}>
 
           {/* ── SPREAD SELECT ─────────────────────────────── */}
           {view === 'spread-select' && (

@@ -209,7 +209,7 @@ export default function CommunicationCoach() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 20px 120px' }}>
+        <div style={{ padding: '20px 20px 180px' }}>
 
           {/* Page header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>

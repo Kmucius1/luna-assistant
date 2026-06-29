@@ -128,7 +128,7 @@ export default function ReviewPage() {
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 16px 120px' }}>
+        <div style={{ padding: '20px 16px 180px' }}>
 
           {/* Toast area */}
           <div style={{ position: 'fixed', top: 72, right: 12, left: 12, zIndex: 999, display: 'flex', flexDirection: 'column', gap: 6, pointerEvents: 'none' }}>

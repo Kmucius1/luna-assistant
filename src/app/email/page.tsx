@@ -398,7 +398,7 @@ function EmailInner() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '0 16px 120px' }}>
+        <div style={{ padding: '0 16px 180px' }}>
 
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>

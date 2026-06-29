@@ -384,7 +384,7 @@ p, li { line-height: 1.65; }
 nav .text-xs, nav .text-sm { font-size: 0.8rem !important; }
 
 /* ─── Bottom nav safe area ──────────────────────────────────── */
-.pb-nav { padding-bottom: calc(var(--nav-h) + 52px); }
+.pb-nav { padding-bottom: calc(var(--nav-h) + 100px + env(safe-area-inset-bottom, 0px)); }
 
 /* ─── Desktop overrides ─────────────────────────────────────── */
 @media (min-width: 1024px) {

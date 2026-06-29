@@ -181,7 +181,7 @@ export default function HighestSelfPage() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '0 0 120px' }}>
+        <div style={{ padding: '0 0 180px' }}>
 
           {/* Hero — always visible */}
           <div style={{ background: 'linear-gradient(160deg, rgba(201,169,110,0.2) 0%, rgba(80,40,120,0.15) 50%, transparent 100%)', padding: '20px 20px 24px' }}>

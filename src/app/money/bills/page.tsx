@@ -113,7 +113,7 @@ export default function BillsPage() {
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 16px 120px' }}>
+        <div style={{ padding: '20px 16px 180px' }}>
 
           {/* Header */}
           <div style={{ marginBottom: 20 }}>

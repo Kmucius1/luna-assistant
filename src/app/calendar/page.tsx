@@ -134,7 +134,7 @@ export default function CalendarPage() {
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '0 0 120px' }}>
+        <div style={{ padding: '0 0 180px' }}>
 
           <div style={{ padding: '20px 20px 0' }}>
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>

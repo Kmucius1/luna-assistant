@@ -169,7 +169,7 @@ export default function BusinessExpensesPage() {
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '20px 16px 120px' }}>
+        <div style={{ padding: '20px 16px 180px' }}>
 
           <div style={{ marginBottom: 18 }}>
             <h1 style={{ fontSize: 24, fontWeight: 700, color: 'white', letterSpacing: '-0.02em', marginBottom: 4 }}>Business Expenses</h1>

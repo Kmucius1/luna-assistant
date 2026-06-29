@@ -87,7 +87,7 @@ export default function PlanMyDayPage() {
   return (
     <div className="min-h-screen bg-app overflow-x-hidden">
       <AppLayout noPad className="pt-16">
-        <div style={{ padding: '0 0 120px' }}>
+        <div style={{ padding: '0 0 180px' }}>
 
           {/* Header */}
           <div style={{ background: 'linear-gradient(160deg, rgba(139,111,184,0.18) 0%, rgba(90,63,136,0.1) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
