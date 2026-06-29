@@ -201,9 +201,9 @@ function Slide1({
       </div>
 
       {/* ── Today's Top 3 + Next Event ────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr', gap: 7 }}>
         {/* Top 3 */}
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px' }}>
+        <div style={{ ...G, borderRadius: 18, padding: '10px 11px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={LBL}><Target style={{ width: 10, height: 10 }} />Top 3</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 6 }}>
             {tasks.map((t, i) => (

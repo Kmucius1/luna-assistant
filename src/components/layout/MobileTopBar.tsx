@@ -47,7 +47,9 @@ export function MobileTopBar() {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '10px 18px 8px', flexShrink: 0,
+      paddingTop: 'calc(env(safe-area-inset-top, 44px) + 4px)',
+      paddingLeft: 18, paddingRight: 18, paddingBottom: 8,
+      flexShrink: 0,
     }}>
       {/* Left: moon + phase + time + tagline */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
