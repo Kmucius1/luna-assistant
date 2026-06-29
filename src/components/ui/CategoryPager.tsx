@@ -33,14 +33,20 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
     else setInternalActive(i)
   }
 
+  const touchY = useRef(0)
+
   function onTouchStart(e: React.TouchEvent) {
     touchX.current = e.touches[0].clientX
+    touchY.current = e.touches[0].clientY
   }
 
   function onTouchEnd(e: React.TouchEvent) {
-    const diff = touchX.current - e.changedTouches[0].clientX
-    if (Math.abs(diff) < 40) return
-    if (diff > 0) goTo(Math.min(active + 1, pages.length - 1))
+    const dx = touchX.current - e.changedTouches[0].clientX
+    const dy = touchY.current - e.changedTouches[0].clientY
+    // Require 80px horizontal swipe that is clearly more horizontal than vertical (2.5:1)
+    if (Math.abs(dx) < 80) return
+    if (Math.abs(dx) < Math.abs(dy) * 2.5) return
+    if (dx > 0) goTo(Math.min(active + 1, pages.length - 1))
     else goTo(Math.max(active - 1, 0))
   }
 
