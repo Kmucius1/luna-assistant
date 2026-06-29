@@ -444,8 +444,8 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
   return (
     <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
 
-      {/* Weekly Focus */}
-      <div style={{ ...G, borderRadius: 18, padding: '11px 13px', flexShrink: 0 }}>
+      {/* Weekly Focus — flex:1 so it fills space and pushes Plan my week to the bottom */}
+      <div style={{ ...G, borderRadius: 18, padding: '11px 13px', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div style={LBL}><Target style={{ width: 9, height: 9 }} />WEEKLY FOCUS</div>
         <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: '0 0 3px', lineHeight: 1.2 }}>
           One lane gets your energy this week.
