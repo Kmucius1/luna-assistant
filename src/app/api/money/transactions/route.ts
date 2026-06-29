@@ -59,3 +59,45 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch transactions' }, { status: 500 })
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const db = createAdminClient()
+    const body = await req.json() as {
+      merchant_name?: string
+      name?: string
+      amount: number
+      transaction_date: string
+      is_income?: boolean
+      expense_type?: string
+      category_primary?: string
+      account_name?: string
+      notes?: string
+      is_business_expense?: boolean
+    }
+
+    const { data, error } = await db
+      .from('money_transactions')
+      .insert({
+        ...body,
+        user_id: ZOE_USER_ID,
+        name: body.name || body.merchant_name || 'Manual entry',
+        plaid_transaction_id: `manual_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+        is_income: body.is_income ?? false,
+        pending: false,
+        needs_review: false,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[transactions] insert error:', error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ transaction: data })
+  } catch (error) {
+    console.error('[transactions] POST error:', error)
+    return NextResponse.json({ error: 'Failed to create transaction' }, { status: 500 })
+  }
+}
