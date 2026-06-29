@@ -36,7 +36,7 @@ export function AppLayout({ children, noScroll, noPad, className }: AppLayoutPro
               flex: 1,
               overflowY: 'auto',
               overflowX: 'hidden',
-              paddingBottom: 'calc(var(--nav-h, 80px) + 32px + env(safe-area-inset-bottom, 0px))',
+              paddingBottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)) + 94px)',
             }}
           >
             <div className="animate-page-enter content-enter">

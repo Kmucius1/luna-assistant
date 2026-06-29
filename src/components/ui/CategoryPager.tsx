@@ -43,8 +43,10 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
   function onTouchEnd(e: React.TouchEvent) {
     const dx = touchX.current - e.changedTouches[0].clientX
     const dy = touchY.current - e.changedTouches[0].clientY
-    if (Math.abs(dx) < 80) return
-    if (Math.abs(dx) < Math.abs(dy) * 2.5) return
+    if (Math.abs(dx) < 60) return
+    if (Math.abs(dx) < Math.abs(dy) * 2) return
+    // Stop bubbling so SwipeContainer doesn't ALSO fire for the same gesture
+    e.stopPropagation()
     if (dx > 0) goTo(Math.min(active + 1, pages.length - 1))
     else goTo(Math.max(active - 1, 0))
   }
@@ -56,7 +58,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
     <div
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', touchAction: 'pan-y' }}
     >
       {!hidePills && <div style={{
         flexShrink: 0,
@@ -97,7 +99,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         </div>
       </div>}
 
-      <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
+      <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
         <div
           key={`${active}-${animKey.current}`}
           className={animClass}

@@ -21,8 +21,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="lg:hidden fixed bottom-4 left-4 right-4 z-50"
+      className="lg:hidden fixed left-4 right-4 z-50"
       style={{
+        bottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)) + 6px)',
         borderRadius: 36,
         border: '1px solid rgba(255,255,255,0.09)',
         background: 'rgba(10,6,28,0.88)',

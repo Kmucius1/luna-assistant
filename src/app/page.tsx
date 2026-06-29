@@ -65,9 +65,9 @@ const PAGE: React.CSSProperties = {
 function CSSMoon({ size = 130 }: { size?: number }) {
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <div style={{ position: 'absolute', inset: -24, borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,130,60,0.14) 0%, transparent 70%)' }} />
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(ellipse at 38% 36%, #fce8a8 0%, #e0b84a 22%, #b07820 52%, #7a5010 76%, #3c2408 100%)', boxShadow: '0 0 40px rgba(200,145,50,0.28), 0 0 80px rgba(160,100,20,0.12)' }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: ['radial-gradient(circle at 28% 68%, rgba(0,0,0,0.18) 0%, transparent 18%)', 'radial-gradient(circle at 62% 32%, rgba(255,255,255,0.07) 0%, transparent 22%)', 'radial-gradient(circle at 50% 55%, rgba(0,0,0,0.12) 0%, transparent 16%)'].join(', ') }} />
+      <div style={{ position: 'absolute', top: -24, right: -24, bottom: -24, left: -24, borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,130,60,0.14) 0%, transparent 70%)' }} />
+      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '50%', background: 'radial-gradient(ellipse at 38% 36%, #fce8a8 0%, #e0b84a 22%, #b07820 52%, #7a5010 76%, #3c2408 100%)', boxShadow: '0 0 40px rgba(200,145,50,0.28), 0 0 80px rgba(160,100,20,0.12)' }}>
+        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '50%', background: ['radial-gradient(circle at 28% 68%, rgba(0,0,0,0.18) 0%, transparent 18%)', 'radial-gradient(circle at 62% 32%, rgba(255,255,255,0.07) 0%, transparent 22%)', 'radial-gradient(circle at 50% 55%, rgba(0,0,0,0.12) 0%, transparent 16%)'].join(', ') }} />
       </div>
     </div>
   )
@@ -79,9 +79,9 @@ function StarSigil({ size = 72 }: { size?: number }) {
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       {[c * 0.95, c * 0.72, c * 0.48, c * 0.26].map((r, i) => (
-        <div key={i} style={{ position: 'absolute', inset: `${c - r}px`, borderRadius: '50%', border: `0.5px solid rgba(139,111,184,${0.12 + i * 0.1})` }} />
+        <div key={i} style={{ position: 'absolute', top: `${c - r}px`, right: `${c - r}px`, bottom: `${c - r}px`, left: `${c - r}px`, borderRadius: '50%', border: `0.5px solid rgba(139,111,184,${0.12 + i * 0.1})` }} />
       ))}
-      <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 8px rgba(196,169,232,0.7))' }} viewBox={`0 0 ${size} ${size}`}>
+      <svg style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 8px rgba(196,169,232,0.7))' }} viewBox={`0 0 ${size} ${size}`}>
         <path d={`M${c} ${c * 0.07} L${c + c * 0.045} ${c - c * 0.045} L${c * 1.93} ${c} L${c + c * 0.045} ${c + c * 0.045} L${c} ${c * 1.93} L${c - c * 0.045} ${c + c * 0.045} L${c * 0.07} ${c} L${c - c * 0.045} ${c - c * 0.045} Z`} fill="rgba(220,200,255,0.92)" />
         <circle cx={c} cy={c} r={c * 0.065} fill="white" opacity="0.95" />
       </svg>
@@ -119,7 +119,7 @@ function TileHero({ greeting, moon }: { greeting: string; moon: typeof MOON_PHAS
         justifyContent: 'flex-end',
         padding: '28px 26px',
       }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 25% 15%, rgba(139,111,184,0.18) 0%, transparent 55%)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, background: 'radial-gradient(ellipse at 25% 15%, rgba(139,111,184,0.18) 0%, transparent 55%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', top: -12, right: -14, pointerEvents: 'none' }}>
           <CSSMoon size={155} />
         </div>
@@ -536,7 +536,16 @@ export default function HomePage() {
       </div>
 
       <main
-        style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', padding: '0 16px' }}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '0 16px',
+          // Clear the fixed dock + safe-area inset so dots are never hidden behind it
+          paddingBottom: 'calc(max(16px, env(safe-area-inset-bottom, 0px)) + 84px)',
+        }}
         className="mx-auto w-full max-w-[1120px]"
       >
         <CategoryPager

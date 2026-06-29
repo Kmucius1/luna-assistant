@@ -34,7 +34,12 @@ export function SwipeContainer({ children, className, style }: SwipeContainerPro
   }
 
   return (
-    <div onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} className={className} style={style}>
+    <div
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      className={className}
+      style={{ touchAction: 'pan-y', ...style }}
+    >
       {children}
     </div>
   )
