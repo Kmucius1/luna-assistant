@@ -13,9 +13,10 @@ interface Props {
   activeIndex?: number
   onChangeIndex?: (i: number) => void
   hidePills?: boolean
+  pageNoScroll?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills }: Props) {
+export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const touchX = useRef(0)
@@ -100,7 +101,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         <div
           key={`${active}-${animKey.current}`}
           className={animClass}
-          style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', paddingBottom: 24 }}
+          style={{ height: '100%', overflowY: pageNoScroll ? 'hidden' : 'auto', overflowX: 'hidden', paddingBottom: pageNoScroll ? 0 : 24 }}
         >
           {pages[active]?.content}
         </div>
