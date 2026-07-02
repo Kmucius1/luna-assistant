@@ -754,12 +754,20 @@ export default function HomePage() {
         style={{
           flex: 1, minHeight: 0, overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
-          paddingLeft: 16, paddingRight: 16,
           paddingBottom: 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)',
         }}
-        className="mx-auto w-full max-w-[1120px] lg:pt-16 lg:pl-56"
+        className="w-full lg:pt-16 lg:pl-56"
       >
-        <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
+        <div
+          style={{
+            flex: 1, minHeight: 0, overflow: 'hidden',
+            display: 'flex', flexDirection: 'column',
+            paddingLeft: 16, paddingRight: 16,
+          }}
+          className="mx-auto w-full max-w-[1120px]"
+        >
+          <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
+        </div>
       </main>
 
       <BottomNav />
