@@ -432,6 +432,7 @@ function LunaPageInner() {
         pages={lunaPages}
         activeIndex={lunaPageIndex}
         onChangeIndex={(i) => setPage(PAGE_IDS[i])}
+        disableSwipe
       />
     </AppLayout>
   )

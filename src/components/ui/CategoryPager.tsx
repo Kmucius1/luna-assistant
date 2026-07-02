@@ -15,9 +15,12 @@ interface Props {
   onChangeIndex?: (i: number) => void
   hidePills?: boolean
   pageNoScroll?: boolean
+  /** Disable the swipe-to-change-page gesture — use for tap/pill-driven "app" style navigation
+   *  (LUNA, Work, Astrology, Explore). Leave enabled only for Home's intentional swipe carousel. */
+  disableSwipe?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
+export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills, pageNoScroll, disableSwipe }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const touchX = useRef(0)
@@ -37,11 +40,13 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
   }
 
   function onTouchStart(e: React.TouchEvent) {
+    if (disableSwipe) return
     touchX.current = e.touches[0].clientX
     touchY.current = e.touches[0].clientY
   }
 
   function onTouchEnd(e: React.TouchEvent) {
+    if (disableSwipe) return
     const dx = touchX.current - e.changedTouches[0].clientX
     const dy = touchY.current - e.changedTouches[0].clientY
     if (Math.abs(dx) < 60) return
@@ -59,7 +64,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
     <div
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
-      style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', touchAction: 'pan-y' }}
+      style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', touchAction: disableSwipe ? 'auto' : 'pan-y' }}
     >
       {!hidePills && <div style={{
         flexShrink: 0,
@@ -110,7 +115,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
         </div>
       </div>
 
-      {pages.length > 1 && (
+      {pages.length > 1 && !disableSwipe && (
         <div style={{
           flexShrink: 0,
           display: 'flex',

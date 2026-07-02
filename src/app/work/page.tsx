@@ -127,7 +127,7 @@ function Slide1({
   done: Set<string>; onToggle: (id: string) => void; onSync: () => void
 }) {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
@@ -247,7 +247,7 @@ function Slide2({
   ]
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Filter pills + new task */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
@@ -306,7 +306,7 @@ function Slide2({
 // ─────────────────────────────────────────────────────────────────────────────
 function Slide3() {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header */}
       <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(139,111,184,0.20)' }}>
@@ -366,7 +366,7 @@ const MONEY_APPS = [
 
 function Slide4() {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header card */}
       <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(20,44,20,0.72) 0%, rgba(12,28,12,0.85) 100%)', border: '1px solid rgba(138,184,138,0.16)' }}>
@@ -425,7 +425,7 @@ export default function WorkPage() {
 
   const pages = [
     {
-      id: 'today', label: 'Today', noScroll: true,
+      id: 'today', label: 'Today',
       content: (
         <Slide1
           stats={stats} loading={loading} error={error}
@@ -435,22 +435,22 @@ export default function WorkPage() {
       ),
     },
     {
-      id: 'tasks', label: 'Tasks', noScroll: true,
+      id: 'tasks', label: 'Tasks',
       content: <Slide2 tasks={tasks} done={done} onToggle={toggle} />,
     },
     {
-      id: 'clients', label: 'Clients', noScroll: true,
+      id: 'clients', label: 'Clients',
       content: <Slide3 />,
     },
     {
-      id: 'money', label: 'Money', noScroll: true,
+      id: 'money', label: 'Money',
       content: <Slide4 />,
     },
   ]
 
   return (
     <AppLayout noScroll>
-      <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
+      <CategoryPager pages={pages} accentColor="#8B6FB8" disableSwipe />
     </AppLayout>
   )
 }

@@ -141,7 +141,7 @@ function Slide1({
   const [messageExpanded, setMessageExpanded] = useState(false)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: '100%' }}>
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <div style={{
@@ -290,7 +290,7 @@ function PreviewCard({ label, icon, href, linkText, children }: {
 
 function Slide2({ guidance }: { guidance: GuidanceData | null }) {
   return (
-    <div style={{ height: '100%', overflow: 'hidden', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 }}>
       <PreviewCard label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
         <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 6s ease-in-out infinite' }} />
         <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Moon in Cancer</p>
@@ -395,7 +395,7 @@ function TodaysFlowChart() {
 
 function Slide3() {
   return (
-    <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* 1. Wellness & Energy */}
       <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flexShrink: 0 }}>
@@ -485,7 +485,7 @@ function Slide4() {
   }
 
   return (
-    <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
 
       {/* 1. Energy Read Card — large main card */}
       <div style={{
@@ -587,7 +587,7 @@ const PARKED = ['Fashion line ideas', 'Website polish', 'Content concepts']
 
 function Slide5({ guidance }: { guidance: GuidanceData | null }) {
   return (
-    <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
 
       {/* Weekly Focus — redesigned hero tile */}
       <div style={{
@@ -747,13 +747,13 @@ function HomePageInner() {
 
   const pages = [
     {
-      id: 'today', label: 'Today', noScroll: true,
+      id: 'today', label: 'Today',
       content: <Slide1 greeting={greeting} moon={moon} guidance={guidance} gLoading={gLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
     },
-    { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} /> },
-    { id: 'wellness', label: 'Wellness', noScroll: true, content: <Slide3 /> },
-    { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide4 /> },
-    { id: 'weekly',   label: 'Weekly',   noScroll: true, content: <Slide5 guidance={guidance} /> },
+    { id: 'previews', label: 'Previews', content: <Slide2 guidance={guidance} /> },
+    { id: 'wellness', label: 'Wellness', content: <Slide3 /> },
+    { id: 'energy',   label: 'Energy',   content: <Slide4 /> },
+    { id: 'weekly',   label: 'Weekly',   content: <Slide5 guidance={guidance} /> },
   ]
 
   return (
