@@ -1,0 +1,34 @@
+{
+  "brand": "LUNA",
+  "primary_dock": [
+    "Home",
+    "Work",
+    "LUNA",
+    "Astrology",
+    "Explore"
+  ],
+  "colors": {
+    "deep_navy": "#050413",
+    "moon_purple": "#7C4DFF",
+    "soft_lavender": "#B99CFF",
+    "pearl": "#F5F0FF",
+    "glass": "rgba(255,255,255,0.045)"
+  },
+  "assets": {
+    "logos": [
+      "public/brand/logos/luna-logo.svg",
+      "public/brand/logos/luna-mark.svg",
+      "public/brand/logos/luna-logo-wordmark.png",
+      "public/brand/logos/app-icon-1024.png"
+    ],
+    "backgrounds": [
+      "public/brand/backgrounds/moon-ocean-mobile.png",
+      "public/brand/backgrounds/moon-ocean-tablet.png",
+      "public/brand/backgrounds/moon-ocean-desktop.png",
+      "public/brand/backgrounds/hero-moon-card-mobile.png",
+      "public/brand/backgrounds/hero-moon-card-desktop.png"
+    ],
+    "icons": "public/brand/icons/*.svg",
+    "ui_images": "public/brand/ui/*.png"
+  }
+}

@@ -1,0 +1,25 @@
+<svg width="720" height="180" viewBox="0 0 720 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="moonGlow" cx="50%" cy="45%" r="70%">
+      <stop offset="0%" stop-color="#EDE6FF"/>
+      <stop offset="50%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#6D4ACB"/>
+    </radialGradient>
+    <linearGradient id="letters" x1="0" y1="0" x2="720" y2="180">
+      <stop offset="0" stop-color="#F5F0FF"/>
+      <stop offset="0.45" stop-color="#C9B8FF"/>
+      <stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="20" y="38" width="104" height="104" rx="28" fill="#7C4DFF" fill-opacity="0.24" stroke="#D8C7FF" stroke-opacity="0.25"/>
+  <path d="M78 58C63.1 62.1 52.2 75.7 52.2 91.8C52.2 111.2 67.9 126.9 87.3 126.9C100.8 126.9 112.5 119.3 118.4 108.1C112.9 111 106.6 112.7 99.9 112.7C78.8 112.7 61.7 95.6 61.7 74.5C61.7 68.6 63 63 65.4 58C69.4 57.3 73.6 57.3 78 58Z" fill="url(#moonGlow)" filter="url(#softGlow)"/>
+  <text x="155" y="116" font-family="Georgia, 'Times New Roman', serif" font-size="66" letter-spacing="24" fill="url(#letters)">LUNA</text>
+  <path d="M565 54l8 23 23 8-23 8-8 23-8-23-23-8 23-8 8-23Z" fill="#F0E8FF" filter="url(#softGlow)"/>
+</svg>

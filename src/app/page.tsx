@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { SwipeContainer } from '@/components/layout/SwipeContainer'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { DesktopHeader } from '@/components/layout/DesktopHeader'
-import { DesktopTabBar } from '@/components/layout/DesktopTabBar'
+import { DesktopSidebar } from '@/components/layout/DesktopSidebar'
 import { MobileTopBar } from '@/components/layout/MobileTopBar'
 import { CategoryPager } from '@/components/ui/CategoryPager'
 import {
   Star, Moon, Sparkles, Target, Calendar,
   Mic, Brain, Zap, Check, Loader2,
   BookOpen, Scissors, Plus,
+  Heart, Droplet, Flame, TrendingUp, Waves, PenLine, Sun,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -59,18 +60,6 @@ const LBL: React.CSSProperties = {
   marginBottom: 8, flexShrink: 0,
 }
 
-// ─── CSS Moon ─────────────────────────────────────────────────────────────────
-function CSSMoon({ size = 100 }: { size?: number }) {
-  return (
-    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <div style={{ position: 'absolute', top: -14, right: -14, bottom: -14, left: -14, borderRadius: '50%', background: 'radial-gradient(circle, rgba(180,130,60,0.12) 0%, transparent 70%)' }} />
-      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '50%', background: 'radial-gradient(ellipse at 38% 36%, #fce8a8 0%, #e0b84a 22%, #b07820 52%, #7a5010 76%, #3c2408 100%)', boxShadow: `0 0 ${size * 0.3}px rgba(200,145,50,0.20)` }}>
-        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '50%', background: 'radial-gradient(circle at 28% 68%, rgba(0,0,0,0.16) 0%, transparent 18%), radial-gradient(circle at 62% 32%, rgba(255,255,255,0.07) 0%, transparent 22%)' }} />
-      </div>
-    </div>
-  )
-}
-
 // ─── Star sigil ───────────────────────────────────────────────────────────────
 function StarSigil({ size = 52 }: { size?: number }) {
   const c = size / 2
@@ -83,31 +72,6 @@ function StarSigil({ size = 52 }: { size?: number }) {
         <path d={`M${c} ${c*0.07} L${c+c*0.045} ${c-c*0.055} L${c*1.93} ${c} L${c+c*0.045} ${c+c*0.055} L${c} ${c*1.93} L${c-c*0.045} ${c+c*0.055} L${c*0.07} ${c} L${c-c*0.045} ${c-c*0.055} Z`} fill="rgba(220,200,255,0.92)" />
         <circle cx={c} cy={c} r={c * 0.065} fill="white" opacity="0.95" />
       </svg>
-    </div>
-  )
-}
-
-// ─── Crescent moon (Astrology preview) ────────────────────────────────────────
-function CrescentMoon({ size = 54 }: { size?: number }) {
-  const cut = size * 0.84
-  return (
-    <div style={{ position: 'relative', width: size, height: size, margin: '5px auto 7px' }}>
-      <div style={{ position: 'absolute', top: -8, right: -8, bottom: -8, left: -8, borderRadius: '50%', background: 'radial-gradient(circle, rgba(120,60,200,0.20) 0%, transparent 70%)' }} />
-      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '50%', background: 'linear-gradient(135deg, #B080E0 0%, #7840C0 45%, #4820A0 80%)', boxShadow: '0 0 18px rgba(140,80,220,0.38)' }}>
-        <div style={{ position: 'absolute', top: -size * 0.14, right: -size * 0.14, width: cut, height: cut, borderRadius: '50%', background: '#0f0824' }} />
-      </div>
-    </div>
-  )
-}
-
-// ─── Purple cloud (Night preview) ────────────────────────────────────────────
-function PurpleCloud() {
-  return (
-    <div style={{ position: 'relative', width: 80, height: 48, margin: '5px auto 7px' }}>
-      <div style={{ position: 'absolute', bottom: -3, left: '50%', transform: 'translateX(-50%)', width: 80, height: 18, background: 'radial-gradient(ellipse, rgba(110,45,190,0.35) 0%, transparent 70%)' }} />
-      <div style={{ position: 'absolute', bottom: 6, left: '50%', transform: 'translateX(-50%)', width: 68, height: 34, borderRadius: '46% 46% 40% 40%', background: 'radial-gradient(ellipse at 44% 28%, #9055C8 0%, #6030A8 42%, #381878 80%)', boxShadow: '0 0 18px rgba(120,50,200,0.32)' }} />
-      <div style={{ position: 'absolute', bottom: 22, left: '26%', width: 28, height: 28, borderRadius: '50%', background: 'radial-gradient(circle, #9055C8 0%, #6030A8 70%)' }} />
-      <div style={{ position: 'absolute', bottom: 20, left: '44%', width: 36, height: 36, borderRadius: '50%', background: 'radial-gradient(circle, #A065D8 0%, #7040B8 70%)' }} />
     </div>
   )
 }
@@ -175,40 +139,41 @@ function Slide1({
   const nextEvent = calEvents[0] ?? null
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 7, height: '100%', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%', overflow: 'hidden' }}>
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <div style={{
         ...G,
-        background: 'linear-gradient(140deg, rgba(40,14,90,0.78) 0%, rgba(16,5,44,0.88) 100%)',
         border: '1px solid rgba(139,111,184,0.18)',
-        borderRadius: 20, padding: '12px 14px 10px',
+        borderRadius: 28, padding: '16px 18px 14px',
         position: 'relative', overflow: 'hidden',
         display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-        flexShrink: 0,
+        flexShrink: 0, minHeight: 128,
       }}>
-        <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, background: 'radial-gradient(ellipse at 22% 18%, rgba(120,80,180,0.14) 0%, transparent 55%)', pointerEvents: 'none' }} />
+        <img
+          src="/brand/backgrounds/hero-moon-card-mobile.png"
+          alt=""
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(16,5,44,0.72) 0%, rgba(16,5,44,0.28) 60%, rgba(16,5,44,0.10) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 2, flex: 1, paddingRight: 6 }}>
-          <p style={{ fontSize: 17, fontWeight: 900, color: 'white', lineHeight: 1.2, margin: '0 0 5px' }}>
+          <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px' }}>
             {greeting}, Zoe ✦
           </p>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#A98FE8', lineHeight: 1.4, margin: '0 0 8px' }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#B99CFF', lineHeight: 1.4, margin: '0 0 10px' }}>
             You are not behind.<br />You are becoming.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ fontSize: 12 }}>{moon.emoji}</span>
-            <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: 0, lineHeight: 1.3 }}>
-              {moon.name} · {moon.pct}%
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.3 }}>
+              {moon.name} · {moon.pct}% illuminated
             </p>
           </div>
-        </div>
-        <div style={{ position: 'relative', zIndex: 2, marginTop: -4, marginRight: -2, opacity: 0.88 }}>
-          <CSSMoon size={96} />
         </div>
       </div>
 
       {/* ── LUNA's Message ────────────────────────────────────────────── */}
-      <div style={{ ...G, borderRadius: 20, padding: '10px 12px', display: 'flex', alignItems: 'flex-start', gap: 9, flexShrink: 0 }}>
+      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 10, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={LBL}><span>✦</span>LUNA'S MESSAGE</div>
           {gLoading ? (
@@ -218,71 +183,71 @@ function Slide1({
               ))}
             </div>
           ) : (
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.68)', lineHeight: 1.6, margin: '0 0 6px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, margin: '0 0 7px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
               {guidance?.energy ?? 'Your energy needs structure before speed. Pick one priority and protect your body before you start spiraling.'}
             </p>
           )}
           <Link href="/luna" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#8B6FB8' }}>Tell me more →</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#8B6FB8' }}>Tell me more →</span>
           </Link>
         </div>
-        <StarSigil size={50} />
+        <img src="/brand/ui/luna-message-star.png" alt="" style={{ width: 52, height: 52, flexShrink: 0, objectFit: 'contain', animation: 'breathe 4s ease-in-out infinite' }} />
       </div>
 
       {/* ── Today's Top 3 + Next Event ────────────────────────────────── */}
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr', gap: 7 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr', gap: 8 }}>
         {/* Top 3 */}
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Target style={{ width: 10, height: 10 }} />Top 3</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 6 }}>
+        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
             {tasks.map((t, i) => (
-              <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6 }}>
-                <div style={{ width: 15, height: 15, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.18)', border: '1px solid rgba(139,111,184,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                  <span style={{ fontSize: 7.5, fontWeight: 800, color: '#C4A9E8' }}>{i + 1}</span>
+              <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(139,111,184,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: '#C4A9E8' }}>{i + 1}</span>
                 </div>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
               </div>
             ))}
           </div>
           <Link href="/tasks" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 10, color: '#8B6FB8', fontWeight: 600 }}>View all →</span>
+            <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600 }}>View all tasks →</span>
           </Link>
         </div>
 
         {/* Next Event */}
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Event</div>
-          <p style={{ fontSize: 15, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
+          <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
+          <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {nextEvent?.title ?? 'Client Call'}
           </p>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#8B6FB8', margin: '0 0 3px' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#8B6FB8', margin: '0 0 3px' }}>
             Today · {nextEvent?.startTime ?? '1:30 PM'}
           </p>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.28)', margin: '0 0 auto', lineHeight: 1.4 }}>
-            Prep 15 min before.
+          <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
+            Prep 15 minutes before.
           </p>
-          <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 7 }}>
-            <div style={{ padding: '5px', background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.18)', borderRadius: 9, textAlign: 'center' }}>
-              <span style={{ fontSize: 10, color: '#8B6FB8', fontWeight: 600 }}>View →</span>
+          <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
+            <div style={{ padding: '6px', background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.18)', borderRadius: 10, textAlign: 'center' }}>
+              <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600 }}>View details →</span>
             </div>
           </Link>
         </div>
       </div>
 
       {/* ── Quick Actions ─────────────────────────────────────────────── */}
-      <div style={{ ...G, borderRadius: 18, padding: '9px 12px', flexShrink: 0 }}>
+      <div style={{ ...G, borderRadius: 22, padding: '11px 14px', flexShrink: 0 }}>
         <div style={LBL}><Zap style={{ width: 10, height: 10 }} />Quick Actions</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 5 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
           {[
             { icon: Mic,      label: 'Dictate',  href: '/luna?tab=dictate' },
             { icon: Brain,    label: 'Brain Dump', href: '/brain-dump'     },
-            { icon: Calendar, label: 'Plan Day', href: '/plan-my-day'      },
+            { icon: Calendar, label: 'Plan My Day', href: '/plan-my-day'   },
             { icon: Plus,     label: 'New Task', href: '/tasks'            },
           ].map(({ icon: Icon, label, href }) => (
             <Link key={label} href={href} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '7px 2px', borderRadius: 11, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <Icon style={{ width: 14, height: 14, color: 'rgba(196,169,232,0.68)' }} strokeWidth={1.6} />
-                <span style={{ fontSize: 9, fontWeight: 600, color: 'rgba(255,255,255,0.42)', textAlign: 'center', lineHeight: 1.2 }}>{label}</span>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '9px 2px', borderRadius: 13, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <Icon style={{ width: 15, height: 15, color: 'rgba(196,169,232,0.72)' }} strokeWidth={1.6} />
+                <span style={{ fontSize: 9.5, fontWeight: 600, color: 'rgba(255,255,255,0.46)', textAlign: 'center', lineHeight: 1.2 }}>{label}</span>
               </div>
             </Link>
           ))}
@@ -301,10 +266,10 @@ function PreviewCard({ label, icon, href, linkText, children }: {
 }) {
   return (
     <Link href={href} style={{ textDecoration: 'none', display: 'flex' }}>
-      <div style={{ ...G, borderRadius: 20, padding: '10px 11px 8px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div style={{ ...G, borderRadius: 24, padding: '13px 14px 11px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={LBL}>{icon}{label}</div>
         {children}
-        <span style={{ fontSize: 10, color: '#8B6FB8', fontWeight: 600, marginTop: 4, flexShrink: 0 }}>{linkText} →</span>
+        <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600, marginTop: 5, flexShrink: 0 }}>{linkText} →</span>
       </div>
     </Link>
   )
@@ -312,44 +277,182 @@ function PreviewCard({ label, icon, href, linkText, children }: {
 
 function Slide2({ guidance }: { guidance: GuidanceData | null }) {
   return (
-    <div style={{ height: '100%', overflow: 'hidden', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 7 }}>
-      <PreviewCard label="Astrology" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open">
-        <CrescentMoon size={52} />
-        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Moon in Cancer</p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', margin: '2px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {guidance?.moon_note ?? 'Emotional clarity · intuition'}
+    <div style={{ height: '100%', overflow: 'hidden', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 }}>
+      <PreviewCard label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
+        <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 6s ease-in-out infinite' }} />
+        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Moon in Cancer</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
         </p>
       </PreviewCard>
 
-      <PreviewCard label="Style" icon={<Scissors style={{ width: 9, height: 9 }} />} href="/creative" linkText="Atelier">
+      <PreviewCard label="Style Preview" icon={<Scissors style={{ width: 9, height: 9 }} />} href="/creative" linkText="Open Atelier">
         <StyleVisual />
-        <p style={{ fontSize: 11, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Today&apos;s Inspo</p>
-        <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', margin: '2px 0 0', lineHeight: 1.3, flexShrink: 0 }}>Chic · Neutral · Boss</p>
+        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Soft power dressing</p>
+        <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.40)', margin: '3px 0 0', lineHeight: 1.3, flexShrink: 0 }}>Neutrals · Structure · Effortless</p>
       </PreviewCard>
 
-      <PreviewCard label="Money" icon={
+      <PreviewCard label="Money Preview" icon={
         <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#16A34A', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ fontSize: 7, fontWeight: 800, color: 'white', lineHeight: 1 }}>$</span>
         </div>
       } href="/money/transactions" linkText="View">
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 4, paddingBottom: 2 }}>
-          <p style={{ fontSize: 13, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>2 bills due<br />this week</p>
-          <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.30)', margin: '5px 0 1px' }}>Total</p>
-          <p style={{ fontSize: 17, fontWeight: 900, color: '#4ADE80', margin: 0 }}>$320.00</p>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 5, paddingBottom: 3 }}>
+          <p style={{ fontSize: 14, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>2 bills due<br />this week</p>
+          <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.32)', margin: '6px 0 1px' }}>Total</p>
+          <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: 0 }}>$320.00</p>
         </div>
       </PreviewCard>
 
-      <PreviewCard label="Night" icon={<Moon style={{ width: 9, height: 9 }} />} href="/night" linkText="View">
-        <PurpleCloud />
-        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Protect tomorrow.</p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', margin: '2px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Wind down. Reset.</p>
+      <PreviewCard label="Night Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/night" linkText="View">
+        <img src="/brand/ui/night-cloud.png" alt="" style={{ width: 84, height: 50, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 7s ease-in-out infinite' }} />
+        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Protect tomorrow.</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Wind down. Rest. Reset.</p>
       </PreviewCard>
     </div>
   )
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 3 — Energy Reset  (decision flow: 5 compact cards, no scroll)
+// SLIDE 3 — Wellness & Energy  (gauge + flow chart + journal prompt, no scroll)
+// ─────────────────────────────────────────────────────────────────────────────
+const ENERGY_STATS = [
+  { icon: Moon,        label: 'Sleep',       value: '7h 42m',   status: 'Good',        delta: '↑ 12%', color: '#6BE38B' },
+  { icon: Droplet,     label: 'Hydration',   value: '1.6 L',    status: 'On Track',    delta: '↑ 8%',  color: '#B7AED6' },
+  { icon: Flame,       label: 'Movement',    value: '6,421 steps', status: 'Good',     delta: '↑ 15%', color: '#6BE38B' },
+  { icon: TrendingUp,  label: 'Energy Peak', value: '4:00 – 6:00 PM', status: 'Later Today', delta: 'Prepare for flow', color: '#E6B84A' },
+]
+
+function EnergyGauge({ pct = 78, size = 108 }: { pct?: number; size?: number }) {
+  const stroke = size * 0.09
+  const r = (size - stroke) / 2
+  const c = size / 2
+  const circumference = 2 * Math.PI * r
+  const offset = circumference * (1 - pct / 100)
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0, animation: 'breathe 5s ease-in-out infinite' }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+        <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(139,111,184,0.16)" strokeWidth={stroke} />
+        <circle
+          cx={c} cy={c} r={r} fill="none" stroke="#8D5CFF" strokeWidth={stroke}
+          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
+          style={{ filter: 'drop-shadow(0 0 6px rgba(141,92,255,0.55))' }}
+        />
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <span style={{ fontSize: size * 0.26, fontWeight: 900, color: 'white', lineHeight: 1 }}>{pct}</span>
+        <span style={{ fontSize: size * 0.085, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Good Energy</span>
+        <span style={{ fontSize: size * 0.09, marginTop: 2, color: '#E6B84A' }}>✦</span>
+      </div>
+    </div>
+  )
+}
+
+function TodaysFlowChart() {
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <div style={{
+        position: 'absolute', left: '46%', top: -6, transform: 'translateX(-50%)',
+        padding: '3px 9px', borderRadius: 10, background: 'rgba(139,111,184,0.22)',
+        border: '1px solid rgba(196,169,232,0.35)', whiteSpace: 'nowrap', zIndex: 2,
+      }}>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#C4A9E8' }}>Peak 4–6 PM</span>
+      </div>
+      <svg viewBox="0 0 320 70" width="100%" height="70" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+        <path
+          d="M0,58 C40,56 60,52 90,44 C130,34 150,10 175,8 C200,10 220,34 250,46 C275,54 295,57 320,58"
+          fill="none" stroke="#8D5CFF" strokeWidth="2.5" strokeLinecap="round"
+          style={{ filter: 'drop-shadow(0 0 5px rgba(141,92,255,0.5))', animation: 'breathe 6s ease-in-out infinite' }}
+        />
+        <circle cx="175" cy="8" r="4" fill="#B58CFF" style={{ filter: 'drop-shadow(0 0 5px rgba(181,140,255,0.8))' }} />
+      </svg>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
+        {['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '12 AM'].map(t => (
+          <span key={t} style={{ fontSize: 8, color: 'rgba(255,255,255,0.32)', fontWeight: 600 }}>{t}</span>
+        ))}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+        <span style={{ fontSize: 9, color: 'rgba(196,169,232,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Rest</span>
+        <span style={{ fontSize: 9, color: 'rgba(230,184,74,0.7)', display: 'flex', alignItems: 'center', gap: 3 }}><Sun style={{ width: 9, height: 9 }} />Focus</span>
+        <span style={{ fontSize: 9, color: 'rgba(196,169,232,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Wind Down</span>
+      </div>
+    </div>
+  )
+}
+
+function Slide3() {
+  return (
+    <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+      {/* 1. Wellness & Energy */}
+      <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flexShrink: 0 }}>
+        <div style={LBL}><Heart style={{ width: 10, height: 10 }} />Wellness &amp; Energy</div>
+        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '-4px 0 10px' }}>Your mind, body &amp; spirit today</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <EnergyGauge pct={78} size={104} />
+          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {ENERGY_STATS.map(({ icon: Icon, label, value, status, delta, color }) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon style={{ width: 11, height: 11, color: '#C4A9E8' }} strokeWidth={1.8} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.2 }}>{label}</p>
+                  <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', margin: 0, lineHeight: 1.2 }}>{value}</p>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <p style={{ fontSize: 9.5, fontWeight: 700, color, margin: 0, lineHeight: 1.2 }}>{status}</p>
+                  <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.32)', margin: 0, lineHeight: 1.2 }}>{delta}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* 2. Today's Flow */}
+      <div style={{ ...G, borderRadius: 22, padding: '13px 14px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ ...LBL, marginBottom: 4 }}><Waves style={{ width: 10, height: 10 }} />Today's Flow</div>
+          <Link href="/health" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 9.5, color: '#8B6FB8', fontWeight: 600 }}>See full day →</span>
+          </Link>
+        </div>
+        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: '0 0 10px' }}>Energy throughout your day</p>
+        <TodaysFlowChart />
+      </div>
+
+      {/* 3. Daily Journal Prompt */}
+      <Link href="/journal" style={{ textDecoration: 'none', flex: 1, minHeight: 0, display: 'flex' }}>
+        <div style={{
+          ...G, borderRadius: 22, padding: '13px 14px', flex: 1, minHeight: 0,
+          display: 'flex', alignItems: 'center', gap: 12,
+          background: 'linear-gradient(140deg, rgba(40,14,90,0.55) 0%, rgba(16,5,44,0.72) 100%)',
+        }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={LBL}><PenLine style={{ width: 10, height: 10 }} />Daily Journal Prompt</div>
+            <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.35)', margin: '-4px 0 8px' }}>For your reflection</p>
+            <p style={{ fontSize: 12, color: 'rgba(196,169,232,0.88)', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 10px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+              "What is one area of my life that is asking for more patience?"
+            </p>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 12,
+              background: 'linear-gradient(135deg, #6B3DFF 0%, #8D5CFF 100%)',
+              boxShadow: '0 0 18px rgba(109,60,255,0.35)',
+            }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>Start Journaling →</span>
+            </div>
+          </div>
+          <BookOpen style={{ width: 44, height: 44, color: 'rgba(196,169,232,0.55)', flexShrink: 0, animation: 'breathe 9s ease-in-out infinite' }} strokeWidth={1.3} />
+        </div>
+      </Link>
+
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIDE 4 — Energy Reset  (decision flow: 5 compact cards, no scroll)
 // ─────────────────────────────────────────────────────────────────────────────
 const RESET_MODES = [
   { label: 'I woke up late',     mode: 'recovery' },
@@ -358,7 +461,7 @@ const RESET_MODES = [
   { label: 'I need softness',    mode: 'soft'     },
 ]
 
-function Slide3() {
+function Slide4() {
   const [activeMode, setActiveMode] = useState<string | null>(null)
   const [bodyDone,   setBodyDone]   = useState<Set<string>>(new Set())
   const [focusDone,  setFocusDone]  = useState(false)
@@ -376,7 +479,7 @@ function Slide3() {
         ...G,
         background: 'linear-gradient(140deg, rgba(50,25,100,0.75) 0%, rgba(20,10,55,0.82) 100%)',
         border: '1px solid rgba(139,111,184,0.22)',
-        borderRadius: 20, padding: '12px 14px',
+        borderRadius: 24, padding: '12px 14px',
         flexShrink: 0, boxShadow: '0 0 28px rgba(100,50,200,0.12), inset 0 1px 0 rgba(255,255,255,0.06)',
       }}>
         <div style={LBL}><Zap style={{ width: 9, height: 9 }} />ENERGY READ</div>
@@ -388,7 +491,7 @@ function Slide3() {
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {[['Mood', '🫧 scattered'], ['Energy', 'medium'], ['Sleep', '7h 24m'], ['Support', 'grounding']].map(([k, v]) => (
-            <div key={k} style={{ padding: '3px 8px', borderRadius: 20, background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.22)' }}>
+            <div key={k} style={{ padding: '3px 8px', borderRadius: 24, background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.22)' }}>
               <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', fontWeight: 600 }}>{k}: </span>
               <span style={{ fontSize: 9, color: '#C4A9E8', fontWeight: 700 }}>{v}</span>
             </div>
@@ -399,14 +502,14 @@ function Slide3() {
       {/* 2+3. Body Basics + Focus Reset — side by side row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
         {/* Body Basics */}
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px' }}>
+        <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><Sparkles style={{ width: 9, height: 9 }} />BODY BASICS</div>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: '0 0 7px', lineHeight: 1.4 }}>
             You need water + food before decisions.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
             {['💧 Water', '🍽 Food', '🚿 Shower', '☀️ Sunlight'].map(item => (
-              <button key={item} onClick={() => toggleBody(item)} style={{ padding: '3px 7px', borderRadius: 7, border: `1px solid ${bodyDone.has(item) ? 'rgba(138,184,138,0.45)' : 'rgba(255,255,255,0.09)'}`, background: bodyDone.has(item) ? 'rgba(138,184,138,0.14)' : 'rgba(255,255,255,0.04)', color: bodyDone.has(item) ? '#8AB88A' : 'rgba(255,255,255,0.50)', fontSize: 9, fontWeight: 600, cursor: 'pointer', textDecoration: bodyDone.has(item) ? 'line-through' : 'none' }}>
+              <button key={item} onClick={() => toggleBody(item)} style={{ padding: '3px 7px', borderRadius: 11, border: `1px solid ${bodyDone.has(item) ? 'rgba(138,184,138,0.45)' : 'rgba(255,255,255,0.09)'}`, background: bodyDone.has(item) ? 'rgba(138,184,138,0.14)' : 'rgba(255,255,255,0.04)', color: bodyDone.has(item) ? '#8AB88A' : 'rgba(255,255,255,0.50)', fontSize: 9, fontWeight: 600, cursor: 'pointer', textDecoration: bodyDone.has(item) ? 'line-through' : 'none' }}>
                 {item}
               </button>
             ))}
@@ -414,7 +517,7 @@ function Slide3() {
         </div>
 
         {/* Focus Reset */}
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ ...G, borderRadius: 22, padding: '10px 11px', display: 'flex', flexDirection: 'column' }}>
           <div style={LBL}><Target style={{ width: 9, height: 9 }} />FOCUS RESET</div>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: '0 0 4px', lineHeight: 1.4 }}>
             One 25-min block. No multitasking.
@@ -422,18 +525,18 @@ function Slide3() {
           <p style={{ fontSize: 10, fontWeight: 700, color: '#C4A9E8', margin: '0 0 auto', lineHeight: 1.35 }}>
             Reply to priority client email
           </p>
-          <button onClick={() => setFocusDone(!focusDone)} style={{ marginTop: 7, padding: '5px 6px', borderRadius: 9, border: `1px solid ${focusDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.32)'}`, background: focusDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: focusDone ? '#8AB88A' : '#C4A9E8', fontSize: 9.5, fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={() => setFocusDone(!focusDone)} style={{ marginTop: 7, padding: '5px 6px', borderRadius: 13, border: `1px solid ${focusDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.32)'}`, background: focusDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: focusDone ? '#8AB88A' : '#C4A9E8', fontSize: 9.5, fontWeight: 700, cursor: 'pointer' }}>
             {focusDone ? '✓ Done' : 'Start focus block →'}
           </button>
         </div>
       </div>
 
       {/* 4. Choose Reset Mode — compact 4-button card */}
-      <div style={{ ...G, borderRadius: 18, padding: '10px 12px', flexShrink: 0 }}>
+      <div style={{ ...G, borderRadius: 22, padding: '10px 12px', flexShrink: 0 }}>
         <div style={LBL}><Moon style={{ width: 9, height: 9 }} />CHOOSE RESET MODE</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
           {RESET_MODES.map(({ label, mode }) => (
-            <button key={mode} onClick={() => setActiveMode(activeMode === mode ? null : mode)} style={{ padding: '6px 8px', borderRadius: 10, border: `1px solid ${activeMode === mode ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: activeMode === mode ? 'rgba(139,111,184,0.18)' : 'rgba(255,255,255,0.03)', color: activeMode === mode ? '#C4A9E8' : 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textAlign: 'left', lineHeight: 1.3 }}>
+            <button key={mode} onClick={() => setActiveMode(activeMode === mode ? null : mode)} style={{ padding: '6px 8px', borderRadius: 14, border: `1px solid ${activeMode === mode ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: activeMode === mode ? 'rgba(139,111,184,0.18)' : 'rgba(255,255,255,0.03)', color: activeMode === mode ? '#C4A9E8' : 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textAlign: 'left', lineHeight: 1.3 }}>
               {label}
             </button>
           ))}
@@ -449,13 +552,13 @@ function Slide3() {
       </div>
 
       {/* 5. Home Energy Card */}
-      <div style={{ ...G, borderRadius: 18, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+      <div style={{ ...G, borderRadius: 22, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={LBL}><Star style={{ width: 9, height: 9 }} />HOME ENERGY</div>
           <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.80)', margin: '0 0 1px' }}>Small reset. Big energy.</p>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: 0 }}>Start one load of laundry</p>
         </div>
-        <button onClick={() => setHomeDone(!homeDone)} style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 10, border: `1px solid ${homeDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.30)'}`, background: homeDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: homeDone ? '#8AB88A' : '#C4A9E8', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        <button onClick={() => setHomeDone(!homeDone)} style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 14, border: `1px solid ${homeDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.30)'}`, background: homeDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: homeDone ? '#8AB88A' : '#C4A9E8', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
           {homeDone ? '✓ Done' : 'Start task →'}
         </button>
       </div>
@@ -465,17 +568,17 @@ function Slide3() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 4 — Weekly / Growth  (5 cards, no scroll)
+// SLIDE 5 — Weekly / Growth  (5 cards, no scroll)
 // ─────────────────────────────────────────────────────────────────────────────
 const PARKED = ['Fashion line ideas', 'Website polish', 'Content concepts']
 
-function Slide4({ guidance }: { guidance: GuidanceData | null }) {
+function Slide5({ guidance }: { guidance: GuidanceData | null }) {
   return (
     <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
 
       {/* Weekly Focus — redesigned hero tile */}
       <div style={{
-        borderRadius: 22, padding: '14px 16px 12px',
+        borderRadius: 26, padding: '14px 16px 12px',
         flex: 1, minHeight: 0, overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
         background: 'linear-gradient(148deg, rgba(58,18,115,0.90) 0%, rgba(28,8,78,0.94) 50%, rgba(10,4,38,0.97) 100%)',
@@ -492,7 +595,7 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div style={{ ...LBL, marginBottom: 0 }}><Target style={{ width: 9, height: 9 }} />Weekly Focus</div>
-          <div style={{ padding: '3px 10px', borderRadius: 20, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(196,169,232,0.24)' }}>
+          <div style={{ padding: '3px 10px', borderRadius: 24, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(196,169,232,0.24)' }}>
             <span style={{ fontSize: 9, fontWeight: 800, color: '#C4A9E8', letterSpacing: '0.08em' }}>
               WK {Math.ceil((new Date().getTime() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 604800000)}
             </span>
@@ -533,7 +636,7 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
         {/* Theme pills */}
         <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 10, flexShrink: 0, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
           {['Refinement', 'Visibility', 'Momentum'].map((theme, i) => (
-            <div key={theme} style={{ padding: '3px 10px', borderRadius: 20, background: `rgba(139,111,184,${0.12 + i * 0.04})`, border: '1px solid rgba(196,169,232,0.16)' }}>
+            <div key={theme} style={{ padding: '3px 10px', borderRadius: 24, background: `rgba(139,111,184,${0.12 + i * 0.04})`, border: '1px solid rgba(196,169,232,0.16)' }}>
               <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(196,169,232,0.62)', letterSpacing: '0.04em' }}>{theme}</span>
             </div>
           ))}
@@ -542,13 +645,13 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
 
       {/* Lesson + Upcoming row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px' }}>
+        <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><BookOpen style={{ width: 9, height: 9 }} />LESSON</div>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: 0, fontStyle: 'italic', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
             {guidance?.shadow_question ?? 'Recognition over chasing. Speak clearly, then let the right doors open.'}
           </p>
         </div>
-        <div style={{ ...G, borderRadius: 18, padding: '10px 11px' }}>
+        <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><Calendar style={{ width: 9, height: 9 }} />UPCOMING ENERGY</div>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
             This week favors refinement, planning, and one brave visible step.
@@ -557,12 +660,12 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
       </div>
 
       {/* Parked Priorities */}
-      <div style={{ ...G, borderRadius: 18, padding: '10px 12px', flexShrink: 0 }}>
+      <div style={{ ...G, borderRadius: 22, padding: '10px 12px', flexShrink: 0 }}>
         <div style={LBL}><Star style={{ width: 9, height: 9 }} />PARKED PRIORITIES</div>
         <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', margin: '0 0 7px' }}>Your ideas are safe here.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {PARKED.map((p, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', borderRadius: 8, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#8B6FB8', flexShrink: 0 }} />
               <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>{p}</p>
             </div>
@@ -574,7 +677,7 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
       <Link href="/luna" style={{ textDecoration: 'none', flexShrink: 0 }}>
         <div style={{
           ...G,
-          borderRadius: 18, padding: '12px 16px',
+          borderRadius: 22, padding: '12px 16px',
           background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.28)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           boxShadow: '0 0 18px rgba(100,50,200,0.08)',
@@ -630,8 +733,9 @@ export default function HomePage() {
       content: <Slide1 greeting={greeting} moon={moon} guidance={guidance} gLoading={gLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
     },
     { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} /> },
-    { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide3 /> },
-    { id: 'weekly',   label: 'Weekly',   noScroll: true, content: <Slide4 guidance={guidance} /> },
+    { id: 'wellness', label: 'Wellness', noScroll: true, content: <Slide3 /> },
+    { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide4 /> },
+    { id: 'weekly',   label: 'Weekly',   noScroll: true, content: <Slide5 guidance={guidance} /> },
   ]
 
   return (
@@ -639,6 +743,7 @@ export default function HomePage() {
       style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       className="bg-app"
     >
+      <DesktopSidebar />
       <DesktopHeader />
 
       <div className="lg:hidden" style={{ flexShrink: 0 }}>
@@ -652,13 +757,12 @@ export default function HomePage() {
           paddingLeft: 16, paddingRight: 16,
           paddingBottom: 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)',
         }}
-        className="mx-auto w-full max-w-[1120px] lg:pt-16"
+        className="mx-auto w-full max-w-[1120px] lg:pt-16 lg:pl-56"
       >
         <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
       </main>
 
       <BottomNav />
-      <DesktopTabBar />
     </SwipeContainer>
   )
 }

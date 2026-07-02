@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Search, Bell, Sun, Moon, Zap, Settings, LogOut } from 'lucide-react'
+import { Search, Bell, Sun, Moon, Settings, LogOut } from 'lucide-react'
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -26,10 +26,6 @@ function getCurrentMoonPhase() {
 }
 
 export function DesktopHeader() {
-  const [time, setTime]   = useState('')
-  const [ampm, setAmpm]   = useState('')
-  const [date, setDate]   = useState('')
-  const [seconds, setSeconds] = useState(0)
   const [showMenu, setShowMenu] = useState(false)
   const { theme, toggle } = useTheme()
   const moon = getCurrentMoonPhase()
@@ -41,20 +37,6 @@ export function DesktopHeader() {
     router.push('/auth/login')
   }
 
-  useEffect(() => {
-    function tick() {
-      const now = new Date()
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York'
-      const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(undefined, { ...opts, timeZone: tz }).format(now)
-      setTime(fmt({ hour: 'numeric', minute: '2-digit', hour12: true }).replace(/[AP]M/i, '').trim())
-      setAmpm(fmt({ hour: 'numeric', hour12: true }).match(/[AP]M/i)?.[0] ?? '')
-      setDate(fmt({ weekday: 'short', month: 'short', day: 'numeric' }))
-      setSeconds(now.getSeconds())
-    }
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [])
   const [searchOpen, setSearchOpen] = useState(false)
 
   // ⌘K shortcut
@@ -68,7 +50,7 @@ export function DesktopHeader() {
 
   return (
     <header
-      className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center"
+      className="hidden lg:flex fixed top-0 left-0 lg:left-56 right-0 z-50 h-16 items-center"
       style={{
         background: 'rgba(10, 8, 28, 0.94)',
         backdropFilter: 'blur(32px)',
@@ -76,51 +58,25 @@ export function DesktopHeader() {
         borderBottom: '1px solid rgba(255,255,255,0.08)',
       }}>
 
-      {/* Left — LUNA wordmark */}
-      <div className="flex items-center pl-7 w-48 flex-shrink-0">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-6 h-6 rounded-lg flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)' }}>
-            <Moon className="h-3.5 w-3.5 text-white" strokeWidth={2} />
-          </div>
-          <span className="font-display text-base font-bold tracking-[0.22em]"
-            style={{ color: 'var(--text-1)' }}>
-            LUNA
-          </span>
+      {/* Left — moon phase */}
+      <div className="flex items-center gap-2 pl-7 w-56 flex-shrink-0">
+        <span className="text-lg leading-none">{moon.emoji}</span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-2)' }}>{moon.name} · 82%</p>
+          <p className="text-[11px] leading-tight" style={{ color: 'var(--text-4)' }}>Illuminating your next step</p>
+        </div>
+      </div>
+
+      {/* Center — LUNA wordmark */}
+      <div className="flex-1 flex items-center justify-center">
+        <Link href="/" className="flex items-center gap-1.5 group">
+          <span className="font-display text-2xl font-bold tracking-[0.24em]" style={{ color: 'var(--text-1)' }}>LUNA</span>
+          <span className="text-sm" style={{ color: '#C4A9E8' }}>✦</span>
         </Link>
       </div>
 
-      {/* Center — clock + date + moon */}
-      <div className="flex-1 flex items-center justify-center gap-5">
-
-        {/* Time — large, like a status bar */}
-        <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-xl font-semibold tabular-nums"
-            style={{ color: 'var(--text-1)', letterSpacing: '-0.01em' }}>
-            {time}
-          </span>
-          <span className="text-xs font-semibold"
-            style={{ color: 'var(--text-3)' }}>{ampm}</span>
-        </div>
-
-        {/* Divider */}
-        <div className="w-px h-4" style={{ background: 'var(--surface-border)' }} />
-
-        {/* Date */}
-        <span className="text-sm font-medium" style={{ color: 'var(--text-2)' }}>{date}</span>
-
-        {/* Divider */}
-        <div className="w-px h-4" style={{ background: 'var(--surface-border)' }} />
-
-        {/* Moon */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-base leading-none">{moon.emoji}</span>
-          <span className="text-sm font-medium" style={{ color: 'var(--text-3)' }}>{moon.name}</span>
-        </div>
-      </div>
-
       {/* Right — actions */}
-      <div className="flex items-center gap-2 pr-7 w-48 justify-end flex-shrink-0">
+      <div className="flex items-center gap-2 pr-7 w-56 justify-end flex-shrink-0">
 
         {/* Search */}
         <button
