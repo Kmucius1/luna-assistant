@@ -11,7 +11,7 @@ interface AppLayoutProps {
   className?: string
 }
 
-const DOCK_CLEAR = 'calc(max(10px, env(safe-area-inset-bottom, 0px)) + 78px)'
+const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 
 export function AppLayout({ children, noScroll, noPad, className }: AppLayoutProps) {
   return (

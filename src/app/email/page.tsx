@@ -342,7 +342,7 @@ function EmailInner() {
   const [accounts, setAccounts]           = useState<ConnectedAccount[]>([])
   const [sync, setSync]                   = useState<SyncData | null>(null)
   const [loading, setLoading]             = useState(false)
-  const [tab, setTab]                     = useState<'priority' | 'urgent' | 'needs_reply' | 'fyi' | 'all' | 'tasks'>('priority')
+  const [tab, setTab]                     = useState<'priority' | 'urgent' | 'needs_reply' | 'fyi' | 'all' | 'tasks' | 'bills'>('priority')
   const [selected, setSelected]           = useState<GmailEmail | null>(null)
   const [showReply, setShowReply]         = useState(false)
   const [showContacts, setShowContacts]   = useState(false)
@@ -383,12 +383,19 @@ function EmailInner() {
   const byAccount = (arr: GmailEmail[]) =>
     accountFilter === 'all' ? arr : arr.filter(e => e.account === accountFilter || e.fromEmail?.includes(accountFilter))
 
+  const BILLS_KEYWORDS = /bill|invoice|statement|payment due|balance due|past due|amount due|medical|doctor|health|insurance|prescription|lab result|appointment|collection|utility|shutoff|charge|receipt/i
+
+  const billsEmails = byAccount((sync?.all ?? []).filter(e =>
+    BILLS_KEYWORDS.test(e.subject) || BILLS_KEYWORDS.test(e.snippet) || BILLS_KEYWORDS.test(e.from)
+  ))
+
   const tabData: Record<string, GmailEmail[]> = {
     priority:    byAccount(sync?.priority    ?? []),
     urgent:      byAccount(sync?.urgent      ?? []),
     needs_reply: byAccount(sync?.needs_reply ?? []),
     fyi:         byAccount([...(sync?.fyi ?? []), ...(sync?.newsletter ?? [])]),
     all:         byAccount(sync?.all         ?? []),
+    bills:       billsEmails,
     tasks:       [],
   }
   const list = tabData[tab] ?? []
@@ -471,23 +478,20 @@ function EmailInner() {
           {/* Tabs */}
           <div style={{ display: 'flex', gap: 6, overflowX: 'auto', marginBottom: 14, scrollbarWidth: 'none' }}>
             {([
-              { key: 'priority',    label: '⭐ Priority',   count: sync?.priority_count,            highlight: true  },
-              { key: 'urgent',      label: '🔴 Urgent',    count: sync?.urgent.length,             highlight: false },
-              { key: 'needs_reply', label: '⚡ Reply',     count: sync?.needs_reply.length,        highlight: false },
-              { key: 'fyi',         label: '📬 FYI',       count: (sync?.fyi?.length ?? 0) + (sync?.newsletter?.length ?? 0), highlight: false },
-              { key: 'tasks',       label: '✅ Tasks',     count: sync?.extracted_tasks.length,    highlight: false },
-              { key: 'all',         label: 'All',          count: sync?.total,                     highlight: false },
+              { key: 'priority',    label: '⭐ Priority',      count: sync?.priority_count,            highlight: true,  accent: '#C9A96E' },
+              { key: 'bills',       label: '🏥 Bills & Medical', count: billsEmails.length,             highlight: true,  accent: '#E05E5E' },
+              { key: 'urgent',      label: '🔴 Urgent',         count: sync?.urgent.length,             highlight: false, accent: '#8B6FB8' },
+              { key: 'needs_reply', label: '⚡ Reply',          count: sync?.needs_reply.length,        highlight: false, accent: '#8B6FB8' },
+              { key: 'fyi',         label: '📬 FYI',            count: (sync?.fyi?.length ?? 0) + (sync?.newsletter?.length ?? 0), highlight: false, accent: '#8B6FB8' },
+              { key: 'tasks',       label: '✅ Tasks',          count: sync?.extracted_tasks.length,    highlight: false, accent: '#8B6FB8' },
+              { key: 'all',         label: 'All',               count: sync?.total,                     highlight: false, accent: '#8B6FB8' },
             ] as const).map(t => (
               <button key={t.key} onClick={() => { setTab(t.key); setSelected(null); setShowReply(false) }}
                 style={{
-                  flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                  background: tab === t.key
-                    ? (t.highlight ? 'rgba(201,169,110,0.3)' : 'rgba(139,111,184,0.3)')
-                    : 'rgba(255,255,255,0.07)',
-                  color: tab === t.key
-                    ? (t.highlight ? '#E8D5A3' : 'rgba(196,169,232,0.95)')
-                    : 'rgba(255,255,255,0.5)',
-                  boxShadow: tab === t.key && t.highlight ? '0 0 10px rgba(201,169,110,0.2)' : 'none',
+                  flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: tab === t.key && t.highlight ? `1px solid ${t.accent}55` : '1px solid transparent', cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                  background: tab === t.key ? `${t.accent}28` : 'rgba(255,255,255,0.07)',
+                  color: tab === t.key ? (t.key === 'bills' ? '#F4A0A0' : t.highlight ? '#E8D5A3' : 'rgba(196,169,232,0.95)') : 'rgba(255,255,255,0.5)',
+                  boxShadow: tab === t.key && t.highlight && (t.count ?? 0) > 0 ? `0 0 10px ${t.accent}33` : 'none',
                 }}>
                 {t.label}{t.count !== undefined ? ` (${t.count})` : ''}
               </button>

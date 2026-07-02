@@ -321,8 +321,8 @@ function Slide3() {
 
       {/* Secondary links — flex:1 spacer card */}
       <div style={{ ...G, borderRadius: 18, padding: '12px 14px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={LBL}><Briefcase style={{ width: 9, height: 9 }} />Also in Work</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1 }}>
+        <div style={LBL}><Briefcase style={{ width: 9, height: 9 }} />Quick Access</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {[
             { icon: Mail,         label: 'Email',      desc: 'Gmail inbox',         href: '/email',      color: '#A8C4DA' },
             { icon: Calendar,     label: 'Calendar',   desc: "Today's events",      href: '/calendar',   color: '#8AAEC8' },

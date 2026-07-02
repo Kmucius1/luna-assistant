@@ -68,11 +68,13 @@ async function categorizeEmails(emails: (GmailMessage & { account: string })[]) 
     const userPrompt = `Categorize each email below.
 
 Categories:
-- urgent: needs response TODAY, deadline or time-sensitive
+- urgent: needs response TODAY, deadline or time-sensitive. ALWAYS use "urgent" for: bills due, payment due, invoice, statement due, balance due, past due, medical bills, doctor bills, insurance EOB, prescription ready, lab results, appointment reminders, account past due, collection notices, utility shutoff warnings.
 - needs_reply: requires a response but not urgent
 - fyi: informational, no reply needed
 - newsletter: marketing, newsletters, subscriptions
 - internal: automated notifications, system emails
+
+IMPORTANT: Any email about money owed, medical care, insurance, prescriptions, or health appointments must be "urgent". When in doubt on financial or medical emails, choose "urgent" over "fyi".
 
 For each email, also extract concrete ACTION ITEMS as short task strings if present.
 

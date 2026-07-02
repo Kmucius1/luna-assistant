@@ -112,16 +112,45 @@ function PurpleCloud() {
   )
 }
 
-// ─── Style visual placeholder ─────────────────────────────────────────────────
+// ─── Pinterest outfit inspo strip ────────────────────────────────────────────
+const OUTFIT_PINS = [
+  { src: 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg', label: 'Chic Workwear' },
+  { src: 'https://i.pinimg.com/736x/0b/f7/2f/0bf72f36fe8ef8c3e2260069ebc7c9b8.jpg', label: 'Business Casual' },
+  { src: 'https://i.pinimg.com/736x/9e/22/4e/9e224e109889a66d84689073f5fd3453.jpg', label: 'Old Money' },
+  { src: 'https://i.pinimg.com/736x/90/a0/83/90a083f4aa1d32c00d420bfdd3baa212.jpg', label: 'Classy' },
+  { src: 'https://i.pinimg.com/736x/98/40/10/984010c8f122ff9fc08d9a918d91173a.jpg', label: 'Wide-Leg' },
+  { src: 'https://i.pinimg.com/736x/dd/85/71/dd8571499b11785dd01ecf717acb0465.jpg', label: 'Effortless' },
+  { src: 'https://i.pinimg.com/736x/0f/ab/ab/0fabab24cecd50492cc8a572b5665ae0.jpg', label: 'Office Chic' },
+]
+
 function StyleVisual() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '5px auto 7px', gap: 7 }}>
-      <Scissors style={{ width: 18, height: 18, color: 'rgba(220,190,140,0.42)' }} strokeWidth={1.2} />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <div style={{ width: 16, height: 24, borderRadius: 3, background: 'rgba(220,190,140,0.10)', border: '1px solid rgba(220,190,140,0.10)' }} />
-        <div style={{ width: 20, height: 14, borderRadius: 3, background: 'rgba(220,190,140,0.07)' }} />
+    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: '4px 0' }}>
+      {/* Scrollable outfit strip */}
+      <div style={{
+        display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none',
+        WebkitOverflowScrolling: 'touch', paddingBottom: 2,
+      }}>
+        {OUTFIT_PINS.map((pin, i) => (
+          <div key={i} style={{ flexShrink: 0, position: 'relative' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={pin.src}
+              alt={pin.label}
+              style={{
+                width: 54, height: 72, objectFit: 'cover',
+                borderRadius: 9, display: 'block',
+                border: '1px solid rgba(220,190,140,0.15)',
+              }}
+            />
+          </div>
+        ))}
       </div>
-      <div style={{ width: 8, height: 20, borderRadius: 2, background: 'rgba(220,190,140,0.08)' }} />
+      {/* Pinterest credit */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, flexShrink: 0 }}>
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+        <span style={{ fontSize: 8, color: 'rgba(220,190,140,0.45)', fontWeight: 600, letterSpacing: '0.04em' }}>PINTEREST INSPO</span>
+      </div>
     </div>
   )
 }
@@ -294,8 +323,8 @@ function Slide2({ guidance }: { guidance: GuidanceData | null }) {
 
       <PreviewCard label="Style" icon={<Scissors style={{ width: 9, height: 9 }} />} href="/creative" linkText="Atelier">
         <StyleVisual />
-        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Soft power dressing</p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.40)', margin: '2px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Neutrals · Effortless</p>
+        <p style={{ fontSize: 11, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Today&apos;s Inspo</p>
+        <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', margin: '2px 0 0', lineHeight: 1.3, flexShrink: 0 }}>Chic · Neutral · Boss</p>
       </PreviewCard>
 
       <PreviewCard label="Money" icon={
@@ -444,15 +473,71 @@ function Slide4({ guidance }: { guidance: GuidanceData | null }) {
   return (
     <div style={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 7 }}>
 
-      {/* Weekly Focus — flex:1 so it fills space and pushes Plan my week to the bottom */}
-      <div style={{ ...G, borderRadius: 18, padding: '11px 13px', flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <div style={LBL}><Target style={{ width: 9, height: 9 }} />WEEKLY FOCUS</div>
-        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: '0 0 3px', lineHeight: 1.2 }}>
-          One lane gets your energy this week.
+      {/* Weekly Focus — redesigned hero tile */}
+      <div style={{
+        borderRadius: 22, padding: '14px 16px 12px',
+        flex: 1, minHeight: 0, overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+        background: 'linear-gradient(148deg, rgba(58,18,115,0.90) 0%, rgba(28,8,78,0.94) 50%, rgba(10,4,38,0.97) 100%)',
+        border: '1px solid rgba(196,169,232,0.20)',
+        boxShadow: '0 0 48px rgba(100,40,210,0.18), inset 0 1px 0 rgba(255,255,255,0.07)',
+        position: 'relative',
+        backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
+      }}>
+        {/* Glow orb top-right */}
+        <div style={{ position: 'absolute', top: -28, right: -28, width: 130, height: 130, borderRadius: '50%', background: 'radial-gradient(circle, rgba(160,100,255,0.22) 0%, transparent 68%)', pointerEvents: 'none' }} />
+        {/* Glow orb bottom-left */}
+        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 90, height: 90, borderRadius: '50%', background: 'radial-gradient(circle, rgba(100,50,200,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexShrink: 0, position: 'relative', zIndex: 1 }}>
+          <div style={{ ...LBL, marginBottom: 0 }}><Target style={{ width: 9, height: 9 }} />Weekly Focus</div>
+          <div style={{ padding: '3px 10px', borderRadius: 20, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(196,169,232,0.24)' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#C4A9E8', letterSpacing: '0.08em' }}>
+              WK {Math.ceil((new Date().getTime() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 604800000)}
+            </span>
+          </div>
+        </div>
+
+        {/* Center sigil */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10, flexShrink: 0, position: 'relative', zIndex: 1 }}>
+          <StarSigil size={48} />
+        </div>
+
+        {/* Focus declaration */}
+        <p style={{ fontSize: 17, fontWeight: 900, color: 'white', margin: '0 0 5px', lineHeight: 1.22, textAlign: 'center', letterSpacing: '-0.01em', position: 'relative', zIndex: 1, flexShrink: 0 }}>
+          One lane gets your<br />energy this week.
         </p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+
+        {/* Affirmation */}
+        <p style={{ fontSize: 11, color: 'rgba(196,169,232,0.68)', margin: '0 0 auto', lineHeight: 1.6, textAlign: 'center', fontStyle: 'italic', position: 'relative', zIndex: 1, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {guidance?.affirmation ?? 'Finish what unlocks momentum.'}
         </p>
+
+        {/* Week day progress */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 12, flexShrink: 0, position: 'relative', zIndex: 1 }}>
+          {['M','T','W','T','F','S','S'].map((day, i) => {
+            const jsDay = new Date().getDay()
+            const weekPos = jsDay === 0 ? 6 : jsDay - 1
+            const isPast  = i < weekPos
+            const isToday = i === weekPos
+            return (
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                <div style={{ width: isToday ? 9 : 6, height: isToday ? 9 : 6, borderRadius: '50%', background: isToday ? '#C4A9E8' : isPast ? 'rgba(139,111,184,0.58)' : 'rgba(255,255,255,0.10)', boxShadow: isToday ? '0 0 8px rgba(196,169,232,0.60)' : 'none', transition: 'all 0.2s' }} />
+                <span style={{ fontSize: 7.5, fontWeight: 700, color: isToday ? '#C4A9E8' : isPast ? 'rgba(196,169,232,0.38)' : 'rgba(255,255,255,0.18)', letterSpacing: '0.04em' }}>{day}</span>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Theme pills */}
+        <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 10, flexShrink: 0, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
+          {['Refinement', 'Visibility', 'Momentum'].map((theme, i) => (
+            <div key={theme} style={{ padding: '3px 10px', borderRadius: 20, background: `rgba(139,111,184,${0.12 + i * 0.04})`, border: '1px solid rgba(196,169,232,0.16)' }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(196,169,232,0.62)', letterSpacing: '0.04em' }}>{theme}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Lesson + Upcoming row */}
@@ -564,8 +649,8 @@ export default function HomePage() {
         style={{
           flex: 1, minHeight: 0, overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
-          padding: '0 16px',
-          paddingBottom: 'calc(max(10px, env(safe-area-inset-bottom, 0px)) + 78px)',
+          paddingLeft: 16, paddingRight: 16,
+          paddingBottom: 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)',
         }}
         className="mx-auto w-full max-w-[1120px] lg:pt-16"
       >
