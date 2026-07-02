@@ -125,7 +125,7 @@ export default function ExplorePage() {
   return (
     <AppLayout noScroll>
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <CategoryPager pages={pages} accentColor="#8B6FB8" disableSwipe />
+        <CategoryPager pages={pages} accentColor="#8B6FB8" hidePills />
       </div>
     </AppLayout>
   )

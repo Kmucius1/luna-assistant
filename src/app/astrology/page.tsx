@@ -598,7 +598,7 @@ export default function AstrologyPage() {
         </div>
       </div>
 
-      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#C4A9E8" disableSwipe />
+      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#C4A9E8" hidePills />
     </AppLayout>
   )
 }

@@ -450,7 +450,7 @@ export default function WorkPage() {
 
   return (
     <AppLayout noScroll>
-      <CategoryPager pages={pages} accentColor="#8B6FB8" disableSwipe />
+      <CategoryPager pages={pages} accentColor="#8B6FB8" hidePills />
     </AppLayout>
   )
 }
