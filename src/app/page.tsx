@@ -1,6 +1,7 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { SwipeContainer } from '@/components/layout/SwipeContainer'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { DesktopHeader } from '@/components/layout/DesktopHeader'
@@ -137,6 +138,7 @@ function Slide1({
 }) {
   const tasks     = (dataLoaded && topTasks.length > 0) ? topTasks.slice(0, 3) : FALLBACK_TASKS
   const nextEvent = calEvents[0] ?? null
+  const [messageExpanded, setMessageExpanded] = useState(false)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, height: '100%', overflow: 'hidden' }}>
@@ -183,13 +185,24 @@ function Slide1({
               ))}
             </div>
           ) : (
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, margin: '0 0 7px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+            <p style={{
+              fontSize: 13, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, margin: '0 0 7px',
+              overflow: messageExpanded ? 'visible' : 'hidden',
+              display: messageExpanded ? 'block' : '-webkit-box',
+              WebkitLineClamp: messageExpanded ? 'unset' : 3, WebkitBoxOrient: 'vertical',
+            }}>
               {guidance?.energy ?? 'Your energy needs structure before speed. Pick one priority and protect your body before you start spiraling.'}
+              {messageExpanded && guidance?.affirmation && (
+                <><br /><br />{guidance.affirmation}</>
+              )}
             </p>
           )}
-          <Link href="/luna" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#8B6FB8' }}>Tell me more →</span>
-          </Link>
+          <button
+            onClick={() => setMessageExpanded(v => !v)}
+            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#8B6FB8' }}
+          >
+            {messageExpanded ? 'Show less ←' : 'Tell me more →'}
+          </button>
         </div>
         <img src="/brand/ui/luna-message-star.png" alt="" style={{ width: 52, height: 52, flexShrink: 0, objectFit: 'contain', animation: 'breathe 4s ease-in-out infinite' }} />
       </div>
@@ -694,7 +707,12 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
-export default function HomePage() {
+const TAB_TO_SLIDE: Record<string, number> = { today: 0, previews: 1, wellness: 2, energy: 3, weekly: 4 }
+
+function HomePageInner() {
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab')
+  const [activeSlide, setActiveSlide] = useState(TAB_TO_SLIDE[initialTab ?? ''] ?? 0)
   const [hour,       setHour]       = useState(new Date().getHours())
   const [guidance,   setGuidance]   = useState<GuidanceData | null>(null)
   const [gLoading,   setGLoading]   = useState(true)
@@ -766,11 +784,19 @@ export default function HomePage() {
           }}
           className="mx-auto w-full max-w-[1120px]"
         >
-          <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
+          <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" activeIndex={activeSlide} onChangeIndex={setActiveSlide} />
         </div>
       </main>
 
       <BottomNav />
     </SwipeContainer>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomePageInner />
+    </Suspense>
   )
 }

@@ -13,7 +13,7 @@ const GLASS: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(20px)',
 }
 
-interface AppDef { label: string; emoji: string; href: string; desc: string; color: string }
+interface AppDef { label: string; emoji: string; href: string; desc: string; color: string; external?: boolean }
 
 const ALL_APPS: AppDef[] = [
   { label: 'LUNA Chat',       emoji: '💬', href: '/luna',                color: '#C4A9E8', desc: 'Talk to your AI guide'        },
@@ -30,8 +30,8 @@ const ALL_APPS: AppDef[] = [
   { label: 'Night Mode',      emoji: '🌙', href: '/night',               color: '#A890D0', desc: 'Wind down & tomorrow prep'   },
   { label: 'Relationships',   emoji: '💗', href: '/relationships',        color: '#D4A8C4', desc: 'Love energy & synastry'      },
   { label: 'Manifestation',   emoji: '✨', href: '/manifestation',        color: '#C9A96E', desc: 'Intentions & vision board'  },
-  { label: 'Subscriptions',   emoji: '💳', href: '/subscriptions',        color: '#A8C4DA', desc: 'Bills & recurring payments'  },
-  { label: 'EHM Strategies',  emoji: '🏠', href: '/ehm',                  color: '#C9A96E', desc: 'Mortgage & real estate'     },
+  { label: 'Subscriptions',   emoji: '💳', href: '/money/subscriptions',  color: '#A8C4DA', desc: 'Bills & recurring payments'  },
+  { label: 'EHM Strategies',  emoji: '🏠', href: 'https://ehmstrategies.com', color: '#C9A96E', desc: 'Mortgage & real estate', external: true },
   { label: 'Dictate',         emoji: '🎙️', href: '/luna?tab=dictate',    color: '#C4A9E8', desc: 'Voice memo to LUNA'         },
   { label: 'Work Overview',   emoji: '💼', href: '/work',                 color: '#A8C4DA', desc: 'Dashboard & projects'       },
   { label: 'Check-in',        emoji: '⚡', href: '/?tab=energy',          color: '#8AB88A', desc: 'Daily energy check-in'      },
@@ -49,8 +49,8 @@ const CATEGORIES = [
 function AppGrid({ apps }: { apps: AppDef[] }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-      {apps.map(app => (
-        <Link key={app.label} href={app.href} style={{ textDecoration: 'none' }}>
+      {apps.map(app => {
+        const tile = (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 2px' }}>
             <div style={{
               width: 46, height: 46, borderRadius: 14, flexShrink: 0,
@@ -65,8 +65,17 @@ function AppGrid({ apps }: { apps: AppDef[] }) {
               {app.label}
             </span>
           </div>
-        </Link>
-      ))}
+        )
+        return app.external ? (
+          <a key={app.label} href={app.href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            {tile}
+          </a>
+        ) : (
+          <Link key={app.label} href={app.href} style={{ textDecoration: 'none' }}>
+            {tile}
+          </Link>
+        )
+      })}
     </div>
   )
 }
