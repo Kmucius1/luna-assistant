@@ -94,7 +94,7 @@ function AppBtn({ icon: Icon, label, href, color, desc, external }: {
 }) {
   const inner = (
     <div style={{
-      ...G, borderRadius: 18, padding: '14px 10px 12px',
+      ...G, borderRadius: 20, padding: '14px 10px 12px',
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
       cursor: 'pointer', textAlign: 'center',
     }}>
@@ -127,13 +127,13 @@ function Slide1({
   done: Set<string>; onToggle: (id: string) => void; onSync: () => void
 }) {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(168,196,218,0.12)', border: '1px solid rgba(168,196,218,0.2)' }}>
-            <Briefcase style={{ width: 18, height: 18, color: '#A8C4DA' }} strokeWidth={1.6} />
+          <div style={{ width: 38, height: 38, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.16)', border: '1px solid rgba(139,111,184,0.28)' }}>
+            <Briefcase style={{ width: 18, height: 18, color: '#C4A9E8' }} strokeWidth={1.6} />
           </div>
           <div>
             <p style={{ fontSize: 20, fontWeight: 800, color: 'white', lineHeight: 1.1, margin: 0 }}>Work</p>
@@ -142,7 +142,7 @@ function Slide1({
             </p>
           </div>
         </div>
-        <button onClick={onSync} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.09)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.38)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={onSync} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 13, border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.46)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
           {loading ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <RefreshCw style={{ width: 12, height: 12 }} />}
           Sync
         </button>
@@ -164,10 +164,10 @@ function Slide1({
       </div>
 
       {/* Needs attention — flex:1, inner scroll */}
-      <div style={{ ...G, borderRadius: 18, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ ...G, borderRadius: 22, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
           <div style={LBL}><Zap style={{ width: 9, height: 9 }} />Needs attention</div>
-          <Link href="/tasks" style={{ fontSize: 11, color: 'rgba(168,196,218,0.5)', textDecoration: 'none', fontWeight: 600 }}>All tasks →</Link>
+          <Link href="/tasks" style={{ fontSize: 10.5, color: '#8B6FB8', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
         </div>
         {error && !loading ? (
           <div style={{ padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -192,15 +192,15 @@ function Slide1({
       </div>
 
       {/* Quick: Email + Calendar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, flexShrink: 0 }}>
         <Link href="/email" style={{ textDecoration: 'none' }}>
-          <div style={{ ...G, borderRadius: 16, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ ...G, borderRadius: 22, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Mail style={{ width: 18, height: 18, color: '#A8C4DA', flexShrink: 0 }} strokeWidth={1.5} />
             <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Email</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Gmail inbox</p></div>
           </div>
         </Link>
         <Link href="/calendar" style={{ textDecoration: 'none' }}>
-          <div style={{ ...G, borderRadius: 16, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ ...G, borderRadius: 22, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Calendar style={{ width: 18, height: 18, color: '#8AAEC8', flexShrink: 0 }} strokeWidth={1.5} />
             <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Calendar</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Today's events</p></div>
           </div>
@@ -247,26 +247,26 @@ function Slide2({
   ]
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Filter pills + new task */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         <div style={{ flex: 1, display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none' }}>
           {FILTERS.map(f => (
-            <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: '6px 12px', borderRadius: 20, border: `1px solid ${filter === f.id ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.09)'}`, background: filter === f.id ? 'rgba(139,111,184,0.16)' : 'rgba(255,255,255,0.04)', color: filter === f.id ? '#C4A9E8' : 'rgba(255,255,255,0.40)', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: '6px 12px', borderRadius: 20, border: `1px solid ${filter === f.id ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: filter === f.id ? 'rgba(139,111,184,0.18)' : 'rgba(255,255,255,0.03)', color: filter === f.id ? '#C4A9E8' : 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {f.label}
             </button>
           ))}
         </div>
         <Link href="/tasks?new=1" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 10, background: 'rgba(139,111,184,0.18)', border: '1px solid rgba(139,111,184,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(139,111,184,0.18)', border: '1px solid rgba(139,111,184,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Plus style={{ width: 16, height: 16, color: '#C4A9E8' }} strokeWidth={2} />
           </div>
         </Link>
       </div>
 
       {/* Task list */}
-      <div style={{ ...G, flex: 1, minHeight: 0, borderRadius: 18, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ ...G, flex: 1, minHeight: 0, borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
           <div style={LBL}><CheckSquare style={{ width: 9, height: 9 }} />{filtered.length} task{filtered.length !== 1 ? 's' : ''} {filter !== 'all' ? `· ${FILTERS.find(f => f.id === filter)?.label}` : ''}</div>
         </div>
@@ -285,11 +285,15 @@ function Slide2({
         )}
       </div>
 
-      {/* View in DRYP Hub */}
+      {/* View in DRYP Hub — primary CTA */}
       <a href="https://dryphub.com" target="_blank" rel="noreferrer" style={{ textDecoration: 'none', flexShrink: 0 }}>
-        <div style={{ ...G, borderRadius: 16, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(168,196,218,0.06)', border: '1px solid rgba(168,196,218,0.14)' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#A8C4DA' }}>Open DRYP Hub →</span>
-          <ExternalLink style={{ width: 14, height: 14, color: 'rgba(168,196,218,0.45)' }} />
+        <div style={{
+          borderRadius: 16, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'linear-gradient(135deg, #6B3DFF 0%, #8D5CFF 100%)',
+          boxShadow: '0 0 18px rgba(109,60,255,0.35)',
+        }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>Open DRYP Hub →</span>
+          <ExternalLink style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.7)' }} />
         </div>
       </a>
 
@@ -302,17 +306,17 @@ function Slide2({
 // ─────────────────────────────────────────────────────────────────────────────
 function Slide3() {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header */}
-      <div style={{ ...G, borderRadius: 18, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(168,196,218,0.14)' }}>
+      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(139,111,184,0.20)' }}>
         <div style={LBL}><Users style={{ width: 9, height: 9 }} />DRYP Digital · CRM</div>
         <p style={{ fontSize: 16, fontWeight: 800, color: 'white', margin: '0 0 3px' }}>Clients & Outreach</p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.42)', margin: 0 }}>Your agency work, campaigns, and client relationships.</p>
       </div>
 
       {/* Primary CRM apps — 2×2 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, flexShrink: 0 }}>
         <AppBtn icon={Building2}   label="DRYP Hub"   href="https://dryphub.com"             color="#C4A9E8" desc="CRM dashboard"    external />
         <AppBtn icon={Users}       label="Clients"    href="/dryp-hub"                       color="#A890D0" desc="Account list"              />
         <AppBtn icon={Zap}         label="Outreach"   href="https://dryphub.com/outreach"    color="#9070B0" desc="Contact pipeline" external />
@@ -320,7 +324,7 @@ function Slide3() {
       </div>
 
       {/* Secondary links — flex:1 spacer card */}
-      <div style={{ ...G, borderRadius: 18, padding: '12px 14px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ ...G, borderRadius: 22, padding: '12px 14px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         <div style={LBL}><Briefcase style={{ width: 9, height: 9 }} />Quick Access</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {[
@@ -330,7 +334,7 @@ function Slide3() {
             { icon: Target,       label: 'Work Overview', desc: 'Dashboard',         href: '/work',       color: '#8B6FB8' },
           ].map(({ icon: Icon, label, desc, href, color }) => (
             <Link key={label} href={href} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div style={{ width: 32, height: 32, borderRadius: 10, background: `${color}18`, border: `1px solid ${color}28`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Icon style={{ width: 15, height: 15, color }} strokeWidth={1.6} />
                 </div>
@@ -362,17 +366,17 @@ const MONEY_APPS = [
 
 function Slide4() {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header card */}
-      <div style={{ ...G, borderRadius: 18, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(20,44,20,0.72) 0%, rgba(12,28,12,0.85) 100%)', border: '1px solid rgba(138,184,138,0.16)' }}>
+      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(20,44,20,0.72) 0%, rgba(12,28,12,0.85) 100%)', border: '1px solid rgba(138,184,138,0.16)' }}>
         <div style={LBL}><BarChart2 style={{ width: 9, height: 9 }} />Money</div>
         <p style={{ fontSize: 16, fontWeight: 800, color: 'white', margin: '0 0 3px' }}>Financial Overview</p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', margin: 0 }}>Track spending, bills, subscriptions, and plan ahead.</p>
       </div>
 
       {/* Money apps grid — flex:1 so it fills remaining space */}
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(3, 1fr)', gap: 7 }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(3, 1fr)', gap: 8 }}>
         {MONEY_APPS.map(app => (
           <AppBtn key={app.href} {...app} />
         ))}
@@ -446,7 +450,7 @@ export default function WorkPage() {
 
   return (
     <AppLayout noScroll>
-      <CategoryPager pages={pages} hidePills accentColor="#A8C4DA" />
+      <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" />
     </AppLayout>
   )
 }
