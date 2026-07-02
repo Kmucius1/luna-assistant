@@ -5,12 +5,12 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { CategoryPager } from '@/components/ui/CategoryPager'
 import { Search, Moon, Briefcase, DollarSign, Heart, Star, Sparkles, Calendar, MessageCircle, Scissors, Home, Zap, BookOpen, Clock, Target, Brain, Mic, Sun } from 'lucide-react'
 
-const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.04)',
-  border: '1px solid rgba(255,255,255,0.09)',
+const G: React.CSSProperties = {
+  background: 'rgba(20,12,50,0.68)',
+  border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: 22,
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
 }
 
 interface AppDef { label: string; emoji: string; href: string; desc: string; color: string; external?: boolean }
@@ -48,16 +48,21 @@ const CATEGORIES = [
 
 function AppGrid({ apps }: { apps: AppDef[] }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
       {apps.map(app => {
         const tile = (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 2px' }}>
+          <div style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+            padding: '12px 4px 10px', borderRadius: 13,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}>
             <div style={{
-              width: 46, height: 46, borderRadius: 14, flexShrink: 0,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.09)',
+              width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+              background: `${app.color}20`,
+              border: `1px solid ${app.color}40`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 20,
+              fontSize: 19,
             }}>
               {app.emoji}
             </div>
@@ -82,8 +87,8 @@ function AppGrid({ apps }: { apps: AppDef[] }) {
 
 function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ ...GLASS, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', marginBottom: 14 }}>
-      <Search style={{ width: 15, height: 15, color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
+    <div style={{ ...G, borderRadius: 18, display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', marginBottom: 14 }}>
+      <Search style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.5)', flexShrink: 0 }} />
       <input
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -120,7 +125,7 @@ export default function ExplorePage() {
   return (
     <AppLayout noScroll>
       <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <CategoryPager pages={pages} accentColor="#8B6FB8" />
+        <CategoryPager pages={pages} accentColor="#8B6FB8" disableSwipe />
       </div>
     </AppLayout>
   )

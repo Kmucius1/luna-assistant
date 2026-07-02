@@ -5,12 +5,25 @@ import { CategoryPager } from '@/components/ui/CategoryPager'
 import { Star, ChevronRight, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 
-const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: 20,
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
+const G: React.CSSProperties = {
+  background: 'rgba(20,12,50,0.68)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderRadius: 22,
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
+}
+
+const LBL: React.CSSProperties = {
+  fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
+  textTransform: 'uppercase', color: '#8B6FB8',
+  display: 'flex', alignItems: 'center', gap: 6,
+  marginBottom: 10, flexShrink: 0,
+}
+
+const GO_DEEPER: React.CSSProperties = {
+  padding: '13px 18px', borderRadius: 16,
+  background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.22)',
+  display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
 }
 
 function Shimmer({ h = 12, w = '100%' }: { h?: number; w?: string|number }) {
@@ -29,11 +42,8 @@ function TabCosmic() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.15))' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14 }}>
-          <span style={{ fontSize: 18 }}>✨</span>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.7)' }}>Today's Cosmic Weather</span>
-        </div>
+      <div style={{ ...G, borderRadius: 26, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.15))' }}>
+        <div style={LBL}><span>✨</span>Today's Cosmic Weather</div>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>{[1,2,3].map(i => <Shimmer key={i} h={12} w={i===2?'70%':'100%'} />)}</div>
         ) : brief ? (
@@ -69,12 +79,12 @@ function TabCosmic() {
         { href: '/astrology/transits', label: "Today's Transits", emoji: '🪐' },
       ].map(item => (
         <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-          <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+          <div style={GO_DEEPER}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 18 }}>{item.emoji}</span>
-              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)' }}>{item.label}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#8B6FB8' }}>{item.label}</span>
             </div>
-            <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+            <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
           </div>
         </Link>
       ))}
@@ -94,7 +104,7 @@ function TabMoon() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '20px', background: 'linear-gradient(135deg, rgba(20,15,50,0.4), rgba(60,40,100,0.15))', border: '1px solid rgba(139,111,184,0.2)' }}>
+      <div style={{ ...G, borderRadius: 26, padding: '20px', background: 'linear-gradient(135deg, rgba(20,15,50,0.4), rgba(60,40,100,0.15))', border: '1px solid rgba(139,111,184,0.2)' }}>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
@@ -120,16 +130,16 @@ function TabMoon() {
           </div>
         )}
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.6)', marginBottom: 12 }}>Moon Rituals</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>Moon Rituals</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {RITUALS.map((r, i) => <p key={i} style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>{r}</p>)}
         </div>
       </div>
       <Link href="/astrology/moon" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Moon Portal</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Moon Portal</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -152,9 +162,9 @@ function TabTransits() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
+      <div style={{ ...G, padding: '16px 18px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(168,196,218,0.65)' }}>Live Sky Now</p>
+          <div style={{ ...LBL, marginBottom: 0 }}>Live Sky Now</div>
           <button onClick={() => { setLoading(true); fetch('/api/astrology/planets').then(r => r.json()).then(d => setPlanets(d.planets ?? [])).catch(() => {}).finally(() => setLoading(false)) }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)' }}>
             <RefreshCw className="h-3.5 w-3.5" />
           </button>
@@ -176,8 +186,8 @@ function TabTransits() {
           </div>
         )}
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.65)', marginBottom: 12 }}>Key 2026 Transits for You</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>Key 2026 Transits for You</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {KEY_TRANSITS.map(t => (
             <div key={t.planet} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -188,9 +198,9 @@ function TabTransits() {
         </div>
       </div>
       <Link href="/astrology/transits" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Transit Report</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Transit Report</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -214,8 +224,8 @@ function TabChart() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.65)', marginBottom: 14 }}>Your Big Three</p>
+      <div style={{ ...G, borderRadius: 26, padding: '16px 18px' }}>
+        <div style={LBL}>Your Big Three</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {BIG3.map(p => (
             <div key={p.label} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
@@ -229,8 +239,8 @@ function TabChart() {
           ))}
         </div>
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.65)', marginBottom: 12 }}>Planetary Placements</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>Planetary Placements</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {PLANETS.map(p => (
             <div key={p.planet} style={{ display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.04)' }}>
@@ -243,9 +253,9 @@ function TabChart() {
       </div>
       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center', fontStyle: 'italic' }}>Nov 14, 2000 · 7:04 PM · Sellersville, PA</p>
       <Link href="/astrology/birth-chart" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Birth Chart</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Birth Chart</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -264,31 +274,31 @@ function TabSpirit() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       {loading ? (
-        <div style={{ ...GLASS, padding: '20px' }}><div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>{[1,2,3].map(i => <Shimmer key={i} h={12} />)}</div></div>
+        <div style={{ ...G, padding: '20px' }}><div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>{[1,2,3].map(i => <Shimmer key={i} h={12} />)}</div></div>
       ) : (
         <>
           {guidance?.affirmation && (
-            <div style={{ ...GLASS, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.12))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(196,169,232,0.6)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Today's Affirmation</p>
+            <div style={{ ...G, borderRadius: 26, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.12))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
+              <div style={{ ...LBL, justifyContent: 'center' }}>Today's Affirmation</div>
               <p style={{ fontSize: 16, color: 'white', fontStyle: 'italic', lineHeight: 1.6 }}>"{guidance.affirmation}"</p>
             </div>
           )}
           {guidance?.shadow_question && (
-            <div style={{ ...GLASS, padding: '16px 18px' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(201,107,90,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Shadow Work</p>
+            <div style={{ ...G, padding: '16px 18px' }}>
+              <div style={LBL}>Shadow Work</div>
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, fontStyle: 'italic' }}>{guidance.shadow_question}</p>
             </div>
           )}
           {guidance?.ritual && (
-            <div style={{ ...GLASS, padding: '16px 18px', background: 'rgba(138,184,138,0.06)', border: '1px solid rgba(138,184,138,0.15)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(138,184,138,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Today's Ritual</p>
+            <div style={{ ...G, padding: '16px 18px', background: 'rgba(138,184,138,0.06)', border: '1px solid rgba(138,184,138,0.15)' }}>
+              <p style={{ ...LBL, color: 'rgba(138,184,138,0.75)' }}>Today's Ritual</p>
               <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>{guidance.ritual}</p>
             </div>
           )}
         </>
       )}
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(201,169,110,0.65)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>3 Gratitudes</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>3 Gratitudes</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {gratitude.map((g, i) => (
             <input key={i} value={g} onChange={e => setGratitude(prev => prev.map((v, j) => j === i ? e.target.value : v))}
@@ -298,9 +308,9 @@ function TabSpirit() {
         </div>
       </div>
       <Link href="/astrology/rituals" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Spirit + Rituals</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Spirit + Rituals</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -321,14 +331,14 @@ function TabCrystals() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
+      <div style={{ ...G, borderRadius: 26, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
         <span style={{ fontSize: 40 }}>🔮</span>
         <p style={{ fontSize: 14, fontWeight: 700, color: 'white', marginTop: 8 }}>Crystal of the Day</p>
         <p style={{ fontSize: 16, fontWeight: 800, color: '#C4A9E8', marginTop: 4 }}>Labradorite</p>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 6, lineHeight: 1.6 }}>Your magic is activated. Trust what you see beneath the surface — your Scorpio Sun + Cancer Moon picks up on things others miss.</p>
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.65)', marginBottom: 12 }}>Crystal Library</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>Crystal Library</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {CRYSTAL_LIBRARY.map(c => (
             <div key={c.name} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -342,9 +352,9 @@ function TabCrystals() {
         </div>
       </div>
       <Link href="/astrology/crystals" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Crystal Guide</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Crystal Guide</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -361,8 +371,8 @@ function TabLove() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px', background: 'rgba(201,90,90,0.06)', border: '1px solid rgba(201,90,90,0.15)' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(201,130,130,0.7)', marginBottom: 12 }}>Zoe + Kaleb Synastry</p>
+      <div style={{ ...G, borderRadius: 26, padding: '16px 18px', background: 'rgba(201,90,90,0.06)', border: '1px solid rgba(201,90,90,0.15)' }}>
+        <p style={{ ...LBL, color: 'rgba(201,130,130,0.75)' }}>Zoe + Kaleb Synastry</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {SYNASTRY.map(s => (
             <div key={s.label}>
@@ -378,17 +388,17 @@ function TabLove() {
           ))}
         </div>
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.65)', marginBottom: 10 }}>Love Patterns to Watch</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>Love Patterns to Watch</div>
         {['Venus in Capricorn: you express love through acts of service, loyalty, and building. You need that mirrored back.',
           'Mars in Libra: you need relational harmony BEFORE you act. Conflict freezes your momentum — find balance first.',
           "Cancer Moon: emotional safety isn't optional. Without it, you close down. Communicate your needs early."
         ].map((note, i) => <p key={i} style={{ fontSize: 13, color: 'rgba(255,255,255,0.62)', lineHeight: 1.6, marginBottom: 8 }}>✦ {note}</p>)}
       </div>
       <Link href="/love" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Love + Relationships</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Love + Relationships</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -412,14 +422,14 @@ function TabForecasts() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(168,196,218,0.65)', marginBottom: 10 }}>This Week</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>This Week</div>
         {loading ? <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}><Shimmer h={12} /><Shimmer h={12} w="80%" /></div>
           : forecast?.weekly ? <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6 }}>{forecast.weekly}</p>
           : <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic' }}>Weekly forecast loading…</p>}
       </div>
-      <div style={{ ...GLASS, padding: '16px 18px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.65)', marginBottom: 14 }}>2026–2028 Outlook</p>
+      <div style={{ ...G, padding: '16px 18px' }}>
+        <div style={LBL}>2026–2028 Outlook</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {TIMELINE.map(t => (
             <div key={t.period} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
@@ -433,9 +443,9 @@ function TabForecasts() {
         </div>
       </div>
       <Link href="/astrology/forecasts" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Forecast Report</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Forecast Report</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -452,21 +462,21 @@ function TabDeepDive() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '14px 18px', background: 'rgba(20,15,50,0.3)', border: '1px solid rgba(139,111,184,0.2)' }}>
+      <div style={{ ...G, padding: '14px 18px', background: 'rgba(20,15,50,0.3)', border: '1px solid rgba(139,111,184,0.2)' }}>
         <p style={{ fontSize: 13, color: 'rgba(196,169,232,0.75)', lineHeight: 1.6, fontStyle: 'italic' }}>These are your deep placements — the ones that explain the patterns that keep showing up in your life.</p>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {DEEP.map(d => (
-          <div key={d.label} style={{ ...GLASS, padding: '16px 18px' }}>
+          <div key={d.label} style={{ ...G, padding: '16px 18px' }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#C4A9E8', marginBottom: 8 }}>{d.label}</p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>{d.content}</p>
           </div>
         ))}
       </div>
       <Link href="/astrology/deep-dives" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>More Deep Dives</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>More Deep Dives</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -489,11 +499,8 @@ function TabToday() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...GLASS, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.15))' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-          <span style={{ fontSize: 16 }}>✨</span>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.7)' }}>Today's Cosmic Weather</span>
-        </div>
+      <div style={{ ...G, borderRadius: 26, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.15))' }}>
+        <div style={LBL}><span>✨</span>Today's Cosmic Weather</div>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}><Shimmer h={12} /><Shimmer h={12} w="80%" /></div>
         ) : brief ? (
@@ -506,17 +513,17 @@ function TabToday() {
         )}
       </div>
 
-      <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+      <div style={{ ...G, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
         <span style={{ fontSize: 36, lineHeight: 1 }}>{loading ? '🌙' : (moon?.phase?.emoji ?? '🌙')}</span>
         <div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(196,169,232,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>Moon Phase</p>
+          <div style={{ ...LBL, marginBottom: 3 }}>Moon Phase</div>
           <p style={{ fontSize: 16, fontWeight: 700, color: 'white' }}>{loading ? '…' : (moon?.phase?.name ?? 'Loading')}</p>
         </div>
       </div>
 
       {(guidance?.affirmation || loading) && (
-        <div style={{ ...GLASS, padding: '16px 18px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(196,169,232,0.6)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Today's Affirmation</p>
+        <div style={{ ...G, borderRadius: 26, padding: '16px 18px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)' }}>
+          <div style={{ ...LBL, justifyContent: 'center' }}>Today's Affirmation</div>
           {loading
             ? <Shimmer h={12} />
             : <p style={{ fontSize: 14, color: 'white', fontStyle: 'italic', lineHeight: 1.6 }}>"{guidance?.affirmation}"</p>
@@ -525,9 +532,9 @@ function TabToday() {
       )}
 
       <Link href="/astrology/daily" style={{ textDecoration: 'none' }}>
-        <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Full Daily Reading</span>
-          <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.25)' }} />
+        <div style={GO_DEEPER}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Daily Reading</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
         </div>
       </Link>
     </div>
@@ -551,12 +558,12 @@ export default function AstrologyPage() {
 
   const appsContent = (
     <div>
-      <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(196,169,232,0.5)', marginBottom: 14, paddingTop: 4 }}>All Sections</p>
+      <div style={{ ...LBL, marginBottom: 14, paddingTop: 4 }}>All Sections</div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
         {APPS_GRID.map(item =>
           item.href ? (
             <Link key={item.label} href={item.href} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px 12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 18, cursor: 'pointer', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px 12px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18, cursor: 'pointer', textAlign: 'center' }}>
                 <span style={{ fontSize: 28 }}>{item.emoji}</span>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.75)', lineHeight: 1.2 }}>{item.label}</p>
               </div>
@@ -591,7 +598,7 @@ export default function AstrologyPage() {
         </div>
       </div>
 
-      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#C4A9E8" />
+      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#C4A9E8" disableSwipe />
     </AppLayout>
   )
 }
