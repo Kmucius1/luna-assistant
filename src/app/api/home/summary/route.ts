@@ -1,26 +1,57 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getTodayEvents } from '@/lib/calendar'
+import { getTodayEvents, type CalendarEvent } from '@/lib/calendar'
 import { getGmailTokens, getGmailInboxCounts } from '@/lib/gmail'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
+interface ExternalSummary {
+  events: CalendarEvent[]
+  unreadCount: number | null
+  starredCount: number | null
+}
+
+// Calendar + Gmail both hit external APIs across every connected account —
+// this is the slow part on a cold serverless instance (no in-memory cache
+// yet warmed up). A minute-bucketed Supabase cache gives a durable,
+// cross-instance-safe result so a cold instance still gets a fast read
+// instead of repeating the whole external fan-out.
+async function getExternalSummary(): Promise<ExternalSummary> {
+  const minuteBucket = String(Math.floor(Date.now() / 60_000))
+  const { payload } = await getOrCreateDailyContent<ExternalSummary>({
+    userId: ZOE_USER_ID,
+    generationType: 'home_summary_external',
+    dateKey: minuteBucket,
+    generate: async () => {
+      const [calendarResult, emailResult] = await Promise.allSettled([
+        getTodayEvents(),
+        (async () => {
+          const tokens = await getGmailTokens()
+          if (!tokens) return null
+          return getGmailInboxCounts(tokens.access_token)
+        })(),
+      ])
+      const events = calendarResult.status === 'fulfilled' ? calendarResult.value.filter(e => e.isToday) : []
+      const counts = emailResult.status === 'fulfilled' ? emailResult.value : null
+      return {
+        payload: { events, unreadCount: counts?.unreadCount ?? null, starredCount: counts?.starredCount ?? null },
+        source: 'ai' as const,
+      }
+    },
+  })
+  return payload
+}
+
 export async function GET() {
   const db = adminDb()
 
-  // Fetch all data in parallel
-  const [calendarResult, emailResult, tasksResult, gmailStatusResult] = await Promise.allSettled([
-    // Today's calendar events
-    getTodayEvents(),
-
-    // Recent email counts (no per-message fetches — just resultSizeEstimate)
-    (async () => {
-      const tokens = await getGmailTokens()
-      if (!tokens) return null
-      return getGmailInboxCounts(tokens.access_token)
-    })(),
+  const [externalResult, tasksResult, gmailStatusResult] = await Promise.allSettled([
+    getExternalSummary(),
 
     // Top open tasks
     db.from('tasks')
@@ -33,14 +64,11 @@ export async function GET() {
     db.from('gmail_tokens').select('email, connected_at').order('connected_at', { ascending: true }),
   ])
 
-  // Calendar
-  const calendarEvents = calendarResult.status === 'fulfilled' ? calendarResult.value : []
-  const todayEvents    = calendarEvents.filter(e => e.isToday)
-
-  // Email
-  const emailCounts = emailResult.status === 'fulfilled' ? emailResult.value : null
-  const unreadCount  = emailCounts?.unreadCount ?? null
-  const starredCount = emailCounts?.starredCount ?? null
+  // Calendar + email
+  const external    = externalResult.status === 'fulfilled' ? externalResult.value : null
+  const todayEvents  = external?.events ?? []
+  const unreadCount  = external?.unreadCount ?? null
+  const starredCount = external?.starredCount ?? null
   // Unread inbox mail is a reasonable proxy for "needs a reply"
   const needsReply   = unreadCount
 
@@ -56,7 +84,7 @@ export async function GET() {
     calendar: {
       today:        todayEvents,
       todayCount:   todayEvents.length,
-      connected:    calendarEvents.length > 0 || calendarResult.status === 'fulfilled',
+      connected:    todayEvents.length > 0 || externalResult.status === 'fulfilled',
     },
     email: {
       connected:    gmailAccounts.length > 0,
