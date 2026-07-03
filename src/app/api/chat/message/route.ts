@@ -102,6 +102,15 @@ CONVERSATION RULES:
 11. Reference money, work, relationships, body, spirit naturally — you know her whole life.
 12. Sometimes the most powerful thing is the simplest: "What do you actually need right now?"`
 
+// Rare-case fallback if AI is genuinely unreachable — in LUNA's voice, no
+// mention of connections/errors. Your message is already saved above; this
+// just covers what she says back when generation itself failed.
+const PRESENCE_FALLBACKS = [
+  "I heard you. Give me one more second and say that again — I want to actually be with it, not rush past it.",
+  "I'm here, I just need you to say that once more. I don't want to give you a half answer.",
+  "Say that again for me? I want to sit with it properly before I respond.",
+]
+
 export async function POST(req: NextRequest) {
   try {
     const { message, session_id } = await req.json() as { message: string; session_id?: string }
@@ -159,7 +168,7 @@ export async function POST(req: NextRequest) {
       response = await callAI(systemPrompt, userPrompt, 300)
     } catch (aiErr) {
       console.error('[chat/message] AI call failed:', aiErr instanceof Error ? aiErr.message : aiErr)
-      response = "I'm here. The connection dropped for a second, but I saved what you said. Try again."
+      response = PRESENCE_FALLBACKS[Math.floor(Math.random() * PRESENCE_FALLBACKS.length)]
     }
 
     // Save LUNA response
@@ -179,7 +188,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[chat/message]', err instanceof Error ? err.message : err)
     return NextResponse.json(
-      { response: "I'm here. The connection dropped for a second — try again in a moment." },
+      { response: PRESENCE_FALLBACKS[Math.floor(Math.random() * PRESENCE_FALLBACKS.length)] },
       { status: 200 }
     )
   }

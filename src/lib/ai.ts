@@ -1,5 +1,5 @@
 import Groq from 'groq-sdk'
-import { AI_MODEL } from './ai/config'
+import { AI_MODEL, AI_FALLBACK_MODEL } from './ai/config'
 
 let _groq: Groq | null = null
 function getGroq() {
@@ -540,30 +540,38 @@ Return ONLY valid JSON:
   "tags": ["tag1", "tag2", "tag3"]
 }`
 
-// ─── Core AI caller with retry (Groq — free tier) ─────────────
+// ─── Core AI caller with retry + model fallback (Groq — free tier) ────
+// Groq's rate limits (especially tokens-per-day) are tracked per model, not
+// per account — a busy day on AI_MODEL doesn't touch AI_FALLBACK_MODEL's
+// own quota. On a rate-limit error, retry briefly (for short request-rate
+// blips), then move to the fallback model rather than waiting out a
+// multi-minute daily-quota window while the user stares at a dead chat.
 export async function callAI(systemPrompt: string, userMessage: string, maxTokens = 2048): Promise<string> {
-  const MAX_RETRIES = 3
+  const models = Array.from(new Set([AI_MODEL, AI_FALLBACK_MODEL]))
   let lastErr: Error | null = null
 
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    try {
-      const completion = await groq.chat.completions.create({
-        model: AI_MODEL,
-        max_tokens: maxTokens,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user',   content: userMessage  },
-        ],
-      })
-      const text = completion.choices[0]?.message?.content
-      if (text) return text
-      throw new Error('Empty response from AI')
-    } catch (err) {
-      lastErr = err instanceof Error ? err : new Error(String(err))
-      const msg = lastErr.message.toLowerCase()
-      const isRateLimit = msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')
-      if (!isRateLimit || attempt === MAX_RETRIES - 1) break
-      await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+  for (const model of models) {
+    const MAX_RETRIES = 2
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const completion = await groq.chat.completions.create({
+          model,
+          max_tokens: maxTokens,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user',   content: userMessage  },
+          ],
+        })
+        const text = completion.choices[0]?.message?.content
+        if (text) return text
+        throw new Error('Empty response from AI')
+      } catch (err) {
+        lastErr = err instanceof Error ? err : new Error(String(err))
+        const msg = lastErr.message.toLowerCase()
+        const isRateLimit = msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')
+        if (!isRateLimit || attempt === MAX_RETRIES - 1) break
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+      }
     }
   }
   throw lastErr ?? new Error('AI request failed')

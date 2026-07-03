@@ -17,7 +17,7 @@ export async function sendChatMessage(
   })
   const data = await res.json() as { response?: string; session_id?: string; time_period?: string }
   return {
-    response: data.response ?? "I'm here. The connection dropped for a second — try again.",
+    response: data.response ?? "I'm here — say that again for me?",
     session_id: data.session_id ?? sessionId,
     time_period: data.time_period ?? '',
   }
