@@ -242,7 +242,9 @@ export default function SpiritScreen() {
 
     setLoadingGuidance(true)
     try {
-      const res  = await fetch('/api/ai/spiritual-guidance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
+      const tz  = Intl.DateTimeFormat().resolvedOptions().timeZone
+      const url = `/api/ai/spiritual-guidance?tz=${encodeURIComponent(tz)}${force ? '&refresh=1' : ''}`
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
       const data = await res.json()
       setGuidance(data)
       try { localStorage.setItem(cacheKey, JSON.stringify(data)) } catch {}

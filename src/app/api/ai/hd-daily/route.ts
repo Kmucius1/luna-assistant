@@ -1,6 +1,41 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson, ZOE_SOUL } from '@/lib/ai'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { createClient } from '@/lib/supabase/server'
 import { format } from 'date-fns'
+
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+
+async function resolveUserId(): Promise<string> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.id) return user.id
+  } catch { /* fall through */ }
+  return ZOE_USER_ID
+}
+
+interface HdDaily {
+  daily_focus: string
+  invitation_watch: string
+  not_self_check: string
+  strategy_note: string
+  voice_prompt: string
+  affirmation: string
+}
+
+const FALLBACK_HD: HdDaily = {
+  daily_focus: 'Today calibrates your Projector wisdom toward one thing: noticing where you are giving energy without being asked. Your clarity comes from pausing before you offer, not from working harder.',
+  invitation_watch: 'Watch for a moment where someone genuinely asks for your full read on something — strategy, not just execution. That is the invitation worth leaning into.',
+  not_self_check: 'Notice if you start explaining yourself twice, or over-justifying a decision no one questioned. That is the bitterness signal — a sign you gave before being asked.',
+  strategy_note: 'Practice Wait For Invitation today by choosing one thing NOT to push forward on. Let it sit. Notice how it feels to let something come to you instead.',
+  voice_prompt: 'Say out loud: "What do I actually think is true here?" — before you decide anything today. Your authority lives in your voice, not your head.',
+  affirmation: 'I am recognized for what I already know. I do not have to prove it — I only have to wait to be seen.',
+}
+
+const REQUIRED_FIELDS: (keyof HdDaily)[] = [
+  'daily_focus', 'invitation_watch', 'not_self_check', 'strategy_note', 'voice_prompt', 'affirmation',
+]
 
 const HD_SYSTEM = `${ZOE_SOUL}
 
@@ -16,18 +51,40 @@ Return ONLY valid JSON, no markdown, no explanation:
   "affirmation": "A short, powerful HD-specific affirmation in first person. In her voice. Rooted in her Projector truth, not hustle."
 }`
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const today = format(new Date(), 'EEEE, MMMM d, yyyy')
-    const hour = new Date().getHours()
-    const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+    const { searchParams } = new URL(request.url)
+    const refresh = searchParams.get('refresh') === '1'
+    const tz = searchParams.get('tz') || 'America/New_York'
+    const userId = await resolveUserId()
 
-    const message = `Today is ${today}, ${timeOfDay}. Generate Zoe's Human Design daily focus. Be specific to her actual life at DRYP right now.`
+    const { payload } = await getOrCreateDailyContent<HdDaily>({
+      userId,
+      generationType: 'hd_daily',
+      timezone: tz,
+      forceRegenerate: refresh,
+      generate: async () => {
+        try {
+          const today = format(new Date(), 'EEEE, MMMM d, yyyy')
+          const hour = new Date().getHours()
+          const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
+          const message = `Today is ${today}, ${timeOfDay}. Generate Zoe's Human Design daily focus. Be specific to her actual life at DRYP right now.`
 
-    const result = await callAI(HD_SYSTEM, message, 900)
-    return NextResponse.json(parseAIJson(result))
+          const result = await callAI(HD_SYSTEM, message, 900)
+          const parsed = parseAIJson<HdDaily>(result)
+          for (const field of REQUIRED_FIELDS) {
+            if (parsed[field] === undefined) throw new Error(`Missing field: ${field}`)
+          }
+          return { payload: parsed, source: 'ai' as const }
+        } catch {
+          return { payload: FALLBACK_HD, source: 'fallback' as const }
+        }
+      },
+    })
+
+    return NextResponse.json(payload)
   } catch (err) {
     console.error('HD daily error:', err)
-    return NextResponse.json({ error: 'Could not generate HD guidance' }, { status: 500 })
+    return NextResponse.json(FALLBACK_HD)
   }
 }
