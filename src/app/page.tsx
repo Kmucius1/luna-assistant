@@ -187,91 +187,100 @@ const FALLBACK_TASKS = [
 ]
 
 function Slide1({
-  greeting, moon, heroBg, heroTagline, guidance, topTasks, calEvents, dataLoaded, lunaMessage, lmLoading,
+  greeting, moon, heroBg, heroTagline, topTasks, calEvents, dataLoaded,
 }: {
   greeting: string; moon: typeof MOON_PHASES[0]
   heroBg: string; heroTagline: string
-  guidance: GuidanceData | null
   topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean
-  lunaMessage: { message: string; affirmation: string } | null; lmLoading: boolean
 }) {
   const tasks     = (dataLoaded && topTasks.length > 0) ? topTasks.slice(0, 3) : FALLBACK_TASKS
   const nextEvent = calEvents[0] ?? null
+
+  return (
+    <div className="flex flex-col gap-3" style={{ minHeight: '100%' }}>
+
+      {/* Hero — background + tagline swap with time of day */}
+      <LunaHeroCard backgroundImage={heroBg} className="p-5 lg:p-6" >
+        <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
+          {greeting}, Zoe ✦
+        </p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)', whiteSpace: 'pre-line' }}>
+          {heroTagline}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <span style={{ fontSize: 12 }}>{moon.emoji}</span>
+          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
+            {moon.name} · {moon.pct}% illuminated
+          </p>
+        </div>
+      </LunaHeroCard>
+
+      {/* Today's Top 3 + Next Event */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
+            {tasks.map((t, i) => (
+              <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: 'var(--luna-purple-2)' }}>{i + 1}</span>
+                </div>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+              </div>
+            ))}
+          </div>
+          <Link href="/tasks" style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View all tasks →</span>
+          </Link>
+        </div>
+
+        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
+          <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
+          <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {nextEvent?.title ?? 'Client Call'}
+          </p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)', margin: '0 0 3px' }}>
+            Today · {nextEvent?.startTime ?? '1:30 PM'}
+          </p>
+          <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
+            Prep 15 minutes before.
+          </p>
+          <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
+            <div style={{ padding: '6px', background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.18)', borderRadius: 10, textAlign: 'center' }}>
+              <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View details →</span>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIDE 1B — Focus  (Quick Actions + LUNA'S MESSAGE, split out of Slide 1 so
+// neither slide needs to scroll on smaller phones)
+// ─────────────────────────────────────────────────────────────────────────────
+function Slide1B({ guidance, lunaMessage, lmLoading }: {
+  guidance: GuidanceData | null
+  lunaMessage: { message: string; affirmation: string } | null; lmLoading: boolean
+}) {
   const [messageExpanded, setMessageExpanded] = useState(false)
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4" style={{ minHeight: '100%' }}>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4" style={{ minHeight: '100%' }}>
 
-      {/* ── LEFT column: Hero + Top3/NextEvent + Quick Actions ──────────── */}
-      <div className="lg:col-span-2 flex flex-col gap-3">
-
-        {/* Hero — background + tagline swap with time of day */}
-        <LunaHeroCard backgroundImage={heroBg} className="p-5 lg:p-6" >
-          <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
-            {greeting}, Zoe ✦
-          </p>
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)', whiteSpace: 'pre-line' }}>
-            {heroTagline}
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ fontSize: 12 }}>{moon.emoji}</span>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
-              {moon.name} · {moon.pct}% illuminated
-            </p>
-          </div>
-        </LunaHeroCard>
-
-        {/* Today's Top 3 + Next Event */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-            <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
-              {tasks.map((t, i) => (
-                <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                  <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                    <span style={{ fontSize: 8, fontWeight: 800, color: 'var(--luna-purple-2)' }}>{i + 1}</span>
-                  </div>
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
-                </div>
-              ))}
-            </div>
-            <Link href="/tasks" style={{ textDecoration: 'none' }}>
-              <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View all tasks →</span>
-            </Link>
-          </div>
-
-          <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
-            <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
-            <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {nextEvent?.title ?? 'Client Call'}
-            </p>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)', margin: '0 0 3px' }}>
-              Today · {nextEvent?.startTime ?? '1:30 PM'}
-            </p>
-            <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
-              Prep 15 minutes before.
-            </p>
-            <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
-              <div style={{ padding: '6px', background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.18)', borderRadius: 10, textAlign: 'center' }}>
-                <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View details →</span>
-              </div>
-            </Link>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div style={{ ...G, borderRadius: 22, padding: '13px 14px' }}>
-          <div style={LBL}><Zap style={{ width: 10, height: 10 }} />Quick Actions</div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <LunaActionTile icon={<Mic size={16} strokeWidth={1.6} />} label="Dictate" href="/luna?tab=dictate" />
-            <LunaActionTile icon={<Brain size={16} strokeWidth={1.6} />} label="Brain Dump" href="/brain-dump" />
-            <LunaActionTile icon={<Calendar size={16} strokeWidth={1.6} />} label="Plan My Day" href="/plan-my-day" />
-            <LunaActionTile icon={<Plus size={16} strokeWidth={1.6} />} label="New Task" href="/tasks" />
-          </div>
+      {/* Quick Actions */}
+      <div style={{ ...G, borderRadius: 22, padding: '13px 14px', alignSelf: 'start' }}>
+        <div style={LBL}><Zap style={{ width: 10, height: 10 }} />Quick Actions</div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2">
+          <LunaActionTile icon={<Mic size={16} strokeWidth={1.6} />} label="Dictate" href="/luna?tab=dictate" />
+          <LunaActionTile icon={<Brain size={16} strokeWidth={1.6} />} label="Brain Dump" href="/brain-dump" />
+          <LunaActionTile icon={<Calendar size={16} strokeWidth={1.6} />} label="Plan My Day" href="/plan-my-day" />
+          <LunaActionTile icon={<Plus size={16} strokeWidth={1.6} />} label="New Task" href="/tasks" />
         </div>
       </div>
 
-      {/* ── RIGHT column: LUNA'S MESSAGE, full height ────────────────────── */}
+      {/* LUNA'S MESSAGE */}
       <div style={{ ...G, borderRadius: 26, padding: '20px 20px', display: 'flex', flexDirection: 'column' }}>
         <div style={LBL}><span>✦</span>LUNA'S MESSAGE</div>
         {lmLoading ? (
@@ -892,18 +901,22 @@ function HomePageInner() {
 
   const pages = [
     {
-      id: 'today', label: 'Today',
-      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
+      id: 'today', label: 'Today', noScroll: true,
+      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
     },
-    { id: 'previews', label: 'Previews', content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
-    { id: 'wellness', label: 'Wellness', content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
-    { id: 'energy',   label: 'Energy',   content: <Slide4 topTasks={topTasks} /> },
-    { id: 'weekly',   label: 'Weekly',   content: <Slide5 guidance={guidance} /> },
+    {
+      id: 'focus', label: 'Focus', noScroll: true,
+      content: <Slide1B guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} />,
+    },
+    { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
+    { id: 'wellness', label: 'Wellness', noScroll: true, content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
+    { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide4 topTasks={topTasks} /> },
+    { id: 'weekly',   label: 'Weekly',   noScroll: true, content: <Slide5 guidance={guidance} /> },
   ]
 
   return (
     <LunaShell noScroll wide>
-      <LunaSwipePager pages={pages} hidePills accentColor="#9b5cff" activeIndex={activeSlide} onChangeIndex={setActiveSlide} />
+      <LunaSwipePager pages={pages} hidePills accentColor="#9b5cff" activeIndex={activeSlide} onChangeIndex={setActiveSlide} pageNoScroll />
     </LunaShell>
   )
 }
