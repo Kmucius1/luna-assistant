@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getGmailTokens, listGmailMessages, type GmailMessage } from '@/lib/gmail'
+import { getAllValidGmailTokens, listGmailMessages, type GmailMessage } from '@/lib/gmail'
 import { callAI } from '@/lib/ai'
 
 function adminDb() {
@@ -30,23 +30,6 @@ function matchesPriority(email: GmailMessage, contacts: { name: string; email: s
     if (parts.length >= 2 && parts.every(p => fromLower.includes(p))) return c.name
   }
   return null
-}
-
-// ─── Multi-account tokens ─────────────────────────────────────────────────────
-async function getAllTokens(): Promise<{ access_token: string; connected_email: string }[]> {
-  try {
-    const { data } = await adminDb()
-      .from('gmail_tokens')
-      .select('email, access_token, refresh_token, token_expiry')
-      .order('connected_at', { ascending: true })
-    if (!data?.length) return []
-    return data.map((row: { email: string; access_token: string }) => ({
-      access_token: row.access_token, connected_email: row.email,
-    }))
-  } catch {
-    const single = await getGmailTokens()
-    return single ? [single] : []
-  }
 }
 
 // ─── Classification cache — avoids re-spending AI tokens on emails we've
@@ -171,7 +154,7 @@ Return ONLY valid JSON array: [{"index": 0, "category": "...", "isMeeting": fals
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
 export async function GET() {
-  const allTokens = await getAllTokens()
+  const allTokens = await getAllValidGmailTokens()
   if (!allTokens.length) return NextResponse.json({ error: 'not_connected' }, { status: 401 })
 
   const priorityContacts = await getPriorityContacts()
@@ -180,17 +163,23 @@ export async function GET() {
     // Fetch from all accounts in parallel
     const accountEmails = await Promise.all(
       allTokens.map(async (tok) => {
-        // Also search specifically for emails FROM priority contacts (read or unread)
-        const priorityQuery = priorityContacts.map(c => `from:(${c.name})`).join(' OR ')
-        const [unread, starred, priorityMail] = await Promise.all([
-          listGmailMessages(tok.access_token, 'in:inbox is:unread', 20),
-          listGmailMessages(tok.access_token, 'in:inbox is:starred', 5),
-          priorityQuery ? listGmailMessages(tok.access_token, `in:inbox ${priorityQuery}`, 10) : Promise.resolve([]),
-        ])
-        const seen = new Set<string>()
-        return [...priorityMail, ...unread, ...starred]
-          .filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true })
-          .map(e => ({ ...e, account: tok.connected_email }))
+        try {
+          // Also search specifically for emails FROM priority contacts (read or unread)
+          const priorityQuery = priorityContacts.map(c => `from:(${c.name})`).join(' OR ')
+          const [unread, starred, priorityMail] = await Promise.all([
+            listGmailMessages(tok.access_token, 'in:inbox is:unread', 20),
+            listGmailMessages(tok.access_token, 'in:inbox is:starred', 5),
+            priorityQuery ? listGmailMessages(tok.access_token, `in:inbox ${priorityQuery}`, 10) : Promise.resolve([]),
+          ])
+          const seen = new Set<string>()
+          return [...priorityMail, ...unread, ...starred]
+            .filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true })
+            .map(e => ({ ...e, account: tok.connected_email }))
+        } catch (err) {
+          // One bad/expired account shouldn't take down mail for the other connected accounts
+          console.error(`Gmail fetch failed for ${tok.connected_email}:`, err instanceof Error ? err.message : err)
+          return []
+        }
       })
     )
 

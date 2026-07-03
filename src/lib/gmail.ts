@@ -91,6 +91,35 @@ export async function getGmailTokens(): Promise<{ access_token: string; connecte
   return { access_token: data.access_token, connected_email: data.email }
 }
 
+// ─── Get ALL connected accounts' tokens (auto-refresh each if expired) ────────
+export async function getAllValidGmailTokens(): Promise<{ access_token: string; connected_email: string }[]> {
+  const db = adminDb()
+  const { data } = await db.from('gmail_tokens').select('*').order('connected_at', { ascending: true })
+  if (!data?.length) return []
+
+  const results: { access_token: string; connected_email: string }[] = []
+  await Promise.all(data.map(async (row: {
+    id: string; email: string; access_token: string; refresh_token: string; token_expiry: string
+  }) => {
+    try {
+      const expiry       = row.token_expiry ? new Date(row.token_expiry).getTime() : 0
+      const needsRefresh = Date.now() > expiry - 60_000
+      let access_token    = row.access_token
+
+      if (needsRefresh && row.refresh_token) {
+        const refreshed = await refreshAccessToken(row.refresh_token)
+        access_token     = refreshed.access_token
+        const newExpiry  = new Date(Date.now() + refreshed.expires_in * 1000).toISOString()
+        await db.from('gmail_tokens').update({ access_token, token_expiry: newExpiry }).eq('id', row.id)
+      }
+
+      results.push({ access_token, connected_email: row.email })
+    } catch { /* skip accounts whose refresh fails — don't fail the whole batch */ }
+  }))
+
+  return results
+}
+
 // ─── Store tokens ─────────────────────────────────────────────────────────────
 export async function storeGmailTokens(tokens: {
   access_token: string; refresh_token: string; expires_in: number; email: string
