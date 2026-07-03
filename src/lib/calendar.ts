@@ -84,6 +84,7 @@ export interface CalendarEvent {
   status?: string
   organizer?: string
   attendeeCount?: number
+  attendeeEmails?: string[]
 }
 
 function formatTime(dateStr: string, allDay: boolean): string {
@@ -126,7 +127,7 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
             start?: { dateTime?: string; date?: string }
             end?:   { dateTime?: string; date?: string }
             location?: string; description?: string; htmlLink?: string; colorId?: string
-            organizer?: { email?: string }; attendees?: unknown[]
+            organizer?: { email?: string }; attendees?: { email?: string }[]
           }>
 
           for (const ev of items) {
@@ -158,6 +159,7 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
               status:        ev.status,
               organizer:     ev.organizer?.email,
               attendeeCount: ev.attendees?.length ?? 0,
+              attendeeEmails: (ev.attendees ?? []).map(a => a.email).filter((e): e is string => Boolean(e)),
             })
           }
         } catch { /* skip calendar on error */ }

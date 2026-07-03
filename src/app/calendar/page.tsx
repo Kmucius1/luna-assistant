@@ -3,27 +3,36 @@ import { useState, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Calendar, Clock, MapPin, RefreshCw, ExternalLink, ArrowLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import type { ICalEvent } from '@/lib/ical'
+import type { CalendarEvent } from '@/lib/calendar'
 
-const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
+const G: React.CSSProperties = {
+  background: 'rgba(20,12,50,0.68)',
+  border: '1px solid rgba(255,255,255,0.08)',
   borderRadius: 20,
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
 }
 
-function formatTime(iso: string): string {
-  const d = new Date(iso)
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+// ─── People with their own accent color, so their events are recognizable at a glance ──
+const PEOPLE: { email: string; label: string; color: string }[] = [
+  { email: 'mick@hooverdigital.com', label: 'Mick', color: '#E08B4A' },
+]
+
+function personFor(ev: CalendarEvent): { label: string; color: string } | null {
+  const emails = [ev.organizer, ...(ev.attendeeEmails ?? [])].filter(Boolean).map(e => e!.toLowerCase())
+  const calendarName = ev.calendar?.toLowerCase() ?? ''
+  for (const p of PEOPLE) {
+    if (emails.includes(p.email.toLowerCase()) || calendarName.includes(p.label.toLowerCase())) return p
+  }
+  return null
 }
 
-function eventDay(ev: ICalEvent): Date {
+function eventDay(ev: CalendarEvent): Date {
   if (ev.allDay) return new Date(ev.start.slice(0, 10) + 'T12:00:00')
   return new Date(ev.start)
 }
 
-function formatDateLabel(ev: ICalEvent): string {
+function formatDateLabel(ev: CalendarEvent): string {
   const d = eventDay(ev)
   const now = new Date()
   if (d.toDateString() === now.toDateString()) return 'Today'
@@ -31,16 +40,8 @@ function formatDateLabel(ev: ICalEvent): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 }
 
-function isToday(ev: ICalEvent): boolean {
-  return eventDay(ev).toDateString() === new Date().toDateString()
-}
-
-function isTomorrow(ev: ICalEvent): boolean {
-  return eventDay(ev).toDateString() === new Date(Date.now() + 86400000).toDateString()
-}
-
-function groupByDate(events: ICalEvent[]): { label: string; key: string; events: ICalEvent[] }[] {
-  const map = new Map<string, ICalEvent[]>()
+function groupByDate(events: CalendarEvent[]): { label: string; key: string; events: CalendarEvent[] }[] {
+  const map = new Map<string, CalendarEvent[]>()
   for (const ev of events) {
     const key = eventDay(ev).toDateString()
     if (!map.has(key)) map.set(key, [])
@@ -55,21 +56,31 @@ function groupByDate(events: ICalEvent[]): { label: string; key: string; events:
     }))
 }
 
-function EventCard({ ev }: { ev: ICalEvent }) {
-  const past     = new Date(ev.end) < new Date()
-  const today    = isToday(ev)
-  const tomorrow = isTomorrow(ev)
-  const accent   = today ? '#8B6FB8' : tomorrow ? '#C9A96E' : 'rgba(255,255,255,0.15)'
+function EventCard({ ev }: { ev: CalendarEvent }) {
+  const past   = new Date(ev.end) < new Date()
+  const person = personFor(ev)
+  const accent = person ? person.color : ev.isToday ? '#8B6FB8' : ev.isTomorrow ? '#C9A96E' : 'rgba(255,255,255,0.15)'
 
   return (
-    <div style={{ ...GLASS, padding: '14px 16px', opacity: past ? 0.5 : 1, borderLeft: `3px solid ${accent}` }}>
+    <div style={{ ...G, padding: '14px 16px', opacity: past ? 0.5 : 1, borderLeft: `3px solid ${accent}` }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1.35, marginBottom: 6 }}>{ev.title}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1.35, margin: 0 }}>{ev.title}</p>
+            {person && (
+              <span style={{
+                fontSize: 9.5, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase',
+                color: person.color, background: `${person.color}22`, border: `1px solid ${person.color}44`,
+                borderRadius: 8, padding: '2px 7px', flexShrink: 0,
+              }}>
+                {person.label}
+              </span>
+            )}
+          </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
               <Clock className="h-3 w-3" />
-              {ev.allDay ? 'All day' : `${formatTime(ev.start)} – ${formatTime(ev.end)}`}
+              {ev.allDay ? 'All day' : `${ev.startTime} – ${ev.endTime}`}
             </span>
             {ev.location && (
               <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
@@ -83,16 +94,18 @@ function EventCard({ ev }: { ev: ICalEvent }) {
             </p>
           )}
         </div>
-        <a href="https://calendar.google.com/calendar/r" target="_blank" rel="noreferrer" style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0, marginTop: 2 }}>
-          <ExternalLink className="h-4 w-4" />
-        </a>
+        {ev.htmlLink && (
+          <a href={ev.htmlLink} target="_blank" rel="noreferrer" style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0, marginTop: 2 }}>
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        )}
       </div>
     </div>
   )
 }
 
 export default function CalendarPage() {
-  const [events,    setEvents]    = useState<ICalEvent[]>([])
+  const [events,    setEvents]    = useState<CalendarEvent[]>([])
   const [loading,   setLoading]   = useState(true)
   const [error,     setError]     = useState('')
   const [filter,    setFilter]    = useState<'all' | 'today' | 'week'>('all')
@@ -101,16 +114,14 @@ export default function CalendarPage() {
   const load = useCallback(async () => {
     setLoading(true); setError('')
     try {
-      const res  = await fetch('/api/calendar/ical')
+      const res  = await fetch('/api/calendar/upcoming?days=14')
       const data = await res.json()
       if (!res.ok) throw new Error(data.error ?? 'Failed to load calendar')
       // Keep events from yesterday onward (so events earlier today still show)
       const cutoff = new Date(Date.now() - 86400000)
-      const upcoming = (data.events ?? []).filter((e: ICalEvent) => new Date(e.end) > cutoff)
+      const upcoming = (data.events ?? []).filter((e: CalendarEvent) => new Date(e.end) > cutoff)
       setEvents(upcoming)
-      if (data.fetchedAt) {
-        setFetchedAt(new Date(data.fetchedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))
-      }
+      setFetchedAt(new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }))
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load events')
     } finally { setLoading(false) }
@@ -122,14 +133,15 @@ export default function CalendarPage() {
   const weekOut = new Date(now.getTime() + 7 * 86400000)
 
   const filtered = filter === 'today'
-    ? events.filter(e => isToday(e))
+    ? events.filter(e => e.isToday)
     : filter === 'week'
     ? events.filter(e => eventDay(e) <= weekOut)
     : events
 
   const grouped    = groupByDate(filtered)
-  const todayCount = events.filter(e => isToday(e)).length
+  const todayCount = events.filter(e => e.isToday).length
   const weekCount  = events.filter(e => eventDay(e) <= weekOut).length
+  const peopleInView = PEOPLE.filter(p => events.some(e => personFor(e)?.label === p.label))
 
   return (
     <div className="bg-app min-h-screen">
@@ -155,6 +167,17 @@ export default function CalendarPage() {
               </button>
             </div>
 
+            {peopleInView.length > 0 && (
+              <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
+                {peopleInView.map(p => (
+                  <span key={p.email} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, flexShrink: 0 }} />
+                    {p.label}'s schedule
+                  </span>
+                ))}
+              </div>
+            )}
+
             {events.length > 0 && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
                 {(['all', 'today', 'week'] as const).map(v => (
@@ -169,7 +192,7 @@ export default function CalendarPage() {
           <div style={{ padding: '0 16px' }}>
 
             {error && (
-              <div style={{ ...GLASS, padding: 16, background: 'rgba(224,94,94,0.07)', border: '1px solid rgba(224,94,94,0.2)', marginBottom: 12 }}>
+              <div style={{ ...G, padding: 16, background: 'rgba(224,94,94,0.07)', border: '1px solid rgba(224,94,94,0.2)', marginBottom: 12 }}>
                 <p style={{ fontSize: 13, color: '#E05E5E' }}>{error}</p>
               </div>
             )}
@@ -177,7 +200,7 @@ export default function CalendarPage() {
             {loading && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {[1,2,3].map(i => (
-                  <div key={i} style={{ ...GLASS, padding: 18, height: 80 }}>
+                  <div key={i} style={{ ...G, padding: 18, height: 80 }}>
                     <div style={{ width: '60%', height: 14, borderRadius: 7, background: 'rgba(255,255,255,0.07)', marginBottom: 10 }} />
                     <div style={{ width: '40%', height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.05)' }} />
                   </div>
@@ -208,13 +231,13 @@ export default function CalendarPage() {
             )}
 
             {!loading && !error && grouped.length === 0 && (
-              <div style={{ ...GLASS, padding: 32, textAlign: 'center' }}>
+              <div style={{ ...G, padding: 32, textAlign: 'center' }}>
                 <div style={{ width: 56, height: 56, borderRadius: 18, background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <Calendar className="h-6 w-6" style={{ color: '#8B6FB8' }} />
                 </div>
                 <p style={{ fontSize: 16, fontWeight: 700, color: 'white', marginBottom: 8 }}>No upcoming events</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                  {filter !== 'all' ? 'Try switching to All to see more.' : 'Your calendar is clear.'}
+                  {filter !== 'all' ? 'Try switching to All to see more.' : 'Connect Google Calendar in Settings to see your schedule here.'}
                 </p>
               </div>
             )}
