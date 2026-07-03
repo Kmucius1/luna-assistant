@@ -1,6 +1,10 @@
 /**
  * LUNA Astrology Engine
- * Real-time calculations via astronomy-engine (Swiss Ephemeris compatible).
+ * Real-time planetary calculations via astronomy-engine, which uses the
+ * same VSOP87/ELP2000 ephemeris algorithm family Swiss Ephemeris is built
+ * on — the astronomical facts here are scientifically grounded. What Luna
+ * does with those facts (sign/aspect meanings, guidance) is traditional
+ * symbolic interpretation, not a scientific claim.
  * Natal positions from Zoe's confirmed birth chart (Nov 14 2000, 7:04 PM, Sellersville PA).
  */
 import * as Astronomy from 'astronomy-engine'
@@ -44,6 +48,24 @@ export const SIGN_EMOJIS = signsData.SIGN_EMOJIS as Record<ZodiacSign, string>
 export const SIGN_KEYWORDS = signsData.SIGN_KEYWORDS as Record<ZodiacSign, string>
 export const PLANET_EMOJIS = planetsData.PLANET_EMOJIS as Record<string, string>
 export const PLANET_KEYWORDS = planetsData.PLANET_KEYWORDS as Record<string, string>
+
+// Short body-feel phrases per sign, used by fallback-text generators (works
+// with zero AI credits). Shared by daily-guidance's buildFallback() and the
+// new readingGenerator's buildReadingFallback() — one dictionary, not two.
+export const SIGN_ENERGY_DESCRIPTIONS: Record<ZodiacSign, string> = {
+  Aries: 'bold forward-moving initiation energy',
+  Taurus: 'slow, grounded, sensual steadiness',
+  Gemini: 'quick mental and social energy',
+  Cancer: 'emotional depth and tender inward feeling',
+  Leo: 'radiant creative expression',
+  Virgo: 'discerning helpful refinement',
+  Libra: 'relational harmonizing beauty',
+  Scorpio: 'intense transformative depth',
+  Sagittarius: 'expansive adventurous fire',
+  Capricorn: 'disciplined ambitious grounding',
+  Aquarius: 'innovative detached electric awareness',
+  Pisces: 'dreamy empathic intuition',
+}
 
 const ASPECT_CONFIG = [
   { name: 'conjunction', angle: 0,   orb: 8,  emoji: '☌', energy: 'intense fusion — both energies merge completely' },

@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/luna/generate-readings", "schedule": "0 * * * *" }
+  ]
+}

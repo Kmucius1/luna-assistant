@@ -1,24 +1,20 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import * as Tabs from '@radix-ui/react-tabs'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { RefreshCw, AlertCircle } from 'lucide-react'
 import { useLocation } from '@/hooks/useLocation'
+import type { ReadingJSON } from '@/lib/luna/readingGenerator'
 
-interface DailyGuidance {
-  horoscope:       string
-  energy:          string
-  do_today:        string[]
-  dont_today:      string[]
-  career:          string
-  love:            string
-  sex:             string
-  money:           string
-  friendship:      string
-  family:          string
-  self_reflection: string
-  main_focus:      string
-  highest_self:    string
-  affirmation:     string
+interface StoredReadingSlim {
+  reading_date: string
+  reading_json: ReadingJSON
+  generated_at: string
+}
+
+interface WindowResponse {
+  readings: StoredReadingSlim[]
+  updatedAt: string
 }
 
 // ─── Shimmer placeholder card ─────────────────────────────────────────────────
@@ -34,43 +30,10 @@ function ShimmerCard({ height = 80 }: { height?: number }) {
 function LoadingState() {
   return (
     <div className="space-y-4 pb-32">
-      <ShimmerCard height={120} />
-      <ShimmerCard height={64} />
-      <div className="grid grid-cols-2 gap-3">
-        <ShimmerCard height={200} />
-        <ShimmerCard height={200} />
+      <ShimmerCard height={280} />
+      <div className="grid grid-cols-5 gap-2">
+        {[1, 2, 3, 4, 5].map(i => <ShimmerCard key={i} height={90} />)}
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        {[1,2,3,4,5,6].map(i => <ShimmerCard key={i} height={110} />)}
-      </div>
-      <ShimmerCard height={100} />
-      <ShimmerCard height={80} />
-      <ShimmerCard height={140} />
-      <ShimmerCard height={80} />
-    </div>
-  )
-}
-
-// ─── Section card wrapper ─────────────────────────────────────────────────────
-function SectionCard({
-  children,
-  style,
-  className = '',
-}: {
-  children: React.ReactNode
-  style?: React.CSSProperties
-  className?: string
-}) {
-  return (
-    <div
-      className={`rounded-[22px] p-5 ${className}`}
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--surface-border)',
-        ...style,
-      }}
-    >
-      {children}
     </div>
   )
 }
@@ -84,60 +47,64 @@ function Label({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ─── Life area card ───────────────────────────────────────────────────────────
-function AreaCard({ emoji, title, text }: { emoji: string; title: string; text: string }) {
-  return (
-    <div
-      className="rounded-[18px] p-4 h-full"
-      style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}
-    >
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">{emoji}</span>
-        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'var(--text-3)' }}>{title}</p>
-      </div>
-      <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{text}</p>
-    </div>
-  )
-}
+const TAB_STYLE = (active: boolean): React.CSSProperties => ({
+  padding: '8px 14px',
+  borderRadius: 999,
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: 'pointer',
+  border: `1px solid ${active ? 'rgba(155,92,255,0.45)' : 'var(--surface-border)'}`,
+  background: active ? 'rgba(155,92,255,0.18)' : 'var(--surface)',
+  color: active ? 'var(--violet)' : 'var(--text-3)',
+  whiteSpace: 'nowrap',
+})
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DailyReadingPage() {
-  const [data,    setData]    = useState<DailyGuidance | null>(null)
+  const [data, setData] = useState<WindowResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(false)
+  const [error, setError] = useState(false)
+  const [activeTab, setActiveTab] = useState('love')
   const location = useLocation()
 
-  const today = location.localDate
-    || new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date())
-
-  const fetchGuidance = useCallback(async (refresh = false) => {
+  const fetchWindow = useCallback(async (refresh = false) => {
     setLoading(true)
     setError(false)
     try {
-      const tz   = encodeURIComponent(location.tz)
-      const time = encodeURIComponent(location.localTime)
-      const date = encodeURIComponent(location.localDate)
-      const base = `/api/astrology/daily-guidance?tz=${tz}&time=${time}&date=${date}`
-      const url  = refresh ? `${base}&refresh=1` : base
-      const res  = await fetch(url)
+      const tz = encodeURIComponent(location.tz || 'America/New_York')
+      const base = `/api/luna/daily-readings?tz=${tz}`
+      const url = refresh ? `${base}&refresh=1` : base
+      const res = await fetch(url)
       if (!res.ok) throw new Error('non-2xx')
-      const json = await res.json() as DailyGuidance
+      const json = await res.json() as WindowResponse
       setData(json)
     } catch {
       setError(true)
     } finally {
       setLoading(false)
     }
-  }, [location.tz, location.localTime, location.localDate])
+  }, [location.tz])
 
-  useEffect(() => {
-    // Wait until we have the local time before fetching
-    if (location.localTime) fetchGuidance()
-  }, [location.localTime, fetchGuidance])
+  useEffect(() => { fetchWindow() }, [fetchWindow])
+
+  const today = data?.readings?.[0]
+  const upcoming = data?.readings?.slice(1) ?? []
+
+  const updatedNote = (() => {
+    if (!today) return ''
+    const genDate = new Date(today.generated_at)
+    const todayLocal = new Intl.DateTimeFormat('en-CA', { timeZone: location.tz || 'America/New_York' }).format(new Date())
+    const genLocal = new Intl.DateTimeFormat('en-CA', { timeZone: location.tz || 'America/New_York' }).format(genDate)
+    if (genLocal === todayLocal) {
+      // Honest: only claim the midnight-cron framing if it's actually today's date —
+      // we don't know the exact generation hour without more plumbing, so keep it soft.
+      return 'Updated today'
+    }
+    return `Generated ${new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(genDate)}`
+  })()
 
   return (
     <div className="min-h-screen bg-app">
-      {/* Ambient orbs */}
       <div
         className="fixed top-0 right-0 w-[500px] h-[500px] pointer-events-none z-0"
         style={{ background: 'radial-gradient(circle at 75% 15%, rgba(155,92,255,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
@@ -151,16 +118,13 @@ export default function DailyReadingPage() {
         {/* Header ─────────────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between mb-6 pt-2">
           <div>
-            <h1
-              className="font-display text-2xl font-bold leading-tight"
-              style={{ color: 'var(--text-1)' }}
-            >
+            <h1 className="font-display text-2xl font-bold leading-tight" style={{ color: 'var(--text-1)' }}>
               Your Reading 🌙
             </h1>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>{today}</p>
+            {updatedNote && <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>{updatedNote}</p>}
           </div>
           <button
-            onClick={() => fetchGuidance(true)}
+            onClick={() => fetchWindow(true)}
             disabled={loading}
             className="flex items-center gap-1.5 px-4 py-2 rounded-[14px] text-xs font-semibold tap-scale"
             style={{
@@ -175,35 +139,26 @@ export default function DailyReadingPage() {
           </button>
         </div>
 
-        {/* Loading ─────────────────────────────────────────────────────────── */}
         {loading && <LoadingState />}
 
-        {/* Error ───────────────────────────────────────────────────────────── */}
         {!loading && error && (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <AlertCircle className="h-8 w-8" style={{ color: 'var(--text-3)' }} />
-            <p className="text-sm text-center" style={{ color: 'var(--text-2)' }}>
-              Something went wrong — tap to retry
-            </p>
+            <p className="text-sm text-center" style={{ color: 'var(--text-2)' }}>Something went wrong — tap to retry</p>
             <button
-              onClick={() => fetchGuidance()}
+              onClick={() => fetchWindow()}
               className="px-6 py-3 rounded-[14px] text-sm font-semibold tap-scale"
-              style={{
-                background: 'rgba(155,92,255,0.15)',
-                border: '1px solid rgba(155,92,255,0.3)',
-                color: 'var(--violet)',
-              }}
+              style={{ background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.3)', color: 'var(--violet)' }}
             >
               Try Again
             </button>
           </div>
         )}
 
-        {/* Content ─────────────────────────────────────────────────────────── */}
-        {!loading && !error && data && (
+        {!loading && !error && today && (
           <div className="space-y-4 pb-32 animate-page-enter">
 
-            {/* ── Daily Horoscope ─────────────────────────────────────────── */}
+            {/* ── Today's card ─────────────────────────────────────────────── */}
             <div
               className="rounded-[22px] p-6"
               style={{
@@ -211,149 +166,131 @@ export default function DailyReadingPage() {
                 border: '1px solid rgba(155,92,255,0.30)',
               }}
             >
-              <Label>Daily Horoscope</Label>
-              <p className="text-base leading-relaxed" style={{ color: 'var(--text-1)' }}>
-                {data.horoscope}
+              <Label>{today.reading_json.date}</Label>
+              <p className="font-display text-xl font-bold mb-2" style={{ color: 'var(--text-1)' }}>
+                {today.reading_json.title}
+              </p>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-1)' }}>
+                {today.reading_json.main_theme}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-4 text-xs" style={{ color: 'var(--text-3)' }}>
+                <span className="px-2.5 py-1 rounded-full" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                  ☀️ {today.reading_json.cosmic_weather.sun_sign} season
+                </span>
+                <span className="px-2.5 py-1 rounded-full" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                  🌙 {today.reading_json.cosmic_weather.moon_sign} · {today.reading_json.cosmic_weather.moon_phase}
+                </span>
+              </div>
+
+              <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                {today.reading_json.luna_message}
               </p>
             </div>
 
-            {/* ── Today's Energy ──────────────────────────────────────────── */}
-            <SectionCard>
-              <Label>Today&apos;s Energy</Label>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>
-                {data.energy}
-              </p>
-            </SectionCard>
+            {/* ── Tabs: Love / Work / Energy / Spiritual / Journal ────────────── */}
+            <Tabs.Root value={activeTab} onValueChange={setActiveTab}>
+              <Tabs.List className="flex gap-2 overflow-x-auto pb-1 mb-3" style={{ scrollbarWidth: 'none' }}>
+                {(['love', 'work', 'energy', 'spiritual', 'journal'] as const).map(tab => (
+                  <Tabs.Trigger key={tab} value={tab} asChild>
+                    <button type="button" style={TAB_STYLE(activeTab === tab)}>
+                      {tab === 'love' ? 'Love' : tab === 'work' ? 'Work' : tab === 'energy' ? 'Energy' : tab === 'spiritual' ? 'Spiritual' : 'Journal'}
+                    </button>
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
 
-            {/* ── Do / Avoid ──────────────────────────────────────────────── */}
-            <div className="grid grid-cols-2 gap-3">
-              {/* Do Today */}
-              <div
-                className="rounded-[20px] p-4"
-                style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}
-              >
-                <Label>Do Today</Label>
-                <div className="flex flex-col gap-2">
-                  {data.do_today.map((item, i) => (
-                    <div
-                      key={i}
-                      className="px-2.5 py-1.5 rounded-[10px] text-xs font-medium leading-snug"
-                      style={{ background: 'rgba(90,138,122,0.15)', border: '1px solid rgba(90,138,122,0.25)', color: '#5A8A7A' }}
-                    >
-                      {item}
+              <Tabs.Content value="love">
+                <SectionCard><p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{today.reading_json.personal_alignment.relationship_theme}</p></SectionCard>
+              </Tabs.Content>
+              <Tabs.Content value="work">
+                <SectionCard><p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{today.reading_json.personal_alignment.career_theme}</p></SectionCard>
+              </Tabs.Content>
+              <Tabs.Content value="energy">
+                <SectionCard>
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-1)' }}>{today.reading_json.personal_alignment.energy_theme}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(90,138,122,0.12)', border: '1px solid rgba(90,138,122,0.22)' }}>
+                      <p className="text-[11px] font-bold uppercase mb-1" style={{ color: '#5A8A7A' }}>Do this</p>
+                      <p className="text-xs" style={{ color: 'var(--text-1)' }}>{today.reading_json.guidance.do_this}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Avoid Today */}
-              <div
-                className="rounded-[20px] p-4"
-                style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}
-              >
-                <Label>Avoid Today</Label>
-                <div className="flex flex-col gap-2">
-                  {data.dont_today.map((item, i) => (
-                    <div
-                      key={i}
-                      className="px-2.5 py-1.5 rounded-[10px] text-xs font-medium leading-snug"
-                      style={{ background: 'rgba(201,107,90,0.13)', border: '1px solid rgba(201,107,90,0.22)', color: '#C96B5A' }}
-                    >
-                      {item}
+                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(201,107,90,0.10)', border: '1px solid rgba(201,107,90,0.2)' }}>
+                      <p className="text-[11px] font-bold uppercase mb-1" style={{ color: '#C96B5A' }}>Avoid this</p>
+                      <p className="text-xs" style={{ color: 'var(--text-1)' }}>{today.reading_json.guidance.avoid_this}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                  </div>
+                </SectionCard>
+              </Tabs.Content>
+              <Tabs.Content value="spiritual">
+                <SectionCard>
+                  <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-1)' }}>{today.reading_json.personal_alignment.natal_focus}</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="rounded-[14px] p-3" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                      <p className="font-bold uppercase mb-1" style={{ color: 'var(--text-3)' }}>Numerology</p>
+                      <p style={{ color: 'var(--text-1)' }}>Day {today.reading_json.numerology.personal_day} — {today.reading_json.numerology.meaning}</p>
+                    </div>
+                    <div className="rounded-[14px] p-3" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                      <p className="font-bold uppercase mb-1" style={{ color: 'var(--text-3)' }}>Chinese day energy</p>
+                      <p style={{ color: 'var(--text-1)' }}>{today.reading_json.chinese_astrology.day_energy} — {today.reading_json.chinese_astrology.guidance}</p>
+                    </div>
+                  </div>
+                </SectionCard>
+              </Tabs.Content>
+              <Tabs.Content value="journal">
+                <SectionCard>
+                  <Label>Journal prompt</Label>
+                  <p className="text-base font-display italic leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                    &ldquo;{today.reading_json.guidance.journal_prompt}&rdquo;
+                  </p>
+                  <Label>Affirmation</Label>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--violet)' }}>{today.reading_json.guidance.affirmation}</p>
+                </SectionCard>
+              </Tabs.Content>
+            </Tabs.Root>
 
-            {/* ── Life Area Messages ───────────────────────────────────────── */}
+            {/* ── Next 5 days ──────────────────────────────────────────────── */}
             <div>
               <p className="text-xs font-bold uppercase tracking-widest mb-2.5" style={{ color: 'var(--text-4)' }}>
-                Life Areas
+                Coming up
               </p>
-              <div className="grid grid-cols-2 gap-3">
-                <AreaCard emoji="💼" title="Career"     text={data.career}     />
-                <AreaCard emoji="💜" title="Love"       text={data.love}       />
-                <AreaCard emoji="🔥" title="Sex"        text={data.sex}        />
-                <AreaCard emoji="💸" title="Money"      text={data.money}      />
-                <AreaCard emoji="✨" title="Friendship" text={data.friendship} />
-                <AreaCard emoji="🌿" title="Family"     text={data.family}     />
+              <div className="flex gap-2.5 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+                {upcoming.map(r => (
+                  <div
+                    key={r.reading_date}
+                    className="rounded-[16px] p-3.5 flex-shrink-0"
+                    style={{ width: 150, background: 'var(--surface)', border: '1px solid var(--surface-border)' }}
+                  >
+                    <p className="text-[11px] font-bold uppercase mb-1" style={{ color: 'var(--text-4)' }}>
+                      {new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(r.reading_date + 'T12:00:00'))}
+                    </p>
+                    <p className="text-xs font-semibold mb-1.5" style={{ color: 'var(--text-1)' }}>{r.reading_json.title}</p>
+                    <p className="text-[11px]" style={{ color: 'var(--text-3)' }}>
+                      🌙 {r.reading_json.cosmic_weather.moon_sign}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* ── Self Reflection ─────────────────────────────────────────── */}
-            <div
-              className="rounded-[22px] p-6"
-              style={{
-                background: 'linear-gradient(145deg, rgba(13,11,30,0.85) 0%, rgba(30,26,56,0.85) 100%)',
-                border: '1px solid rgba(155,92,255,0.22)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.55)' }}>
-                Reflect
-              </p>
-              <p
-                className="text-lg font-display italic leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.90)' }}
-              >
-                &ldquo;{data.self_reflection}&rdquo;
+            {/* ── Clarity note + source note ───────────────────────────────── */}
+            <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+              <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-3)' }}>{today.reading_json.clarity_note}</p>
+              <p className="text-[10.5px] leading-relaxed" style={{ color: 'var(--text-4)' }}>
+                Sky data calculated from real-time ephemeris math. Interpretation is symbolic guidance, not scientific prediction.
               </p>
             </div>
-
-            {/* ── Main Focus ──────────────────────────────────────────────── */}
-            <div
-              className="rounded-[22px] p-5"
-              style={{
-                background: 'rgba(201,169,110,0.12)',
-                border: '1px solid rgba(201,169,110,0.25)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(201,169,110,0.8)' }}>
-                Main Focus Today
-              </p>
-              <p className="text-base font-semibold leading-snug" style={{ color: '#C9A96E' }}>
-                {data.main_focus}
-              </p>
-            </div>
-
-            {/* ── Highest Self ─────────────────────────────────────────────── */}
-            <div
-              className="rounded-[22px] p-6"
-              style={{
-                background: 'linear-gradient(145deg, rgba(90,60,160,0.25) 0%, rgba(155,92,255,0.15) 50%, rgba(60,40,120,0.22) 100%)',
-                border: '1px solid rgba(155,92,255,0.35)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.65)' }}>
-                Your Highest Self
-              </p>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>
-                {data.highest_self}
-              </p>
-            </div>
-
-            {/* ── Affirmation ─────────────────────────────────────────────── */}
-            <div
-              className="rounded-[22px] p-7 text-center"
-              style={{
-                background: 'linear-gradient(135deg, rgba(155,92,255,0.30) 0%, rgba(90,60,150,0.22) 50%, rgba(184,159,216,0.18) 100%)',
-                border: '1px solid rgba(155,92,255,0.30)',
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.6)' }}>
-                Today&apos;s Affirmation
-              </p>
-              <p
-                className="text-base font-display italic leading-relaxed"
-                style={{ color: '#FFFFFF' }}
-              >
-                &ldquo;{data.affirmation}&rdquo;
-              </p>
-            </div>
-
           </div>
         )}
       </AppLayout>
+    </div>
+  )
+}
+
+// ─── Section card wrapper ─────────────────────────────────────────────────────
+function SectionCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[22px] p-5" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+      {children}
     </div>
   )
 }
