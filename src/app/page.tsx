@@ -38,10 +38,67 @@ function getMoonPhase() {
   const days = (Date.now() - new Date('2024-01-11').getTime()) / 86_400_000
   return MOON_PHASES[Math.floor(((days % 29.53) / 29.53) * 8)] ?? MOON_PHASES[0]
 }
+type HeroTimeBucket = 'morning' | 'afternoon' | 'evening' | 'night'
+
+function getHeroTimeBucket(h: number): HeroTimeBucket {
+  if (h < 12) return 'morning'
+  if (h < 17) return 'afternoon'
+  if (h < 21) return 'evening'
+  return 'night'
+}
+
+const HERO_GREETINGS: Record<HeroTimeBucket, string> = {
+  morning: 'Good morning',
+  afternoon: 'Good afternoon',
+  evening: 'Good evening',
+  night: 'Good night',
+}
+
+const HERO_BACKGROUNDS: Record<HeroTimeBucket, string> = {
+  morning: '/brand/ui/hero-morning.jpg',
+  afternoon: '/brand/ui/hero-afternoon.jpg',
+  evening: '/brand/ui/hero-evening.jpg',
+  night: '/brand/ui/hero-night.jpg',
+}
+
+// Rotating taglines, grouped by time of day so tone matches the moment.
+// Picked by day-of-year so it's stable through a single viewing but changes daily.
+const HERO_TAGLINES: Record<HeroTimeBucket, string[]> = {
+  morning: [
+    'You are not behind.\nYou are becoming.',
+    'Start soft.\nThe day will meet you there.',
+    'One clear breath\nbefore the noise begins.',
+  ],
+  afternoon: [
+    'Keep going.\nYou are closer than it feels.',
+    'This is the middle,\nnot the mistake.',
+    'Steady pace.\nYou do not have to rush this.',
+  ],
+  evening: [
+    'The day is closing.\nLet it.',
+    'You did enough.\nReally.',
+    'Soften now.\nTomorrow can wait its turn.',
+  ],
+  night: [
+    'Rest is not\nfalling behind.',
+    'The quiet is yours.\nStay a while.',
+    'You are not behind.\nYou are becoming.',
+  ],
+}
+
 function getGreeting(h: number) {
-  if (h < 12) return 'Good morning'
-  if (h < 17) return 'Good afternoon'
-  return 'Good evening'
+  return HERO_GREETINGS[getHeroTimeBucket(h)]
+}
+
+function getHeroBackground(h: number) {
+  return HERO_BACKGROUNDS[getHeroTimeBucket(h)]
+}
+
+function getHeroTagline(h: number) {
+  const bucket = getHeroTimeBucket(h)
+  const pool = HERO_TAGLINES[bucket]
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86_400_000)
+  return pool[dayOfYear % pool.length]
 }
 
 // ─── Shared glass card style — LUNA locked theme tokens ────────────────────────
@@ -130,9 +187,10 @@ const FALLBACK_TASKS = [
 ]
 
 function Slide1({
-  greeting, moon, guidance, topTasks, calEvents, dataLoaded, lunaMessage, lmLoading,
+  greeting, moon, heroBg, heroTagline, guidance, topTasks, calEvents, dataLoaded, lunaMessage, lmLoading,
 }: {
   greeting: string; moon: typeof MOON_PHASES[0]
+  heroBg: string; heroTagline: string
   guidance: GuidanceData | null
   topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean
   lunaMessage: { message: string; affirmation: string } | null; lmLoading: boolean
@@ -147,13 +205,13 @@ function Slide1({
       {/* ── LEFT column: Hero + Top3/NextEvent + Quick Actions ──────────── */}
       <div className="lg:col-span-2 flex flex-col gap-3">
 
-        {/* Hero */}
-        <LunaHeroCard backgroundImage="/brand/ui/luna-hero-card-desktop.png" className="p-5 lg:p-6" >
+        {/* Hero — background + tagline swap with time of day */}
+        <LunaHeroCard backgroundImage={heroBg} className="p-5 lg:p-6" >
           <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
             {greeting}, Zoe ✦
           </p>
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)' }}>
-            You are not behind.<br />You are becoming.
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)', whiteSpace: 'pre-line' }}>
+            {heroTagline}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ fontSize: 12 }}>{moon.emoji}</span>
@@ -816,13 +874,15 @@ function HomePageInner() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  const moon     = getMoonPhase()
-  const greeting = getGreeting(hour)
+  const moon        = getMoonPhase()
+  const greeting    = getGreeting(hour)
+  const heroBg       = getHeroBackground(hour)
+  const heroTagline  = getHeroTagline(hour)
 
   const pages = [
     {
       id: 'today', label: 'Today',
-      content: <Slide1 greeting={greeting} moon={moon} guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
+      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
     },
     { id: 'previews', label: 'Previews', content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
     { id: 'wellness', label: 'Wellness', content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
