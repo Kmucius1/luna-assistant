@@ -26,11 +26,17 @@ async function handle(req: NextRequest) {
 
     for (const dateKey of dateKeys) {
       const cached = existing.get(dateKey)
-      // Regenerate if missing entirely, or if today's reading didn't
-      // finish cleanly last time.
       const isMissing = !cached
-      const isStaleToday = dateKey === dateKeys[0] && cached?.status !== 'ready'
-      if (!isMissing && !isStaleToday) continue
+      // A reading that only made it to the real-data fallback (e.g. AI quota
+      // was exhausted at generation time) isn't actually done — retry it so
+      // the hourly cron can upgrade it to a real AI reading once the quota
+      // frees up, instead of leaving template text stuck for the rest of
+      // the day. Never a wasted attempt: generateDailyReading() always
+      // falls back to the same real-data template on repeated failure.
+      const lastSource = cached?.source_log_json?.[cached.source_log_json.length - 1] as { source?: string } | undefined
+      const isUpgradeable = cached?.status === 'ready' && lastSource?.source === 'fallback'
+      const isStale = !isMissing && cached?.status !== 'ready'
+      if (!isMissing && !isStale && !isUpgradeable) continue
 
       try {
         const generated = await generateDailyReading(dateFromKey(dateKey), timezone)
@@ -52,7 +58,7 @@ async function handle(req: NextRequest) {
           luna_message: generated.payload.luna_message,
           generated_at: now.toISOString(),
           expires_at: expiresAt.toISOString(),
-          source_log_json: [{ source: generated.source, generated_at: now.toISOString() }],
+          source_log_json: [...(cached?.source_log_json ?? []), { source: generated.source, generated_at: now.toISOString() }],
           status: 'ready',
         }
 
