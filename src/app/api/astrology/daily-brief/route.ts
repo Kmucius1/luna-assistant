@@ -1,5 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+
+interface DailyBrief {
+  overall_vibe: string
+  tagline: string
+  energy: string
+  avoid: string
+  focus: string
+  gifts: string
+  prepare: string
+  mantra: string
+  colors: string[]
+  color_note: string
+  crystals: string[]
+  crystal_notes: Record<string, string>
+}
+
+const FALLBACK_BRIEF: DailyBrief = {
+  overall_vibe: 'Steady and present',
+  tagline: 'Today asks for grounded attention, not grand gestures.',
+  energy: 'Move at a pace you can sustain. Let today be built from small, deliberate steps rather than urgency.',
+  avoid: 'Avoid overcommitting or letting other people\'s pace dictate yours.',
+  focus: 'Keep your attention on what\'s actually in front of you — one priority, done well.',
+  gifts: 'Quiet clarity is available if you slow down enough to notice it.',
+  prepare: 'If today gets intense, come back to your breath and your body before reacting.',
+  mantra: 'I move at my own pace.',
+  colors: ['deep blue', 'soft white'],
+  color_note: 'Calming, grounding tones for a day that asks for steadiness.',
+  crystals: ['moonstone', 'clear quartz'],
+  crystal_notes: { moonstone: 'Supports emotional steadiness', 'clear quartz': 'Clarity and calm focus' },
+}
 
 const BRIEF_PROMPT = `You are LUNA, Zoe's deeply personal cosmic guide.
 
@@ -42,66 +75,75 @@ Return ONLY valid JSON — no markdown, no explanation:
 
 export async function GET(request: NextRequest) {
   const tz = request.nextUrl.searchParams.get('tz') || 'America/New_York'
+  const refresh = request.nextUrl.searchParams.get('refresh') === '1'
 
-  try {
-    // Fetch current sky data from existing APIs in parallel
-    const base = new URL(request.url)
-    base.pathname = ''
-    const origin = `${base.protocol}//${base.host}`
+  // Fetch current sky data from existing APIs in parallel — needed for both
+  // the cache-hit response (sky changes through the day) and generation.
+  const base = new URL(request.url)
+  base.pathname = ''
+  const origin = `${base.protocol}//${base.host}`
 
-    const [moonRes, planetsRes, transitsRes] = await Promise.allSettled([
-      fetch(`${origin}/api/astrology/moon?tz=${encodeURIComponent(tz)}`).then(r => r.json()),
-      fetch(`${origin}/api/astrology/planets?tz=${encodeURIComponent(tz)}`).then(r => r.json()),
-      fetch(`${origin}/api/astrology/transits`).then(r => r.json()),
-    ])
+  const [moonRes, planetsRes, transitsRes] = await Promise.allSettled([
+    fetch(`${origin}/api/astrology/moon?tz=${encodeURIComponent(tz)}`).then(r => r.json()),
+    fetch(`${origin}/api/astrology/planets?tz=${encodeURIComponent(tz)}`).then(r => r.json()),
+    fetch(`${origin}/api/astrology/transits`).then(r => r.json()),
+  ])
 
-    const moon     = moonRes.status === 'fulfilled'     ? moonRes.value     : null
-    const planets  = planetsRes.status === 'fulfilled'  ? planetsRes.value  : null
-    const transits = transitsRes.status === 'fulfilled' ? transitsRes.value : null
+  const moon     = moonRes.status === 'fulfilled'     ? moonRes.value     : null
+  const planets  = planetsRes.status === 'fulfilled'  ? planetsRes.value  : null
+  const transits = transitsRes.status === 'fulfilled' ? transitsRes.value : null
 
-    const now = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: tz })
+  const { payload: brief, source } = await getOrCreateDailyContent<DailyBrief>({
+    userId: ZOE_USER_ID,
+    generationType: 'daily_brief',
+    timezone: tz,
+    forceRegenerate: refresh,
+    generate: async () => {
+      try {
+        const now = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', timeZone: tz })
 
-    const skyData = [
-      `Date: ${now}`,
-      moon ? [
-        `Moon Phase: ${moon.phase?.name} (${moon.phase?.illumination}% illuminated)`,
-        `Moon Sign: ${moon.sign?.name} at ${moon.sign?.formatted}`,
-        `Moon Phase Keywords: ${moon.phase?.description || ''}`,
-        `Moon Sign Keywords: ${moon.sign?.keywords || ''}`,
-        moon.phase?.next_exact ? `Next moon phase: ${moon.phase.next_exact.name} in ${moon.phase.next_exact.time}` : '',
-        moon.next_ingress ? `Moon moves to next sign: ${moon.next_ingress}` : '',
-      ].filter(Boolean).join('\n') : 'Moon data unavailable',
-      planets ? [
-        `Planetary positions: ${planets.planets?.map((p: { name: string; sign: string; retrograde: boolean }) => `${p.name} in ${p.sign}${p.retrograde ? ' (retrograde)' : ''}`).join(', ')}`,
-        planets.retrogrades?.length ? `Retrogrades active: ${planets.retrogrades.join(', ')}` : 'No retrogrades',
-      ].join('\n') : 'Planet data unavailable',
-      transits ? [
-        transits.daily_theme ? `Today's cosmic theme: ${transits.daily_theme}` : '',
-        transits.moon_house ? `Moon is in Zoe's ${transits.moon_house}th house — ${transits.moon_house_meaning}` : '',
-        transits.major_aspects?.length ? `Active transits to her natal chart:\n${transits.major_aspects.map((a: { transiting: string; type: string; natal: string; interpretation: string }) => `- ${a.transiting} ${a.type} natal ${a.natal}: ${a.interpretation}`).join('\n')}` : '',
-      ].filter(Boolean).join('\n') : 'Transit data unavailable',
-    ].join('\n\n')
+        const skyData = [
+          `Date: ${now}`,
+          moon ? [
+            `Moon Phase: ${moon.phase?.name} (${moon.phase?.illumination}% illuminated)`,
+            `Moon Sign: ${moon.sign?.name} at ${moon.sign?.formatted}`,
+            `Moon Phase Keywords: ${moon.phase?.description || ''}`,
+            `Moon Sign Keywords: ${moon.sign?.keywords || ''}`,
+            moon.phase?.next_exact ? `Next moon phase: ${moon.phase.next_exact.name} in ${moon.phase.next_exact.time}` : '',
+            moon.next_ingress ? `Moon moves to next sign: ${moon.next_ingress}` : '',
+          ].filter(Boolean).join('\n') : 'Moon data unavailable',
+          planets ? [
+            `Planetary positions: ${planets.planets?.map((p: { name: string; sign: string; retrograde: boolean }) => `${p.name} in ${p.sign}${p.retrograde ? ' (retrograde)' : ''}`).join(', ')}`,
+            planets.retrogrades?.length ? `Retrogrades active: ${planets.retrogrades.join(', ')}` : 'No retrogrades',
+          ].join('\n') : 'Planet data unavailable',
+          transits ? [
+            transits.daily_theme ? `Today's cosmic theme: ${transits.daily_theme}` : '',
+            transits.moon_house ? `Moon is in Zoe's ${transits.moon_house}th house — ${transits.moon_house_meaning}` : '',
+            transits.major_aspects?.length ? `Active transits to her natal chart:\n${transits.major_aspects.map((a: { transiting: string; type: string; natal: string; interpretation: string }) => `- ${a.transiting} ${a.type} natal ${a.natal}: ${a.interpretation}`).join('\n')}` : '',
+          ].filter(Boolean).join('\n') : 'Transit data unavailable',
+        ].join('\n\n')
 
-    const prompt = BRIEF_PROMPT.replace('{SKY_DATA}', skyData)
+        const prompt = BRIEF_PROMPT.replace('{SKY_DATA}', skyData)
 
-    const raw = await callAI(
-      'You are LUNA, a precise cosmic guide. Return ONLY valid JSON. No markdown. No explanation outside the JSON.',
-      prompt,
-      2400
-    )
+        const raw = await callAI(
+          'You are LUNA, a precise cosmic guide. Return ONLY valid JSON. No markdown. No explanation outside the JSON.',
+          prompt,
+          2400
+        )
 
-    const brief = parseAIJson(raw)
-    if (!brief) return NextResponse.json({ error: 'Failed to parse brief' }, { status: 500 })
+        const parsed = parseAIJson(raw) as DailyBrief | null
+        if (!parsed) throw new Error('Failed to parse brief')
+        return { payload: parsed, source: 'ai' as const }
+      } catch {
+        return { payload: FALLBACK_BRIEF, source: 'fallback' as const }
+      }
+    },
+  })
 
-    return NextResponse.json({
-      ...brief,
-      generated_at: new Date().toISOString(),
-      sky: { moon, planets: planets?.planets, retrogrades: planets?.retrogrades, transits }
-    }, {
-      headers: { 'Cache-Control': 's-maxage=3600, stale-while-revalidate=300' }
-    })
-  } catch (err) {
-    console.error('Daily brief error:', err)
-    return NextResponse.json({ error: String(err) }, { status: 500 })
-  }
+  return NextResponse.json({
+    ...brief,
+    generated_at: new Date().toISOString(),
+    source,
+    sky: { moon, planets: planets?.planets, retrogrades: planets?.retrogrades, transits },
+  })
 }

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 
-const cache = new Map<string, { data: LoveGuidance; ts: number }>()
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 export interface LoveGuidance {
   daily_message:     string
@@ -99,11 +100,6 @@ export async function GET(req: NextRequest) {
       ? `love_${localDate.replace(/[^a-zA-Z0-9]/g, '_')}`
       : `love_${new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)}`
 
-    if (!refresh) {
-      const hit = cache.get(dateKey)
-      if (hit && Date.now() - hit.ts < 60 * 60 * 1000) return NextResponse.json(hit.data)
-    }
-
     const planets  = getCurrentPlanets(now)
     const transits = getTransitsToNatal(now).slice(0, 8)
 
@@ -120,12 +116,19 @@ export async function GET(req: NextRequest) {
       `${t.transiting} ${t.type} natal ${t.natal} (${t.natalSign} ${t.natalDegree}°) — ${t.interpretation}`
     ).join('\n')
 
-    try {
-      const dateStr = localDate || new Intl.DateTimeFormat('en-US', {
-        timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-      }).format(now)
+    const { payload: guidance } = await getOrCreateDailyContent<LoveGuidance>({
+      userId: ZOE_USER_ID,
+      generationType: 'love_guidance',
+      timezone: clientTz,
+      dateKey,
+      forceRegenerate: refresh,
+      generate: async () => {
+        try {
+          const dateStr = localDate || new Intl.DateTimeFormat('en-US', {
+            timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+          }).format(now)
 
-      const prompt = `Today is ${dateStr}.
+          const prompt = `Today is ${dateStr}.
 
 CURRENT SKY:
 ${planetLines}
@@ -161,19 +164,19 @@ Generate a complete love energy reading for today. Return ONLY valid JSON matchi
   "navigate_now": ["5 specific pieces of guidance for how to navigate her love life right now, grounded in today's transits and her chart"]
 }`
 
-      const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Write about love with honesty, warmth, and real depth. No toxic positivity. No vague generalities. You know this woman — speak directly to her. Return ONLY valid JSON — no markdown fences."
-      const rawText = await callAI(SYSTEM, prompt, 1500)
-      const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
-      const guidance = JSON.parse(jsonText) as LoveGuidance
+          const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Write about love with honesty, warmth, and real depth. No toxic positivity. No vague generalities. You know this woman — speak directly to her. Return ONLY valid JSON — no markdown fences."
+          const rawText = await callAI(SYSTEM, prompt, 1500)
+          const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+          const parsed = JSON.parse(jsonText) as LoveGuidance
+          return { payload: parsed, source: 'ai' as const }
+        } catch {
+          // AI unavailable — use transit-based fallback (always accurate)
+          return { payload: buildFallbackLoveGuidance(planets, transits), source: 'fallback' as const }
+        }
+      },
+    })
 
-      cache.set(dateKey, { data: guidance, ts: Date.now() })
-      return NextResponse.json(guidance)
-    } catch {
-      // AI unavailable — use transit-based fallback (always accurate)
-      const fallback = buildFallbackLoveGuidance(planets, transits)
-      cache.set(dateKey, { data: fallback, ts: Date.now() })
-      return NextResponse.json(fallback)
-    }
+    return NextResponse.json(guidance)
   } catch (err) {
     console.error('[love-guidance] error:', err)
     return NextResponse.json({ error: 'Failed to generate love guidance.' }, { status: 500 })

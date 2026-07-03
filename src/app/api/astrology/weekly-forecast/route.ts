@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal } from '@/lib/astrology'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 
-const cache = new Map<string, { data: WeeklyForecast; ts: number }>()
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 export interface DayForecast {
   date:       string   // "Monday, June 23"
@@ -105,11 +106,6 @@ export async function GET(req: NextRequest) {
     const now = new Date()
     const dateKey = `weekly_${localDate.replace(/[^a-zA-Z0-9]/g, '_') || now.toDateString()}`
 
-    if (!refresh) {
-      const hit = cache.get(dateKey)
-      if (hit && Date.now() - hit.ts < 3 * 60 * 60 * 1000) return NextResponse.json(hit.data)
-    }
-
     // Build per-day planet data for all 7 days
     const dayData = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(now)
@@ -135,8 +131,15 @@ export async function GET(req: NextRequest) {
 ${tLines}`
     }).join('\n\n')
 
-    try {
-      const prompt = `Generate a detailed 7-day horoscope for Zoe for the upcoming week.
+    const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
+      userId: ZOE_USER_ID,
+      generationType: 'weekly_forecast',
+      timezone: clientTz,
+      dateKey,
+      forceRegenerate: refresh,
+      generate: async () => {
+        try {
+          const prompt = `Generate a detailed 7-day horoscope for Zoe for the upcoming week.
 
 ZOE'S NATAL CHART:
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
@@ -173,19 +176,19 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
   ]
 }`
 
-      const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
-      const rawText = await callAI(SYSTEM, prompt, 4000)
-      const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
-      const forecast = JSON.parse(jsonText) as WeeklyForecast
+          const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
+          const rawText = await callAI(SYSTEM, prompt, 4000)
+          const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+          const parsed = JSON.parse(jsonText) as WeeklyForecast
+          return { payload: parsed, source: 'ai' as const }
+        } catch {
+          // Fallback: transit-based generation (always accurate)
+          return { payload: buildFallbackWeekly(now, clientTz), source: 'fallback' as const }
+        }
+      },
+    })
 
-      cache.set(dateKey, { data: forecast, ts: Date.now() })
-      return NextResponse.json(forecast)
-    } catch {
-      // Fallback: transit-based generation (always accurate)
-      const fallback = buildFallbackWeekly(now, clientTz)
-      cache.set(dateKey, { data: fallback, ts: Date.now() })
-      return NextResponse.json(fallback)
-    }
+    return NextResponse.json(forecast)
   } catch (err) {
     console.error('[weekly-forecast] error:', err)
     return NextResponse.json({ error: 'Failed to generate weekly forecast.' }, { status: 500 })
