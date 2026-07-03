@@ -299,7 +299,7 @@ export default function SettingsPage() {
 
           {/* ── CONNECTIONS ───────────────────────────────────────── */}
           <div style={CARD}>
-            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: 'rgba(139,111,184,0.7)' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
+            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: 'rgba(155,92,255,0.7)' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
 
             {/* Gmail accounts */}
             <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Gmail Accounts</p>
@@ -310,8 +310,8 @@ export default function SettingsPage() {
             {/* Connection note + troubleshooting */}
             {!allConnected && (
               <>
-                <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.18)' }}>
-                  <p style={{ fontSize: 12, color: 'rgba(196,169,232,0.8)', lineHeight: 1.5 }}>
+                <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.18)' }}>
+                  <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.8)', lineHeight: 1.5 }}>
                     Connect both Google Workspace accounts so LUNA reads all your emails and calendar events. Gmail + Calendar are authorized together in one sign-in.
                   </p>
                 </div>
@@ -377,8 +377,8 @@ export default function SettingsPage() {
                 <p style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 2 }}>Theme</p>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Currently {theme === 'dark' ? 'dark' : 'light'} mode</p>
               </div>
-              <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 14, border: '1px solid rgba(139,111,184,0.3)', background: 'rgba(139,111,184,0.1)', cursor: 'pointer', color: 'white', fontSize: 13, fontWeight: 600 }}>
-                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#C9A96E' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#8B6FB8' }} /> Dark mode</>}
+              <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 14, border: '1px solid rgba(155,92,255,0.3)', background: 'rgba(155,92,255,0.1)', cursor: 'pointer', color: 'white', fontSize: 13, fontWeight: 600 }}>
+                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#C9A96E' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#9b5cff' }} /> Dark mode</>}
               </button>
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function SettingsPage() {
             <SectionLabel icon={<User className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.45)' }} />} text="Account" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(139,111,184,0.4)' }}>Z</div>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(155,92,255,0.4)' }}>Z</div>
                 <div>
                   <p style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>Zoe Taylor</p>
                   <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Owner · DRYP Digital</p>
@@ -403,7 +403,7 @@ export default function SettingsPage() {
           {/* ── AI PROFILE ───────────────────────────────────────── */}
           <form onSubmit={handleSave}>
             <div style={CARD}>
-              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: 'rgba(139,111,184,0.7)' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
+              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: 'rgba(155,92,255,0.7)' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
 
               <div style={{ marginBottom: 14 }}>
                 <FieldLabel text="Your preferred tone" />
@@ -465,9 +465,9 @@ export default function SettingsPage() {
             {/* Save */}
             <button type="submit" disabled={saving} style={{
               width: '100%', padding: '14px 0', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
-              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
+              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
               color: saved ? '#8AB88A' : 'white',
-              boxShadow: saved ? 'none' : '0 6px 24px rgba(139,111,184,0.35)',
+              boxShadow: saved ? 'none' : '0 6px 24px rgba(155,92,255,0.35)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               transition: 'all 0.3s ease',
             }}>

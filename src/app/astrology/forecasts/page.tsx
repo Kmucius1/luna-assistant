@@ -27,7 +27,7 @@ function IntensityPips({ value }: { value: number }) {
   return (
     <div style={{ display: 'flex', gap: 2 }}>
       {Array.from({ length: 10 }, (_, i) => (
-        <div key={i} style={{ width: 12, height: 3, borderRadius: 2, background: i < value ? 'rgba(196,169,232,0.8)' : 'rgba(255,255,255,0.1)' }} />
+        <div key={i} style={{ width: 12, height: 3, borderRadius: 2, background: i < value ? 'rgba(185,139,255,0.8)' : 'rgba(255,255,255,0.1)' }} />
       ))}
     </div>
   )
@@ -43,7 +43,7 @@ function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
       <button onClick={() => setOpen(v => !v)} style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: isFirst ? '#C4A9E8' : 'white' }}>{day.dayLabel}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: isFirst ? '#b98bff' : 'white' }}>{day.dayLabel}</p>
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{day.date}</span>
           </div>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.45 }}>{day.theme}</p>
@@ -82,7 +82,7 @@ function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {(day.guidance ?? []).map((tip, i) => (
                 <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: 10, background: 'rgba(139,111,184,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#9B7FC8', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                  <div style={{ width: 20, height: 20, borderRadius: 10, background: 'rgba(155,92,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#9B7FC8', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
                   <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', lineHeight: 1.55 }}>{tip}</p>
                 </div>
               ))}
@@ -96,8 +96,8 @@ function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
           </div>
 
           {/* Affirmation */}
-          <div style={{ padding: 14, borderRadius: 16, background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.18)', textAlign: 'center' }}>
-            <p style={{ fontSize: 12, color: '#C4A9E8', fontStyle: 'italic', lineHeight: 1.55 }}>"{day.affirmation}"</p>
+          <div style={{ padding: 14, borderRadius: 16, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.18)', textAlign: 'center' }}>
+            <p style={{ fontSize: 12, color: '#b98bff', fontStyle: 'italic', lineHeight: 1.55 }}>"{day.affirmation}"</p>
           </div>
         </div>
       )}
@@ -158,8 +158,8 @@ export default function ForecastsPage() {
             {!loading && forecast && (
               <div style={{ ...GLASS, padding: 18, marginBottom: 16, background: 'linear-gradient(135deg, rgba(80,40,130,0.3), rgba(20,10,40,0.2))' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                  <Sparkles className="h-4 w-4" style={{ color: '#C4A9E8' }} />
-                  <Label text="This Week's Theme" color="#C4A9E8" />
+                  <Sparkles className="h-4 w-4" style={{ color: '#b98bff' }} />
+                  <Label text="This Week's Theme" color="#b98bff" />
                 </div>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', lineHeight: 1.6, marginBottom: 14 }}>{forecast.week_theme}</p>
 
@@ -200,11 +200,11 @@ export default function ForecastsPage() {
 
             {/* Chart note */}
             {forecast && (
-              <div style={{ ...GLASS, padding: 14, marginTop: 16, background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.15)' }}>
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#8B6FB8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Reading personalized to your chart</p>
+              <div style={{ ...GLASS, padding: 14, marginTop: 16, background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.15)' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9b5cff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Reading personalized to your chart</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {[['☀️','Scorpio 22°'],['🌙','Cancer 4°'],['✨','Gemini Rising'],['♀','Sag Venus 29°'],['♂','Libra Mars 6°'],['☊','Cancer N.Node']].map(([e, v]) => (
-                    <span key={v} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 10, background: 'rgba(139,111,184,0.15)', color: 'rgba(196,169,232,0.8)', border: '1px solid rgba(139,111,184,0.2)' }}>{e} {v}</span>
+                    <span key={v} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 10, background: 'rgba(155,92,255,0.15)', color: 'rgba(185,139,255,0.8)', border: '1px solid rgba(155,92,255,0.2)' }}>{e} {v}</span>
                   ))}
                 </div>
               </div>

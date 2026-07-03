@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+/* ─── LUNA locked theme tokens (luna-final-theme-kit v1.0.0) ─── */
+:root {
+  --luna-bg:          #03040d;
+  --luna-bg-2:        #07071a;
+  --luna-panel:       rgba(255,255,255,0.045);
+  --luna-panel-strong: rgba(17,12,42,0.82);
+  --luna-border:      rgba(185,139,255,0.28);
+  --luna-border-soft: rgba(255,255,255,0.10);
+  --luna-purple:      #9b5cff;
+  --luna-purple-2:    #b98bff;
+  --luna-text:        #f4efff;
+  --luna-muted:       rgba(244,239,255,0.68);
+  --luna-dim:         rgba(244,239,255,0.44);
+  --luna-green:       #33d17a;
+  --luna-radius-card: 28px;
+  --luna-max-width:   1440px;
+  --luna-max-width-narrow: 1120px;
+}
+
 /* ─── Design tokens — Light mode (default) ──────────────────── */
 :root, [data-theme="light"] {
   color-scheme: light;
@@ -57,21 +76,21 @@
   --surface-strong: rgba(255,255,255,0.18);
   --surface-subtle: rgba(255,255,255,0.06);
 
-  /* app background — deep navy */
-  --app-bg-from: #1E1A38;
-  --app-bg-mid:  #141030;
-  --app-bg-to:   #0D0B1E;
+  /* app background — LUNA locked moonlit near-black */
+  --app-bg-from: var(--luna-bg-2);
+  --app-bg-mid:  #050512;
+  --app-bg-to:   var(--luna-bg);
 
   /* nav / header / dock */
-  --nav-bg:        rgba(13,11,30,0.96);
-  --nav-border:    rgba(255,255,255,0.08);
-  --header-bg:     rgba(13,11,30,0.92);
-  --header-border: rgba(255,255,255,0.08);
-  --dock-bg:       rgba(14,11,30,0.94);
+  --nav-bg:        rgba(8,10,24,0.90);
+  --nav-border:    var(--luna-border-soft);
+  --header-bg:     rgba(8,10,24,0.85);
+  --header-border: var(--luna-border-soft);
+  --dock-bg:       rgba(8,10,24,0.80);
   --dock-border:   rgba(255,255,255,0.12);
 
   /* tab states */
-  --tab-active-bg:     rgba(139,111,184,0.90);
+  --tab-active-bg:     var(--luna-purple);
   --tab-active-text:   #ffffff;
   --tab-inactive-text: rgba(255,255,255,0.55);
 }
@@ -86,10 +105,12 @@
 :root {
   --cream:       #FDF8F3;
   --cream-dark:  #F0E8DC;
-  --violet:      #8B6FB8;
-  --violet-mid:  #B89FD8;
+  /* aliased to the locked LUNA purple — every existing var(--violet) consumer
+     picks up the new color with zero file touches */
+  --violet:      var(--luna-purple);
+  --violet-mid:  var(--luna-purple-2);
   --violet-pale: #F4F0FA;
-  --violet-deep: #6A4F9B;
+  --violet-deep: #7C3FE0;
   --lunar:       #A8C4DA;
   --blush:       #E8C0C2;
   --herb:        #B8C9B4;
@@ -188,6 +209,43 @@ body {
   background: linear-gradient(135deg, rgba(139,111,184,0.12) 0%, rgba(184,159,216,0.08) 100%);
   border: 1px solid rgba(139,111,184,0.18);
   border-radius: 20px;
+}
+
+/* ─── LUNA locked card system (src/components/luna/**) ───────── */
+.luna-page-container {
+  width: 100%;
+  max-width: var(--luna-max-width);
+  margin: 0 auto;
+}
+.luna-page-container-narrow {
+  width: 100%;
+  max-width: var(--luna-max-width-narrow);
+  margin: 0 auto;
+}
+.luna-glass-card {
+  border-radius: var(--luna-radius-card);
+  border: 1px solid rgba(196,155,255,0.15);
+  background: var(--luna-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 40px rgba(89,45,180,0.12);
+  color: var(--luna-text);
+}
+.luna-hero-card {
+  border-radius: var(--luna-radius-card);
+  border: 1px solid rgba(185,139,255,0.38);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 42px rgba(155,92,255,0.20), inset 0 1px 0 rgba(255,255,255,0.08);
+  overflow: hidden;
+  position: relative;
+}
+.luna-section-label {
+  color: var(--luna-purple-2);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 650;
+  font-size: 0.72rem;
 }
 
 /* ─── Gradient backgrounds ──────────────────────────────────── */

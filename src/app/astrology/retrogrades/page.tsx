@@ -138,7 +138,7 @@ export default function RetrogradesPage() {
                         <div className="mt-4 space-y-3">
                           {/* LUNA speaks */}
                           <div className="rounded-[14px] p-3"
-                            style={{ background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)' }}>
+                            style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
                             <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>LUNA</p>
                             <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-1)' }}>{r.meaning.luna}</p>
                           </div>

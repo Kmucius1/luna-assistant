@@ -17,7 +17,7 @@ interface Props {
   pageNoScroll?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
+export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const touchX = useRef(0)
@@ -63,7 +63,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
     >
       {!hidePills && <div style={{
         flexShrink: 0,
-        background: 'rgba(8,4,26,0.92)',
+        background: 'var(--luna-panel-strong, rgba(8,4,26,0.92))',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
@@ -89,7 +89,7 @@ export function CategoryPager({ pages, accentColor = '#8B6FB8', activeIndex, onC
                   flexShrink: 0,
                   background: isActive ? accentFaint : 'transparent',
                   border: `1px solid ${isActive ? accent : 'rgba(255,255,255,0.09)'}`,
-                  color: isActive ? '#C4A9E8' : 'rgba(255,255,255,0.38)',
+                  color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)',
                   transition: 'all 0.18s ease',
                 }}
               >

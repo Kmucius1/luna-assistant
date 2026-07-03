@@ -75,7 +75,7 @@ const HOUSES_DATA = [
 ]
 
 const ASPECTS_DATA = [
-  { symbol: '☌', name: 'Conjunction (0°)', orb: '8°', energy: 'Fusion', color: '#8B6FB8', body: 'Two energies completely merge. Planets in conjunction intensify and blend their themes. This can feel like one energy amplifying the other — the two planets cannot be separated. Conjunctions in your natal chart show where your energies are unified and powerful. Transiting conjunctions mark activation moments.', example: 'Sun conjunct Mars: your identity and drive are fused. You are naturally bold and self-directed.' },
+  { symbol: '☌', name: 'Conjunction (0°)', orb: '8°', energy: 'Fusion', color: '#9b5cff', body: 'Two energies completely merge. Planets in conjunction intensify and blend their themes. This can feel like one energy amplifying the other — the two planets cannot be separated. Conjunctions in your natal chart show where your energies are unified and powerful. Transiting conjunctions mark activation moments.', example: 'Sun conjunct Mars: your identity and drive are fused. You are naturally bold and self-directed.' },
   { symbol: '⚹', name: 'Sextile (60°)', orb: '4°', energy: 'Opportunity', color: '#5A7A9A', body: 'Planets in sextile work together easily but require a small effort to activate. They offer gifts, skills, and opportunities that are available when you reach for them. Less automatic than a trine — more conscious cooperation needed.', example: 'Moon sextile Mercury: your emotions and mind work well together when you choose to express your feelings clearly.' },
   { symbol: '□', name: 'Square (90°)', orb: '8°', energy: 'Friction', color: '#C96B5A', body: 'Planets in square are in dynamic tension. They push against each other, creating friction, urgency, and the drive to grow. Squares in your natal chart show recurring areas of challenge that ultimately build strength and character. They are not bad — they are growth engines.', example: 'Moon square Saturn: your emotional needs and need for structure are in ongoing tension — the work is learning to honor both.' },
   { symbol: '△', name: 'Trine (120°)', orb: '8°', energy: 'Flow', color: '#5A8A7A', body: 'The easiest, most harmonious aspect. Planets in trine flow naturally and support each other. Natal trines are gifts and talents that come easily — sometimes so easily they are taken for granted. Transiting trines offer flowing support and opportunities that feel effortless.', example: 'Venus trine Jupiter: beauty, abundance, and love flow naturally. These energies amplify each other with ease.' },
@@ -137,7 +137,7 @@ export default function DeepDivesPage() {
                     <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--text-4)' }}>What It Rules</p>
                     <p className="text-xs mb-3" style={{ color: 'var(--violet)' }}>{p.rules}</p>
                     <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-2)' }}>{p.body}</p>
-                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)' }}>
+                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
                       <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>In Your Chart</p>
                       <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{p.inYourChart}</p>
                     </div>
@@ -157,7 +157,7 @@ export default function DeepDivesPage() {
                 style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.25)' }}>
+                    style={{ background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)' }}>
                     <span className="text-xs font-bold" style={{ color: 'var(--violet)' }}>{h.number}</span>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -171,7 +171,7 @@ export default function DeepDivesPage() {
                 {expanded === String(h.number) && (
                   <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--surface-border)' }}>
                     <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-2)' }}>{h.body}</p>
-                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)' }}>
+                    <div className="rounded-[14px] p-3" style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
                       <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>For You</p>
                       <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{h.zoe}</p>
                     </div>

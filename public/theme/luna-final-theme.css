@@ -1,0 +1,97 @@
+
+/* LUNA FINAL THEME LOCK — apply globally */
+:root {
+  --luna-bg: #03040d;
+  --luna-bg-2: #07071a;
+  --luna-panel: rgba(10, 8, 28, 0.78);
+  --luna-card: rgba(255, 255, 255, 0.045);
+  --luna-card-strong: rgba(17, 12, 42, 0.82);
+  --luna-border: rgba(185, 139, 255, 0.28);
+  --luna-border-soft: rgba(255, 255, 255, 0.10);
+  --luna-purple: #9b5cff;
+  --luna-purple-2: #b98bff;
+  --luna-purple-soft: #d9c5ff;
+  --luna-text: #f4efff;
+  --luna-muted: rgba(244, 239, 255, 0.68);
+  --luna-dim: rgba(244, 239, 255, 0.44);
+  --luna-green: #33d17a;
+  --luna-radius-card: 28px;
+  --luna-radius-pill: 999px;
+  --luna-shadow-glow: 0 0 34px rgba(155, 92, 255, 0.22);
+  --luna-shadow-card: inset 0 1px 0 rgba(255,255,255,.06), 0 22px 80px rgba(0,0,0,.38);
+  --luna-max-width: 1510px;
+}
+
+body.luna-theme, .luna-theme {
+  background:
+    radial-gradient(circle at 72% 8%, rgba(155, 92, 255, 0.22), transparent 26%),
+    radial-gradient(circle at 12% 22%, rgba(96, 55, 170, 0.16), transparent 28%),
+    linear-gradient(180deg, #03040d 0%, #060617 48%, #03040d 100%);
+  color: var(--luna-text);
+}
+
+.luna-page-shell { min-height: 100dvh; overflow: hidden; position: relative; }
+.luna-page-container { width: 100%; max-width: var(--luna-max-width); margin: 0 auto; padding-left: 38px; padding-right: 38px; }
+.luna-glass-card {
+  border: 1px solid var(--luna-border);
+  background: linear-gradient(145deg, rgba(13, 10, 34, .82), rgba(5, 6, 19, .72));
+  box-shadow: var(--luna-shadow-card);
+  backdrop-filter: blur(26px);
+  border-radius: var(--luna-radius-card);
+}
+.luna-soft-card {
+  border: 1px solid var(--luna-border-soft);
+  background: rgba(255,255,255,.045);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+}
+.luna-hero-card {
+  border: 1px solid rgba(185,139,255,.38);
+  border-radius: 28px;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 42px rgba(155,92,255,.2), inset 0 1px 0 rgba(255,255,255,.08);
+  overflow: hidden;
+}
+.luna-section-label {
+  color: var(--luna-purple-2);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-weight: 650;
+  font-size: 0.82rem;
+}
+.luna-heading-serif { font-family: Georgia, 'Times New Roman', serif; letter-spacing: .01em; color: var(--luna-text); }
+.luna-muted { color: var(--luna-muted); }
+.luna-button {
+  border: 1px solid rgba(185,139,255,.22);
+  background: rgba(127, 78, 220, .11);
+  border-radius: 16px;
+  color: var(--luna-purple-soft);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+}
+.luna-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  width: min(1120px, calc(100vw - 64px));
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(8, 10, 24, .80);
+  backdrop-filter: blur(30px);
+  border-radius: 999px;
+  box-shadow: 0 0 42px rgba(155,92,255,.20), inset 0 1px 0 rgba(255,255,255,.06);
+  z-index: 50;
+}
+.luna-dock-active {
+  border: 1px solid rgba(185,139,255,.56);
+  background: radial-gradient(circle at 50% 10%, rgba(185,139,255,.36), rgba(127,78,220,.18));
+  box-shadow: 0 0 34px rgba(185,139,255,.35);
+}
+.luna-page-dots { display: flex; justify-content: center; align-items: center; gap: 18px; }
+.luna-dot { width: 11px; height: 11px; border-radius: 999px; background: rgba(255,255,255,.22); }
+.luna-dot-active { background: var(--luna-purple-2); box-shadow: 0 0 18px rgba(185,139,255,.65); }
+
+@media (max-width: 768px) {
+  .luna-page-container { padding-left: 24px; padding-right: 24px; max-width: 100%; }
+  .luna-dock { width: calc(100vw - 32px); bottom: 18px; }
+}

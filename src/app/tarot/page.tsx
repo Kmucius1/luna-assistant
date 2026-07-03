@@ -12,7 +12,7 @@ const glass = {
   backdropFilter: 'blur(14px)',
 } as const
 
-const VIOLET = '#8B6FB8'
+const VIOLET = '#9b5cff'
 const LUNAR = '#A8C4DA'
 const GOLDEN = '#C9A96E'
 const BLUSH = '#E8C0C2'
@@ -240,7 +240,7 @@ export default function TarotPage() {
           {view === 'spread-select' && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.14)', fontSize: 20 }}>
+                <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.14)', fontSize: 20 }}>
                   🔮
                 </div>
                 <div>
@@ -360,7 +360,7 @@ export default function TarotPage() {
                                   textTransform: 'uppercase',
                                   padding: '2px 7px',
                                   borderRadius: 20,
-                                  background: card.reversed ? 'rgba(232,192,194,0.12)' : 'rgba(139,111,184,0.14)',
+                                  background: card.reversed ? 'rgba(232,192,194,0.12)' : 'rgba(155,92,255,0.14)',
                                   color: card.reversed ? BLUSH : VIOLET,
                                 }}>
                                   {card.reversed ? 'Reversed' : 'Upright'}
@@ -377,8 +377,8 @@ export default function TarotPage() {
                               width: 44,
                               height: 44,
                               borderRadius: 12,
-                              background: 'rgba(139,111,184,0.08)',
-                              border: '1px solid rgba(139,111,184,0.15)',
+                              background: 'rgba(155,92,255,0.08)',
+                              border: '1px solid rgba(155,92,255,0.15)',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
@@ -435,7 +435,7 @@ export default function TarotPage() {
                     height: 56,
                     borderRadius: '50%',
                     margin: '0 auto 20px',
-                    background: 'radial-gradient(circle, rgba(139,111,184,0.3), transparent)',
+                    background: 'radial-gradient(circle, rgba(155,92,255,0.3), transparent)',
                     animation: 'pulse 2s ease-in-out infinite',
                   }} />
                   <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
@@ -461,12 +461,12 @@ export default function TarotPage() {
                     style={{
                       padding: '12px 28px',
                       borderRadius: 14,
-                      background: 'rgba(139,111,184,0.15)',
+                      background: 'rgba(155,92,255,0.15)',
                       color: VIOLET,
                       fontSize: 14,
                       fontWeight: 700,
                       cursor: 'pointer',
-                      border: `1px solid rgba(139,111,184,0.25)`,
+                      border: `1px solid rgba(155,92,255,0.25)`,
                     }}
                   >
                     Try again
@@ -481,8 +481,8 @@ export default function TarotPage() {
                     ...glass,
                     padding: 24,
                     marginBottom: 20,
-                    background: 'rgba(139,111,184,0.09)',
-                    border: '1px solid rgba(139,111,184,0.18)',
+                    background: 'rgba(155,92,255,0.09)',
+                    border: '1px solid rgba(155,92,255,0.18)',
                     textAlign: 'center',
                   }}>
                     <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: VIOLET, marginBottom: 10 }}>
@@ -514,7 +514,7 @@ export default function TarotPage() {
                                   textTransform: 'uppercase',
                                   padding: '2px 6px',
                                   borderRadius: 20,
-                                  background: cr.reversed ? 'rgba(232,192,194,0.1)' : 'rgba(139,111,184,0.12)',
+                                  background: cr.reversed ? 'rgba(232,192,194,0.1)' : 'rgba(155,92,255,0.12)',
                                   color: cr.reversed ? BLUSH : VIOLET,
                                 }}>
                                   {cr.reversed ? 'Reversed' : 'Upright'}
@@ -554,7 +554,7 @@ export default function TarotPage() {
                   </div>
 
                   {/* Affirmation */}
-                  <div style={{ borderRadius: 20, padding: '20px 22px', marginBottom: 14, textAlign: 'center', background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                  <div style={{ borderRadius: 20, padding: '20px 22px', marginBottom: 14, textAlign: 'center', background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                     <p style={{ fontSize: 16, fontStyle: 'italic', color: 'rgba(255,255,255,0.88)', lineHeight: 1.6, fontFamily: 'Georgia, serif' }}>
                       &ldquo;{reading.affirmation}&rdquo;
                     </p>
@@ -653,7 +653,7 @@ export default function TarotPage() {
 
               {stats.total > 0 && (
                 <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(139,111,184,0.14)', color: VIOLET, fontSize: 12, fontWeight: 700 }}>
+                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(155,92,255,0.14)', color: VIOLET, fontSize: 12, fontWeight: 700 }}>
                     {stats.total} readings
                   </span>
                   <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(201,169,110,0.12)', color: GOLDEN, fontSize: 12, fontWeight: 700 }}>

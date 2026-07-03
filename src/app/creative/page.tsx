@@ -118,7 +118,7 @@ function SectionHeader({ icon: Icon, title, sub }: { icon: React.ComponentType<{
   return (
     <div className="flex items-center gap-3 mb-6">
       <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={{ background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.2)' }}>
+        style={{ background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.2)' }}>
         <Icon className="w-5 h-5" style={{ color: 'var(--violet)' }} />
       </div>
       <div>
@@ -165,8 +165,8 @@ function OracleCompact() {
               onClick={() => setSelectedMood(m.label)}
               className="flex flex-col items-center gap-1 rounded-2xl py-3 px-2 transition-all"
               style={{
-                background: selectedMood === m.label ? 'rgba(139,111,184,0.20)' : 'var(--surface-subtle)',
-                border: selectedMood === m.label ? '1.5px solid rgba(139,111,184,0.5)' : '1.5px solid var(--surface-border)',
+                background: selectedMood === m.label ? 'rgba(155,92,255,0.20)' : 'var(--surface-subtle)',
+                border: selectedMood === m.label ? '1.5px solid rgba(155,92,255,0.5)' : '1.5px solid var(--surface-border)',
               }}>
               <span className="text-xl">{m.emoji}</span>
               <span style={{ color: selectedMood === m.label ? 'var(--violet)' : 'var(--text-3)', fontSize: '0.72rem' }}
@@ -181,7 +181,7 @@ function OracleCompact() {
         disabled={loading || !selectedMood}
         className="w-full rounded-2xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2"
         style={{
-          background: !selectedMood ? 'var(--surface)' : 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
+          background: !selectedMood ? 'var(--surface)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
           color: !selectedMood ? 'var(--text-3)' : '#fff',
           opacity: loading ? 0.7 : 1,
         }}>
@@ -195,11 +195,11 @@ function OracleCompact() {
 
       {result && (
         <div className="rounded-3xl p-5 space-y-4"
-          style={{ background: 'linear-gradient(135deg, rgba(139,111,184,0.18), rgba(106,79,155,0.12))', border: '1px solid rgba(139,111,184,0.25)' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.18), rgba(106,79,155,0.12))', border: '1px solid rgba(155,92,255,0.25)' }}>
           {result.style_lane && (
             <div className="flex items-center gap-2">
               <div className="rounded-full px-3 py-1 text-sm font-bold"
-                style={{ background: 'rgba(139,111,184,0.25)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(155,92,255,0.25)', color: 'var(--violet)' }}>
                 {result.style_lane}
               </div>
               {result.outfit_energy && (
@@ -209,7 +209,7 @@ function OracleCompact() {
           )}
           {result.why_it_works && (
             <div className="rounded-2xl p-4"
-              style={{ background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.15)' }}>
+              style={{ background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.15)' }}>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>✨ {result.why_it_works}</p>
             </div>
           )}
@@ -281,8 +281,8 @@ function OracleSection() {
               onClick={() => setSelectedMood(m.label)}
               className="flex flex-col items-center gap-1 rounded-2xl py-3 px-2 transition-all"
               style={{
-                background: selectedMood === m.label ? 'rgba(139,111,184,0.20)' : 'var(--surface-subtle)',
-                border: selectedMood === m.label ? '1.5px solid rgba(139,111,184,0.5)' : '1.5px solid var(--surface-border)',
+                background: selectedMood === m.label ? 'rgba(155,92,255,0.20)' : 'var(--surface-subtle)',
+                border: selectedMood === m.label ? '1.5px solid rgba(155,92,255,0.5)' : '1.5px solid var(--surface-border)',
               }}>
               <span className="text-xl">{m.emoji}</span>
               <span style={{ color: selectedMood === m.label ? 'var(--violet)' : 'var(--text-3)', fontSize: '0.72rem' }}
@@ -323,8 +323,8 @@ function OracleSection() {
                   onClick={() => setWeather(weather === w ? '' : w)}
                   className="rounded-full px-3 py-1.5 text-sm font-medium transition-all"
                   style={{
-                    background: weather === w ? 'rgba(139,111,184,0.20)' : 'var(--surface-subtle)',
-                    border: weather === w ? '1.5px solid rgba(139,111,184,0.5)' : '1px solid var(--surface-border)',
+                    background: weather === w ? 'rgba(155,92,255,0.20)' : 'var(--surface-subtle)',
+                    border: weather === w ? '1.5px solid rgba(155,92,255,0.5)' : '1px solid var(--surface-border)',
                     color: weather === w ? 'var(--violet)' : 'var(--text-2)',
                   }}>
                   {w}
@@ -356,7 +356,7 @@ function OracleSection() {
         disabled={loading || (!selectedMood && !desiredFeel)}
         className="w-full rounded-2xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2"
         style={{
-          background: (!selectedMood && !desiredFeel) ? 'var(--surface)' : 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
+          background: (!selectedMood && !desiredFeel) ? 'var(--surface)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
           color: (!selectedMood && !desiredFeel) ? 'var(--text-3)' : '#fff',
           opacity: loading ? 0.7 : 1,
         }}>
@@ -367,11 +367,11 @@ function OracleSection() {
 
       {result && (
         <div className="rounded-3xl p-6 space-y-5"
-          style={{ background: 'linear-gradient(135deg, rgba(139,111,184,0.18) 0%, rgba(106,79,155,0.12) 100%)', border: '1px solid rgba(139,111,184,0.25)' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.18) 0%, rgba(106,79,155,0.12) 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
           {result.style_lane && (
             <div className="flex items-center gap-2">
               <div className="rounded-full px-3 py-1 text-sm font-bold"
-                style={{ background: 'rgba(139,111,184,0.25)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(155,92,255,0.25)', color: 'var(--violet)' }}>
                 {result.style_lane}
               </div>
               {result.outfit_energy && (
@@ -420,7 +420,7 @@ function OracleSection() {
           </div>
           {result.why_it_works && (
             <div className="rounded-2xl p-4"
-              style={{ background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.15)' }}>
+              style={{ background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.15)' }}>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>✨ {result.why_it_works}</p>
             </div>
           )}
@@ -539,7 +539,7 @@ function ClosetSection() {
               onClick={addItem}
               disabled={saving || !newItem.name}
               className="w-full rounded-2xl py-3 font-bold text-sm transition-all"
-              style={{ background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: '#fff', opacity: saving ? 0.7 : 1 }}>
+              style={{ background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: '#fff', opacity: saving ? 0.7 : 1 }}>
               {saving ? 'Saving...' : 'Add to Closet'}
             </button>
           </div>
@@ -578,7 +578,7 @@ function ClosetSection() {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {item.vibe_tags.slice(0, 2).map(t => (
                     <span key={t} className="text-xs px-2 py-0.5 rounded-full"
-                      style={{ background: 'rgba(139,111,184,0.12)', color: 'var(--violet)' }}>
+                      style={{ background: 'rgba(155,92,255,0.12)', color: 'var(--violet)' }}>
                       {t}
                     </span>
                   ))}
@@ -620,7 +620,7 @@ function InspirationSection() {
         <ACard>
           <div className="flex items-start gap-4">
             <img src={activeImage} alt="Style ref" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
-              style={{ border: '2px solid rgba(139,111,184,0.3)' }} />
+              style={{ border: '2px solid rgba(155,92,255,0.3)' }} />
             <div className="flex-1 min-w-0">
               {analyzing ? (
                 <div className="flex items-center gap-2 py-2">
@@ -631,7 +631,7 @@ function InspirationSection() {
                 <div className="space-y-2">
                   {(analysisResult.style_lane as string) && (
                     <div className="rounded-full inline-block px-3 py-1 text-sm font-bold"
-                      style={{ background: 'rgba(139,111,184,0.2)', color: 'var(--violet)' }}>
+                      style={{ background: 'rgba(155,92,255,0.2)', color: 'var(--violet)' }}>
                       {analysisResult.style_lane as string}
                     </div>
                   )}
@@ -669,7 +669,7 @@ function InspirationSection() {
             style={{ border: activeImage === src ? '2.5px solid var(--violet)' : '1px solid var(--surface-border)' }}>
             <img src={src} alt={`Style ref ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl"
-              style={{ background: 'rgba(139,111,184,0.5)' }}>
+              style={{ background: 'rgba(155,92,255,0.5)' }}>
               <Sparkles className="w-5 h-5 text-white" />
             </div>
           </button>
@@ -720,7 +720,7 @@ function ProjectsSection() {
   const stageColor = (status: string) => {
     const idx = PROJECT_STAGES.indexOf(status)
     if (idx < 3) return '#9E95AC'
-    if (idx < 7) return '#8B6FB8'
+    if (idx < 7) return '#9b5cff'
     return '#B8C9B4'
   }
 
@@ -734,7 +734,7 @@ function ProjectsSection() {
           <p className="text-3xl mb-3">🧵</p>
           <p className="font-semibold text-base mb-1" style={{ color: 'var(--text-1)' }}>No projects yet</p>
           <p className="text-sm mb-5" style={{ color: 'var(--text-3)' }}>Load the 7 beginner starter projects built for your style</p>
-          <button onClick={seedProjects} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: '#fff', opacity: seeding ? 0.7 : 1 }}>
+          <button onClick={seedProjects} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: '#fff', opacity: seeding ? 0.7 : 1 }}>
             {seeding ? 'Loading...' : 'Load Starter Projects'}
           </button>
         </ACard>
@@ -751,7 +751,7 @@ function ProjectsSection() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(139,111,184,0.12)', color: 'var(--violet)' }}>{project.style_lane}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(155,92,255,0.12)', color: 'var(--violet)' }}>{project.style_lane}</span>
                         <span className="text-xs" style={{ color: 'var(--text-3)' }}>{project.estimated_time}</span>
                       </div>
                       <p className="font-semibold text-base" style={{ color: 'var(--text-1)' }}>{project.title}</p>
@@ -783,7 +783,7 @@ function ProjectsSection() {
                       <div className="flex flex-wrap gap-1">
                         {PROJECT_STAGES.map((stage, idx) => (
                           <span key={stage} className="text-xs px-2 py-1 rounded-full font-medium capitalize"
-                            style={{ background: idx <= stageIdx ? 'rgba(139,111,184,0.2)' : 'var(--surface-subtle)', color: idx <= stageIdx ? 'var(--violet)' : 'var(--text-4)', border: idx === stageIdx ? '1px solid rgba(139,111,184,0.4)' : '1px solid transparent' }}>
+                            style={{ background: idx <= stageIdx ? 'rgba(155,92,255,0.2)' : 'var(--surface-subtle)', color: idx <= stageIdx ? 'var(--violet)' : 'var(--text-4)', border: idx === stageIdx ? '1px solid rgba(155,92,255,0.4)' : '1px solid transparent' }}>
                             {idx <= stageIdx ? '✓ ' : ''}{stage}
                           </span>
                         ))}
@@ -791,7 +791,7 @@ function ProjectsSection() {
                     </div>
                     {!isDone && (
                       <button onClick={() => advanceStage(project)} className="w-full rounded-2xl py-3 font-semibold text-sm transition-all flex items-center justify-center gap-2"
-                        style={{ background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.25)', color: 'var(--violet)' }}>
+                        style={{ background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', color: 'var(--violet)' }}>
                         <ArrowRight className="w-4 h-4" />
                         Mark as &ldquo;{PROJECT_STAGES[stageIdx + 1]}&rdquo;
                       </button>
@@ -860,7 +860,7 @@ function StudioSection() {
         <div className="flex flex-wrap gap-2 mb-4">
           {STYLE_LANES.map(lane => (
             <button key={lane} onClick={() => setStyleLane(lane)} className="rounded-full px-3 py-1.5 text-sm font-medium transition-all"
-              style={{ background: styleLane === lane ? 'rgba(139,111,184,0.20)' : 'var(--surface-subtle)', color: styleLane === lane ? 'var(--violet)' : 'var(--text-3)', border: styleLane === lane ? '1.5px solid rgba(139,111,184,0.4)' : '1px solid var(--surface-border)' }}>
+              style={{ background: styleLane === lane ? 'rgba(155,92,255,0.20)' : 'var(--surface-subtle)', color: styleLane === lane ? 'var(--violet)' : 'var(--text-3)', border: styleLane === lane ? '1.5px solid rgba(155,92,255,0.4)' : '1px solid var(--surface-border)' }}>
               {lane}
             </button>
           ))}
@@ -868,7 +868,7 @@ function StudioSection() {
         <SLabel>Notes & vision</SLabel>
         <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the vision — fabrics, fit, details, inspiration..." rows={4} className="w-full rounded-2xl px-4 py-3 text-sm outline-none resize-none mb-4" style={{ background: 'var(--surface-subtle)', border: '1px solid var(--surface-border)', color: 'var(--text-1)' }} />
         <button onClick={createProject} disabled={saving || !projectTitle || !styleLane} className="w-full rounded-2xl py-3.5 font-bold text-sm transition-all flex items-center justify-center gap-2"
-          style={{ background: !projectTitle || !styleLane ? 'var(--surface)' : 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: !projectTitle || !styleLane ? 'var(--text-3)' : '#fff', opacity: saving ? 0.7 : 1 }}>
+          style={{ background: !projectTitle || !styleLane ? 'var(--surface)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: !projectTitle || !styleLane ? 'var(--text-3)' : '#fff', opacity: saving ? 0.7 : 1 }}>
           {saved ? <><Check className="w-4 h-4" /> Saved to Projects</> : saving ? 'Saving...' : <><Scissors className="w-4 h-4" /> Create Project</>}
         </button>
       </ACard>
@@ -905,7 +905,7 @@ function VaultSection() {
 
   const categoryGradient = (category: string) => {
     if (category === 'swimwear')   return 'linear-gradient(135deg, rgba(168,196,218,0.2), rgba(184,159,216,0.15))'
-    if (category === 'streetwear') return 'linear-gradient(135deg, rgba(139,111,184,0.2), rgba(106,79,155,0.15))'
+    if (category === 'streetwear') return 'linear-gradient(135deg, rgba(155,92,255,0.2), rgba(106,79,155,0.15))'
     return 'linear-gradient(135deg, rgba(201,169,110,0.15), rgba(232,192,194,0.1))'
   }
 
@@ -919,7 +919,7 @@ function VaultSection() {
           <p className="text-3xl mb-3">💎</p>
           <p className="font-semibold text-base mb-1" style={{ color: 'var(--text-1)' }}>Vault is empty</p>
           <p className="text-sm mb-5" style={{ color: 'var(--text-3)' }}>Load your 5 pre-seeded brand concepts</p>
-          <button onClick={seedVault} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: '#fff', opacity: seeding ? 0.7 : 1 }}>
+          <button onClick={seedVault} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: '#fff', opacity: seeding ? 0.7 : 1 }}>
             {seeding ? 'Loading...' : 'Open the Vault'}
           </button>
         </ACard>
@@ -1013,7 +1013,7 @@ function ShoppingSection() {
         <div className="flex gap-2 mb-3 flex-wrap">
           {lists.map(l => (
             <button key={l} onClick={() => setNewList(l)} className="px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={newList === l ? { background: 'var(--violet)', color: 'white' } : { background: 'rgba(139,111,184,0.1)', color: 'var(--text-2)' }}>
+              style={newList === l ? { background: 'var(--violet)', color: 'white' } : { background: 'rgba(155,92,255,0.1)', color: 'var(--text-2)' }}>
               {l}
             </button>
           ))}
@@ -1021,7 +1021,7 @@ function ShoppingSection() {
         <div className="flex gap-2">
           <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === 'Enter' && addItem()} placeholder="What are you looking for?"
             className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-1)', border: '1px solid rgba(139,111,184,0.15)' }} />
+            style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-1)', border: '1px solid rgba(155,92,255,0.15)' }} />
           <button onClick={addItem} className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" style={{ background: 'var(--violet)', color: 'white' }}>Add</button>
         </div>
       </ACard>
@@ -1035,7 +1035,7 @@ function ShoppingSection() {
               {listItems.map(item => (
                 <div key={item.id} className="flex items-center gap-3">
                   <button onClick={() => removeItem(item.id)} className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
-                    style={{ background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)' }}>
+                    style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
                     <Check className="w-3 h-3" style={{ color: 'var(--violet)' }} />
                   </button>
                   <p className="text-sm flex-1" style={{ color: 'var(--text-1)' }}>{item.text}</p>
@@ -1084,7 +1084,7 @@ export default function AtelierPage() {
   return (
     <AppLayout noScroll>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.2)' }}>
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.2)' }}>
           <Scissors className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
         </div>
         <div>

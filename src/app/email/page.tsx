@@ -68,7 +68,7 @@ const TABS: { key: TabKey; label: string; emoji: string; color: string }[] = [
   { key: 'dryp_client',   label: 'DRYP Clients',    emoji: '💼', color: '#A890D0' },
   { key: 'personal',      label: 'Zoe Personal',    emoji: '🌸', color: '#D4A8C4' },
   { key: 'meetings',      label: 'Meetings',        emoji: '📅', color: '#8AAEC8' },
-  { key: 'recap',         label: 'Recap',           emoji: '📋', color: 'rgba(196,169,232,0.9)' },
+  { key: 'recap',         label: 'Recap',           emoji: '📋', color: 'rgba(185,139,255,0.9)' },
   { key: 'tracking',      label: 'Tracking',        emoji: '📦', color: '#C9A96E' },
   { key: 'bills_medical', label: 'Bills / Medical', emoji: '🏥', color: '#E08B4A' },
   { key: 'admin_tools',   label: 'Admin / Tools',   emoji: '⚙️', color: 'rgba(255,255,255,0.5)' },
@@ -127,7 +127,7 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
       borderBottom: '1px solid rgba(255,255,255,0.05)',
       background: isPri
         ? 'rgba(201,169,110,0.06)'
-        : email.isRead ? 'transparent' : 'rgba(139,111,184,0.04)',
+        : email.isRead ? 'transparent' : 'rgba(155,92,255,0.04)',
       display: 'flex', gap: 10, alignItems: 'flex-start',
       borderLeft: isPri ? '3px solid rgba(201,169,110,0.7)' : `3px solid ${tag.color}55`,
     }}>
@@ -226,9 +226,9 @@ function ReplyDrafter({ email, onClose }: { email: GmailEmail; onClose: () => vo
   ] : []
 
   return (
-    <div style={{ ...G, margin: '10px 0', padding: 16, border: '1px solid rgba(139,111,184,0.25)' }}>
+    <div style={{ ...G, margin: '10px 0', padding: 16, border: '1px solid rgba(155,92,255,0.25)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(196,169,232,0.85)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(185,139,255,0.85)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           <Sparkles className="inline h-3 w-3 mr-1" />AI Reply Drafts
         </p>
         <button onClick={onClose} style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}><X className="h-4 w-4" /></button>
@@ -246,7 +246,7 @@ function ReplyDrafter({ email, onClose }: { email: GmailEmail; onClose: () => vo
               <div style={{ display: 'flex', gap: 6 }}>
                 <button onClick={() => send(opt.text, opt.key)} disabled={!!sending || !!sent}
                   style={{ flex: 1, padding: '8px 12px', borderRadius: 12, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
-                    background: sent === opt.key ? 'rgba(90,138,90,0.3)' : 'rgba(139,111,184,0.25)',
+                    background: sent === opt.key ? 'rgba(90,138,90,0.3)' : 'rgba(155,92,255,0.25)',
                     color: sent === opt.key ? '#8AB88A' : 'rgba(255,255,255,0.85)' }}>
                   {sending === opt.key ? 'Sending…' : sent === opt.key ? '✓ Sent'
                     : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}><Send className="h-3 w-3" />Send</span>}
@@ -437,7 +437,7 @@ function EmailInner() {
                 )}
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8B6FB8' }}>Mail</p>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9b5cff' }}>Mail</p>
                 <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
               </div>
             </div>
@@ -469,8 +469,8 @@ function EmailInner() {
               {['all', ...connectedEmails].map(acc => (
                 <button key={acc} onClick={() => setAccountFilter(acc)} style={{
                   flexShrink: 0, padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-                  background: accountFilter === acc ? 'rgba(139,111,184,0.35)' : 'rgba(255,255,255,0.07)',
-                  color: accountFilter === acc ? 'rgba(196,169,232,0.95)' : 'rgba(255,255,255,0.5)',
+                  background: accountFilter === acc ? 'rgba(155,92,255,0.35)' : 'rgba(255,255,255,0.07)',
+                  color: accountFilter === acc ? 'rgba(185,139,255,0.95)' : 'rgba(255,255,255,0.5)',
                 }}>{acc === 'all' ? 'All inboxes' : acc}</button>
               ))}
             </div>
@@ -482,7 +482,7 @@ function EmailInner() {
               {[
                 { label: 'Priority',    count: priorityCount,                          color: '#C9A96E', glow: true  },
                 { label: 'Urgent',      count: allEmails.filter(e => e.isUrgent).length, color: '#E05E5E', glow: false },
-                { label: 'Unread',      count: sync.unread_count,                       color: '#8B6FB8', glow: false },
+                { label: 'Unread',      count: sync.unread_count,                       color: '#9b5cff', glow: false },
                 { label: 'Tasks found', count: sync.extracted_tasks.length,             color: '#8AAEC8', glow: false },
               ].map(s => (
                 <div key={s.label} style={{ ...G, padding: '10px 6px', textAlign: 'center', border: s.glow && s.count > 0 ? '1px solid rgba(201,169,110,0.35)' : G.border, boxShadow: s.glow && s.count > 0 ? '0 0 12px rgba(201,169,110,0.15)' : 'none' }}>
@@ -561,7 +561,7 @@ function EmailInner() {
                         {!showReply && (
                           <button onClick={() => setShowReply(true)} style={{
                             display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                            background: 'rgba(139,111,184,0.25)', color: 'rgba(196,169,232,0.95)', fontSize: 12, fontWeight: 600,
+                            background: 'rgba(155,92,255,0.25)', color: 'rgba(185,139,255,0.95)', fontSize: 12, fontWeight: 600,
                           }}>
                             <Sparkles className="h-3.5 w-3.5" /> Draft AI Reply <ChevronRight className="h-3.5 w-3.5 ml-auto" />
                           </button>

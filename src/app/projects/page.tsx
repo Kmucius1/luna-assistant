@@ -113,7 +113,7 @@ export default function ProjectsPage() {
                 <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white' }}>Projects</h1>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{activeCount} active</p>
               </div>
-              <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', background: 'rgba(139,111,184,0.9)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                 <Plus className="h-4 w-4" /> Add project
               </button>
             </div>
@@ -147,7 +147,7 @@ export default function ProjectsPage() {
                   </div>
                   <div><FieldLabel text="Next action" /><input value={newProject.next_action} onChange={e => setNewProject(p => ({ ...p, next_action: e.target.value }))} style={INPUT_S} placeholder="What needs to happen next?" /></div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="submit" style={{ flex: 1, padding: '11px 0', borderRadius: 14, border: 'none', background: 'rgba(139,111,184,0.9)', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create project</button>
+                    <button type="submit" style={{ flex: 1, padding: '11px 0', borderRadius: 14, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create project</button>
                     <button type="button" onClick={() => setShowForm(false)} style={{ padding: '11px 18px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', fontSize: 13, cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </form>
@@ -178,7 +178,7 @@ export default function ProjectsPage() {
                               <StatusIcon className="h-3 w-3" /> {project.status.replace('_', ' ')}
                             </span>
                             {openTasks > 0 && (
-                              <span style={{ padding: '3px 9px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: 'rgba(139,111,184,0.12)', color: '#8B6FB8' }}>
+                              <span style={{ padding: '3px 9px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: 'rgba(155,92,255,0.12)', color: '#9b5cff' }}>
                                 {openTasks} task{openTasks !== 1 ? 's' : ''}
                               </span>
                             )}
@@ -194,7 +194,7 @@ export default function ProjectsPage() {
                       <div style={{ padding: '0 18px 18px', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                         {project.next_action && (
                           <div style={{ marginTop: 14, marginBottom: 12 }}>
-                            <p style={{ fontSize: 10, fontWeight: 700, color: '#8B6FB8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5 }}>Next action</p>
+                            <p style={{ fontSize: 10, fontWeight: 700, color: '#9b5cff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5 }}>Next action</p>
                             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{project.next_action}</p>
                           </div>
                         )}

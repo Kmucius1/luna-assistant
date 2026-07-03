@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
+import { buildLunaContext, formatLunaContextForPrompt } from '@/lib/luna/context'
 
 const ZOE_USER_ID = '98f5b277-bb63-41d5-89ec-0edadc1e2858'
+
+// Documented single-tenant fallback — resolves the real signed-in user where a
+// session exists, otherwise falls back to the app's existing hardcoded user.
+// Not a full multi-tenant auth retrofit (tracked separately).
+async function resolveUserId(): Promise<string> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.id) return user.id
+  } catch {
+    // no session client available — fall through
+  }
+  return ZOE_USER_ID
+}
 
 // ─── Time awareness ────────────────────────────────────────────────────────────
 function getTimePeriod(hour: number): { period: string; context: string; opener?: string } {
@@ -95,6 +111,7 @@ export async function POST(req: NextRequest) {
     }
 
     const db = createAdminClient()
+    const userId = await resolveUserId()
     const now = new Date()
     const hour = now.getHours()
     const { period, context } = getTimePeriod(hour)
@@ -104,7 +121,7 @@ export async function POST(req: NextRequest) {
     const { data: history } = await db
       .from('luna_messages')
       .select('role, content, created_at')
-      .eq('user_id', ZOE_USER_ID)
+      .eq('user_id', userId)
       .eq('session_id', sid)
       .order('created_at', { ascending: false })
       .limit(12)
@@ -113,12 +130,18 @@ export async function POST(req: NextRequest) {
 
     // Save user message first
     await db.from('luna_messages').insert({
-      user_id: ZOE_USER_ID,
+      user_id: userId,
       session_id: sid,
       role: 'user',
       content: message,
       time_period: period,
     })
+
+    // Real per-user context (chart, Human Design, profile) — additive to the
+    // hand-tuned LUNA_SYSTEM voice below, not a replacement for it.
+    const lunaContext = await buildLunaContext(userId)
+    const contextBlock = formatLunaContextForPrompt(lunaContext)
+    const systemPrompt = contextBlock ? `${LUNA_SYSTEM}\n\n${contextBlock}` : LUNA_SYSTEM
 
     // Build conversation context for AI
     const timeContext = `Current time: ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} (${period})\nContext: ${context}`
@@ -133,17 +156,15 @@ export async function POST(req: NextRequest) {
 
     let response: string
     try {
-      response = await callAI(LUNA_SYSTEM, userPrompt, 300)
+      response = await callAI(systemPrompt, userPrompt, 300)
     } catch (aiErr) {
-      const isUnavailable = aiErr instanceof Error && aiErr.message === 'LUNA_AI_UNAVAILABLE'
-      response = isUnavailable
-        ? "I'm here with you — just taking a breath. Try sending that again in a moment."
-        : "Something got in the way of my response. I'm still here — try again."
+      console.error('[chat/message] AI call failed:', aiErr instanceof Error ? aiErr.message : aiErr)
+      response = "I'm here. The connection dropped for a second, but I saved what you said. Try again."
     }
 
     // Save LUNA response
     await db.from('luna_messages').insert({
-      user_id: ZOE_USER_ID,
+      user_id: userId,
       session_id: sid,
       role: 'assistant',
       content: response,
@@ -156,8 +177,10 @@ export async function POST(req: NextRequest) {
       time_period: period,
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[chat/message]', msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    console.error('[chat/message]', err instanceof Error ? err.message : err)
+    return NextResponse.json(
+      { response: "I'm here. The connection dropped for a second — try again in a moment." },
+      { status: 200 }
+    )
   }
 }

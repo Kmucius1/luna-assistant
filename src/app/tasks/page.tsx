@@ -107,11 +107,11 @@ export default function TasksPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(139,111,184,0.3)', background: 'rgba(139,111,184,0.1)', color: '#8B6FB8', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(155,92,255,0.3)', background: 'rgba(155,92,255,0.1)', color: '#9b5cff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   {aiLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                   AI rank
                 </button>
-                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: 'rgba(139,111,184,0.9)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add task
                 </button>
               </div>
@@ -220,14 +220,14 @@ export default function TasksPage() {
 
             {/* AI ranking banner */}
             {aiLoading && (
-              <div style={{ ...GLASS, padding: 14, background: 'rgba(139,111,184,0.08)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#8B6FB8' }} />
+              <div style={{ ...GLASS, padding: 14, background: 'rgba(155,92,255,0.08)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#9b5cff' }} />
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>AI is ranking your tasks…</p>
               </div>
             )}
             {aiRankings && !aiLoading && (
-              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.2)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <p style={{ fontSize: 12, color: '#8B6FB8' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
+              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ fontSize: 12, color: '#9b5cff' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
                 <button onClick={() => setAiRankings(null)} style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
               </div>
             )}
@@ -237,7 +237,7 @@ export default function TasksPage() {
               {STATUS_FILTERS.map(f => (
                 <button key={f.value} onClick={() => setStatusFilter(f.value)} style={{
                   padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 0.15s',
-                  background: statusFilter === f.value ? 'rgba(139,111,184,0.9)' : 'rgba(255,255,255,0.06)',
+                  background: statusFilter === f.value ? 'rgba(155,92,255,0.9)' : 'rgba(255,255,255,0.06)',
                   color:      statusFilter === f.value ? 'white' : 'rgba(255,255,255,0.5)',
                 }}>
                   {f.label}
@@ -254,9 +254,9 @@ export default function TasksPage() {
                 {categories.map(cat => (
                   <button key={cat} onClick={() => setCategoryFilter(cat === categoryFilter ? 'all' : cat)} style={{
                     padding: '6px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize',
-                    background: categoryFilter === cat ? 'rgba(139,111,184,0.2)' : 'rgba(255,255,255,0.05)',
-                    color:      categoryFilter === cat ? '#8B6FB8' : 'rgba(255,255,255,0.4)',
-                    border:     categoryFilter === cat ? '1px solid rgba(139,111,184,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                    background: categoryFilter === cat ? 'rgba(155,92,255,0.2)' : 'rgba(255,255,255,0.05)',
+                    color:      categoryFilter === cat ? '#9b5cff' : 'rgba(255,255,255,0.4)',
+                    border:     categoryFilter === cat ? '1px solid rgba(155,92,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
                   }}>
                     {cat}
                   </button>
@@ -268,7 +268,7 @@ export default function TasksPage() {
             {filtered.length === 0 ? (
               <div style={{ ...GLASS, padding: 36, textAlign: 'center' }}>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)', marginBottom: 16 }}>No tasks match these filters.</p>
-                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: 'rgba(139,111,184,0.9)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add your first task
                 </button>
               </div>
@@ -277,7 +277,7 @@ export default function TasksPage() {
                 {filtered.map((task, i) => (
                   <div key={task.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     {aiRankings && (
-                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(139,111,184,0.15)', color: '#8B6FB8', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
+                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(155,92,255,0.15)', color: '#9b5cff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
                     )}
                     <div style={{ flex: 1 }}>
                       <TaskCard task={task} onStatusChange={handleStatusChange} />

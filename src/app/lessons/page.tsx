@@ -179,7 +179,7 @@ export default function LessonsScreen() {
               <div key={i} className="glass-card p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{lesson.week}</p>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,111,184,0.1)', color: 'var(--violet)' }}>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
                     {lesson.theme}
                   </span>
                 </div>

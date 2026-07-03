@@ -9,11 +9,13 @@ interface AppLayoutProps {
   noScroll?: boolean
   noPad?: boolean
   className?: string
+  /** Hub/list pages: 1440px cap instead of the default 1120px narrow-page cap */
+  wide?: boolean
 }
 
 const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 
-export function AppLayout({ children, noScroll, noPad, className }: AppLayoutProps) {
+export function AppLayout({ children, noScroll, noPad, className, wide }: AppLayoutProps) {
   return (
     <SwipeContainer
       style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
@@ -28,7 +30,7 @@ export function AppLayout({ children, noScroll, noPad, className }: AppLayoutPro
       </div>
 
       <main
-        className={['mx-auto w-full max-w-[1120px] lg:pt-16', className ?? ''].join(' ')}
+        className={['mx-auto w-full', wide ? 'max-w-[1440px]' : 'max-w-[1120px]', 'lg:pt-16', className ?? ''].join(' ')}
         style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       >
         {noScroll ? (

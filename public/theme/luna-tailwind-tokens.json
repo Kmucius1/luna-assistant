@@ -1,0 +1,19 @@
+{
+  "colors": {
+    "lunaBg": "#03040d",
+    "lunaBg2": "#07071a",
+    "lunaPurple": "#9b5cff",
+    "lunaPurple2": "#b98bff",
+    "lunaText": "#f4efff",
+    "lunaMuted": "rgba(244,239,255,0.68)",
+    "lunaGreen": "#33d17a"
+  },
+  "borderRadius": {
+    "lunaCard": "28px",
+    "lunaPill": "999px"
+  },
+  "boxShadow": {
+    "lunaGlow": "0 0 34px rgba(155, 92, 255, 0.22)",
+    "lunaCard": "inset 0 1px 0 rgba(255,255,255,.06), 0 22px 80px rgba(0,0,0,.38)"
+  }
+}

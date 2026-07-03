@@ -140,7 +140,7 @@ export default function DailyReadingPage() {
       {/* Ambient orbs */}
       <div
         className="fixed top-0 right-0 w-[500px] h-[500px] pointer-events-none z-0"
-        style={{ background: 'radial-gradient(circle at 75% 15%, rgba(139,111,184,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
+        style={{ background: 'radial-gradient(circle at 75% 15%, rgba(155,92,255,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
       />
       <div
         className="fixed bottom-0 left-0 w-[350px] h-[350px] pointer-events-none z-0"
@@ -189,8 +189,8 @@ export default function DailyReadingPage() {
               onClick={() => fetchGuidance()}
               className="px-6 py-3 rounded-[14px] text-sm font-semibold tap-scale"
               style={{
-                background: 'rgba(139,111,184,0.15)',
-                border: '1px solid rgba(139,111,184,0.3)',
+                background: 'rgba(155,92,255,0.15)',
+                border: '1px solid rgba(155,92,255,0.3)',
                 color: 'var(--violet)',
               }}
             >
@@ -207,8 +207,8 @@ export default function DailyReadingPage() {
             <div
               className="rounded-[22px] p-6"
               style={{
-                background: 'linear-gradient(145deg, rgba(139,111,184,0.22) 0%, rgba(90,60,150,0.12) 100%)',
-                border: '1px solid rgba(139,111,184,0.30)',
+                background: 'linear-gradient(145deg, rgba(155,92,255,0.22) 0%, rgba(90,60,150,0.12) 100%)',
+                border: '1px solid rgba(155,92,255,0.30)',
               }}
             >
               <Label>Daily Horoscope</Label>
@@ -286,10 +286,10 @@ export default function DailyReadingPage() {
               className="rounded-[22px] p-6"
               style={{
                 background: 'linear-gradient(145deg, rgba(13,11,30,0.85) 0%, rgba(30,26,56,0.85) 100%)',
-                border: '1px solid rgba(139,111,184,0.22)',
+                border: '1px solid rgba(155,92,255,0.22)',
               }}
             >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(196,169,232,0.55)' }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.55)' }}>
                 Reflect
               </p>
               <p
@@ -320,11 +320,11 @@ export default function DailyReadingPage() {
             <div
               className="rounded-[22px] p-6"
               style={{
-                background: 'linear-gradient(145deg, rgba(90,60,160,0.25) 0%, rgba(139,111,184,0.15) 50%, rgba(60,40,120,0.22) 100%)',
-                border: '1px solid rgba(139,111,184,0.35)',
+                background: 'linear-gradient(145deg, rgba(90,60,160,0.25) 0%, rgba(155,92,255,0.15) 50%, rgba(60,40,120,0.22) 100%)',
+                border: '1px solid rgba(155,92,255,0.35)',
               }}
             >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(196,169,232,0.65)' }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.65)' }}>
                 Your Highest Self
               </p>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>
@@ -336,11 +336,11 @@ export default function DailyReadingPage() {
             <div
               className="rounded-[22px] p-7 text-center"
               style={{
-                background: 'linear-gradient(135deg, rgba(139,111,184,0.30) 0%, rgba(90,60,150,0.22) 50%, rgba(184,159,216,0.18) 100%)',
-                border: '1px solid rgba(139,111,184,0.30)',
+                background: 'linear-gradient(135deg, rgba(155,92,255,0.30) 0%, rgba(90,60,150,0.22) 50%, rgba(184,159,216,0.18) 100%)',
+                border: '1px solid rgba(155,92,255,0.30)',
               }}
             >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(196,169,232,0.6)' }}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.6)' }}>
                 Today&apos;s Affirmation
               </p>
               <p

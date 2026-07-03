@@ -131,7 +131,7 @@ export default function DictationScreen() {
           {/* Header */}
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,111,184,0.12)' }}>
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(155,92,255,0.12)' }}>
                 <Mic className="h-5 w-5" style={{ color: 'var(--violet)' }} />
               </div>
               <div>
@@ -161,7 +161,7 @@ export default function DictationScreen() {
                   <button key={t.value} onClick={() => setType(t.value)}
                     className="flex-none px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
                     style={{
-                      background: type === t.value ? 'var(--violet)' : 'rgba(139,111,184,0.08)',
+                      background: type === t.value ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
                       color: type === t.value ? 'white' : 'var(--mid)',
                     }}>
                     {t.emoji} {t.label}
@@ -199,9 +199,9 @@ export default function DictationScreen() {
 
               {/* OR type */}
               <div className="relative flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px" style={{ background: 'rgba(139,111,184,0.1)' }} />
+                <div className="flex-1 h-px" style={{ background: 'rgba(155,92,255,0.1)' }} />
                 <p className="text-xs" style={{ color: 'var(--faint)' }}>or type</p>
-                <div className="flex-1 h-px" style={{ background: 'rgba(139,111,184,0.1)' }} />
+                <div className="flex-1 h-px" style={{ background: 'rgba(155,92,255,0.1)' }} />
               </div>
 
               <div className="mb-5">
@@ -238,7 +238,7 @@ export default function DictationScreen() {
                 <div className="flex flex-wrap gap-2">
                   {result.key_feelings.map((f, i) => (
                     <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium"
-                      style={{ background: 'rgba(139,111,184,0.1)', color: 'var(--violet)' }}>
+                      style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
                       {f}
                     </span>
                   ))}
@@ -284,7 +284,7 @@ export default function DictationScreen() {
               )}
 
               {/* Affirmation */}
-              <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+              <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                 <p className="font-display text-base italic" style={{ color: 'var(--depth)' }}>
                   &ldquo;{result.affirmation}&rdquo;
                 </p>
@@ -294,7 +294,7 @@ export default function DictationScreen() {
               <div className="flex gap-3">
                 <button onClick={reset}
                   className="flex-1 py-3.5 rounded-2xl font-semibold text-center transition-all"
-                  style={{ background: 'rgba(139,111,184,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
                   Speak again
                 </button>
                 <button

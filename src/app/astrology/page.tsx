@@ -15,14 +15,14 @@ const G: React.CSSProperties = {
 
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: '#9b5cff',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10, flexShrink: 0,
 }
 
 const GO_DEEPER: React.CSSProperties = {
   padding: '13px 18px', borderRadius: 16,
-  background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.22)',
+  background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.22)',
   display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
 }
 
@@ -51,8 +51,8 @@ function TabCosmic() {
             {brief.tagline && <p style={{ fontSize: 16, fontWeight: 700, color: 'white', marginBottom: 10, lineHeight: 1.4 }}>{brief.tagline}</p>}
             {brief.overall_vibe && <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, marginBottom: 12 }}>{brief.overall_vibe}</p>}
             {brief.energy && (
-              <div style={{ background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)', borderRadius: 12, padding: '10px 14px', marginBottom: 8 }}>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(196,169,232,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Energy</p>
+              <div style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)', borderRadius: 12, padding: '10px 14px', marginBottom: 8 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(185,139,255,0.6)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Energy</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.5 }}>{brief.energy}</p>
               </div>
             )}
@@ -68,7 +68,7 @@ function TabCosmic() {
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>{brief.avoid}</p>
               </div>
             )}
-            {brief.mantra && <p style={{ fontSize: 14, color: '#C4A9E8', fontStyle: 'italic', lineHeight: 1.6, marginTop: 4, textAlign: 'center' }}>✦ {brief.mantra}</p>}
+            {brief.mantra && <p style={{ fontSize: 14, color: '#b98bff', fontStyle: 'italic', lineHeight: 1.6, marginTop: 4, textAlign: 'center' }}>✦ {brief.mantra}</p>}
           </>
         ) : (
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', lineHeight: 1.6 }}>Connect your profile for a personalized daily reading.</p>
@@ -82,9 +82,9 @@ function TabCosmic() {
           <div style={GO_DEEPER}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <span style={{ fontSize: 18 }}>{item.emoji}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#8B6FB8' }}>{item.label}</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#9b5cff' }}>{item.label}</span>
             </div>
-            <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+            <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
           </div>
         </Link>
       ))}
@@ -104,7 +104,7 @@ function TabMoon() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...G, borderRadius: 26, padding: '20px', background: 'linear-gradient(135deg, rgba(20,15,50,0.4), rgba(60,40,100,0.15))', border: '1px solid rgba(139,111,184,0.2)' }}>
+      <div style={{ ...G, borderRadius: 26, padding: '20px', background: 'linear-gradient(135deg, rgba(20,15,50,0.4), rgba(60,40,100,0.15))', border: '1px solid rgba(155,92,255,0.2)' }}>
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
             <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
@@ -116,8 +116,8 @@ function TabMoon() {
             <p style={{ fontSize: 20, fontWeight: 800, color: 'white' }}>{moon.phase.name}</p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{Math.round(moon.phase.illumination * 100)}% illuminated</p>
             {moon.sign && (
-              <div style={{ marginTop: 8, padding: '8px 16px', borderRadius: 12, background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.2)' }}>
-                <p style={{ fontSize: 13, color: '#C4A9E8' }}>Moon in {moon.sign.name} {moon.sign.emoji}</p>
+              <div style={{ marginTop: 8, padding: '8px 16px', borderRadius: 12, background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
+                <p style={{ fontSize: 13, color: '#b98bff' }}>Moon in {moon.sign.name} {moon.sign.emoji}</p>
                 <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>{moon.sign.keywords}</p>
               </div>
             )}
@@ -138,8 +138,8 @@ function TabMoon() {
       </div>
       <Link href="/astrology/moon" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Moon Portal</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Moon Portal</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -191,7 +191,7 @@ function TabTransits() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {KEY_TRANSITS.map(t => (
             <div key={t.planet} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#C4A9E8', marginBottom: 5 }}>{t.planet} in {t.sign}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#b98bff', marginBottom: 5 }}>{t.planet} in {t.sign}</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55 }}>{t.note}</p>
             </div>
           ))}
@@ -199,8 +199,8 @@ function TabTransits() {
       </div>
       <Link href="/astrology/transits" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Transit Report</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Transit Report</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -245,7 +245,7 @@ function TabChart() {
           {PLANETS.map(p => (
             <div key={p.planet} style={{ display: 'flex', gap: 10, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.04)' }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(168,196,218,0.8)', width: 60, flexShrink: 0 }}>{p.planet}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#C4A9E8', width: 70, flexShrink: 0 }}>{p.sign}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#b98bff', width: 70, flexShrink: 0 }}>{p.sign}</span>
               <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{p.note}</span>
             </div>
           ))}
@@ -254,8 +254,8 @@ function TabChart() {
       <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', textAlign: 'center', fontStyle: 'italic' }}>Nov 14, 2000 · 7:04 PM · Sellersville, PA</p>
       <Link href="/astrology/birth-chart" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Birth Chart</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Birth Chart</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -278,7 +278,7 @@ function TabSpirit() {
       ) : (
         <>
           {guidance?.affirmation && (
-            <div style={{ ...G, borderRadius: 26, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.12))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
+            <div style={{ ...G, borderRadius: 26, padding: '18px 20px', background: 'linear-gradient(135deg, rgba(60,40,100,0.2), rgba(30,20,60,0.12))', border: '1px solid rgba(155,92,255,0.2)', textAlign: 'center' }}>
               <div style={{ ...LBL, justifyContent: 'center' }}>Today's Affirmation</div>
               <p style={{ fontSize: 16, color: 'white', fontStyle: 'italic', lineHeight: 1.6 }}>"{guidance.affirmation}"</p>
             </div>
@@ -309,8 +309,8 @@ function TabSpirit() {
       </div>
       <Link href="/astrology/rituals" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Spirit + Rituals</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Spirit + Rituals</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -331,10 +331,10 @@ function TabCrystals() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...G, borderRadius: 26, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)', textAlign: 'center' }}>
+      <div style={{ ...G, borderRadius: 26, padding: '16px 18px', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(155,92,255,0.2)', textAlign: 'center' }}>
         <span style={{ fontSize: 40 }}>🔮</span>
         <p style={{ fontSize: 14, fontWeight: 700, color: 'white', marginTop: 8 }}>Crystal of the Day</p>
-        <p style={{ fontSize: 16, fontWeight: 800, color: '#C4A9E8', marginTop: 4 }}>Labradorite</p>
+        <p style={{ fontSize: 16, fontWeight: 800, color: '#b98bff', marginTop: 4 }}>Labradorite</p>
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 6, lineHeight: 1.6 }}>Your magic is activated. Trust what you see beneath the surface — your Scorpio Sun + Cancer Moon picks up on things others miss.</p>
       </div>
       <div style={{ ...G, padding: '16px 18px' }}>
@@ -344,7 +344,7 @@ function TabCrystals() {
             <div key={c.name} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{c.name}</p>
-                <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(196,169,232,0.6)', background: 'rgba(139,111,184,0.1)', padding: '2px 7px', borderRadius: 6 }}>{c.chakra}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(185,139,255,0.6)', background: 'rgba(155,92,255,0.1)', padding: '2px 7px', borderRadius: 6 }}>{c.chakra}</span>
               </div>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{c.energy}</p>
             </div>
@@ -353,8 +353,8 @@ function TabCrystals() {
       </div>
       <Link href="/astrology/crystals" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Crystal Guide</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Crystal Guide</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -363,7 +363,7 @@ function TabCrystals() {
 
 function TabLove() {
   const SYNASTRY = [
-    { label: 'Emotional Bond',  score: 8,   color: '#C4A9E8', note: 'Zoe Cancer Moon + Kaleb Cancer Moon = deeply mirrored emotional needs.' },
+    { label: 'Emotional Bond',  score: 8,   color: '#b98bff', note: 'Zoe Cancer Moon + Kaleb Cancer Moon = deeply mirrored emotional needs.' },
     { label: 'Chemistry',       score: 9,   color: '#E08B4A', note: 'Magnetic pull. Kaleb Scorpio Rising + your Scorpio Sun = electric.' },
     { label: 'Long-term Fit',   score: 8.5, color: '#8AB88A', note: 'Shared values on building, loyalty, and legacy.' },
     { label: 'Communication',   score: 6,   color: '#C9A96E', note: 'Work area. Two people who feel deeply but process differently.' },
@@ -397,8 +397,8 @@ function TabLove() {
       </div>
       <Link href="/love" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Love + Relationships</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Love + Relationships</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -434,7 +434,7 @@ function TabForecasts() {
           {TIMELINE.map(t => (
             <div key={t.period} style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#C4A9E8' }}>{t.theme}</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#b98bff' }}>{t.theme}</span>
                 <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)' }}>{t.period}</span>
               </div>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.58)', lineHeight: 1.5 }}>{t.note}</p>
@@ -444,8 +444,8 @@ function TabForecasts() {
       </div>
       <Link href="/astrology/forecasts" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Forecast Report</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Forecast Report</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -462,21 +462,21 @@ function TabDeepDive() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-      <div style={{ ...G, padding: '14px 18px', background: 'rgba(20,15,50,0.3)', border: '1px solid rgba(139,111,184,0.2)' }}>
-        <p style={{ fontSize: 13, color: 'rgba(196,169,232,0.75)', lineHeight: 1.6, fontStyle: 'italic' }}>These are your deep placements — the ones that explain the patterns that keep showing up in your life.</p>
+      <div style={{ ...G, padding: '14px 18px', background: 'rgba(20,15,50,0.3)', border: '1px solid rgba(155,92,255,0.2)' }}>
+        <p style={{ fontSize: 13, color: 'rgba(185,139,255,0.75)', lineHeight: 1.6, fontStyle: 'italic' }}>These are your deep placements — the ones that explain the patterns that keep showing up in your life.</p>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {DEEP.map(d => (
           <div key={d.label} style={{ ...G, padding: '16px 18px' }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#C4A9E8', marginBottom: 8 }}>{d.label}</p>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#b98bff', marginBottom: 8 }}>{d.label}</p>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>{d.content}</p>
           </div>
         ))}
       </div>
       <Link href="/astrology/deep-dives" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>More Deep Dives</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>More Deep Dives</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -522,7 +522,7 @@ function TabToday() {
       </div>
 
       {(guidance?.affirmation || loading) && (
-        <div style={{ ...G, borderRadius: 26, padding: '16px 18px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(139,111,184,0.2)' }}>
+        <div style={{ ...G, borderRadius: 26, padding: '16px 18px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(60,40,100,0.15), rgba(30,20,60,0.10))', border: '1px solid rgba(155,92,255,0.2)' }}>
           <div style={{ ...LBL, justifyContent: 'center' }}>Today's Affirmation</div>
           {loading
             ? <Shimmer h={12} />
@@ -533,8 +533,8 @@ function TabToday() {
 
       <Link href="/astrology/daily" style={{ textDecoration: 'none' }}>
         <div style={GO_DEEPER}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#8B6FB8' }}>Full Daily Reading</span>
-          <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#9b5cff' }}>Full Daily Reading</span>
+          <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
         </div>
       </Link>
     </div>
@@ -570,9 +570,9 @@ export default function AstrologyPage() {
             </Link>
           ) : (
             <button key={item.label} onClick={() => setPagerIndex(0)} style={{ textDecoration: 'none', background: 'none', border: 'none', padding: 0 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px 12px', background: 'rgba(196,169,232,0.08)', border: '1px solid rgba(196,169,232,0.2)', borderRadius: 18, cursor: 'pointer', textAlign: 'center' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px 12px', background: 'rgba(185,139,255,0.08)', border: '1px solid rgba(185,139,255,0.2)', borderRadius: 18, cursor: 'pointer', textAlign: 'center' }}>
                 <span style={{ fontSize: 28 }}>{item.emoji}</span>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#C4A9E8', lineHeight: 1.2 }}>{item.label}</p>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#b98bff', lineHeight: 1.2 }}>{item.label}</p>
               </div>
             </button>
           )
@@ -589,8 +589,8 @@ export default function AstrologyPage() {
   return (
     <AppLayout noScroll>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.25)' }}>
-          <Star className="h-5 w-5" style={{ color: '#C4A9E8' }} strokeWidth={1.6} />
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.14)', border: '1px solid rgba(155,92,255,0.25)' }}>
+          <Star className="h-5 w-5" style={{ color: '#b98bff' }} strokeWidth={1.6} />
         </div>
         <div>
           <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>Astrology</h1>
@@ -598,7 +598,7 @@ export default function AstrologyPage() {
         </div>
       </div>
 
-      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#C4A9E8" hidePills />
+      <CategoryPager pages={astroPages} activeIndex={pagerIndex} onChangeIndex={setPagerIndex} accentColor="#b98bff" hidePills />
     </AppLayout>
   )
 }

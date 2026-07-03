@@ -12,7 +12,7 @@ const G: React.CSSProperties = {
 }
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: '#9b5cff',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10,
 }
@@ -56,7 +56,7 @@ export default function ManifestationPage() {
         {/* Affirmation */}
         <div style={{ ...G, padding: '18px 20px', background: 'linear-gradient(140deg, rgba(40,14,90,0.55) 0%, rgba(16,5,44,0.72) 100%)' }}>
           <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Today's Affirmation</div>
-          <p style={{ fontSize: 15, fontStyle: 'italic', color: 'rgba(196,169,232,0.9)', margin: 0 }}>"{affirmation}"</p>
+          <p style={{ fontSize: 15, fontStyle: 'italic', color: 'rgba(185,139,255,0.9)', margin: 0 }}>"{affirmation}"</p>
         </div>
 
         {/* Add intention */}
@@ -103,7 +103,7 @@ export default function ManifestationPage() {
               >
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                  border: `1px solid ${i.done ? '#6BE38B' : 'rgba(139,111,184,0.4)'}`,
+                  border: `1px solid ${i.done ? '#6BE38B' : 'rgba(155,92,255,0.4)'}`,
                   background: i.done ? 'rgba(107,227,139,0.18)' : 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>

@@ -150,7 +150,7 @@ function SectionHeader({ title, icon, color = 'var(--violet)' }: { title: string
   )
 }
 
-function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg = 'rgba(139,111,184,0.08)' }:
+function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg = 'rgba(155,92,255,0.08)' }:
   { items: string[]; onChange: (items: string[]) => void; placeholder: string; color?: string; bg?: string }) {
   const [input, setInput] = useState('')
   function add() {
@@ -176,7 +176,7 @@ function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg =
           onKeyDown={e => { if (e.key === 'Enter') add() }}
           placeholder={placeholder}
           className="flex-1 px-3 py-2 rounded-xl text-xs outline-none"
-          style={{ background: 'rgba(139,111,184,0.05)', color: 'var(--depth)', border: '1px solid rgba(139,111,184,0.1)' }} />
+          style={{ background: 'rgba(155,92,255,0.05)', color: 'var(--depth)', border: '1px solid rgba(155,92,255,0.1)' }} />
         <button onClick={add}
           className="px-3 py-2 rounded-xl" style={{ background: bg, color }}>
           <Plus className="h-4 w-4" />
@@ -324,18 +324,18 @@ export default function ProfilePage() {
                 </button>
               </div>
             ))}
-            <div className="pt-2 border-t" style={{ borderColor: 'rgba(139,111,184,0.08)' }}>
+            <div className="pt-2 border-t" style={{ borderColor: 'rgba(155,92,255,0.08)' }}>
               <input value={newRelName} onChange={e => setNewRelName(e.target.value)}
                 placeholder="Name (e.g. Kaleb, Mom, Client A)"
                 className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-                style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(139,111,184,0.1)' }} />
+                style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.1)' }} />
               <input value={newRelCtx} onChange={e => setNewRelCtx(e.target.value)}
                 placeholder="Context (relationship type, dynamics, anything LUNA should know)"
                 className="w-full bg-transparent outline-none text-xs mb-3"
                 style={{ color: 'var(--depth)' }} />
               <button onClick={addRelationship}
                 className="text-xs font-semibold px-3 py-1.5 rounded-xl"
-                style={{ background: 'rgba(139,111,184,0.1)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
                 <Plus className="inline h-3 w-3 mr-1" />Add person
               </button>
             </div>
@@ -366,11 +366,11 @@ export default function ProfilePage() {
             <input value={newGoalTitle} onChange={e => setNewGoalTitle(e.target.value)}
               placeholder="Goal title"
               className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(139,111,184,0.08)' }} />
+              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.08)' }} />
             <input value={newGoalWhen} onChange={e => setNewGoalWhen(e.target.value)}
               placeholder="Timeframe (e.g. 6 months, Long-term)"
               className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(139,111,184,0.08)' }} />
+              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.08)' }} />
             <input value={newGoalWhy} onChange={e => setNewGoalWhy(e.target.value)}
               placeholder="Why this matters to me..."
               className="w-full bg-transparent outline-none text-xs mb-3"

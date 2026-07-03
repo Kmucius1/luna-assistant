@@ -50,12 +50,12 @@ export function DesktopHeader() {
 
   return (
     <header
-      className="hidden lg:flex fixed top-0 left-0 lg:left-56 right-0 z-50 h-16 items-center"
+      className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-16 items-center"
       style={{
-        background: 'rgba(10, 8, 28, 0.94)',
+        background: 'var(--header-bg)',
         backdropFilter: 'blur(32px)',
         WebkitBackdropFilter: 'blur(32px)',
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: '1px solid var(--header-border)',
       }}>
 
       {/* Left — moon phase */}
@@ -71,7 +71,7 @@ export function DesktopHeader() {
       <div className="flex-1 flex items-center justify-center">
         <Link href="/" className="flex items-center gap-1.5 group">
           <span className="font-display text-2xl font-bold tracking-[0.24em]" style={{ color: 'var(--text-1)' }}>LUNA</span>
-          <span className="text-sm" style={{ color: '#C4A9E8' }}>✦</span>
+          <span className="text-sm" style={{ color: '#b98bff' }}>✦</span>
         </Link>
       </div>
 
@@ -107,7 +107,7 @@ export function DesktopHeader() {
         <button className="relative w-8 h-8 flex items-center justify-center tap-scale">
           <Bell className="h-4 w-4" style={{ color: 'var(--text-2)' }} strokeWidth={1.6} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full badge-pulse"
-            style={{ background: '#8B6FB8' }} />
+            style={{ background: '#9b5cff' }} />
         </button>
 
         {/* Settings */}
@@ -122,7 +122,7 @@ export function DesktopHeader() {
         <div style={{ position: 'relative' }}>
           <button onClick={() => setShowMenu(v => !v)}
             className="w-8 h-8 rounded-full flex items-center justify-center tap-scale flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', border: '2px solid rgba(139,111,184,0.4)', boxShadow: '0 0 12px rgba(139,111,184,0.3)', cursor: 'pointer' }}>
+            style={{ background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', border: '2px solid rgba(155,92,255,0.4)', boxShadow: '0 0 12px rgba(155,92,255,0.3)', cursor: 'pointer' }}>
             <span className="text-white font-bold" style={{ fontSize: 11 }}>Z</span>
           </button>
           {showMenu && (

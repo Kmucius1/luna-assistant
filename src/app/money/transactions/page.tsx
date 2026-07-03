@@ -90,7 +90,7 @@ function AddTxnModal({ onSave, onClose }: { onSave: () => void; onClose: () => v
       <div style={{
         position: 'relative', width: '100%', maxWidth: 600,
         background: 'linear-gradient(180deg, #1E1540 0%, #12102E 100%)',
-        border: '1px solid rgba(139,111,184,0.25)', borderRadius: '20px 20px 0 0',
+        border: '1px solid rgba(155,92,255,0.25)', borderRadius: '20px 20px 0 0',
         padding: '24px 20px 40px', zIndex: 1, maxHeight: '90vh', overflowY: 'auto',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -159,8 +159,8 @@ function AddTxnModal({ onSave, onClose }: { onSave: () => void; onClose: () => v
 
           <button onClick={save} disabled={saving} style={{
             height: 46, borderRadius: 12,
-            background: 'linear-gradient(135deg, rgba(139,111,184,0.3) 0%, rgba(139,111,184,0.15) 100%)',
-            border: '1px solid rgba(139,111,184,0.4)', color: 'rgba(196,169,232,0.9)',
+            background: 'linear-gradient(135deg, rgba(155,92,255,0.3) 0%, rgba(155,92,255,0.15) 100%)',
+            border: '1px solid rgba(155,92,255,0.4)', color: 'rgba(185,139,255,0.9)',
             fontSize: 14, fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', marginTop: 4,
           }}>{saving ? 'Saving…' : 'Save Transaction'}</button>
         </div>
@@ -233,8 +233,8 @@ function TransactionsContent() {
             <button onClick={() => setShowAdd(true)} style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '8px 14px', borderRadius: 12, cursor: 'pointer',
-              background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.35)',
-              color: 'rgba(196,169,232,0.9)', fontSize: 13, fontWeight: 700,
+              background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.35)',
+              color: 'rgba(185,139,255,0.9)', fontSize: 13, fontWeight: 700,
             }}><Plus style={{ width: 14, height: 14 }} /> Add</button>
           </div>
 
@@ -275,9 +275,9 @@ function TransactionsContent() {
             {(['all', 'review'] as const).map(t => (
               <button key={t} onClick={() => setTab(t)} style={{
                 padding: '8px 16px', borderRadius: 12, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                background: tab === t ? 'rgba(139,111,184,0.25)' : 'rgba(255,255,255,0.07)',
-                color: tab === t ? 'rgba(196,169,232,0.9)' : 'rgba(255,255,255,0.5)',
-                border: tab === t ? '1px solid rgba(139,111,184,0.3)' : '1px solid rgba(255,255,255,0.1)',
+                background: tab === t ? 'rgba(155,92,255,0.25)' : 'rgba(255,255,255,0.07)',
+                color: tab === t ? 'rgba(185,139,255,0.9)' : 'rgba(255,255,255,0.5)',
+                border: tab === t ? '1px solid rgba(155,92,255,0.3)' : '1px solid rgba(255,255,255,0.1)',
               }}>{t === 'all' ? 'All Transactions' : 'Needs Review'}</button>
             ))}
           </div>
@@ -306,9 +306,9 @@ function TransactionsContent() {
             {categories.map(cat => (
               <button key={cat} onClick={() => setCategoryFilter(cat)} style={{
                 padding: '5px 10px', borderRadius: 9, fontSize: 11, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                background: categoryFilter === cat ? 'rgba(139,111,184,0.2)' : 'rgba(255,255,255,0.05)',
-                color: categoryFilter === cat ? 'rgba(196,169,232,0.9)' : 'rgba(255,255,255,0.4)',
-                border: categoryFilter === cat ? '1px solid rgba(139,111,184,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                background: categoryFilter === cat ? 'rgba(155,92,255,0.2)' : 'rgba(255,255,255,0.05)',
+                color: categoryFilter === cat ? 'rgba(185,139,255,0.9)' : 'rgba(255,255,255,0.4)',
+                border: categoryFilter === cat ? '1px solid rgba(155,92,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
               }}>{cat === 'all' ? 'All' : `${CATEGORY_ICONS[cat] ?? ''} ${cat.replace('_', ' ')}`}</button>
             ))}
           </div>
@@ -323,11 +323,11 @@ function TransactionsContent() {
             <div style={{ ...CARD, padding: 36, textAlign: 'center' }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>No transactions yet</p>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', lineHeight: 1.6, marginBottom: 18 }}>
-                Tap <strong style={{ color: 'rgba(196,169,232,0.7)' }}>Add</strong> to log a transaction manually, or connect your bank to sync automatically.
+                Tap <strong style={{ color: 'rgba(185,139,255,0.7)' }}>Add</strong> to log a transaction manually, or connect your bank to sync automatically.
               </p>
               <button onClick={() => setShowAdd(true)} style={{
-                padding: '10px 20px', borderRadius: 12, background: 'rgba(139,111,184,0.15)',
-                border: '1px solid rgba(139,111,184,0.3)', color: 'rgba(196,169,232,0.9)',
+                padding: '10px 20px', borderRadius: 12, background: 'rgba(155,92,255,0.15)',
+                border: '1px solid rgba(155,92,255,0.3)', color: 'rgba(185,139,255,0.9)',
                 fontSize: 13, fontWeight: 700, cursor: 'pointer',
               }}>+ Add Transaction</button>
             </div>

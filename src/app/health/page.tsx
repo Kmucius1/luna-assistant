@@ -14,7 +14,7 @@ const G: React.CSSProperties = {
 }
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: '#9b5cff',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10,
 }
@@ -40,7 +40,7 @@ function EnergyGauge({ pct = 78, size = 128 }: { pct?: number; size?: number }) 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0, animation: 'breathe 5s ease-in-out infinite' }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(139,111,184,0.16)" strokeWidth={stroke} />
+        <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(155,92,255,0.16)" strokeWidth={stroke} />
         <circle
           cx={c} cy={c} r={r} fill="none" stroke="#8D5CFF" strokeWidth={stroke}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
@@ -73,8 +73,8 @@ export default function HealthPage() {
             <div style={{ flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {STATS.map(({ icon: Icon, label, value, status, delta, color }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon style={{ width: 15, height: 15, color: '#C4A9E8' }} strokeWidth={1.8} />
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon style={{ width: 15, height: 15, color: '#b98bff' }} strokeWidth={1.8} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.88)', margin: 0 }}>{label}</p>
@@ -121,7 +121,7 @@ export default function HealthPage() {
           style={{ ...G, padding: '16px 20px', cursor: 'pointer', background: 'linear-gradient(140deg, rgba(40,14,90,0.55) 0%, rgba(16,5,44,0.72) 100%)' }}
         >
           <div style={LBL}><PenLine style={{ width: 11, height: 11 }} />Reflect on Today</div>
-          <p style={{ fontSize: 13, color: 'rgba(196,169,232,0.88)', fontStyle: 'italic', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'rgba(185,139,255,0.88)', fontStyle: 'italic', margin: 0 }}>
             "What did my body ask for today, and did I listen?"
           </p>
           {journalOpen && (

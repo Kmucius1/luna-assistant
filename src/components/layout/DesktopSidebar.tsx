@@ -43,8 +43,8 @@ export function DesktopSidebar() {
             <Link key={href} href={href}
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
               style={{
-                background: active ? 'rgba(139,111,184,0.18)' : 'transparent',
-                color: active ? '#C4A9E8' : 'rgba(255,255,255,0.55)',
+                background: active ? 'rgba(155,92,255,0.18)' : 'transparent',
+                color: active ? '#b98bff' : 'rgba(255,255,255,0.55)',
               }}>
               <Icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={active ? 2 : 1.6} />
               <span className={`text-sm ${active ? 'font-semibold' : 'font-medium'}`}>{label}</span>
@@ -56,12 +56,12 @@ export function DesktopSidebar() {
       {/* Today's Energy widget */}
       <div className="px-5 pb-8 pt-4">
         <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.42)' }}>Today's Energy</p>
-        <p className="text-xs mt-0.5" style={{ color: 'rgba(196,169,232,0.55)' }}>Scattered but capable</p>
+        <p className="text-xs mt-0.5" style={{ color: 'rgba(185,139,255,0.55)' }}>Scattered but capable</p>
         <div
           className="w-11 h-11 rounded-full mt-3"
           style={{
-            background: 'radial-gradient(circle at 40% 35%, rgba(196,169,232,0.9) 0%, rgba(139,111,184,0.5) 55%, transparent 78%)',
-            boxShadow: '0 0 18px rgba(139,111,184,0.4)',
+            background: 'radial-gradient(circle at 40% 35%, rgba(185,139,255,0.9) 0%, rgba(155,92,255,0.5) 55%, transparent 78%)',
+            boxShadow: '0 0 18px rgba(155,92,255,0.4)',
             animation: 'breathe 5s ease-in-out infinite',
           }}
         />

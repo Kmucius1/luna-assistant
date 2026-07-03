@@ -17,7 +17,7 @@ const MOCK_TASKS: Task[] = [
 const URGENCY_COLORS: Record<string, string> = {
   critical: '#E05E5E',
   high:     '#E08B4A',
-  medium:   '#8B6FB8',
+  medium:   '#9b5cff',
   low:      '#B8C9B4',
 }
 
@@ -101,7 +101,7 @@ export default function TodayScreen() {
               onClick={generateBrief}
               disabled={briefLoading}
               className="w-full mb-5 py-3.5 rounded-2xl flex items-center justify-center gap-2 font-semibold transition-all active:scale-95"
-              style={{ background: 'rgba(139,111,184,0.08)', border: '1.5px solid rgba(139,111,184,0.15)', color: 'var(--violet)' }}
+              style={{ background: 'rgba(155,92,255,0.08)', border: '1.5px solid rgba(155,92,255,0.15)', color: 'var(--violet)' }}
             >
               <Sparkles className="h-4 w-4" />
               {briefLoading ? 'Reading your day...' : 'Generate my daily brief'}
@@ -121,7 +121,7 @@ export default function TodayScreen() {
                   </div>
                 )}
                 {brief.first_step && (
-                  <div className="py-3 border-t" style={{ borderColor: 'rgba(139,111,184,0.1)' }}>
+                  <div className="py-3 border-t" style={{ borderColor: 'rgba(155,92,255,0.1)' }}>
                     <p className="text-xs font-medium mb-1" style={{ color: 'var(--text-3)' }}>Start here →</p>
                     <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{brief.first_step}</p>
                   </div>
@@ -147,7 +147,7 @@ export default function TodayScreen() {
               {loading ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="glass-card p-4 animate-pulse">
-                    <div className="h-4 rounded-full w-3/4" style={{ background: 'rgba(139,111,184,0.1)' }} />
+                    <div className="h-4 rounded-full w-3/4" style={{ background: 'rgba(155,92,255,0.1)' }} />
                   </div>
                 ))
               ) : top3.map((task, i) => (
@@ -158,7 +158,7 @@ export default function TodayScreen() {
                     className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center transition-all"
                     style={{
                       background: done.has(task.id) ? 'var(--violet)' : 'transparent',
-                      border: done.has(task.id) ? 'none' : '1.5px solid rgba(139,111,184,0.3)',
+                      border: done.has(task.id) ? 'none' : '1.5px solid rgba(155,92,255,0.3)',
                     }}
                   >
                     {done.has(task.id) && <Check className="h-3.5 w-3.5 text-white" />}
@@ -204,7 +204,7 @@ export default function TodayScreen() {
           {/* Quick links */}
           <div className="grid grid-cols-2 gap-3 mb-5">
             {[
-              { href: '/dictation', icon: Sparkles, label: 'Brain dump',     sub: 'Speak your mind',     bg: 'rgba(139,111,184,0.1)', color: 'var(--violet)' },
+              { href: '/dictation', icon: Sparkles, label: 'Brain dump',     sub: 'Speak your mind',     bg: 'rgba(155,92,255,0.1)', color: 'var(--violet)' },
               { href: '/work',      icon: Zap,      label: 'Work reality',   sub: 'Emails & tasks',      bg: 'rgba(201,169,110,0.1)', color: 'var(--golden)' },
               { href: '/career',    icon: ArrowRight,label: 'Career compass', sub: 'Highest-use work',   bg: 'rgba(168,196,218,0.15)',color: 'var(--lunar)' },
               { href: '/messages',  icon: LinkIcon,  label: 'Messages',       sub: 'Reply with clarity',  bg: 'rgba(184,200,180,0.15)',color: '#5A8A5A' },

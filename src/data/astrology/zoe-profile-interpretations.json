@@ -1,0 +1,56 @@
+[
+  {
+    "placement": "Scorpio Sun",
+    "keywords": ["depth", "transformation", "truth", "intensity", "magnetism"],
+    "interpretation": "Your core identity runs deep — you need meaning, not surface. You sense what's unsaid in a room before anyone speaks it. Shallow work and shallow people drain you fast.",
+    "shadowNote": "Watch for control as a defense mechanism when you feel exposed."
+  },
+  {
+    "placement": "Cancer Moon",
+    "keywords": ["safety", "home", "cyclical energy", "nurturing", "memory"],
+    "interpretation": "Emotional safety is non-negotiable for you — it has to come before work, before visibility, before anyone else's needs. Your energy moves in cycles, not a flat line.",
+    "shadowNote": "Watch for carrying other people's pain as if it's yours."
+  },
+  {
+    "placement": "Gemini Rising",
+    "keywords": ["expressive", "quick", "witty", "communicative"],
+    "interpretation": "The way you're first perceived is light, curious, fast-talking — but that's a doorway into real depth, not the whole picture. Your voice is your primary vehicle for everything.",
+    "shadowNote": "Watch for scattering across too many threads at once instead of finishing one."
+  },
+  {
+    "placement": "Scorpio Mercury",
+    "keywords": ["research-driven", "precise", "pattern-reading"],
+    "interpretation": "You think in depth and in patterns, not in soundbites. You need to talk something out loud before you actually know what you think about it.",
+    "shadowNote": "Watch for over-researching as a way to delay a decision you've already made."
+  },
+  {
+    "placement": "Venus Sagittarius",
+    "keywords": ["freedom", "adventure", "philosophy", "expansion"],
+    "interpretation": "You love big — bold, adventurous, globally-minded. Style and relationships both need room to breathe and grow, not a fixed box.",
+    "shadowNote": "Watch for restlessness reading as disinterest when it's really just a need for more room."
+  },
+  {
+    "placement": "Mars Libra",
+    "keywords": ["beauty", "balance", "conflict-averse", "aesthetic drive"],
+    "interpretation": "You act through beauty and fairness, not force. You're capable of real decisiveness once your values are clear — the hesitation is usually about finding the fair path, not fear.",
+    "shadowNote": "Watch for conflict-avoidance turning into indecision that costs you more than the conflict would have."
+  },
+  {
+    "placement": "Saturn Taurus",
+    "keywords": ["slow wealth", "body stability", "discipline"],
+    "interpretation": "Your money and stability lesson is patience — slow, steady, body-first. Panic-spending or over-extending is the pattern to catch, not a personal failure.",
+    "shadowNote": "Watch for treating rest as something you have to earn first."
+  },
+  {
+    "placement": "North Node Cancer",
+    "keywords": ["emotional intelligence", "home", "receiving", "intuition"],
+    "interpretation": "Your growth direction is toward trusting your gut and letting yourself be nurtured, not just nurturing everyone else. Away from over-achieving as a stand-in for safety.",
+    "shadowNote": null
+  },
+  {
+    "placement": "Virgo Midheaven",
+    "keywords": ["systems", "precision", "service", "clarity"],
+    "interpretation": "Your public role is the systems-builder — the one who turns chaos into structure other people can actually use. Career satisfaction comes from usefulness and craft, not just visibility.",
+    "shadowNote": "Watch for perfectionism becoming the reason nothing ships."
+  }
+]

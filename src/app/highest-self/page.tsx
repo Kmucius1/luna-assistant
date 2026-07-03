@@ -388,7 +388,7 @@ export default function HighestSelfPage() {
                     {/* Tasks extracted */}
                     {result.tasks && result.tasks.length > 0 && (
                       <div>
-                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8B6FB8', marginBottom: 10 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 10 }}>
                           I heard these in what you shared
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -396,7 +396,7 @@ export default function HighestSelfPage() {
                             const isAdded  = added.has(task.title)
                             const isAdding = adding.has(task.title)
                             return (
-                              <div key={i} style={{ borderRadius: 18, overflow: 'hidden', border: isAdded ? '1px solid rgba(90,138,90,0.35)' : '1px solid rgba(139,111,184,0.25)', background: isAdded ? 'rgba(90,138,90,0.06)' : 'rgba(139,111,184,0.07)' }}>
+                              <div key={i} style={{ borderRadius: 18, overflow: 'hidden', border: isAdded ? '1px solid rgba(90,138,90,0.35)' : '1px solid rgba(155,92,255,0.25)', background: isAdded ? 'rgba(90,138,90,0.06)' : 'rgba(155,92,255,0.07)' }}>
                                 <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <p style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 3 }}>{task.title}</p>
@@ -409,8 +409,8 @@ export default function HighestSelfPage() {
                                   <button onClick={() => addToBoard(task)} disabled={isAdded || isAdding} style={{
                                     flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5,
                                     padding: '7px 12px', borderRadius: 12, fontSize: 11, fontWeight: 700, cursor: isAdded ? 'default' : 'pointer',
-                                    border: isAdded ? '1px solid rgba(90,138,90,0.4)' : '1px solid rgba(139,111,184,0.4)',
-                                    background: isAdded ? 'rgba(90,138,90,0.12)' : 'rgba(139,111,184,0.15)',
+                                    border: isAdded ? '1px solid rgba(90,138,90,0.4)' : '1px solid rgba(155,92,255,0.4)',
+                                    background: isAdded ? 'rgba(90,138,90,0.12)' : 'rgba(155,92,255,0.15)',
                                     color: isAdded ? '#8AB88A' : '#C4AAEE',
                                   }}>
                                     {isAdded ? <><CheckCircle className="h-3.5 w-3.5" /> Added</> : isAdding ? <>…</> : <><Plus className="h-3.5 w-3.5" /> Add to board</>}
@@ -428,9 +428,9 @@ export default function HighestSelfPage() {
                           })}
                         </div>
                         <Link href="/tasks" style={{ textDecoration: 'none' }}>
-                          <div style={{ marginTop: 10, padding: '10px 16px', borderRadius: 14, border: '1px solid rgba(139,111,184,0.2)', background: 'rgba(139,111,184,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ marginTop: 10, padding: '10px 16px', borderRadius: 14, border: '1px solid rgba(155,92,255,0.2)', background: 'rgba(155,92,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>View task board</p>
-                            <span style={{ fontSize: 12, color: '#8B6FB8' }}>→</span>
+                            <span style={{ fontSize: 12, color: '#9b5cff' }}>→</span>
                           </div>
                         </Link>
                       </div>
@@ -454,7 +454,7 @@ export default function HighestSelfPage() {
                     </div>
 
                     <div style={{ ...GLASS, padding: 18 }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, color: '#8B6FB8', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Design + Chart Insight</p>
+                      <p style={{ fontSize: 10, fontWeight: 700, color: '#9b5cff', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Design + Chart Insight</p>
                       <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.65 }}>{result.chart_connection}</p>
                     </div>
 

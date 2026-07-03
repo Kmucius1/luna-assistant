@@ -43,7 +43,7 @@ export default function LateModeScreen() {
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,111,184,0.12)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(155,92,255,0.12)' }}>
               <Moon className="h-5 w-5" style={{ color: 'var(--violet)' }} />
             </div>
             <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Recovery Mode</p>
@@ -74,8 +74,8 @@ export default function LateModeScreen() {
                   <div
                     className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                     style={{
-                      background: done ? 'var(--violet)' : 'rgba(139,111,184,0.1)',
-                      border: done ? 'none' : '1.5px solid rgba(139,111,184,0.2)',
+                      background: done ? 'var(--violet)' : 'rgba(155,92,255,0.1)',
+                      border: done ? 'none' : '1.5px solid rgba(155,92,255,0.2)',
                     }}
                   >
                     {done && <Check className="h-3.5 w-3.5 text-white" />}
@@ -93,7 +93,7 @@ export default function LateModeScreen() {
             {AFFIRMATIONS.map((a, i) => (
               <p key={i} className="text-sm leading-relaxed py-2" style={{
                 color: 'var(--mid)',
-                borderBottom: i < AFFIRMATIONS.length - 1 ? '1px solid rgba(139,111,184,0.08)' : 'none',
+                borderBottom: i < AFFIRMATIONS.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none',
               }}>
                 &ldquo;{a}&rdquo;
               </p>

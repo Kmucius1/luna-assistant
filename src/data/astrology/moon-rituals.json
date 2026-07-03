@@ -1,0 +1,44 @@
+{
+  "intentions": {
+    "Aries": "courage, bold new beginnings, launching something that scares you",
+    "Taurus": "grounding, financial stability, body care, slow pleasure",
+    "Gemini": "communication clarity, writing projects, new connections, learning",
+    "Cancer": "emotional healing, home, family, self-nurturing, intuition",
+    "Leo": "self-expression, creative projects, visibility, heart-led leadership",
+    "Virgo": "health routines, systems, clarity, service, refinement",
+    "Libra": "balance, beauty, relationships, peace, justice, aesthetic upgrades",
+    "Scorpio": "transformation, shadow work, deep truth, releasing old wounds",
+    "Sagittarius": "expansion, freedom, travel, publishing, spiritual growth, vision",
+    "Capricorn": "career, discipline, long-term goals, legacy building, reputation",
+    "Aquarius": "community, innovation, liberation, collective vision, friendships",
+    "Pisces": "spiritual connection, dreams, art, compassion, letting go of control"
+  },
+  "rituals": {
+    "Aries": ["Light a red candle", "Write one brave action you commit to", "Move your body intensely for 10 min"],
+    "Taurus": ["Take a bath with salt + rose petals", "Touch something that grounds you", "Write your financial intention clearly"],
+    "Gemini": ["Write three pages without stopping", "Call someone who inspires you", "Start the journal or essay you have been delaying"],
+    "Cancer": ["Make yourself tea and sit in stillness", "Write a letter to your younger self", "Declutter one corner of your home"],
+    "Leo": ["Dress in something that makes you feel powerful", "Create something with your hands", "Say the affirmation out loud to a mirror"],
+    "Virgo": ["Clean your workspace completely", "Write your ideal daily routine", "Choose one habit to start today"],
+    "Libra": ["Buy or arrange flowers", "Write what you want your relationships to feel like", "Balance your giving and receiving"],
+    "Scorpio": ["Write what you are releasing on paper and burn it safely", "Sit in darkness and breathe for five minutes", "Name the shadow pattern you are working with"],
+    "Sagittarius": ["Read something that expands your mind", "Plan one adventure — near or far", "Write your biggest vision without editing"],
+    "Capricorn": ["Write your five-year vision for your career", "Take one practical step toward a long-term goal", "Honor your discipline — even small consistency matters"],
+    "Aquarius": ["Connect with a community you believe in", "Write what freedom truly means to you", "Innovate one thing in your daily system"],
+    "Pisces": ["Meditate for at least 15 minutes", "Write down your dreams", "Create something without any goal or purpose"]
+  },
+  "releases": {
+    "Aries": ["anger that is hurting you", "impulsive decisions made from pride"],
+    "Taurus": ["stubbornness that keeps you stuck", "overspending from emotional emptiness"],
+    "Gemini": ["scattered energy across too many projects", "saying yes before thinking"],
+    "Cancer": ["carrying others pain as if it is yours", "hiding your needs to avoid conflict"],
+    "Leo": ["performing for approval", "dimming your light when others feel threatened"],
+    "Virgo": ["perfectionism that becomes paralysis", "criticism turned inward"],
+    "Libra": ["people-pleasing at your own expense", "avoiding hard decisions to keep peace"],
+    "Scorpio": ["control as a defense mechanism", "secrets that are taking up your energy"],
+    "Sagittarius": ["overcommitting before thinking", "running from depth or commitment"],
+    "Capricorn": ["working to prove your worth", "equating success with safety"],
+    "Aquarius": ["emotional detachment as protection", "being different for the sake of it"],
+    "Pisces": ["escaping through fantasy or numbing", "taking on energy that is not yours"]
+  }
+}

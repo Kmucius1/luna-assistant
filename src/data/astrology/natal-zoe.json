@@ -1,0 +1,114 @@
+{
+  "Sun": {
+    "sign": "Scorpio",
+    "degree": 22,
+    "minutes": 56,
+    "lon": 232.93,
+    "notes": "Core identity. Depth, truth, transformation, magnetism, emotional intensity."
+  },
+  "Moon": {
+    "sign": "Cancer",
+    "degree": 4,
+    "minutes": 39,
+    "lon": 94.65,
+    "notes": "Emotional body. Safety, home, cyclical energy, nurturing, deep feeling memory."
+  },
+  "Mercury": {
+    "sign": "Scorpio",
+    "degree": 3,
+    "minutes": 44,
+    "lon": 213.73,
+    "notes": "Thinking mind. Depth-seeking, research-driven, precise, pattern-reading, truth-hungry."
+  },
+  "Venus": {
+    "sign": "Sagittarius",
+    "degree": 29,
+    "minutes": 55,
+    "lon": 269.92,
+    "notes": "Love & style. Freedom-seeking, bold, expansive, adventurous, philosophy-lover. Cusp Capricorn."
+  },
+  "Mars": {
+    "sign": "Libra",
+    "degree": 6,
+    "minutes": 42,
+    "lon": 186.71,
+    "notes": "Drive & action. Beauty-motivated, conflict-careful, decisive through values, aesthetics as fuel."
+  },
+  "Jupiter": {
+    "sign": "Gemini",
+    "degree": 7,
+    "minutes": 54,
+    "lon": 67.9,
+    "notes": "Expansion. Growth through communication, curiosity, ideas, learning, and many interests."
+  },
+  "Saturn": {
+    "sign": "Taurus",
+    "degree": 27,
+    "minutes": 51,
+    "lon": 57.86,
+    "notes": "Discipline. Slow wealth, body stability, patience, practical foundations, calm spending."
+  },
+  "Uranus": {
+    "sign": "Aquarius",
+    "degree": 17,
+    "minutes": 3,
+    "lon": 317.05,
+    "notes": "Awakening. Innovation, community, collective consciousness, futurist thinking."
+  },
+  "Neptune": {
+    "sign": "Aquarius",
+    "degree": 4,
+    "minutes": 3,
+    "lon": 304.05,
+    "notes": "Dreams. Collective imagination, spiritual dissolution, idealism, mass consciousness."
+  },
+  "Pluto": {
+    "sign": "Sagittarius",
+    "degree": 11,
+    "minutes": 59,
+    "lon": 251.99,
+    "notes": "Transformation. Generational power, belief system death/rebirth, philosophy as power."
+  },
+  "NNode": {
+    "sign": "Cancer",
+    "degree": 17,
+    "minutes": 0,
+    "lon": 107,
+    "notes": "Soul direction. Toward emotional intelligence, home, receiving, intuition, nurturing others."
+  },
+  "SNode": {
+    "sign": "Capricorn",
+    "degree": 17,
+    "minutes": 0,
+    "lon": 287,
+    "notes": "Past patterns. Releasing over-achievement, proving, rigid control, cold ambition."
+  },
+  "Chiron": {
+    "sign": "Sagittarius",
+    "degree": 15,
+    "minutes": 0,
+    "lon": 255,
+    "notes": "Wound & healing. Belief systems, freedom, teaching before being taught, philosophical pain."
+  },
+  "Lilith": {
+    "sign": "Gemini",
+    "degree": 20,
+    "minutes": 0,
+    "lon": 80,
+    "notes": "Raw power. Wild mind, rebellion through voice, refusing to be silenced or simplified."
+  },
+  "Midheaven": {
+    "sign": "Virgo",
+    "degree": 12,
+    "minutes": 0,
+    "lon": 162,
+    "notes": "Career & legacy. Analyst, helper, systems-builder, clarity-giver, service through craft."
+  },
+  "Rising": {
+    "sign": "Gemini",
+    "degree": 12,
+    "minutes": 0,
+    "lon": 72,
+    "notes": "First impression. Quick, expressive, communicative, multi-faceted, youthful energy."
+  }
+}

@@ -198,9 +198,9 @@ export function SmartInput({
               <button key={s} onClick={() => selectSuggestion(s)}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
                 style={{
-                  background: selected ? 'rgba(139,111,184,0.85)' : 'rgba(255,255,255,0.07)',
+                  background: selected ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
                   color: selected ? 'white' : 'rgba(255,255,255,0.75)',
-                  border: `1px solid ${selected ? 'rgba(139,111,184,0.8)' : 'rgba(255,255,255,0.12)'}`,
+                  border: `1px solid ${selected ? 'rgba(155,92,255,0.8)' : 'rgba(255,255,255,0.12)'}`,
                   transform: selected ? 'scale(1.02)' : undefined,
                 }}>
                 {selected && <Check className="h-3 w-3" />}
@@ -223,13 +223,13 @@ export function SmartInput({
             className="w-full rounded-[16px] px-4 py-3 text-sm resize-none focus:outline-none transition-all luna-input"
             style={{
               background: 'rgba(255,255,255,0.07)',
-              border: `1px solid ${listening ? 'rgba(139,111,184,0.55)' : 'rgba(255,255,255,0.12)'}`,
+              border: `1px solid ${listening ? 'rgba(155,92,255,0.55)' : 'rgba(255,255,255,0.12)'}`,
               color: '#ffffff',
               paddingRight: 48,
               fontFamily: 'inherit',
               lineHeight: 1.6,
               colorScheme: 'dark',
-              boxShadow: listening ? '0 0 0 3px rgba(139,111,184,0.15)' : undefined,
+              boxShadow: listening ? '0 0 0 3px rgba(155,92,255,0.15)' : undefined,
             }}
           />
         ) : (
@@ -242,7 +242,7 @@ export function SmartInput({
             className="w-full rounded-[16px] px-4 py-3 text-sm focus:outline-none transition-all luna-input"
             style={{
               background: 'rgba(255,255,255,0.07)',
-              border: `1px solid ${listening ? 'rgba(139,111,184,0.55)' : 'rgba(255,255,255,0.12)'}`,
+              border: `1px solid ${listening ? 'rgba(155,92,255,0.55)' : 'rgba(255,255,255,0.12)'}`,
               color: '#ffffff',
               paddingRight: 48,
               fontFamily: 'inherit',
@@ -256,9 +256,9 @@ export function SmartInput({
           onClick={listening ? stopListening : startListening}
           className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           style={{
-            background: listening ? 'var(--violet)' : 'rgba(139,111,184,0.12)',
-            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(139,111,184,0.25)'}`,
-            boxShadow: listening ? '0 0 0 4px rgba(139,111,184,0.2)' : undefined,
+            background: listening ? 'var(--violet)' : 'rgba(155,92,255,0.12)',
+            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(155,92,255,0.25)'}`,
+            boxShadow: listening ? '0 0 0 4px rgba(155,92,255,0.2)' : undefined,
           }}
           title={listening ? 'Stop recording' : 'Tap to dictate'}>
           {listening

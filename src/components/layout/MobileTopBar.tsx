@@ -44,7 +44,7 @@ export function MobileTopBar() {
           <p style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>
             {moon.name} · {moon.pct}%
           </p>
-          <p style={{ fontSize: 10, color: 'rgba(196,169,232,0.42)', margin: 0, lineHeight: 1.25 }}>
+          <p style={{ fontSize: 10, color: 'rgba(185,139,255,0.42)', margin: 0, lineHeight: 1.25 }}>
             Illuminating your next step
           </p>
         </div>
@@ -52,7 +52,7 @@ export function MobileTopBar() {
 
       {/* Center: LUNA wordmark with sparkle */}
       <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <span style={{ position: 'absolute', top: -8, right: 4, fontSize: 9, color: '#C4A9E8', lineHeight: 1 }}>✦</span>
+        <span style={{ position: 'absolute', top: -8, right: 4, fontSize: 9, color: '#b98bff', lineHeight: 1 }}>✦</span>
         <span className="font-display" style={{ fontSize: 23, fontWeight: 700, letterSpacing: '0.24em', color: 'white' }}>LUNA</span>
       </div>
 
@@ -65,7 +65,7 @@ export function MobileTopBar() {
         <div style={{
           width: 34, height: 34, borderRadius: '50%',
           background: 'linear-gradient(135deg, #7C4DCC, #4A20A0)',
-          border: '2px solid rgba(196,169,232,0.35)',
+          border: '2px solid rgba(185,139,255,0.35)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Z</span>

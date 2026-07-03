@@ -1,0 +1,51 @@
+[
+  {
+    "label": "Business",
+    "emoji": "💼",
+    "color": "var(--lunar)",
+    "items": [
+      { "name": "DRYP Studio", "status": "active", "note": "Creative studio brand expansion" },
+      { "name": "EHM Systems", "status": "active", "note": "CRM + intake forms + mortgage tools" },
+      { "name": "LINK'd UP", "status": "parked", "note": "Events company — next season" },
+      { "name": "Nurturly", "status": "parked", "note": "Full site launch ready — timing TBD" },
+      { "name": "TikTok Shop", "status": "parked", "note": "When ready to launch products" },
+      { "name": "Dropshipping", "status": "parked", "note": "Research phase — parked safely" },
+      { "name": "144 Clients", "status": "future", "note": "The big goal — building toward it" }
+    ]
+  },
+  {
+    "label": "Money",
+    "emoji": "💰",
+    "color": "var(--golden)",
+    "items": [
+      { "name": "Trading", "status": "active", "note": "Rule-based only — no emotional trades" },
+      { "name": "Passive income platforms", "status": "parked", "note": "Building slowly" },
+      { "name": "Books / digital products", "status": "future", "note": "When voice and audience are ready" }
+    ]
+  },
+  {
+    "label": "Creative",
+    "emoji": "🎨",
+    "color": "var(--blush)",
+    "items": [
+      { "name": "Clothing brand", "status": "parked", "note": "Designs sketched, waiting for time" },
+      { "name": "Bikini brand", "status": "future", "note": "Vision in mind, not yet started" },
+      { "name": "Sewing projects", "status": "active", "note": "Ongoing — when energy allows" },
+      { "name": "Painting", "status": "active", "note": "For joy and creative expansion" },
+      { "name": "Tattooing", "status": "parked", "note": "Learning — no rush" },
+      { "name": "Dance", "status": "active", "note": "Keep this — it fuels everything" },
+      { "name": "Content creation", "status": "active", "note": "Ongoing" }
+    ]
+  },
+  {
+    "label": "Personal",
+    "emoji": "🌱",
+    "color": "var(--herb)",
+    "items": [
+      { "name": "Journaling habit", "status": "active", "note": "Daily, even 5 minutes counts" },
+      { "name": "Fitness routine", "status": "parked", "note": "Not the moment — return when ready" },
+      { "name": "Home reset", "status": "parked", "note": "When energy and space align" },
+      { "name": "Communication growth", "status": "active", "note": "Active — use messages helper" }
+    ]
+  }
+]

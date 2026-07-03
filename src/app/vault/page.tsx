@@ -3,58 +3,7 @@ import { useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { GlassCard } from '@/components/ui/GlassCard'
 import { Archive, Plus, Check } from 'lucide-react'
-
-const VAULT_CATEGORIES = [
-  {
-    label: 'Business',
-    emoji: '💼',
-    color: 'var(--lunar)',
-    items: [
-      { name: 'DRYP Studio', status: 'active',  note: 'Creative studio brand expansion' },
-      { name: 'EHM Systems', status: 'active',  note: 'CRM + intake forms + mortgage tools' },
-      { name: 'LINK\'d UP',  status: 'parked',  note: 'Events company — next season' },
-      { name: 'Nurturly',    status: 'parked',  note: 'Full site launch ready — timing TBD' },
-      { name: 'TikTok Shop', status: 'parked',  note: 'When ready to launch products' },
-      { name: 'Dropshipping',status: 'parked',  note: 'Research phase — parked safely' },
-      { name: '144 Clients', status: 'future',  note: 'The big goal — building toward it' },
-    ]
-  },
-  {
-    label: 'Money',
-    emoji: '💰',
-    color: 'var(--golden)',
-    items: [
-      { name: 'Trading',     status: 'active',  note: 'Rule-based only — no emotional trades' },
-      { name: 'Passive income platforms', status: 'parked', note: 'Building slowly' },
-      { name: 'Books / digital products', status: 'future', note: 'When voice and audience are ready' },
-    ]
-  },
-  {
-    label: 'Creative',
-    emoji: '🎨',
-    color: 'var(--blush)',
-    items: [
-      { name: 'Clothing brand', status: 'parked', note: 'Designs sketched, waiting for time' },
-      { name: 'Bikini brand',   status: 'future', note: 'Vision in mind, not yet started' },
-      { name: 'Sewing projects',status: 'active', note: 'Ongoing — when energy allows' },
-      { name: 'Painting',       status: 'active', note: 'For joy and creative expansion' },
-      { name: 'Tattooing',      status: 'parked', note: 'Learning — no rush' },
-      { name: 'Dance',          status: 'active', note: 'Keep this — it fuels everything' },
-      { name: 'Content creation',status:'active', note: 'Ongoing' },
-    ]
-  },
-  {
-    label: 'Personal',
-    emoji: '🌱',
-    color: 'var(--herb)',
-    items: [
-      { name: 'Journaling habit',  status: 'active', note: 'Daily, even 5 minutes counts' },
-      { name: 'Fitness routine',   status: 'parked', note: 'Not the moment — return when ready' },
-      { name: 'Home reset',        status: 'parked', note: 'When energy and space align' },
-      { name: 'Communication growth', status: 'active', note: 'Active — use messages helper' },
-    ]
-  },
-]
+import VAULT_CATEGORIES from '@/data/vault/categories.json'
 
 const STATUS_STYLES: Record<string, { label: string; bg: string; color: string }> = {
   active: { label: 'Active',  bg: 'rgba(90,138,90,0.1)',     color: '#5A8A5A' },
@@ -86,7 +35,7 @@ export default function VaultScreen() {
           </p>
 
           {/* Weekly selection reminder */}
-          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>Weekly selection</p>
             <p className="text-sm" style={{ color: 'var(--text-2)' }}>
               Each week, choose one from each lane: work · creative · money · personal. Everything else rests.
@@ -104,7 +53,7 @@ export default function VaultScreen() {
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{cat.emoji}</span>
                     <p className="font-semibold" style={{ color: 'var(--text-1)' }}>{cat.label}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(139,111,184,0.1)', color: 'var(--text-3)' }}>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--text-3)' }}>
                       {cat.items.length}
                     </span>
                   </div>
@@ -136,7 +85,7 @@ export default function VaultScreen() {
           {/* Add new */}
           <div className="mt-6">
             <button className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-semibold transition-all"
-              style={{ border: '1.5px dashed rgba(139,111,184,0.2)', color: 'var(--text-3)' }}>
+              style={{ border: '1.5px dashed rgba(155,92,255,0.2)', color: 'var(--text-3)' }}>
               <Plus className="h-4 w-4" />
               Add to vault
             </button>

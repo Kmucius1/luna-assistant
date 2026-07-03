@@ -111,7 +111,7 @@ export default function MiddayPage() {
                     <button key={e.value} onClick={() => setEnergy(energy === e.value ? '' : e.value)}
                       className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                       style={{
-                        background: energy === e.value ? 'var(--violet)' : 'rgba(139,111,184,0.08)',
+                        background: energy === e.value ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
                         color: energy === e.value ? 'white' : 'var(--mid)',
                       }}>
                       {e.emoji} {e.label}
@@ -130,7 +130,7 @@ export default function MiddayPage() {
                     <button key={key} onClick={() => toggleCheck(key)}
                       className="w-full flex items-center gap-3 py-2 transition-all">
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ background: checks[key] ? `${color}22` : 'rgba(139,111,184,0.06)' }}>
+                        style={{ background: checks[key] ? `${color}22` : 'rgba(155,92,255,0.06)' }}>
                         <Icon className="h-4 w-4" style={{ color: checks[key] ? color : 'var(--mist)' }} />
                       </div>
                       <span className="text-sm font-medium flex-1 text-left" style={{ color: checks[key] ? 'var(--depth)' : 'var(--mid)' }}>
