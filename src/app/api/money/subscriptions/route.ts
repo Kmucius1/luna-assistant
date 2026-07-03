@@ -29,7 +29,7 @@ export async function GET() {
     }) => {
       if (!sub.next_expected_charge && sub.last_charge_date) {
         const last = new Date(sub.last_charge_date)
-        let next = new Date(last)
+        const next = new Date(last)
         if (sub.frequency === 'monthly' || !sub.frequency) {
           next.setMonth(last.getMonth() + 1)
         } else if (sub.frequency === 'annual') {

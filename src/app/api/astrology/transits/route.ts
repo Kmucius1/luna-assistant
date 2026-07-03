@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
     if (moonPlanet) {
       const risingLon = ZOE_NATAL.Rising.lon
       const moonLon = moonPlanet.lon
-      let diff = ((moonLon - risingLon) + 360) % 360
+      const diff = ((moonLon - risingLon) + 360) % 360
       moonHouse = Math.floor(diff / 30) + 1
     }
 

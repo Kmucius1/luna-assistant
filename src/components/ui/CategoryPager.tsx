@@ -20,9 +20,9 @@ interface Props {
 export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
+  const [animKey, setAnimKey] = useState(0)
   const touchX = useRef(0)
   const touchY = useRef(0)
-  const animKey = useRef(0)
 
   const isControlled = activeIndex !== undefined
   const active = isControlled ? activeIndex : internalActive
@@ -30,7 +30,7 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
   function goTo(i: number) {
     if (i === active) return
     const cls = i > active ? 'pager-enter-right' : 'pager-enter-left'
-    animKey.current += 1
+    setAnimKey(k => k + 1)
     setAnimClass(cls)
     if (isControlled) onChangeIndex?.(i)
     else setInternalActive(i)
@@ -102,7 +102,7 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
 
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
         <div
-          key={`${active}-${animKey.current}`}
+          key={`${active}-${animKey}`}
           className={animClass}
           style={{ height: '100%', overflowY: (pages[active]?.noScroll ?? pageNoScroll) ? 'hidden' : 'auto', overflowX: 'hidden', paddingBottom: (pages[active]?.noScroll ?? pageNoScroll) ? 0 : 24 }}
         >

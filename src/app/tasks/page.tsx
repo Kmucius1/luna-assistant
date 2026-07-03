@@ -36,6 +36,7 @@ export default function TasksPage() {
   const [aiRankings,     setAiRankings]     = useState<Array<{ id: string; reason: string }> | null>(null)
   const [dryphubTasks,   setDryphubTasks]   = useState<DryphubTask[]>([])
   const [dryphubLoading, setDryphubLoading] = useState(true)
+  const [saveError,      setSaveError]      = useState<string | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -57,14 +58,28 @@ export default function TasksPage() {
   useEffect(() => { loadTasks() }, [loadTasks])
 
   async function handleCreateTask(taskData: Partial<Task>) {
-    const res = await fetch('/api/tasks/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(taskData) })
-    const { task } = await res.json()
-    if (task) { setTasks(prev => [task, ...prev]); setShowForm(false) }
+    setSaveError(null)
+    try {
+      const res = await fetch('/api/tasks/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(taskData) })
+      const { task } = await res.json()
+      if (task) { setTasks(prev => [task, ...prev]); setShowForm(false) }
+      else setSaveError("Couldn't save that task — try again.")
+    } catch {
+      setSaveError("Couldn't save that task — try again.")
+    }
   }
 
   async function handleStatusChange(id: string, status: Task['status']) {
-    await fetch('/api/tasks/update', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) })
+    setSaveError(null)
+    const prevTasks = tasks
     setTasks(prev => prev.map(t => t.id === id ? { ...t, status } : t))
+    try {
+      const res = await fetch('/api/tasks/update', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) })
+      if (!res.ok) throw new Error('update failed')
+    } catch {
+      setTasks(prevTasks)
+      setSaveError("Couldn't update that task — try again.")
+    }
   }
 
   async function handleAIRank() {
@@ -204,6 +219,12 @@ export default function TasksPage() {
           </div>
 
           <div style={{ padding: '0 16px' }}>
+
+            {saveError && (
+              <div style={{ ...GLASS, padding: '10px 14px', marginBottom: 14, borderColor: 'rgba(255,120,120,0.3)', color: 'rgba(255,180,180,0.9)', fontSize: 13 }}>
+                {saveError}
+              </div>
+            )}
 
             {/* Add task form */}
             {showForm && (
