@@ -30,6 +30,8 @@ export function BottomNav() {
         backdropFilter: 'blur(28px)',
         WebkitBackdropFilter: 'blur(28px)',
         boxShadow: '0 -4px 32px rgba(100,60,200,0.14), 0 -1px 0 rgba(255,255,255,0.05)',
+        transform: 'translateZ(0)',
+        willChange: 'transform',
       }}
     >
       <div style={{

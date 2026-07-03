@@ -31,6 +31,8 @@ export function DesktopTabBar() {
           border: '1px solid var(--dock-border)',
           boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
           pointerEvents: 'all',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }}>
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = isActive(href)

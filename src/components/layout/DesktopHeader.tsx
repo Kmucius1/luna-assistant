@@ -56,6 +56,8 @@ export function DesktopHeader() {
         backdropFilter: 'blur(32px)',
         WebkitBackdropFilter: 'blur(32px)',
         borderBottom: '1px solid var(--header-border)',
+        transform: 'translateZ(0)',
+        willChange: 'transform',
       }}>
 
       {/* Left — moon phase */}

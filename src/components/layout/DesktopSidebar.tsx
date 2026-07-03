@@ -27,6 +27,8 @@ export function DesktopSidebar() {
         backdropFilter: 'blur(28px)',
         WebkitBackdropFilter: 'blur(28px)',
         borderRight: '1px solid rgba(255,255,255,0.07)',
+        transform: 'translateZ(0)',
+        willChange: 'transform',
       }}
     >
       {/* Sparkle mark */}
