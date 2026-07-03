@@ -10,13 +10,13 @@
 -- src/app/api/money/*, etc.) so this seed lines up with existing single-tenant behavior.
 
 insert into public.luna_identity_profile (user_id)
-values ('98f5b277-bb63-41d5-89ec-0edadc1e2858')
+values ('5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb')
 on conflict (user_id) do nothing;
 
 insert into public.astrology_profiles (user_id)
-values ('98f5b277-bb63-41d5-89ec-0edadc1e2858')
+values ('5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb')
 on conflict (user_id) do nothing;
 
 insert into public.human_design_profile (user_id)
-values ('98f5b277-bb63-41d5-89ec-0edadc1e2858')
+values ('5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb')
 on conflict (user_id) do nothing;

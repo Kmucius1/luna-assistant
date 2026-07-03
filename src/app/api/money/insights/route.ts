@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { callAI, parseAIJson, ZOE_SOUL } from '@/lib/ai'
 import { getMonthRange, formatCurrency } from '@/lib/money'
 
-const ZOE_USER_ID = '98f5b277-bb63-41d5-89ec-0edadc1e2858'
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 const MONEY_INSIGHTS_PROMPT = `${ZOE_SOUL}
 

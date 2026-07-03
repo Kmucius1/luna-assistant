@@ -141,7 +141,7 @@ export async function findAccountByName(name: string): Promise<DryphubAccount | 
 
 // Zoe's user IDs in DRYP Hub (two accounts)
 const ZOE_IDS = [
-  '98f5b277-bb63-41d5-89ec-0edadc1e2858', // zoe.taylor@advantagemediaagency.com
+  '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb', // zoe.taylor@advantagemediaagency.com
   'dc25215f-cda4-4e91-84ee-c9fe49678b6b', // zoe@drypdigital.com
 ]
 

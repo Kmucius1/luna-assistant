@@ -451,6 +451,8 @@ function ClosetSection() {
   const [showAdd, setShowAdd] = useState(false)
   const [newItem, setNewItem] = useState({ name: '', category: 'tops', color: '' })
   const [saving, setSaving] = useState(false)
+  const [detecting, setDetecting] = useState(false)
+  const [detectMsg, setDetectMsg] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
@@ -484,9 +486,50 @@ function ClosetSection() {
     finally { setSaving(false) }
   }
 
+  function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setDetecting(true)
+    setDetectMsg(null)
+    const reader = new FileReader()
+    reader.onload = async () => {
+      try {
+        const res = await fetch('/api/atelier/wardrobe/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: reader.result, sourceLabel: new Date().toLocaleDateString() }),
+        })
+        const data = await res.json() as { items?: WardrobeItem[]; error?: string; message?: string }
+        if (data.items?.length) {
+          setItems(prev => [...data.items!, ...prev])
+          setDetectMsg(`Added ${data.items.length} piece${data.items.length === 1 ? '' : 's'} from that photo.`)
+        } else {
+          setDetectMsg(data.error || data.message || 'No pieces detected in that photo — try a clearer shot.')
+        }
+      } catch {
+        setDetectMsg("Couldn't process that photo. Try again.")
+      } finally {
+        setDetecting(false)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
   return (
     <div className="space-y-5">
       <SectionHeader icon={ShirtIcon} title="My Closet" sub="Track every piece — what you have, what it goes with." />
+
+      <label
+        className="w-full rounded-2xl py-3.5 flex items-center justify-center gap-2 font-semibold text-sm transition-all cursor-pointer"
+        style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.16), rgba(124,63,224,0.16))', border: '1.5px solid rgba(155,92,255,0.3)', color: 'var(--luna-purple-2, #b98bff)', opacity: detecting ? 0.7 : 1 }}>
+        {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
+        {detecting ? 'Reading your outfit…' : 'Upload today\'s outfit — auto-sort into pieces'}
+        <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} disabled={detecting} className="hidden" />
+      </label>
+      {detectMsg && (
+        <p className="text-xs text-center" style={{ color: 'var(--text-3)' }}>{detectMsg}</p>
+      )}
       <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
         {['all', ...WARDROBE_CATEGORIES].map(cat => (
           <button key={cat}

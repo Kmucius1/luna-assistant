@@ -72,7 +72,7 @@ export default function LoginPage() {
             Your personal sanctuary
           </p>
           <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {mode === 'login' ? 'Welcome back, Zoe.' : 'Your sanctuary awaits.'}
+            {mode === 'login' ? 'Welcome back.' : 'Your sanctuary awaits.'}
           </p>
         </div>
 

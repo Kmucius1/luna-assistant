@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { format } from 'date-fns'
 
 const ZOE_IDS = [
-  '98f5b277-bb63-41d5-89ec-0edadc1e2858',
+  '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb',
   'dc25215f-cda4-4e91-84ee-c9fe49678b6b',
 ]
 

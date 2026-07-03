@@ -271,19 +271,10 @@ create table if not exists public.connected_accounts (
 alter table public.connected_accounts enable row level security;
 create policy "Users manage own accounts" on public.connected_accounts for all using (auth.uid() = user_id);
 
--- ─── Gmail Tokens (legacy) ───────────────────────────────────
-create table if not exists public.gmail_tokens (
-  id            uuid default uuid_generate_v4() primary key,
-  user_id       uuid references auth.users(id) on delete cascade not null unique,
-  access_token  text,
-  refresh_token text,
-  token_expiry  timestamptz,
-  gmail_email   text,
-  created_at    timestamptz default now(),
-  updated_at    timestamptz default now()
-);
-alter table public.gmail_tokens enable row level security;
-create policy "Users manage own gmail tokens" on public.gmail_tokens for all using (auth.uid() = user_id);
+-- ─── Gmail Tokens ─────────────────────────────────────────────
+-- NOTE: gmail_tokens already exists live with real connected accounts
+-- (different structure, no user_id) — intentionally skipped here so
+-- this script doesn't collide with it. Do not recreate.
 
 -- ─── DRYPHub Tasks ──────────────────────────────────────────
 create table if not exists public.dryphub_tasks (
@@ -510,4 +501,3 @@ create table if not exists public.morning_messages (
 alter table public.morning_messages enable row level security;
 create policy "Users manage own morning messages" on public.morning_messages for all using (auth.uid() = user_id);
 create unique index morning_messages_user_date_idx on public.morning_messages (user_id, date);
-create policy "Users manage own sync logs" on public.sync_logs for all using (auth.uid() = user_id);

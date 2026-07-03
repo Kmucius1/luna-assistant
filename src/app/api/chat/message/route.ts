@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { buildLunaContext, formatLunaContextForPrompt } from '@/lib/luna/context'
 
-const ZOE_USER_ID = '98f5b277-bb63-41d5-89ec-0edadc1e2858'
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 // Documented single-tenant fallback — resolves the real signed-in user where a
 // session exists, otherwise falls back to the app's existing hardcoded user.

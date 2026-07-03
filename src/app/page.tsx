@@ -355,7 +355,11 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
         </p>
       </PreviewCard>
 
-      <PreviewCard label="Style Preview" icon={<Scissors style={{ width: 9, height: 9 }} />} href="/creative" linkText="Open Atelier">
+      <PreviewCard
+        label="Style Preview" icon={<Scissors style={{ width: 9, height: 9 }} />}
+        href={styleData?.hasProfile ? '/creative' : '/atelier/style-board'}
+        linkText={styleData?.hasProfile ? 'Open Atelier' : 'Pick your style'}
+      >
         {styleData?.hasProfile ? (
           <>
             <StyleVisual />
@@ -363,7 +367,7 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
           </>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Connect your style preferences in Atelier to get a personalized daily look.</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Pick a few looks you like and LUNA will build your daily style from there.</p>
           </div>
         )}
       </PreviewCard>
@@ -821,7 +825,10 @@ function HomePageInner() {
   const searchParams = useSearchParams()
   const initialTab = searchParams.get('tab')
   const [activeSlide, setActiveSlide] = useState(TAB_TO_SLIDE[initialTab ?? ''] ?? 0)
-  const [hour,       setHour]       = useState(new Date().getHours())
+  // Starts null so server-render and the first client-render match exactly
+  // (both fall back to the same neutral bucket) — the real local hour is set
+  // client-only in the effect below, avoiding a server(UTC)/client(local) mismatch.
+  const [hour,       setHour]       = useState<number | null>(null)
   const [guidance,   setGuidance]   = useState<GuidanceData | null>(null)
   const [gLoading,   setGLoading]   = useState(true)
   const [lunaMessage, setLunaMessage] = useState<{ message: string; affirmation: string } | null>(null)
@@ -836,6 +843,7 @@ function HomePageInner() {
   const [checkInLoading, setCheckInLoading] = useState(true)
 
   useEffect(() => {
+    setHour(new Date().getHours())
     const t = setInterval(() => setHour(new Date().getHours()), 60_000)
     return () => clearInterval(t)
   }, [])
@@ -875,9 +883,12 @@ function HomePageInner() {
   useEffect(() => { loadData() }, [loadData])
 
   const moon        = getMoonPhase()
-  const greeting    = getGreeting(hour)
-  const heroBg       = getHeroBackground(hour)
-  const heroTagline  = getHeroTagline(hour)
+  // Neutral fallback (noon) until the client-only effect sets the real local hour —
+  // keeps server render and first client render identical, no hydration mismatch.
+  const effectiveHour = hour ?? 12
+  const greeting    = getGreeting(effectiveHour)
+  const heroBg       = getHeroBackground(effectiveHour)
+  const heroTagline  = getHeroTagline(effectiveHour)
 
   const pages = [
     {
