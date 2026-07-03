@@ -125,7 +125,10 @@ Return ONLY valid JSON array: [{"index": 0, "category": "...", "isMeeting": fals
       action:      p.action || undefined,
       tasks:       p.tasks ?? [],
     })).filter(p => p.id) as CategorizedEmail[]
-  } catch { return [] }
+  } catch (err) {
+    console.error('Email categorization failed:', err instanceof Error ? err.message : err)
+    return []
+  }
 }
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
