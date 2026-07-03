@@ -145,8 +145,18 @@ const ZOE_IDS = [
   'dc25215f-cda4-4e91-84ee-c9fe49678b6b', // zoe@drypdigital.com
 ]
 
+// DRYP Hub lives in a separate Supabase project — every call here is a
+// cross-project round trip. A short cache avoids repeating it on every
+// Work page load.
+const CACHE_TTL_MS = 30_000
+const tasksCache = new Map<number, { data: DryphubTask[]; expiresAt: number }>()
+let statsCache: { data: Awaited<ReturnType<typeof fetchSummaryStats>>; expiresAt: number } | null = null
+
 // ─── Open tasks assigned to Zoe (with client name) ────────────────────────────
 export async function getOpenTasks(limit = 50): Promise<DryphubTask[]> {
+  const cached = tasksCache.get(limit)
+  if (cached && cached.expiresAt > Date.now()) return cached.data
+
   const { data, error } = await db()
     .from('tasks')
     .select(`
@@ -159,15 +169,18 @@ export async function getOpenTasks(limit = 50): Promise<DryphubTask[]> {
     .order('due_date', { ascending: true, nullsFirst: false })
     .limit(limit)
   if (error) throw error
-  return (data ?? []).map((t: Record<string, unknown>) => ({
+  const result = (data ?? []).map((t: Record<string, unknown>) => ({
     ...t,
     account_name: (t.account as { business_name?: string } | null)?.business_name ?? undefined,
     account: undefined,
   })) as unknown as DryphubTask[]
+
+  tasksCache.set(limit, { data: result, expiresAt: Date.now() + CACHE_TTL_MS })
+  return result
 }
 
 // ─── Summary stats ───────────────────────────────────────────────────────────
-export async function getSummaryStats() {
+async function fetchSummaryStats() {
   const [accountsRes, tasksRes, notesTodayRes] = await Promise.all([
     db().from('accounts').select('id, health_status, client_pipeline_stage').eq('is_active', true),
     db().from('tasks').select('id, status, due_date').in('assigned_to', ZOE_IDS).in('status', ['not_started', 'in_progress', 'todo', 'waiting_client']),
@@ -195,4 +208,11 @@ export async function getSummaryStats() {
     notesLastDay:   notesTodayRes.data?.length ?? 0,
     atRiskCount:    accounts.filter((a: { health_status: string }) => ['at_risk', 'churning'].includes(a.health_status)).length,
   }
+}
+
+export async function getSummaryStats() {
+  if (statsCache && statsCache.expiresAt > Date.now()) return statsCache.data
+  const data = await fetchSummaryStats()
+  statsCache = { data, expiresAt: Date.now() + CACHE_TTL_MS }
+  return data
 }
