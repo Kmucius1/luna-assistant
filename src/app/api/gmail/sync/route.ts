@@ -49,6 +49,44 @@ async function getAllTokens(): Promise<{ access_token: string; connected_email: 
   }
 }
 
+// ─── Classification cache — avoids re-spending AI tokens on emails we've
+//     already classified on a previous sync (shared Groq daily token budget) ──
+interface CachedClassification {
+  id: string
+  category: MailCategory
+  isMeeting: boolean
+  isUrgent: boolean
+  needsReview: boolean
+  action?: string
+  tasks?: string[]
+}
+
+async function getCachedClassifications(ids: string[]): Promise<Map<string, CachedClassification>> {
+  const map = new Map<string, CachedClassification>()
+  if (!ids.length) return map
+  try {
+    const { data } = await adminDb().from('email_classifications').select('*').in('id', ids)
+    for (const row of data ?? []) {
+      map.set(row.id, {
+        id: row.id, category: row.category, isMeeting: row.is_meeting, isUrgent: row.is_urgent,
+        needsReview: row.needs_review, action: row.action ?? undefined, tasks: row.tasks ?? [],
+      })
+    }
+  } catch { /* table may not exist yet — just skip caching */ }
+  return map
+}
+
+async function cacheClassifications(items: CategorizedEmail[]) {
+  if (!items.length) return
+  try {
+    await adminDb().from('email_classifications').upsert(items.map(c => ({
+      id: c.id, category: c.category, is_meeting: c.isMeeting, is_urgent: c.isUrgent,
+      needs_review: c.needsReview, action: c.action ?? null, tasks: c.tasks ?? [],
+      classified_at: new Date().toISOString(),
+    })), { onConflict: 'id' })
+  } catch { /* table may not exist yet — classification just won't persist */ }
+}
+
 // ─── AI categorization ─────────────────────────────────────────────────────────
 export type MailCategory =
   | 'dryp_client'   // DRYP Digital business/client work: proposals, project updates, CRM, team coordination
@@ -171,13 +209,16 @@ export async function GET() {
       return { ...e, isPriority: !!match, priorityContact: match ?? undefined }
     })
 
-    // ── Step 2: AI categorize every email, so priority contacts still land in the right
-    //            domain/type tabs (DRYP Clients, Zoe Personal, Meetings, etc.) ──
-    const categorized = await categorizeEmails(priorityFlagged)
+    // ── Step 2: reuse cached classifications, only spend AI tokens on emails we
+    //            haven't seen before (shared Groq daily token budget) ──
+    const cached = await getCachedClassifications(priorityFlagged.map(e => e.id))
+    const uncached = priorityFlagged.filter(e => !cached.has(e.id))
+    const freshlyClassified = await categorizeEmails(uncached)
+    void cacheClassifications(freshlyClassified)
 
-    // ── Step 3: Merge results ──
+    // ── Step 3: Merge results (cache takes priority since it's already classified) ──
     const merged = priorityFlagged.map(e => {
-      const cat = categorized.find(c => c.id === e.id)
+      const cat = cached.get(e.id) ?? freshlyClassified.find(c => c.id === e.id)
       return {
         ...e,
         category:    cat?.category ?? 'admin_tools' as MailCategory,
