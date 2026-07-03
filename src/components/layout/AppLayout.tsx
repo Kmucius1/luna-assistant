@@ -35,7 +35,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
       >
         {noScroll ? (
           <div
-            className={noPad ? '' : 'px-4'}
+            className={noPad ? '' : 'px-4 md:px-8 lg:px-12'}
             style={{
               flex: 1, minHeight: 0, overflow: 'hidden',
               display: 'flex', flexDirection: 'column',
@@ -46,7 +46,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
           </div>
         ) : (
           <div
-            className={noPad ? '' : 'px-4 md:px-8'}
+            className={noPad ? '' : 'px-4 md:px-8 lg:px-12'}
             style={{
               flex: 1, overflowY: 'auto', overflowX: 'hidden',
               paddingBottom: DOCK_CLEAR,

@@ -496,8 +496,8 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
-      {/* 1. Wellness & Energy */}
-      <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flexShrink: 0 }}>
+      {/* Wellness & Energy */}
+      <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flex: 1, minHeight: 0 }}>
         <div style={LBL}><Heart style={{ width: 10, height: 10 }} />Wellness &amp; Energy</div>
         <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '-4px 0 10px' }}>Your mind, body &amp; spirit today</p>
         {checkInLoading ? (
@@ -540,7 +540,18 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
         )}
       </div>
 
-      {/* 2. Today's Flow */}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIDE 3B — Flow + Journal  (split out of Slide 3 so neither needs to scroll)
+// ─────────────────────────────────────────────────────────────────────────────
+function Slide3B() {
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+
+      {/* Today's Flow */}
       <div style={{ ...G, borderRadius: 22, padding: '13px 14px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ ...LBL, marginBottom: 4 }}><Waves style={{ width: 10, height: 10 }} />Today's Flow</div>
@@ -552,7 +563,7 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
         <TodaysFlowChart />
       </div>
 
-      {/* 3. Daily Journal Prompt */}
+      {/* Daily Journal Prompt */}
       <Link href="/journal" style={{ textDecoration: 'none', flex: 1, minHeight: 0, display: 'flex' }}>
         <div style={{
           ...G, borderRadius: 22, padding: '13px 14px', flex: 1, minHeight: 0,
@@ -592,10 +603,8 @@ const RESET_MODES = [
 ]
 
 function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
-  const [activeMode, setActiveMode] = useState<string | null>(null)
   const [bodyDone,   setBodyDone]   = useState<Set<string>>(new Set())
   const [focusDone,  setFocusDone]  = useState(false)
-  const [homeDone,   setHomeDone]   = useState(false)
 
   function toggleBody(item: string) {
     setBodyDone(prev => { const n = new Set(prev); n.has(item) ? n.delete(item) : n.add(item); return n })
@@ -661,7 +670,22 @@ function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
         </div>
       </div>
 
-      {/* 4. Choose Reset Mode — compact 4-button card */}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIDE 4B — Reset Mode + Home Energy  (split out of Slide 4 so neither
+// needs to scroll)
+// ─────────────────────────────────────────────────────────────────────────────
+function Slide4B() {
+  const [activeMode, setActiveMode] = useState<string | null>(null)
+  const [homeDone,   setHomeDone]   = useState(false)
+
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+
+      {/* Choose Reset Mode — compact 4-button card */}
       <div style={{ ...G, borderRadius: 22, padding: '10px 12px', flexShrink: 0 }}>
         <div style={LBL}><Moon style={{ width: 9, height: 9 }} />CHOOSE RESET MODE</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
@@ -681,7 +705,7 @@ function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
         )}
       </div>
 
-      {/* 5. Home Energy Card */}
+      {/* Home Energy Card */}
       <div style={{ ...G, borderRadius: 22, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={LBL}><Star style={{ width: 9, height: 9 }} />HOME ENERGY</div>
@@ -777,6 +801,18 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         </div>
       </div>
 
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SLIDE 5B — Lesson/Upcoming + Parked + Reset  (split out of Slide 5 so
+// neither needs to scroll)
+// ─────────────────────────────────────────────────────────────────────────────
+function Slide5B({ guidance }: { guidance: GuidanceData | null }) {
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 7 }}>
+
       {/* Lesson + Upcoming row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
         <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
@@ -828,7 +864,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
-const TAB_TO_SLIDE: Record<string, number> = { today: 0, previews: 1, wellness: 2, energy: 3, weekly: 4 }
+const TAB_TO_SLIDE: Record<string, number> = { today: 0, previews: 2, wellness: 3, energy: 5, weekly: 7 }
 
 function HomePageInner() {
   const searchParams = useSearchParams()
@@ -910,8 +946,11 @@ function HomePageInner() {
     },
     { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
     { id: 'wellness', label: 'Wellness', noScroll: true, content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
+    { id: 'flow',     label: 'Flow',     noScroll: true, content: <Slide3B /> },
     { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide4 topTasks={topTasks} /> },
+    { id: 'reset',    label: 'Reset',    noScroll: true, content: <Slide4B /> },
     { id: 'weekly',   label: 'Weekly',   noScroll: true, content: <Slide5 guidance={guidance} /> },
+    { id: 'parked',   label: 'Parked',   noScroll: true, content: <Slide5B guidance={guidance} /> },
   ]
 
   return (
