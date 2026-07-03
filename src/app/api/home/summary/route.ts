@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getTodayEvents } from '@/lib/calendar'
-import { getGmailTokens, listGmailMessages } from '@/lib/gmail'
+import { getGmailTokens, getGmailInboxCounts } from '@/lib/gmail'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -15,12 +15,11 @@ export async function GET() {
     // Today's calendar events
     getTodayEvents(),
 
-    // Recent emails (just enough for counts)
+    // Recent email counts (no per-message fetches — just resultSizeEstimate)
     (async () => {
       const tokens = await getGmailTokens()
       if (!tokens) return null
-      const messages = await listGmailMessages(tokens.access_token, 'in:inbox newer_than:3d', 50)
-      return messages
+      return getGmailInboxCounts(tokens.access_token)
     })(),
 
     // Top open tasks
@@ -39,11 +38,11 @@ export async function GET() {
   const todayEvents    = calendarEvents.filter(e => e.isToday)
 
   // Email
-  const emails     = emailResult.status === 'fulfilled' ? emailResult.value : null
-  const unreadCount    = emails?.filter(m => !m.isRead).length ?? null
-  const starredCount   = emails?.filter(m => m.isStarred).length ?? null
-  // Heuristic: messages from last 48h with no reply-to are likely needing reply
-  const needsReply     = emails?.filter(m => !m.isRead && !m.labels.includes('SENT')).length ?? null
+  const emailCounts = emailResult.status === 'fulfilled' ? emailResult.value : null
+  const unreadCount  = emailCounts?.unreadCount ?? null
+  const starredCount = emailCounts?.starredCount ?? null
+  // Unread inbox mail is a reasonable proxy for "needs a reply"
+  const needsReply   = unreadCount
 
   // Tasks
   const tasks = tasksResult.status === 'fulfilled' ? (tasksResult.value.data ?? []) : []
@@ -65,7 +64,6 @@ export async function GET() {
       unread:       unreadCount,
       starred:      starredCount,
       needsReply,
-      fetchedCount: emails?.length ?? 0,
     },
     tasks: {
       top:        tasks,

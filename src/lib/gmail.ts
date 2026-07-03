@@ -202,11 +202,29 @@ export interface GmailMessage {
   hasAttachment: boolean
 }
 
+// ─── Fast inbox counts (no per-message fetches) ───────────────────────────────
+// Gmail's search endpoint returns resultSizeEstimate directly, so counting
+// unread/starred messages doesn't require fetching each message individually.
+export async function getGmailInboxCounts(access_token: string, sinceQuery = 'newer_than:3d') {
+  const [unread, starred] = await Promise.all([
+    gmailFetch(access_token, `/messages?q=${encodeURIComponent(`in:inbox is:unread ${sinceQuery}`)}&maxResults=1`),
+    gmailFetch(access_token, `/messages?q=${encodeURIComponent(`in:inbox is:starred ${sinceQuery}`)}&maxResults=1`),
+  ])
+  return {
+    unreadCount:  unread.resultSizeEstimate ?? 0,
+    starredCount: starred.resultSizeEstimate ?? 0,
+  }
+}
+
 // ─── List messages ────────────────────────────────────────────────────────────
+// format 'full' fetches each message's complete body (needed to display an
+// inbox); 'metadata' skips the body and is much faster when callers only
+// need counts/flags (isRead, isStarred, labels).
 export async function listGmailMessages(
   access_token: string,
   query = 'in:inbox',
   maxResults = 30,
+  format: 'full' | 'metadata' = 'full',
 ): Promise<GmailMessage[]> {
   const list = await gmailFetch(access_token, `/messages?q=${encodeURIComponent(query)}&maxResults=${maxResults}`)
   if (!list.messages?.length) return []
@@ -214,7 +232,7 @@ export async function listGmailMessages(
   const messages = await Promise.all(
     list.messages.map(async (m: { id: string }) => {
       try {
-        const msg = await gmailFetch(access_token, `/messages/${m.id}?format=full`)
+        const msg = await gmailFetch(access_token, `/messages/${m.id}?format=${format}`)
         const headers: { name: string; value: string }[] = msg.payload?.headers ?? []
         const h = (name: string) => headers.find(hh => hh.name.toLowerCase() === name.toLowerCase())?.value ?? ''
         const from = parseEmailHeader(h('From'))

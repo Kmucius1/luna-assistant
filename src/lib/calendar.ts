@@ -94,7 +94,16 @@ function formatTime(dateStr: string, allDay: boolean): string {
   }).format(new Date(dateStr))
 }
 
+// Calendar reads fan out across every connected account and calendar on
+// every call — a short cache avoids repeating that whole fan-out on every
+// Home/dashboard load within the same warm instance.
+const EVENTS_CACHE_TTL_MS = 45_000
+const eventsCache = new Map<number, { events: CalendarEvent[]; expiresAt: number }>()
+
 export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]> {
+  const cached = eventsCache.get(daysAhead)
+  if (cached && cached.expiresAt > Date.now()) return cached.events
+
   const tokens = await getValidTokens()
   if (!tokens.length) return []
 
@@ -168,9 +177,12 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
   }))
 
   const seen = new Set<string>()
-  return allEvents
+  const result = allEvents
     .filter(e => { if (seen.has(e.id)) return false; seen.add(e.id); return true })
     .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+
+  eventsCache.set(daysAhead, { events: result, expiresAt: Date.now() + EVENTS_CACHE_TTL_MS })
+  return result
 }
 
 export async function getTodayEvents(): Promise<CalendarEvent[]> {
