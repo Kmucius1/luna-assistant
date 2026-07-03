@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 14 }}>☽</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '0.18em', color: 'white' }}>LUNA</span>

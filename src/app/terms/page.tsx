@@ -114,7 +114,7 @@ export default function TermsPage() {
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 7 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 12 }}>☽</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 14, letterSpacing: '0.16em', color: 'white' }}>LUNA</span>
@@ -134,10 +134,10 @@ export default function TermsPage() {
 
         {/* Summary card */}
         <div style={{
-          background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.25)',
+          background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.25)',
           borderRadius: 14, padding: '12px 14px', marginBottom: 20,
         }}>
-          <p style={{ fontSize: 12, color: 'rgba(196,169,232,0.85)', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.85)', lineHeight: 1.6, margin: 0 }}>
             By using LUNA, you agree to these terms. Tap each section below to read the details, then accept at the bottom.
           </p>
         </div>
@@ -170,10 +170,10 @@ export default function TermsPage() {
             width: '100%', padding: '14px', borderRadius: 16, border: 'none',
             background: accepted
               ? 'rgba(90,180,90,0.25)'
-              : 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
+              : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
             color: 'white', fontSize: 15, fontWeight: 700, cursor: accepted ? 'default' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            boxShadow: accepted ? 'none' : '0 4px 24px rgba(139,111,184,0.40)',
+            boxShadow: accepted ? 'none' : '0 4px 24px rgba(155,92,255,0.40)',
             transition: 'all 0.3s',
           }}
         >

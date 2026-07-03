@@ -25,7 +25,7 @@ const CRYSTALS = [
   { name: 'Labradorite',      color: '#4A6FA5', desc: 'Strengthens intuition and psychic awareness', use: 'Place on your desk when you need clear decision-making' },
   { name: 'Rose Quartz',      color: '#D4A0A0', desc: 'Heals the heart and invites self-compassion', use: 'Keep near when processing emotional weight or softening' },
   { name: 'Citrine',          color: '#C9A84C', desc: 'Activates abundance and creative confidence',  use: 'Carry when pitching, pricing, or building new income' },
-  { name: 'Amethyst',         color: '#8B6FB8', desc: 'Deepens intuition and spiritual connection',  use: 'Sleep with it nearby to enhance dream clarity' },
+  { name: 'Amethyst',         color: '#9b5cff', desc: 'Deepens intuition and spiritual connection',  use: 'Sleep with it nearby to enhance dream clarity' },
   { name: 'Selenite',         color: '#E8E4F0', desc: 'Clears and recharges your aura',              use: 'Wave over your body at end of day to clear absorbed energy' },
   { name: 'Obsidian',         color: '#1A1A1A', desc: 'Reveals shadow and transforms what is hidden', use: 'Meditate with when ready to face what needs to be seen' },
   { name: 'Moonstone',        color: '#C0C8D8', desc: 'Connects to Cancer Moon intuition and cycles', use: 'Wear or carry during moon phases and emotional transitions' },
@@ -384,7 +384,7 @@ export default function SpiritScreen() {
         <div className="px-6 pb-nav">
 
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,111,184,0.12)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(155,92,255,0.12)' }}>
               <Sparkles className="h-5 w-5" style={{ color: 'var(--violet)' }} />
             </div>
             <div>
@@ -403,7 +403,7 @@ export default function SpiritScreen() {
               <button key={t.value} onClick={() => setActiveTab(t.value)}
                 className="flex-none px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all"
                 style={{
-                  background: activeTab === t.value ? 'var(--violet)' : 'rgba(139,111,184,0.08)',
+                  background: activeTab === t.value ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
                   color:      activeTab === t.value ? 'white' : 'var(--mid)',
                 }}>
                 {t.label}
@@ -430,7 +430,7 @@ export default function SpiritScreen() {
                     </div>
                     <p className="text-xs" style={{ color: 'var(--text-2)' }}>{realMoon ? realMoon.phase.description : moon.desc}</p>
                     {realMoon?.phase.next_exact && (
-                      <p className="text-xs mt-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(139,111,184,0.06)', color: 'var(--violet)' }}>
+                      <p className="text-xs mt-1 px-2 py-1 rounded-lg" style={{ background: 'rgba(155,92,255,0.06)', color: 'var(--violet)' }}>
                         {realMoon.phase.next_exact.name}: {realMoon.phase.next_exact.time}
                       </p>
                     )}
@@ -446,7 +446,7 @@ export default function SpiritScreen() {
                         <p className="text-xs font-mono mt-0.5" style={{ color: 'var(--violet)' }}>{realMoon.sign.formatted}</p>
                         <p className="text-xs mt-0.5" style={{ color: 'var(--text-2)' }}>{realMoon.sign.keywords}</p>
                         {realMoon.next_ingress && (
-                          <p className="text-xs mt-1 px-2 py-1 rounded-lg italic" style={{ background: 'rgba(139,111,184,0.06)', color: 'var(--violet)' }}>→ {realMoon.next_ingress}</p>
+                          <p className="text-xs mt-1 px-2 py-1 rounded-lg italic" style={{ background: 'rgba(155,92,255,0.06)', color: 'var(--violet)' }}>→ {realMoon.next_ingress}</p>
                         )}
                       </div>
                     ) : (
@@ -457,7 +457,7 @@ export default function SpiritScreen() {
                     )}
                   </div>
                 </div>
-                <div className="mt-3 pt-2 border-t flex items-center justify-between" style={{ borderColor: 'rgba(139,111,184,0.08)' }}>
+                <div className="mt-3 pt-2 border-t flex items-center justify-between" style={{ borderColor: 'rgba(155,92,255,0.08)' }}>
                   <p className="text-xs" style={{ color: 'var(--text-4)' }}>
                     Live · astronomy-engine
                     {realMoon?.calculated_at && ` · ${new Date(realMoon.calculated_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}`}
@@ -487,7 +487,7 @@ export default function SpiritScreen() {
               {loadingGuidance ? (
                 <div className="text-center py-12">
                   <div className="w-12 h-12 rounded-full mx-auto mb-4 animate-breathe"
-                    style={{ background: 'radial-gradient(circle, rgba(139,111,184,0.3), transparent)' }} />
+                    style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.3), transparent)' }} />
                   <p className="text-sm" style={{ color: 'var(--text-3)' }}>Receiving spiritual guidance...</p>
                 </div>
               ) : guidance && (
@@ -496,12 +496,12 @@ export default function SpiritScreen() {
                     <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Energy today</p>
                     <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{guidance.energy_today}</p>
                     {guidance.chart_theme && (
-                      <p className="text-xs mt-3 px-3 py-2 rounded-xl italic" style={{ background: 'rgba(139,111,184,0.06)', color: 'var(--violet)' }}>{guidance.chart_theme}</p>
+                      <p className="text-xs mt-3 px-3 py-2 rounded-xl italic" style={{ background: 'rgba(155,92,255,0.06)', color: 'var(--violet)' }}>{guidance.chart_theme}</p>
                     )}
                   </GlassCard>
 
                   {guidance.quote && (
-                    <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.08), rgba(139,111,184,0.06))', border: '1px solid rgba(201,169,110,0.15)' }}>
+                    <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.08), rgba(155,92,255,0.06))', border: '1px solid rgba(201,169,110,0.15)' }}>
                       <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--golden)' }}>Quote</p>
                       <p className="font-display text-base italic leading-relaxed" style={{ color: 'var(--text-1)' }}>&ldquo;{guidance.quote}&rdquo;</p>
                     </div>
@@ -521,7 +521,7 @@ export default function SpiritScreen() {
                     </GlassCard>
                   )}
 
-                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Affirmation</p>
                     <p className="font-display text-lg italic leading-relaxed" style={{ color: 'var(--text-1)' }}>&ldquo;{guidance.affirmation}&rdquo;</p>
                   </div>
@@ -556,7 +556,7 @@ export default function SpiritScreen() {
                         <p className="text-xs" style={{ color: 'var(--text-2)' }}>{guidance.crystal_why || crystal.desc}</p>
                       </div>
                     </div>
-                    <p className="text-xs px-3 py-2 rounded-xl" style={{ background: 'rgba(139,111,184,0.06)', color: 'var(--text-2)' }}>{crystal.use}</p>
+                    <p className="text-xs px-3 py-2 rounded-xl" style={{ background: 'rgba(155,92,255,0.06)', color: 'var(--text-2)' }}>{crystal.use}</p>
                   </GlassCard>
 
                   {guidance.human_design_reminder && (
@@ -573,7 +573,7 @@ export default function SpiritScreen() {
 
                   <button onClick={() => loadGuidance(true)}
                     className="w-full py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
-                    style={{ background: 'rgba(139,111,184,0.08)', color: 'var(--violet)' }}>
+                    style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
                     <RefreshCw className="h-4 w-4" /> Refresh guidance
                   </button>
                 </>
@@ -595,7 +595,7 @@ export default function SpiritScreen() {
                         { v: `${tarotStats.accuracy_pct}%`, l: 'Resonant' },
                         { v: tarotStats.resonance_avg > 0 ? tarotStats.resonance_avg.toFixed(1) : '—', l: 'Avg score' },
                       ].map(s => (
-                        <div key={s.l} className="flex-1 rounded-2xl py-3" style={{ background: 'rgba(139,111,184,0.07)', border: '1px solid rgba(139,111,184,0.14)' }}>
+                        <div key={s.l} className="flex-1 rounded-2xl py-3" style={{ background: 'rgba(155,92,255,0.07)', border: '1px solid rgba(155,92,255,0.14)' }}>
                           <p className="text-lg font-bold" style={{ color: 'var(--violet)' }}>{s.v}</p>
                           <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{s.l}</p>
                         </div>
@@ -614,11 +614,11 @@ export default function SpiritScreen() {
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                             <span style={{ fontSize: 22 }}>{s.emoji}</span>
-                            {cnt > 0 && <span style={{ fontSize: 11, color: 'rgba(139,111,184,0.55)', fontWeight: 600 }}>{cnt}×</span>}
+                            {cnt > 0 && <span style={{ fontSize: 11, color: 'rgba(155,92,255,0.55)', fontWeight: 600 }}>{cnt}×</span>}
                           </div>
                           <p style={{ fontSize: 12, fontWeight: 700, color: 'white', marginBottom: 3 }}>{s.name}</p>
                           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', lineHeight: 1.4 }}>{s.description}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(139,111,184,0.6)', marginTop: 6, fontWeight: 600 }}>{s.count === 1 ? '1 card' : `${s.count} cards`}</p>
+                          <p style={{ fontSize: 11, color: 'rgba(155,92,255,0.6)', marginTop: 6, fontWeight: 600 }}>{s.count === 1 ? '1 card' : `${s.count} cards`}</p>
                         </button>
                       )
                     })}
@@ -629,7 +629,7 @@ export default function SpiritScreen() {
                     <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-4)' }}>Daily rune</p>
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'rgba(139,111,184,0.08)', border: '1.5px solid rgba(139,111,184,0.15)' }}>
+                        style={{ background: 'rgba(155,92,255,0.08)', border: '1.5px solid rgba(155,92,255,0.15)' }}>
                         <span className="text-xl font-bold" style={{ color: 'var(--violet)', fontFamily: 'serif' }}>{todayRune.symbol}</span>
                       </div>
                       <div>
@@ -681,9 +681,9 @@ export default function SpiritScreen() {
                     {drawnCards.slice(0, Math.min(drawnCards.length, 3)).map((card, i) => (
                       <button key={i} onClick={() => flipCard(i)} style={{
                         borderRadius: 16, cursor: flipped[i] ? 'default' : 'pointer',
-                        background: flipped[i] ? 'rgba(139,111,184,0.08)' : 'rgba(139,111,184,0.15)',
+                        background: flipped[i] ? 'rgba(155,92,255,0.08)' : 'rgba(155,92,255,0.15)',
                         padding: '16px 12px', textAlign: 'center',
-                        border: flipped[i] ? '1px solid rgba(139,111,184,0.2)' : '1px solid rgba(139,111,184,0.35)',
+                        border: flipped[i] ? '1px solid rgba(155,92,255,0.2)' : '1px solid rgba(155,92,255,0.35)',
                         transition: 'all 0.3s',
                       } as React.CSSProperties}>
                         {flipped[i] ? (
@@ -709,9 +709,9 @@ export default function SpiritScreen() {
                       {drawnCards.slice(3).map((card, i) => (
                         <button key={i+3} onClick={() => flipCard(i+3)} style={{
                           borderRadius: 16, cursor: flipped[i+3] ? 'default' : 'pointer',
-                          background: flipped[i+3] ? 'rgba(139,111,184,0.08)' : 'rgba(139,111,184,0.15)',
+                          background: flipped[i+3] ? 'rgba(155,92,255,0.08)' : 'rgba(155,92,255,0.15)',
                           padding: '16px 12px', textAlign: 'center',
-                          border: flipped[i+3] ? '1px solid rgba(139,111,184,0.2)' : '1px solid rgba(139,111,184,0.35)',
+                          border: flipped[i+3] ? '1px solid rgba(155,92,255,0.2)' : '1px solid rgba(155,92,255,0.35)',
                         } as React.CSSProperties}>
                           {flipped[i+3] ? (
                             <>
@@ -747,7 +747,7 @@ export default function SpiritScreen() {
                       />
                       <button onClick={getReading} style={{
                         width: '100%', padding: '14px', borderRadius: 18, border: 'none', cursor: 'pointer',
-                        background: 'linear-gradient(135deg, #8B6FB8, #5A3F88)', color: 'white', fontSize: 14, fontWeight: 700,
+                        background: 'linear-gradient(135deg, #9b5cff, #5A3F88)', color: 'white', fontSize: 14, fontWeight: 700,
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       }}>
                         <Sparkles className="h-4 w-4" /> Get my reading
@@ -769,7 +769,7 @@ export default function SpiritScreen() {
 
                   {tarotLoading && (
                     <div className="text-center py-12">
-                      <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'radial-gradient(circle, rgba(139,111,184,0.3), transparent)', animation: 'breathe 3s ease infinite' }} />
+                      <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.3), transparent)', animation: 'breathe 3s ease infinite' }} />
                       <p className="text-sm" style={{ color: 'var(--text-3)' }}>Reading your cards…</p>
                       <p className="text-xs mt-2" style={{ color: 'var(--text-4)' }}>Channeling your reading — this takes a moment</p>
                     </div>
@@ -778,14 +778,14 @@ export default function SpiritScreen() {
                   {!tarotLoading && tarotError && (
                     <div className="text-center py-8">
                       <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.4)' }}>Couldn&apos;t get a reading. Try again.</p>
-                      <button onClick={getReading} style={{ padding: '10px 20px', borderRadius: 14, background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.25)', color: 'var(--violet)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Retry</button>
+                      <button onClick={getReading} style={{ padding: '10px 20px', borderRadius: 14, background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.25)', color: 'var(--violet)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Retry</button>
                     </div>
                   )}
 
                   {!tarotLoading && tarotReading && (
                     <>
-                      <div className="rounded-2xl p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(139,111,184,0.12), rgba(90,63,136,0.1))', border: '1px solid rgba(139,111,184,0.25)' }}>
-                        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(196,169,232,0.7)' }}>{tarotReading.overall_theme}</p>
+                      <div className="rounded-2xl p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.12), rgba(90,63,136,0.1))', border: '1px solid rgba(155,92,255,0.25)' }}>
+                        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(185,139,255,0.7)' }}>{tarotReading.overall_theme}</p>
                         <p className="font-display text-lg italic" style={{ color: 'white' }}>&ldquo;{tarotReading.tagline}&rdquo;</p>
                         {tarotReading.time_note && (
                           <p className="text-xs mt-3 italic" style={{ color: 'rgba(255,255,255,0.35)' }}>{tarotReading.time_note}</p>
@@ -809,7 +809,7 @@ export default function SpiritScreen() {
                               </div>
                               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{cr.personal_reading}</p>
                               {cr.chart_connection && (
-                                <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.15)' }}>
+                                <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.15)' }}>
                                   <p className="text-xs leading-relaxed" style={{ color: 'var(--violet)' }}>✦ {cr.chart_connection}</p>
                                 </div>
                               )}
@@ -833,7 +833,7 @@ export default function SpiritScreen() {
                         </GlassCard>
                       )}
 
-                      <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                      <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                         <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>&ldquo;{tarotReading.affirmation}&rdquo;</p>
                       </div>
 
@@ -848,8 +848,8 @@ export default function SpiritScreen() {
                           ] as { v: 1|2|3; label: string; emoji: string }[]).map(opt => (
                             <button key={opt.v} onClick={() => rateResonance(opt.v)} style={{
                               flex: 1, padding: '10px 4px', borderRadius: 14,
-                              border: resonance === opt.v ? '1.5px solid rgba(139,111,184,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                              background: resonance === opt.v ? 'rgba(139,111,184,0.15)' : 'transparent',
+                              border: resonance === opt.v ? '1.5px solid rgba(155,92,255,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                              background: resonance === opt.v ? 'rgba(155,92,255,0.15)' : 'transparent',
                               cursor: 'pointer', fontSize: 11,
                               fontWeight: resonance === opt.v ? 700 : 400,
                               color: resonance === opt.v ? 'var(--violet)' : 'rgba(255,255,255,0.4)',
@@ -877,7 +877,7 @@ export default function SpiritScreen() {
             <div className="space-y-4 animate-fade-up">
 
               {/* HD header */}
-              <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(139,111,184,0.15), rgba(90,63,136,0.1))', border: '1px solid rgba(139,111,184,0.25)' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.15), rgba(90,63,136,0.1))', border: '1px solid rgba(155,92,255,0.25)' }}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>Your Design</p>
                 <p className="font-display text-xl font-semibold" style={{ color: 'var(--text-1)' }}>{HD_CHART.type}</p>
                 <p className="text-sm mt-0.5" style={{ color: 'var(--text-2)' }}>{HD_CHART.profile}</p>
@@ -900,7 +900,7 @@ export default function SpiritScreen() {
               {hdLoading ? (
                 <div className="text-center py-8">
                   <div className="w-10 h-10 rounded-full mx-auto mb-3 animate-breathe"
-                    style={{ background: 'radial-gradient(circle, rgba(139,111,184,0.3), transparent)' }} />
+                    style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.3), transparent)' }} />
                   <p className="text-sm" style={{ color: 'var(--text-3)' }}>Channeling your HD focus...</p>
                 </div>
               ) : hdGuidance ? (
@@ -925,14 +925,14 @@ export default function SpiritScreen() {
                     <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--golden)' }}>Speak this out loud</p>
                     <p className="text-sm italic" style={{ color: 'var(--text-1)' }}>{hdGuidance.voice_prompt}</p>
                   </GlassCard>
-                  <div className="rounded-2xl p-4 text-center" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                  <div className="rounded-2xl p-4 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                     <p className="font-display text-sm italic" style={{ color: 'var(--text-1)' }}>&ldquo;{hdGuidance.affirmation}&rdquo;</p>
                   </div>
                 </div>
               ) : (
                 <button onClick={loadHdGuidance}
                   className="w-full py-3 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
-                  style={{ background: 'rgba(139,111,184,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
                   <Sparkles className="h-4 w-4" /> Load today&apos;s HD guidance
                 </button>
               )}
@@ -980,7 +980,7 @@ export default function SpiritScreen() {
                   {HD_REMINDERS.map((note, i) => (
                     <GlassCard key={i}>
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(139,111,184,0.1)' }}>
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(155,92,255,0.1)' }}>
                           <Star className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                         </div>
                         <div>
@@ -1023,7 +1023,7 @@ export default function SpiritScreen() {
                       <div className="flex items-center gap-2">
                         <p className="font-semibold" style={{ color: 'var(--text-1)' }}>{c.name}</p>
                         {c.name === crystal.name && (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(139,111,184,0.15)', color: 'var(--violet)' }}>Today</span>
+                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)' }}>Today</span>
                         )}
                       </div>
                       <p className="text-sm mt-0.5" style={{ color: 'var(--text-2)' }}>{c.desc}</p>
@@ -1040,7 +1040,7 @@ export default function SpiritScreen() {
             <div className="space-y-4 animate-fade-up">
 
               {/* Moon phase ritual */}
-              <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(139,111,184,0.1), rgba(90,63,136,0.06))', border: '1px solid rgba(139,111,184,0.2)' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.1), rgba(90,63,136,0.06))', border: '1px solid rgba(155,92,255,0.2)' }}>
                 <div className="flex items-center gap-2 mb-1">
                   <Moon className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>
@@ -1053,7 +1053,7 @@ export default function SpiritScreen() {
                   {moonRitual.steps.map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                        style={{ background: 'rgba(139,111,184,0.2)', color: 'var(--violet)' }}>{i + 1}</div>
+                        style={{ background: 'rgba(155,92,255,0.2)', color: 'var(--violet)' }}>{i + 1}</div>
                       <p className="text-sm leading-relaxed pt-0.5" style={{ color: 'var(--text-1)' }}>{step}</p>
                     </div>
                   ))}
@@ -1096,7 +1096,7 @@ export default function SpiritScreen() {
                   ].map(item => (
                     <div key={item.step} className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                        style={{ background: 'rgba(139,111,184,0.15)', color: 'var(--violet)' }}>{item.step}</div>
+                        style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)' }}>{item.step}</div>
                       <div>
                         <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{item.title}</p>
                         <p className="text-xs mt-0.5 leading-relaxed" style={{ color: 'var(--text-3)' }}>{item.desc}</p>
@@ -1126,7 +1126,7 @@ export default function SpiritScreen() {
               {/* Dream log */}
               <button onClick={() => { window.location.href = '/dictation' }}
                 className="w-full rounded-2xl p-4 flex items-center justify-between"
-                style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                 <div className="flex items-center gap-3">
                   <Moon className="h-5 w-5" style={{ color: 'var(--violet)' }} />
                   <div className="text-left">

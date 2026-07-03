@@ -27,7 +27,7 @@ function dueDateLabel(dateStr?: string): { label: string; color: string; urgent:
 const PO: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
 const sortPriority = (a: DryphubTask, b: DryphubTask) => (PO[a.priority ?? 'low'] ?? 3) - (PO[b.priority ?? 'low'] ?? 3)
 const PRIORITY_COLORS: Record<string, string> = {
-  critical: '#E05E5E', high: '#E08B4A', medium: '#8B6FB8', low: 'rgba(255,255,255,0.15)',
+  critical: '#E05E5E', high: '#E08B4A', medium: '#9b5cff', low: 'rgba(255,255,255,0.15)',
 }
 
 // ─── Shared styles ────────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ const G: React.CSSProperties = {
 }
 const LBL: React.CSSProperties = {
   fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: '#9b5cff',
   display: 'flex', alignItems: 'center', gap: 5,
   marginBottom: 8, flexShrink: 0,
 }
@@ -58,8 +58,8 @@ function TaskRow({ task, done, onToggle }: { task: DryphubTask; done: boolean; o
       <button onClick={onToggle} style={{
         width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: done ? '#8B6FB8' : 'transparent',
-        border: done ? 'none' : '1.5px solid rgba(139,111,184,0.3)',
+        background: done ? '#9b5cff' : 'transparent',
+        border: done ? 'none' : '1.5px solid rgba(155,92,255,0.3)',
         cursor: 'pointer',
       }}>
         {done && <Check style={{ width: 12, height: 12, color: 'white' }} />}
@@ -132,8 +132,8 @@ function Slide1({
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.16)', border: '1px solid rgba(139,111,184,0.28)' }}>
-            <Briefcase style={{ width: 18, height: 18, color: '#C4A9E8' }} strokeWidth={1.6} />
+          <div style={{ width: 38, height: 38, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.16)', border: '1px solid rgba(155,92,255,0.28)' }}>
+            <Briefcase style={{ width: 18, height: 18, color: '#b98bff' }} strokeWidth={1.6} />
           </div>
           <div>
             <p style={{ fontSize: 20, fontWeight: 800, color: 'white', lineHeight: 1.1, margin: 0 }}>Work</p>
@@ -167,7 +167,7 @@ function Slide1({
       <div style={{ ...G, borderRadius: 22, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
           <div style={LBL}><Zap style={{ width: 9, height: 9 }} />Needs attention</div>
-          <Link href="/tasks" style={{ fontSize: 10.5, color: '#8B6FB8', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
+          <Link href="/tasks" style={{ fontSize: 10.5, color: '#9b5cff', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
         </div>
         {error && !loading ? (
           <div style={{ padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
@@ -176,7 +176,7 @@ function Slide1({
           </div>
         ) : loading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Loader2 style={{ width: 22, height: 22, color: 'rgba(139,111,184,0.45)' }} className="animate-spin" />
+            <Loader2 style={{ width: 22, height: 22, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
           </div>
         ) : urgentTasks.length > 0 ? (
           <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
@@ -253,14 +253,14 @@ function Slide2({
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
         <div style={{ flex: 1, display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none' }}>
           {FILTERS.map(f => (
-            <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: '6px 12px', borderRadius: 20, border: `1px solid ${filter === f.id ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: filter === f.id ? 'rgba(139,111,184,0.18)' : 'rgba(255,255,255,0.03)', color: filter === f.id ? '#C4A9E8' : 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: '6px 12px', borderRadius: 20, border: `1px solid ${filter === f.id ? 'rgba(155,92,255,0.45)' : 'rgba(255,255,255,0.08)'}`, background: filter === f.id ? 'rgba(155,92,255,0.18)' : 'rgba(255,255,255,0.03)', color: filter === f.id ? '#b98bff' : 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
               {f.label}
             </button>
           ))}
         </div>
         <Link href="/tasks?new=1" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(139,111,184,0.18)', border: '1px solid rgba(139,111,184,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Plus style={{ width: 16, height: 16, color: '#C4A9E8' }} strokeWidth={2} />
+          <div style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(155,92,255,0.18)', border: '1px solid rgba(155,92,255,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Plus style={{ width: 16, height: 16, color: '#b98bff' }} strokeWidth={2} />
           </div>
         </Link>
       </div>
@@ -309,7 +309,7 @@ function Slide3() {
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
       {/* Header */}
-      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(139,111,184,0.20)' }}>
+      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(155,92,255,0.20)' }}>
         <div style={LBL}><Users style={{ width: 9, height: 9 }} />DRYP Digital · CRM</div>
         <p style={{ fontSize: 16, fontWeight: 800, color: 'white', margin: '0 0 3px' }}>Clients & Outreach</p>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.42)', margin: 0 }}>Your agency work, campaigns, and client relationships.</p>
@@ -317,7 +317,7 @@ function Slide3() {
 
       {/* Primary CRM apps — 2×2 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, flexShrink: 0 }}>
-        <AppBtn icon={Building2}   label="DRYP Hub"   href="https://dryphub.com"             color="#C4A9E8" desc="CRM dashboard"    external />
+        <AppBtn icon={Building2}   label="DRYP Hub"   href="https://dryphub.com"             color="#b98bff" desc="CRM dashboard"    external />
         <AppBtn icon={Users}       label="Clients"    href="/dryp-hub"                       color="#A890D0" desc="Account list"              />
         <AppBtn icon={Zap}         label="Outreach"   href="https://dryphub.com/outreach"    color="#9070B0" desc="Contact pipeline" external />
         <AppBtn icon={BarChart2}   label="Reports"    href="https://dryphub.com"             color="#7050A0" desc="Performance"      external />
@@ -330,8 +330,8 @@ function Slide3() {
           {[
             { icon: Mail,         label: 'Email',      desc: 'Gmail inbox',         href: '/email',      color: '#A8C4DA' },
             { icon: Calendar,     label: 'Calendar',   desc: "Today's events",      href: '/calendar',   color: '#8AAEC8' },
-            { icon: CheckSquare,  label: 'Tasks',      desc: 'Open task list',      href: '/tasks',      color: '#C4A9E8' },
-            { icon: Target,       label: 'Work Overview', desc: 'Dashboard',         href: '/work',       color: '#8B6FB8' },
+            { icon: CheckSquare,  label: 'Tasks',      desc: 'Open task list',      href: '/tasks',      color: '#b98bff' },
+            { icon: Target,       label: 'Work Overview', desc: 'Dashboard',         href: '/work',       color: '#9b5cff' },
           ].map(({ icon: Icon, label, desc, href, color }) => (
             <Link key={label} href={href} style={{ textDecoration: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -450,7 +450,7 @@ export default function WorkPage() {
 
   return (
     <AppLayout noScroll>
-      <CategoryPager pages={pages} accentColor="#8B6FB8" hidePills />
+      <CategoryPager pages={pages} accentColor="#9b5cff" hidePills />
     </AppLayout>
   )
 }

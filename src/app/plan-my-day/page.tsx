@@ -17,7 +17,7 @@ const TYPE_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
   work:     { bg: 'rgba(90,138,164,0.10)',  color: '#7BAEC8',  dot: '#7BAEC8' },
   break:    { bg: 'rgba(90,138,90,0.10)',   color: '#8AB88A',  dot: '#8AB88A' },
   personal: { bg: 'rgba(200,120,160,0.10)', color: '#DC82AA',  dot: '#DC82AA' },
-  evening:  { bg: 'rgba(139,111,184,0.10)', color: '#8B6FB8',  dot: '#8B6FB8' },
+  evening:  { bg: 'rgba(155,92,255,0.10)', color: '#9b5cff',  dot: '#9b5cff' },
   night:    { bg: 'rgba(80,60,120,0.12)',   color: '#A090D0',  dot: '#A090D0' },
   commute:  { bg: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', dot: 'rgba(255,255,255,0.3)' },
 }
@@ -90,13 +90,13 @@ export default function PlanMyDayPage() {
         <div style={{ padding: '0 0 180px' }}>
 
           {/* Header */}
-          <div style={{ background: 'linear-gradient(160deg, rgba(139,111,184,0.18) 0%, rgba(90,63,136,0.1) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
+          <div style={{ background: 'linear-gradient(160deg, rgba(155,92,255,0.18) 0%, rgba(90,63,136,0.1) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
             <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock className="h-5 w-5" style={{ color: '#8B6FB8' }} />
+              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock className="h-5 w-5" style={{ color: '#9b5cff' }} />
               </div>
               <div>
                 <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white' }}>Plan My Day</h1>
@@ -140,9 +140,9 @@ export default function PlanMyDayPage() {
                       <button key={opt.v} onClick={() => setLocation(opt.v)} style={{
                         flex: 1, padding: '11px 8px', borderRadius: 16, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                        background: location === opt.v ? 'rgba(139,111,184,0.15)' : 'rgba(255,255,255,0.04)',
-                        border: location === opt.v ? '1.5px solid rgba(139,111,184,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                        color: location === opt.v ? '#8B6FB8' : 'rgba(255,255,255,0.4)',
+                        background: location === opt.v ? 'rgba(155,92,255,0.15)' : 'rgba(255,255,255,0.04)',
+                        border: location === opt.v ? '1.5px solid rgba(155,92,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
+                        color: location === opt.v ? '#9b5cff' : 'rgba(255,255,255,0.4)',
                       }}>{opt.icon}{opt.label}</button>
                     ))}
                   </div>
@@ -194,10 +194,10 @@ export default function PlanMyDayPage() {
 
                 <button onClick={generate} style={{
                   width: '100%', padding: '16px 0', borderRadius: 20, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #8B6FB8, #5A3F88)',
+                  background: 'linear-gradient(135deg, #9b5cff, #5A3F88)',
                   color: 'white', fontSize: 15, fontWeight: 700,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: '0 6px 24px rgba(139,111,184,0.35)',
+                  boxShadow: '0 6px 24px rgba(155,92,255,0.35)',
                 }}>
                   <Sparkles className="h-5 w-5" /> Build my full day
                 </button>
@@ -207,8 +207,8 @@ export default function PlanMyDayPage() {
             {/* Loading */}
             {loading && (
               <div style={{ ...GLASS, padding: 32, textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <RefreshCw className="h-6 w-6 animate-spin" style={{ color: '#8B6FB8' }} />
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <RefreshCw className="h-6 w-6 animate-spin" style={{ color: '#9b5cff' }} />
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, color: 'white', marginBottom: 6 }}>Building your full day…</p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Pulling your DRYP tasks and mapping your schedule</p>
@@ -229,11 +229,11 @@ export default function PlanMyDayPage() {
 
                 {/* LUNA message */}
                 {plan.ai_message && (
-                  <div style={{ ...GLASS, padding: 18, background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.2)' }}>
+                  <div style={{ ...GLASS, padding: 18, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)' }}>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>🌙</span>
                       <div>
-                        <p style={{ fontSize: 11, fontWeight: 700, color: '#8B6FB8', marginBottom: 4 }}>LUNA</p>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: '#9b5cff', marginBottom: 4 }}>LUNA</p>
                         <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.65 }}>{plan.ai_message}</p>
                         {plan.day_energy && (
                           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 6, fontStyle: 'italic' }}>{plan.day_energy}</p>
@@ -252,7 +252,7 @@ export default function PlanMyDayPage() {
                         { label: 'Wake up',     time: anchors.wake,       emoji: '☀️', color: '#C9A96E' },
                         { label: 'Start work',  time: anchors.at_work,    emoji: '💻', color: '#7BAEC8' },
                         { label: 'Lunch',       time: anchors.lunch,      emoji: '🍽️', color: '#8AB88A' },
-                        { label: 'Leave work',  time: anchors.leave_work, emoji: '🏁', color: '#8B6FB8' },
+                        { label: 'Leave work',  time: anchors.leave_work, emoji: '🏁', color: '#9b5cff' },
                         { label: 'Wind down',   time: anchors.wind_down,  emoji: '🌙', color: '#A090D0' },
                         { label: 'Lights out',  time: anchors.lights_out, emoji: '💤', color: 'rgba(255,255,255,0.35)' },
                         ...(anchors.out_door ? [{ label: 'Out the door', time: anchors.out_door, emoji: '🚗', color: '#DC82AA' }] : []),
@@ -307,7 +307,7 @@ export default function PlanMyDayPage() {
 
                 {/* Regenerate + reset */}
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={generate} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(139,111,184,0.25)', cursor: 'pointer', background: 'rgba(139,111,184,0.08)', color: '#8B6FB8', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <button onClick={generate} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(155,92,255,0.25)', cursor: 'pointer', background: 'rgba(155,92,255,0.08)', color: '#9b5cff', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <RefreshCw className="h-3.5 w-3.5" /> Regenerate
                   </button>
                   <button onClick={() => { setPlan(null); setError('') }} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(255,255,255,0.09)', cursor: 'pointer', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600 }}>

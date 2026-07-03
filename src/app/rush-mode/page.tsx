@@ -55,7 +55,7 @@ export default function RushModeScreen() {
               <span>Progress</span>
               <span>{pct}%</span>
             </div>
-            <div className="h-2 rounded-full w-full" style={{ background: 'rgba(139,111,184,0.1)' }}>
+            <div className="h-2 rounded-full w-full" style={{ background: 'rgba(155,92,255,0.1)' }}>
               <div
                 className="h-2 rounded-full transition-all duration-500"
                 style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet), var(--golden))' }}

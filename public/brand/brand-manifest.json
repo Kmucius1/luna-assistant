@@ -1,34 +1,39 @@
 {
-  "brand": "LUNA",
-  "primary_dock": [
+  "name": "LUNA Final Moonlit CarPlay Theme",
+  "version": "1.0.0",
+  "lockedDock": [
     "Home",
     "Work",
     "LUNA",
     "Astrology",
     "Explore"
   ],
-  "colors": {
-    "deep_navy": "#050413",
-    "moon_purple": "#7C4DFF",
-    "soft_lavender": "#B99CFF",
-    "pearl": "#F5F0FF",
-    "glass": "rgba(255,255,255,0.045)"
+  "mustUse": {
+    "reference": "/brand/references/final-luna-desktop-reference.png",
+    "css": "/theme/luna-final-theme.css",
+    "desktopBackground": "/brand/backgrounds/luna-moon-background-desktop.png",
+    "tabletBackground": "/brand/backgrounds/luna-moon-background-tablet.png",
+    "mobileBackground": "/brand/backgrounds/luna-moon-background-mobile.png",
+    "heroDesktop": "/brand/backgrounds/luna-hero-background-desktop.png",
+    "heroMobile": "/brand/backgrounds/luna-hero-background-mobile.png",
+    "wordmark": "/brand/logos/luna-wordmark.svg",
+    "mark": "/brand/logos/luna-app-mark.svg"
   },
-  "assets": {
-    "logos": [
-      "public/brand/logos/luna-logo.svg",
-      "public/brand/logos/luna-mark.svg",
-      "public/brand/logos/luna-logo-wordmark.png",
-      "public/brand/logos/app-icon-1024.png"
-    ],
-    "backgrounds": [
-      "public/brand/backgrounds/moon-ocean-mobile.png",
-      "public/brand/backgrounds/moon-ocean-tablet.png",
-      "public/brand/backgrounds/moon-ocean-desktop.png",
-      "public/brand/backgrounds/hero-moon-card-mobile.png",
-      "public/brand/backgrounds/hero-moon-card-desktop.png"
-    ],
-    "icons": "public/brand/icons/*.svg",
-    "ui_images": "public/brand/ui/*.png"
-  }
+  "colors": {
+    "lunaBg": "#03040d",
+    "lunaBg2": "#07071a",
+    "lunaPurple": "#9b5cff",
+    "lunaPurple2": "#b98bff",
+    "lunaText": "#f4efff",
+    "lunaMuted": "rgba(244,239,255,0.68)",
+    "lunaGreen": "#33d17a"
+  },
+  "rules": [
+    "One visual theme across all pages.",
+    "No white/corporate/CRM styles.",
+    "All pages use the same AppShell, TopBar, Dock, PageContainer, Card system.",
+    "No second dock.",
+    "Desktop/tablet uses Apple CarPlay style cards with large rounded widgets.",
+    "Mobile uses swipe pages, not long vertical dashboards."
+  ]
 }

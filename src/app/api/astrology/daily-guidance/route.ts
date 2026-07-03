@@ -1,6 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, ZOE_NATAL, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { createClient } from '@/lib/supabase/server'
+
+const ZOE_USER_ID = '98f5b277-bb63-41d5-89ec-0edadc1e2858'
+
+async function resolveUserId(): Promise<string> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.id) return user.id
+  } catch { /* fall through */ }
+  return ZOE_USER_ID
+}
 
 // ─── Transit-based fallback (works with no AI credits) ────────────────────────
 const SIGN_BODY: Record<string, string> = {
@@ -51,9 +64,6 @@ function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dat
   }
 }
 
-// ─── Cache (per calendar day, 1-hour TTL) ────────────────────────────────────
-const cache = new Map<string, { data: DailyGuidance; ts: number }>()
-
 export interface DailyGuidance {
   horoscope:       string
   energy:          string
@@ -87,13 +97,7 @@ export async function GET(req: NextRequest) {
       ? localDate.replace(/[^a-zA-Z0-9]/g, '_')
       : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
 
-    // Serve from cache unless refresh requested or TTL expired (1 hr)
-    if (!refresh) {
-      const hit = cache.get(dateKey)
-      if (hit && Date.now() - hit.ts < 60 * 60 * 1000) {
-        return NextResponse.json(hit.data)
-      }
-    }
+    const userId = await resolveUserId()
 
     // ── Build astronomical context ──────────────────────────────────────────
     const planets  = getCurrentPlanets(now)
@@ -166,34 +170,38 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
   "affirmation": "One powerful affirmation written in first person, specific to today's energy. Not generic — written as if she is declaring it from her Scorpio Sun depth."
 }`
 
-    // ── Call AI ─────────────────────────────────────────────────────────────
-    let guidance: DailyGuidance
-    try {
-    const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice. Never use textbook astrology jargon in descriptions — if you use a term (like "trine" or "retrograde"), it is only as a label/title, never as the explanation. Speak as if you deeply know this woman. Be specific, be real, be encouraging but honest. Make every word feel personally written for Zoe, not for a generic reader. Return ONLY valid JSON — no markdown fences, no prose outside the JSON.'
+    // ── Generate (or serve from the real Supabase daily cache) ──────────────
+    const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
+      userId,
+      generationType: 'daily_guidance',
+      timezone: clientTz,
+      dateKey,
+      forceRegenerate: refresh,
+      generate: async () => {
+        try {
+          const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice. Never use textbook astrology jargon in descriptions — if you use a term (like "trine" or "retrograde"), it is only as a label/title, never as the explanation. Speak as if you deeply know this woman. Be specific, be real, be encouraging but honest. Make every word feel personally written for Zoe, not for a generic reader. Return ONLY valid JSON — no markdown fences, no prose outside the JSON.'
 
-    const rawText = await callAI(SYSTEM, userPrompt, 2000)
-    const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+          const rawText = await callAI(SYSTEM, userPrompt, 2000)
+          const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+          const parsed = JSON.parse(jsonText) as DailyGuidance
 
-    guidance = JSON.parse(jsonText) as DailyGuidance
-
-    // Validate that required fields exist
-    const required: (keyof DailyGuidance)[] = [
-      'horoscope','energy','do_today','dont_today','career','love',
-      'sex','money','friendship','family','self_reflection','main_focus',
-      'highest_self','affirmation',
-    ]
-    for (const field of required) {
-      if (guidance[field] === undefined) {
-        throw new Error(`Missing field in Claude response: ${field}`)
-      }
-    }
-    } catch {
-      // AI unavailable — use transit-based fallback (always accurate, no AI needed)
-      guidance = buildFallback(planets, transits, dateStr, timeStr)
-    }
-
-    // Store in cache
-    cache.set(dateKey, { data: guidance, ts: Date.now() })
+          const required: (keyof DailyGuidance)[] = [
+            'horoscope','energy','do_today','dont_today','career','love',
+            'sex','money','friendship','family','self_reflection','main_focus',
+            'highest_self','affirmation',
+          ]
+          for (const field of required) {
+            if (parsed[field] === undefined) {
+              throw new Error(`Missing field in AI response: ${field}`)
+            }
+          }
+          return { payload: parsed, source: 'ai' as const }
+        } catch {
+          // AI unavailable — use transit-based fallback (always accurate, no AI needed)
+          return { payload: buildFallback(planets, transits, dateStr, timeStr), source: 'fallback' as const }
+        }
+      },
+    })
 
     return NextResponse.json(guidance)
   } catch (err) {

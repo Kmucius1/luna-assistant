@@ -61,11 +61,11 @@ function ReplyCard({ label, text, highlight, onEdit }: {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <div style={{ ...GLASS, padding: '16px', background: highlight ? 'rgba(139,111,184,0.12)' : 'rgba(255,255,255,0.06)', border: `1.5px solid ${highlight ? 'rgba(139,111,184,0.3)' : 'rgba(255,255,255,0.1)'}` }}>
+    <div style={{ ...GLASS, padding: '16px', background: highlight ? 'rgba(155,92,255,0.12)' : 'rgba(255,255,255,0.06)', border: `1.5px solid ${highlight ? 'rgba(155,92,255,0.3)' : 'rgba(255,255,255,0.1)'}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
         <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? '#C4A8E8' : 'rgba(255,255,255,0.45)' }}>{label}</p>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => onEdit(text)} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: 'rgba(139,111,184,0.15)', color: '#C4A8E8', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+          <button onClick={() => onEdit(text)} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: 'rgba(155,92,255,0.15)', color: '#C4A8E8', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
             Edit & Use
           </button>
           <button onClick={copy} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>
@@ -104,16 +104,16 @@ function ProgressBar({ step, sender, relationship, activated }: {
             <div key={s.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
               {/* Connector line before */}
               {i > 0 && (
-                <div style={{ flex: 1, height: 2, background: done || current ? 'rgba(139,111,184,0.7)' : 'rgba(255,255,255,0.1)', transition: 'background 0.3s ease' }} />
+                <div style={{ flex: 1, height: 2, background: done || current ? 'rgba(155,92,255,0.7)' : 'rgba(255,255,255,0.1)', transition: 'background 0.3s ease' }} />
               )}
               {/* Step dot */}
               <div style={{
                 width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: done ? 'rgba(139,111,184,0.9)' : current ? 'rgba(139,111,184,0.15)' : 'rgba(255,255,255,0.07)',
-                border: done ? '2px solid #8B6FB8' : current ? '2px solid rgba(139,111,184,0.8)' : '2px solid rgba(255,255,255,0.12)',
+                background: done ? 'rgba(155,92,255,0.9)' : current ? 'rgba(155,92,255,0.15)' : 'rgba(255,255,255,0.07)',
+                border: done ? '2px solid #9b5cff' : current ? '2px solid rgba(155,92,255,0.8)' : '2px solid rgba(255,255,255,0.12)',
                 transition: 'all 0.3s ease',
-                boxShadow: current ? '0 0 12px rgba(139,111,184,0.35)' : undefined,
+                boxShadow: current ? '0 0 12px rgba(155,92,255,0.35)' : undefined,
               }}>
                 {done ? (
                   <Check style={{ width: 13, height: 13, color: 'white' }} />
@@ -135,7 +135,7 @@ function ProgressBar({ step, sender, relationship, activated }: {
         {answers.map((ans, i) => {
           if (!ans || i >= step - 1) return null
           return (
-            <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.25)', color: '#C4A8E8' }}>
+            <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', color: '#C4A8E8' }}>
               {ans}
             </span>
           )
@@ -267,9 +267,9 @@ export default function CommunicationCoach() {
                       <button key={r.label} onClick={() => setRelationship(relationship === r.label ? '' : r.label)}
                         style={{
                           padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
-                          background: relationship === r.label ? 'rgba(139,111,184,0.85)' : 'rgba(255,255,255,0.07)',
+                          background: relationship === r.label ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
                           color: relationship === r.label ? 'white' : 'rgba(255,255,255,0.72)',
-                          outline: relationship === r.label ? '1.5px solid rgba(139,111,184,0.7)' : '1px solid rgba(255,255,255,0.1)',
+                          outline: relationship === r.label ? '1.5px solid rgba(155,92,255,0.7)' : '1px solid rgba(255,255,255,0.1)',
                           transition: 'all 0.15s ease',
                         }}>
                         {r.label}
@@ -327,14 +327,14 @@ export default function CommunicationCoach() {
                   <button
                     onClick={next}
                     disabled={step === 1 && !sender.trim()}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: step === 1 && !sender.trim() ? 0.45 : 1, boxShadow: '0 4px 20px rgba(139,111,184,0.3)', transition: 'opacity 0.2s ease' }}>
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: step === 1 && !sender.trim() ? 0.45 : 1, boxShadow: '0 4px 20px rgba(155,92,255,0.3)', transition: 'opacity 0.2s ease' }}>
                     Continue <ArrowRight style={{ width: 16, height: 16 }} />
                   </button>
                 ) : (
                   <button
                     onClick={analyze}
                     disabled={!message.trim() || loading}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: !message.trim() || loading ? 0.45 : 1, boxShadow: '0 4px 20px rgba(139,111,184,0.3)', transition: 'opacity 0.2s ease' }}>
+                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: !message.trim() || loading ? 0.45 : 1, boxShadow: '0 4px 20px rgba(155,92,255,0.3)', transition: 'opacity 0.2s ease' }}>
                     <Sparkles style={{ width: 16, height: 16 }} />
                     {loading ? 'Reading between the lines…' : 'Help me respond from wisdom'}
                   </button>
@@ -348,7 +348,7 @@ export default function CommunicationCoach() {
               {/* Answer recap chips */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
                 {[sender, relationship, `${activatedInfo.emoji} ${activatedInfo.label}`].filter(Boolean).map((v, i) => (
-                  <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(139,111,184,0.15)', border: '1px solid rgba(139,111,184,0.25)', color: '#C4A8E8' }}>{v}</span>
+                  <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', color: '#C4A8E8' }}>{v}</span>
                 ))}
               </div>
 
@@ -377,7 +377,7 @@ export default function CommunicationCoach() {
                   <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C4A8E8', marginBottom: 8 }}>What they actually mean</p>
                   <p style={{ fontSize: 14, lineHeight: 1.65, color: 'rgba(255,255,255,0.85)' }}>{result.what_they_mean}</p>
                   {result.emotional_tone && (
-                    <span style={{ display: 'inline-block', marginTop: 8, fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(139,111,184,0.12)', color: '#C4A8E8', textTransform: 'capitalize' }}>{result.emotional_tone}</span>
+                    <span style={{ display: 'inline-block', marginTop: 8, fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(155,92,255,0.12)', color: '#C4A8E8', textTransform: 'capitalize' }}>{result.emotional_tone}</span>
                   )}
                 </div>
               )}

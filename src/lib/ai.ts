@@ -1,4 +1,5 @@
 import Groq from 'groq-sdk'
+import { AI_MODEL } from './ai/config'
 
 let _groq: Groq | null = null
 function getGroq() {
@@ -547,7 +548,7 @@ export async function callAI(systemPrompt: string, userMessage: string, maxToken
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       const completion = await groq.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
+        model: AI_MODEL,
         max_tokens: maxTokens,
         messages: [
           { role: 'system', content: systemPrompt },

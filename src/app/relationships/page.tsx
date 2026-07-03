@@ -45,7 +45,7 @@ const PEOPLE: Person[] = [
     lastContact: 'Today',
     health: 'strong',
     note: "Can't wait to see the deck!",
-    color: '#8B6FB8',
+    color: '#9b5cff',
   },
   {
     id: '3',
@@ -109,7 +109,7 @@ const PEOPLE: Person[] = [
 
 const HEALTH_COLORS: Record<string, string> = {
   strong:  '#5A9E5A',
-  good:    '#8B6FB8',
+  good:    '#9b5cff',
   nurture: '#C9A96E',
   overdue: '#B85A5A',
 }
@@ -138,7 +138,7 @@ const AI_PROMPTS = [
 
 function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }) {
   const cardBg    = dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.8)'
-  const cardBorder = dark ? 'rgba(255,255,255,0.07)' : 'rgba(139,111,184,0.1)'
+  const cardBorder = dark ? 'rgba(255,255,255,0.07)' : 'rgba(155,92,255,0.1)'
   const nameColor = dark ? 'rgba(255,255,255,0.9)' : 'var(--depth)'
   const subColor  = dark ? 'rgba(255,255,255,0.45)' : 'var(--mid)'
   const noteColor = dark ? 'rgba(255,255,255,0.35)' : 'var(--mist)'
@@ -181,7 +181,7 @@ function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }
           <Link href="/messages">
             <button className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-lg transition-all"
               style={{
-                background: dark ? 'rgba(139,111,184,0.12)' : 'rgba(139,111,184,0.08)',
+                background: dark ? 'rgba(155,92,255,0.12)' : 'rgba(155,92,255,0.08)',
                 color: '#A98FD8',
               }}>
               <MessageCircle className="h-3 w-3" />
@@ -253,7 +253,7 @@ export default function RelationshipsPage() {
                   style={{
                     background: filter === f.key ? 'var(--violet)' : 'rgba(255,255,255,0.8)',
                     color: filter === f.key ? 'white' : 'var(--mid)',
-                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(139,111,184,0.12)'}`,
+                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(155,92,255,0.12)'}`,
                   }}>
                   {f.label}
                 </button>
@@ -269,13 +269,13 @@ export default function RelationshipsPage() {
 
             {/* Add person */}
             <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium"
-              style={{ background: 'var(--surface)', border: '1.5px dashed rgba(139,111,184,0.3)', color: 'var(--violet)' }}>
+              style={{ background: 'var(--surface)', border: '1.5px dashed rgba(155,92,255,0.3)', color: 'var(--violet)' }}>
               <Plus className="h-4 w-4" />
               Add someone
             </button>
 
             {/* AI Coach */}
-            <div className="rounded-2xl p-4" style={{ background: 'var(--surface-strong)', border: '1px solid rgba(139,111,184,0.12)' }}>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--surface-strong)', border: '1px solid rgba(155,92,255,0.12)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                 <p className="text-sm font-bold" style={{ color: 'var(--text-1)' }}>Relationship Coach</p>
@@ -287,7 +287,7 @@ export default function RelationshipsPage() {
                 {AI_PROMPTS.map(p => (
                   <button key={p} onClick={() => setAiInput(p)}
                     className="text-xs px-3 py-1.5 rounded-xl transition-all"
-                    style={{ background: 'rgba(139,111,184,0.08)', color: 'var(--violet)' }}>
+                    style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
                     {p}
                   </button>
                 ))}
@@ -308,7 +308,7 @@ export default function RelationshipsPage() {
                 {aiLoading ? 'Thinking...' : 'Get guidance'}
               </button>
               {aiReply && (
-                <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.12)' }}>
+                <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.12)' }}>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{aiReply}</p>
                 </div>
               )}
@@ -321,7 +321,7 @@ export default function RelationshipsPage() {
       <div className="hidden lg:block min-h-screen"
         style={{ background: 'linear-gradient(180deg, #1E1A38 0%, #141030 40%, #0D0B1E 100%)' }}>
         <div className="fixed top-0 right-0 w-[600px] h-[600px] pointer-events-none"
-          style={{ background: 'radial-gradient(circle at 80% 20%, rgba(139,111,184,0.12) 0%, transparent 60%)', filter: 'blur(40px)' }} />
+          style={{ background: 'radial-gradient(circle at 80% 20%, rgba(155,92,255,0.12) 0%, transparent 60%)', filter: 'blur(40px)' }} />
 
         <AppLayout noPad>
           <div className="pt-20 pb-[110px] px-8">
@@ -354,7 +354,7 @@ export default function RelationshipsPage() {
                 <button key={f.key} onClick={() => setFilter(f.key)}
                   className="px-5 py-2 rounded-full text-sm font-medium transition-all"
                   style={{
-                    background: filter === f.key ? 'rgba(139,111,184,0.85)' : 'rgba(255,255,255,0.06)',
+                    background: filter === f.key ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.06)',
                     color: filter === f.key ? 'white' : 'rgba(255,255,255,0.5)',
                     border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(255,255,255,0.08)'}`,
                   }}>
@@ -374,7 +374,7 @@ export default function RelationshipsPage() {
             <div className="rounded-2xl p-6"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5" style={{ color: '#C4A9E8' }} />
+                <Sparkles className="h-5 w-5" style={{ color: '#b98bff' }} />
                 <p className="text-base font-semibold text-white">Relationship Coach</p>
               </div>
               <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -384,7 +384,7 @@ export default function RelationshipsPage() {
                 {AI_PROMPTS.map(p => (
                   <button key={p} onClick={() => setAiInput(p)}
                     className="text-sm px-4 py-2 rounded-xl transition-all"
-                    style={{ background: 'rgba(139,111,184,0.12)', color: '#C4A9E8', border: '1px solid rgba(139,111,184,0.2)' }}>
+                    style={{ background: 'rgba(155,92,255,0.12)', color: '#b98bff', border: '1px solid rgba(155,92,255,0.2)' }}>
                     {p}
                   </button>
                 ))}
@@ -401,7 +401,7 @@ export default function RelationshipsPage() {
                 />
               </div>
               {aiReply && (
-                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.15)' }}>
+                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.15)' }}>
                   <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{aiReply}</p>
                 </div>
               )}

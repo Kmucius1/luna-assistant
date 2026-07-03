@@ -45,7 +45,7 @@ export default function LoginPage() {
     >
       {/* Ambient orbs */}
       <div className="fixed -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(139,111,184,0.25), transparent)', filter: 'blur(70px)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.25), transparent)', filter: 'blur(70px)' }} />
       <div className="fixed bottom-0 -left-24 w-72 h-72 rounded-full pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(106,79,155,0.2), transparent)', filter: 'blur(60px)' }} />
 
@@ -56,8 +56,8 @@ export default function LoginPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-breathe"
             style={{
-              background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
-              boxShadow: '0 8px 40px rgba(139,111,184,0.45)',
+              background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
+              boxShadow: '0 8px 40px rgba(155,92,255,0.45)',
             }}
           >
             <Sparkles className="h-7 w-7 text-white" />
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                 style={{
                   background: '#ffffff',
-                  border: '1.5px solid rgba(139,111,184,0.25)',
+                  border: '1.5px solid rgba(155,92,255,0.25)',
                   color: '#1a1230',
                   fontFamily: 'var(--font-sans)',
                 }}
@@ -136,7 +136,7 @@ export default function LoginPage() {
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all pr-12"
                   style={{
                     background: '#ffffff',
-                    border: '1.5px solid rgba(139,111,184,0.25)',
+                    border: '1.5px solid rgba(155,92,255,0.25)',
                     color: '#1a1230',
                     fontFamily: 'var(--font-sans)',
                   }}
@@ -174,8 +174,8 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 disabled:opacity-60"
               style={{
-                background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)',
-                boxShadow: '0 4px 28px rgba(139,111,184,0.4)',
+                background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
+                boxShadow: '0 4px 28px rgba(155,92,255,0.4)',
                 fontSize: 15,
                 letterSpacing: '0.02em',
               }}

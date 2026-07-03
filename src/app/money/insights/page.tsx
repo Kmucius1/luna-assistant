@@ -128,15 +128,15 @@ export default function InsightsPage() {
               {/* Highest self */}
               {insights.highest_self_action && (
                 <div style={CARD}>
-                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(139,111,184,0.7)', marginBottom: 10 }}>Your Highest Self Would…</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(155,92,255,0.7)', marginBottom: 10 }}>Your Highest Self Would…</p>
                   <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', lineHeight: 1.7, fontStyle: 'italic' }}>{insights.highest_self_action}</p>
                 </div>
               )}
 
               {/* Affirmation */}
               {insights.affirmation && (
-                <div style={{ ...CARD, textAlign: 'center', padding: 24, background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.2)' }}>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: 'rgba(196,169,232,0.9)', lineHeight: 1.6 }}>&ldquo;{insights.affirmation}&rdquo;</p>
+                <div style={{ ...CARD, textAlign: 'center', padding: 24, background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.2)' }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: 'rgba(185,139,255,0.9)', lineHeight: 1.6 }}>&ldquo;{insights.affirmation}&rdquo;</p>
                 </div>
               )}
 

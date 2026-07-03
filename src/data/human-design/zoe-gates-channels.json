@@ -1,0 +1,55 @@
+{
+  "type": "Self-Projected Projector",
+  "profile": "4/6",
+  "authority": "Self-Projected (speaks to find clarity)",
+  "definedCenters": ["Throat", "G Center", "Head", "Ajna"],
+  "centers": [
+    {
+      "name": "Throat",
+      "defined": true,
+      "note": "Consistent access to expression and manifestation — but only reliably powerful when connected through the G Center (identity) rather than forced."
+    },
+    {
+      "name": "G Center",
+      "defined": true,
+      "note": "Stable sense of identity and direction. Love and direction come from a fixed, known place — not from searching outward for it."
+    },
+    {
+      "name": "Head",
+      "defined": true,
+      "note": "Consistent mental pressure/inspiration. Ideas arrive reliably — the risk is trying to answer every question that shows up instead of letting some pass."
+    },
+    {
+      "name": "Ajna",
+      "defined": true,
+      "note": "Fixed way of processing and conceptualizing. Opinions are consistent and can be trusted as genuinely yours, not borrowed from the room."
+    },
+    {
+      "name": "Heart/Will",
+      "defined": false,
+      "note": "Not here to constantly prove worth or willpower through effort. Worth is not something to be earned through output — that's a conditioning pattern to unlearn."
+    },
+    {
+      "name": "Sacral",
+      "defined": false,
+      "note": "Not a generator — no sustainable, consistent work-energy. Energy is not infinite; overworking here leads directly to burnout, not productivity."
+    },
+    {
+      "name": "Spleen",
+      "defined": false,
+      "note": "Instinctive fear/safety signals are inconsistent — decisions shouldn't be rushed on gut-fear alone; give it time to actually land."
+    },
+    {
+      "name": "Solar Plexus",
+      "defined": false,
+      "note": "Emotional weather is often absorbed from other people, not internally generated. If a feeling arrived suddenly around someone else, it might not be yours."
+    }
+  ],
+  "profileLines": {
+    "line4": "Opportunist/Network — builds and succeeds through trusted relationships, not cold outreach. Who knows you matters as much as what you know.",
+    "line6": "Role Model — lives in three phases: trial-and-error (roughly age 1-30), retreat/observation (30-50), role model (50+). Currently in the retreat-into-becoming phase — this is a feature, not a delay."
+  },
+  "voiceClarityNote": "Clarity comes through speaking out loud, not through silent deliberation. Talk it out before organizing it — dictation before structure.",
+  "notSelfTheme": "Bitterness — shows up specifically when forcing recognition, proving worth, or working without being invited/acknowledged first.",
+  "strategyNote": "Wait for recognition and invitation before initiating major moves. This isn't passivity — it's energy protection, since there's no defined Sacral to sustain constant self-initiation."
+}

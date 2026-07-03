@@ -3,6 +3,8 @@ import { useState, useRef, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { CategoryPager } from '@/components/ui/CategoryPager'
+import { sendChatMessage } from '@/lib/chat/sendChatMessage'
+import { LunaLoadingState } from '@/components/luna'
 import {
   Sparkles, Mic, MessageCircle, BookOpen, Star, Archive,
   Send, ChevronRight, ArrowRight, RotateCcw, Pause
@@ -21,7 +23,7 @@ const G: React.CSSProperties = {
 // ─── Section label inside cards ─────────────────────────────────────────────
 const LBL: React.CSSProperties = {
   fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: '#9b5cff',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10, flexShrink: 0,
 }
@@ -44,9 +46,9 @@ const CTA_PRIMARY: React.CSSProperties = {
 
 // ─── Secondary "go deeper" CTA — Full X → links ─────────────────────────────
 const CTA_SECONDARY: React.CSSProperties = {
-  background: 'rgba(139,111,184,0.10)',
-  border: '1px solid rgba(139,111,184,0.22)',
-  color: '#8B6FB8',
+  background: 'rgba(155,92,255,0.10)',
+  border: '1px solid rgba(155,92,255,0.22)',
+  color: '#9b5cff',
 }
 
 type LunaPage = 'chat' | 'dictate' | 'messages' | 'journal' | 'self' | 'vault'
@@ -69,7 +71,7 @@ const STARTERS = [
 ]
 
 const REWRITES = [
-  { label: 'Soft', color: '#C4A9E8',  desc: 'Vulnerable, open, non-attacking' },
+  { label: 'Soft', color: '#b98bff',  desc: 'Vulnerable, open, non-attacking' },
   { label: 'Clear', color: '#A8C4DA', desc: 'Direct, needs-forward' },
   { label: 'Boundary', color: '#B8C9B4', desc: 'Firm, self-protecting' },
 ]
@@ -116,23 +118,26 @@ function LunaPageInner() {
   const [vaultTag, setVaultTag]       = useState<'Idea' | 'Loop' | 'Dream' | 'Future'>('Idea')
   const [vault, setVault]             = useState(VAULT_ITEMS)
   const [dictating, setDictating]     = useState(false)
+  const [sending, setSending]         = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, sending])
 
-  function sendMessage() {
-    if (!chatInput.trim()) return
+  async function sendMessage() {
+    if (!chatInput.trim() || sending) return
     const userMsg = chatInput.trim()
     setChatInput('')
     setMessages(m => [...m, { role: 'user', text: userMsg }])
-    setTimeout(() => {
-      setMessages(m => [...m, {
-        role: 'luna',
-        text: 'That makes sense. Let\'s think through this together — what feels most important to you about it right now?'
-      }])
-    }, 900)
+    setSending(true)
+    try {
+      // Same 'default' session as /chat so both surfaces show one continuous conversation.
+      const { response } = await sendChatMessage(userMsg, 'default')
+      setMessages(m => [...m, { role: 'luna', text: response }])
+    } finally {
+      setSending(false)
+    }
   }
 
   function addToVault() {
@@ -156,7 +161,7 @@ function LunaPageInner() {
                     {STARTERS.map(s => (
                       <button key={s} onClick={() => { setChatInput(s); }}
                         className="text-xs font-semibold px-3.5 py-2 rounded-full cursor-pointer"
-                        style={{ background: 'rgba(139,111,184,0.10)', color: '#8B6FB8', border: '1px solid rgba(139,111,184,0.22)' }}>
+                        style={{ background: 'rgba(155,92,255,0.10)', color: '#9b5cff', border: '1px solid rgba(155,92,255,0.22)' }}>
                         {s}
                       </button>
                     ))}
@@ -176,6 +181,7 @@ function LunaPageInner() {
                       </div>
                     </div>
                   ))}
+                  {sending && <LunaLoadingState compact />}
                   <div ref={bottomRef} />
                 </div>
 
@@ -184,12 +190,13 @@ function LunaPageInner() {
                   <input
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && sendMessage()}
+                    onKeyDown={e => e.key === 'Enter' && void sendMessage()}
                     placeholder="Talk to LUNA..."
                     className="flex-1 px-4 py-3 text-sm outline-none"
                     style={INPUT}
+                    disabled={sending}
                   />
-                  <button onClick={sendMessage}
+                  <button onClick={() => void sendMessage()} disabled={sending}
                     className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer"
                     style={{ ...CTA_PRIMARY, borderRadius: 16 }}>
                     <Send className="h-4 w-4" style={{ color: 'white' }} />
@@ -203,13 +210,13 @@ function LunaPageInner() {
                   <button onClick={() => setDictating(d => !d)}
                     className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 transition-all cursor-pointer"
                     style={{
-                      background: dictating ? 'rgba(224,94,94,0.15)' : 'rgba(139,111,184,0.12)',
-                      border: `2px solid ${dictating ? '#E05E5E' : 'rgba(139,111,184,0.3)'}`,
+                      background: dictating ? 'rgba(224,94,94,0.15)' : 'rgba(155,92,255,0.12)',
+                      border: `2px solid ${dictating ? '#E05E5E' : 'rgba(155,92,255,0.3)'}`,
                       boxShadow: dictating ? '0 0 0 8px rgba(224,94,94,0.08)' : 'none',
                     }}>
                     {dictating
                       ? <Pause className="h-8 w-8" style={{ color: '#E05E5E' }} />
-                      : <Mic className="h-8 w-8" style={{ color: '#8B6FB8' }} />
+                      : <Mic className="h-8 w-8" style={{ color: '#9b5cff' }} />
                     }
                   </button>
                   <p className="text-sm font-semibold mb-1" style={{ color: 'rgba(255,255,255,0.85)' }}>
@@ -225,13 +232,13 @@ function LunaPageInner() {
                   <Link href="/brain-dump" style={{ textDecoration: 'none' }}>
                     <div className="flex items-center justify-between py-2.5">
                       <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>Brain Dump</p>
-                      <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+                      <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
                     </div>
                   </Link>
                   <Link href="/dictation" style={{ textDecoration: 'none' }}>
                     <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
                       <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.85)' }}>Dictation Studio</p>
-                      <ChevronRight className="h-4 w-4" style={{ color: '#8B6FB8' }} />
+                      <ChevronRight className="h-4 w-4" style={{ color: '#9b5cff' }} />
                     </div>
                   </Link>
                 </div>
@@ -240,8 +247,8 @@ function LunaPageInner() {
     { id: 'messages', label: '💬 Messages', content: (
       <div className="space-y-3.5">
                 <div className="p-4"
-                  style={{ ...G, borderRadius: 22, background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))', border: '1px solid rgba(139,111,184,0.20)' }}>
-                  <p className="text-xs font-bold mb-2" style={{ color: '#C4A9E8' }}>Communication Coach</p>
+                  style={{ ...G, borderRadius: 22, background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))', border: '1px solid rgba(155,92,255,0.20)' }}>
+                  <p className="text-xs font-bold mb-2" style={{ color: '#b98bff' }}>Communication Coach</p>
                   <p className="text-sm" style={{ color: 'rgba(255,255,255,0.72)' }}>
                     Paste a draft. LUNA rewrites it in 3 versions — soft, clear, and boundary-setting.
                   </p>
@@ -325,12 +332,12 @@ function LunaPageInner() {
                   style={{
                     ...G, borderRadius: 24,
                     background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))',
-                    border: '1px solid rgba(139,111,184,0.25)',
+                    border: '1px solid rgba(155,92,255,0.25)',
                   }}>
                   <div className="text-xl mb-3">🌟</div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#C4A9E8' }}>Current Pattern</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#b98bff' }}>Current Pattern</p>
                   <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.55)' }}>{highestSelf.current}</p>
-                  <div className="w-full h-px mb-4" style={{ background: 'rgba(139,111,184,0.2)' }} />
+                  <div className="w-full h-px mb-4" style={{ background: 'rgba(155,92,255,0.2)' }} />
                   <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#B8C9B4' }}>Aligned Move</p>
                   <p className="text-base font-semibold leading-snug" style={{ color: 'white' }}>{highestSelf.aligned}</p>
                 </div>
@@ -347,7 +354,7 @@ function LunaPageInner() {
                       className="w-full text-left py-3 text-sm flex items-center justify-between cursor-pointer"
                       style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none', color: 'rgba(255,255,255,0.85)' }}>
                       {q}
-                      <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 ml-2" style={{ color: '#8B6FB8' }} />
+                      <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 ml-2" style={{ color: '#9b5cff' }} />
                     </button>
                   ))}
                 </div>
@@ -369,7 +376,7 @@ function LunaPageInner() {
                       <button key={t} onClick={() => setVaultTag(t)}
                         className="px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer"
                         style={vaultTag === t
-                          ? { background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(139,111,184,0.45)', color: '#C4A9E8' }
+                          ? { background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.45)', color: '#b98bff' }
                           : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.45)' }
                         }>
                         {t}
@@ -397,7 +404,7 @@ function LunaPageInner() {
                   {vault.map(item => (
                     <div key={item.id} className="p-4 flex items-start gap-3" style={{ ...G, borderRadius: 20 }}>
                       <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-semibold"
-                        style={{ background: 'rgba(139,111,184,0.16)', color: '#C4A9E8' }}>
+                        style={{ background: 'rgba(155,92,255,0.16)', color: '#b98bff' }}>
                         {item.tag}
                       </span>
                       <p className="text-sm flex-1" style={{ color: 'rgba(255,255,255,0.72)' }}>{item.text}</p>
@@ -419,8 +426,8 @@ function LunaPageInner() {
     <AppLayout noScroll>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, paddingTop: 8, flexShrink: 0 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(139,111,184,0.12)', border: '1px solid rgba(139,111,184,0.20)' }}>
-          <Sparkles className="h-5 w-5" style={{ color: '#8B6FB8' }} strokeWidth={1.6} />
+        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.20)' }}>
+          <Sparkles className="h-5 w-5" style={{ color: '#9b5cff' }} strokeWidth={1.6} />
         </div>
         <div>
           <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>LUNA</h1>

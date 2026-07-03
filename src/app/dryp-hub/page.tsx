@@ -97,7 +97,7 @@ export default function DryphubPage() {
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #8B6FB8, #5A3F88)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'white' }}>D</div>
+                <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #9b5cff, #5A3F88)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'white' }}>D</div>
                 <div>
                   <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: 'white' }}>DRYP Hub</h1>
                   <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>
@@ -134,7 +134,7 @@ export default function DryphubPage() {
                         { key: 'DRYP_SUPABASE_SERVICE_KEY', hint: 'Service role key (not anon key)' },
                       ].map(v => (
                         <div key={v.key} style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                          <p style={{ fontSize: 12, fontWeight: 700, color: '#8B6FB8', fontFamily: 'monospace' }}>{v.key}</p>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: '#9b5cff', fontFamily: 'monospace' }}>{v.key}</p>
                           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>{v.hint}</p>
                         </div>
                       ))}
@@ -162,7 +162,7 @@ export default function DryphubPage() {
             {stats && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
                 {[
-                  { v: stats.activeClients, l: 'Active Clients',  c: '#8B6FB8' },
+                  { v: stats.activeClients, l: 'Active Clients',  c: '#9b5cff' },
                   { v: stats.openTasks,     l: 'Open Tasks',      c: '#C9A96E' },
                   { v: stats.dueToday,      l: 'Due Today',       c: stats.dueToday > 0 ? '#E05E5E' : 'rgba(255,255,255,0.4)' },
                 ].map(s => (
@@ -178,7 +178,7 @@ export default function DryphubPage() {
             {connected && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
                 {([['clients', 'Clients'], ['activity', `Activity${totalAlerts > 0 ? ` (${totalAlerts})` : ''}`], ['tasks', 'Tasks']] as [typeof tab, string][]).map(([v, label]) => (
-                  <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: tab === v ? 'rgba(139,111,184,0.9)' : 'rgba(255,255,255,0.07)', color: tab === v ? 'white' : 'rgba(255,255,255,0.5)' }}>
+                  <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: tab === v ? 'rgba(155,92,255,0.9)' : 'rgba(255,255,255,0.07)', color: tab === v ? 'white' : 'rgba(255,255,255,0.5)' }}>
                     {label}
                   </button>
                 ))}
@@ -306,7 +306,7 @@ export default function DryphubPage() {
             {!loading && connected && tab === 'tasks' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ ...GLASS, padding: 18, textAlign: 'center' }}>
-                  <a href="https://www.dryphub.com/tasks" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '11px 22px', borderRadius: 14, background: 'linear-gradient(135deg, #8B6FB8, #6A4F9B)', color: 'white', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+                  <a href="https://www.dryphub.com/tasks" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '11px 22px', borderRadius: 14, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
                     <ExternalLink className="h-4 w-4" /> Open DRYP Tasks
                   </a>
                   {stats && (
@@ -320,7 +320,7 @@ export default function DryphubPage() {
                         <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>Due today</p>
                       </div>
                       <div style={{ textAlign: 'center' }}>
-                        <p style={{ fontSize: 22, fontWeight: 800, color: '#8B6FB8' }}>{stats.dueThisWeek}</p>
+                        <p style={{ fontSize: 22, fontWeight: 800, color: '#9b5cff' }}>{stats.dueThisWeek}</p>
                         <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>Due this week</p>
                       </div>
                     </div>
@@ -331,12 +331,12 @@ export default function DryphubPage() {
 
             {/* Meeting note reminder info */}
             {connected && (
-              <div style={{ ...GLASS, padding: 16, marginTop: 14, background: 'rgba(139,111,184,0.05)', border: '1px solid rgba(139,111,184,0.18)' }}>
-                <p style={{ fontSize: 10, fontWeight: 700, color: '#8B6FB8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Meeting Note Reminders</p>
+              <div style={{ ...GLASS, padding: 16, marginTop: 14, background: 'rgba(155,92,255,0.05)', border: '1px solid rgba(155,92,255,0.18)' }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9b5cff', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Meeting Note Reminders</p>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
                   LUNA checks DRYP Hub after each calendar meeting ends. If no notes were added for that client today, you'll see an alert here and in the daily check-in. Always add notes within 30 min of your meeting.
                 </p>
-                <a href="https://www.dryphub.com/notes" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#8B6FB8', textDecoration: 'none', marginTop: 8 }}>
+                <a href="https://www.dryphub.com/notes" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#9b5cff', textDecoration: 'none', marginTop: 8 }}>
                   <Plus className="h-3 w-3" /> Add a note in DRYP Hub
                 </a>
               </div>

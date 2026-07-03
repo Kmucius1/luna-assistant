@@ -2,17 +2,17 @@
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { SwipeContainer } from '@/components/layout/SwipeContainer'
-import { BottomNav } from '@/components/layout/BottomNav'
-import { DesktopHeader } from '@/components/layout/DesktopHeader'
-import { DesktopSidebar } from '@/components/layout/DesktopSidebar'
-import { MobileTopBar } from '@/components/layout/MobileTopBar'
-import { CategoryPager } from '@/components/ui/CategoryPager'
+import { LunaShell } from '@/components/luna/LunaShell'
+import { LunaHeroCard } from '@/components/luna/LunaHeroCard'
+import { LunaActionTile } from '@/components/luna/LunaActionTile'
+import { LunaSwipePager } from '@/components/luna/LunaSwipePager'
+import { LunaEmptyState, LunaLoadingState } from '@/components/luna'
+import VAULT_CATEGORIES from '@/data/vault/categories.json'
 import {
   Star, Moon, Sparkles, Target, Calendar,
-  Mic, Brain, Zap, Check, Loader2,
+  Mic, Brain, Zap,
   BookOpen, Scissors, Plus,
-  Heart, Droplet, Flame, TrendingUp, Waves, PenLine, Sun,
+  Heart, Flame, Waves, PenLine, Sun,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -44,10 +44,10 @@ function getGreeting(h: number) {
   return 'Good evening'
 }
 
-// ─── Shared glass card style ──────────────────────────────────────────────────
+// ─── Shared glass card style — LUNA locked theme tokens ────────────────────────
 const G: React.CSSProperties = {
-  background: 'rgba(20,12,50,0.68)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'var(--luna-panel)',
+  border: '1px solid var(--luna-border-soft)',
   borderRadius: 20,
   backdropFilter: 'blur(18px)',
   WebkitBackdropFilter: 'blur(18px)',
@@ -56,7 +56,7 @@ const G: React.CSSProperties = {
 // ─── Section label inside cards ───────────────────────────────────────────────
 const LBL: React.CSSProperties = {
   fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#8B6FB8',
+  textTransform: 'uppercase', color: 'var(--luna-purple-2)',
   display: 'flex', alignItems: 'center', gap: 5,
   marginBottom: 8, flexShrink: 0,
 }
@@ -67,9 +67,9 @@ function StarSigil({ size = 52 }: { size?: number }) {
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       {[c * 0.95, c * 0.70, c * 0.48].map((r, i) => (
-        <div key={i} style={{ position: 'absolute', top: `${c - r}px`, right: `${c - r}px`, bottom: `${c - r}px`, left: `${c - r}px`, borderRadius: '50%', border: `0.5px solid rgba(139,111,184,${0.08 + i * 0.07})` }} />
+        <div key={i} style={{ position: 'absolute', top: `${c - r}px`, right: `${c - r}px`, bottom: `${c - r}px`, left: `${c - r}px`, borderRadius: '50%', border: `0.5px solid rgba(155,92,255,${0.08 + i * 0.07})` }} />
       ))}
-      <svg style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 4px rgba(196,169,232,0.65))' }} viewBox={`0 0 ${size} ${size}`}>
+      <svg style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, width: '100%', height: '100%', filter: 'drop-shadow(0 0 4px rgba(185,139,255,0.65))' }} viewBox={`0 0 ${size} ${size}`}>
         <path d={`M${c} ${c*0.07} L${c+c*0.045} ${c-c*0.055} L${c*1.93} ${c} L${c+c*0.045} ${c+c*0.055} L${c} ${c*1.93} L${c-c*0.045} ${c+c*0.055} L${c*0.07} ${c} L${c-c*0.045} ${c-c*0.055} Z`} fill="rgba(220,200,255,0.92)" />
         <circle cx={c} cy={c} r={c * 0.065} fill="white" opacity="0.95" />
       </svg>
@@ -130,143 +130,128 @@ const FALLBACK_TASKS = [
 ]
 
 function Slide1({
-  greeting, moon, guidance, gLoading, topTasks, calEvents, dataLoaded,
+  greeting, moon, guidance, topTasks, calEvents, dataLoaded, lunaMessage, lmLoading,
 }: {
   greeting: string; moon: typeof MOON_PHASES[0]
-  guidance: GuidanceData | null; gLoading: boolean
+  guidance: GuidanceData | null
   topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean
+  lunaMessage: { message: string; affirmation: string } | null; lmLoading: boolean
 }) {
   const tasks     = (dataLoaded && topTasks.length > 0) ? topTasks.slice(0, 3) : FALLBACK_TASKS
   const nextEvent = calEvents[0] ?? null
   const [messageExpanded, setMessageExpanded] = useState(false)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: '100%' }}>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4" style={{ minHeight: '100%' }}>
 
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <div style={{
-        ...G,
-        border: '1px solid rgba(139,111,184,0.18)',
-        borderRadius: 28, padding: '16px 18px 14px',
-        position: 'relative', overflow: 'hidden',
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-        flexShrink: 0, minHeight: 128,
-      }}>
-        <img
-          src="/brand/backgrounds/hero-moon-card-mobile.png"
-          alt=""
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.9 }}
-        />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(16,5,44,0.72) 0%, rgba(16,5,44,0.28) 60%, rgba(16,5,44,0.10) 100%)' }} />
-        <div style={{ position: 'relative', zIndex: 2, flex: 1, paddingRight: 6 }}>
-          <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px' }}>
+      {/* ── LEFT column: Hero + Top3/NextEvent + Quick Actions ──────────── */}
+      <div className="lg:col-span-2 flex flex-col gap-3">
+
+        {/* Hero */}
+        <LunaHeroCard backgroundImage="/brand/ui/luna-hero-card-desktop.png" className="p-5 lg:p-6" >
+          <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
             {greeting}, Zoe ✦
           </p>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#B99CFF', lineHeight: 1.4, margin: '0 0 10px' }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)' }}>
             You are not behind.<br />You are becoming.
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ fontSize: 12 }}>{moon.emoji}</span>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.3 }}>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
               {moon.name} · {moon.pct}% illuminated
             </p>
           </div>
-        </div>
-      </div>
+        </LunaHeroCard>
 
-      {/* ── LUNA's Message ────────────────────────────────────────────── */}
-      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', display: 'flex', alignItems: 'flex-start', gap: 10, flexShrink: 0 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={LBL}><span>✦</span>LUNA'S MESSAGE</div>
-          {gLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {[100, 100, 82].map((w, i) => (
-                <div key={i} style={{ height: 9, borderRadius: 4, background: 'rgba(255,255,255,0.07)', width: `${w}%` }} />
+        {/* Today's Top 3 + Next Event */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+            <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
+              {tasks.map((t, i) => (
+                <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                    <span style={{ fontSize: 8, fontWeight: 800, color: 'var(--luna-purple-2)' }}>{i + 1}</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+                </div>
               ))}
             </div>
-          ) : (
-            <p style={{
-              fontSize: 13, color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, margin: '0 0 7px',
-              overflow: messageExpanded ? 'visible' : 'hidden',
-              display: messageExpanded ? 'block' : '-webkit-box',
-              WebkitLineClamp: messageExpanded ? 'unset' : 3, WebkitBoxOrient: 'vertical',
-            }}>
-              {guidance?.energy ?? 'Your energy needs structure before speed. Pick one priority and protect your body before you start spiraling.'}
-              {messageExpanded && guidance?.affirmation && (
-                <><br /><br />{guidance.affirmation}</>
-              )}
-            </p>
-          )}
-          <button
-            onClick={() => setMessageExpanded(v => !v)}
-            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: '#8B6FB8' }}
-          >
-            {messageExpanded ? 'Show less ←' : 'Tell me more →'}
-          </button>
-        </div>
-        <img src="/brand/ui/luna-message-star.png" alt="" style={{ width: 52, height: 52, flexShrink: 0, objectFit: 'contain', animation: 'breathe 4s ease-in-out infinite' }} />
-      </div>
-
-      {/* ── Today's Top 3 + Next Event ────────────────────────────────── */}
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr', gap: 8 }}>
-        {/* Top 3 */}
-        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
-            {tasks.map((t, i) => (
-              <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(139,111,184,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                  <span style={{ fontSize: 8, fontWeight: 800, color: '#C4A9E8' }}>{i + 1}</span>
-                </div>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
-              </div>
-            ))}
+            <Link href="/tasks" style={{ textDecoration: 'none' }}>
+              <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View all tasks →</span>
+            </Link>
           </div>
-          <Link href="/tasks" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600 }}>View all tasks →</span>
-          </Link>
-        </div>
 
-        {/* Next Event */}
-        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
-          <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {nextEvent?.title ?? 'Client Call'}
-          </p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: '#8B6FB8', margin: '0 0 3px' }}>
-            Today · {nextEvent?.startTime ?? '1:30 PM'}
-          </p>
-          <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
-            Prep 15 minutes before.
-          </p>
-          <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
-            <div style={{ padding: '6px', background: 'rgba(139,111,184,0.10)', border: '1px solid rgba(139,111,184,0.18)', borderRadius: 10, textAlign: 'center' }}>
-              <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600 }}>View details →</span>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Quick Actions ─────────────────────────────────────────────── */}
-      <div style={{ ...G, borderRadius: 22, padding: '11px 14px', flexShrink: 0 }}>
-        <div style={LBL}><Zap style={{ width: 10, height: 10 }} />Quick Actions</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
-          {[
-            { icon: Mic,      label: 'Dictate',  href: '/luna?tab=dictate' },
-            { icon: Brain,    label: 'Brain Dump', href: '/brain-dump'     },
-            { icon: Calendar, label: 'Plan My Day', href: '/plan-my-day'   },
-            { icon: Plus,     label: 'New Task', href: '/tasks'            },
-          ].map(({ icon: Icon, label, href }) => (
-            <Link key={label} href={href} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '9px 2px', borderRadius: 13, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                <Icon style={{ width: 15, height: 15, color: 'rgba(196,169,232,0.72)' }} strokeWidth={1.6} />
-                <span style={{ fontSize: 9.5, fontWeight: 600, color: 'rgba(255,255,255,0.46)', textAlign: 'center', lineHeight: 1.2 }}>{label}</span>
+          <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
+            <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
+            <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {nextEvent?.title ?? 'Client Call'}
+            </p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)', margin: '0 0 3px' }}>
+              Today · {nextEvent?.startTime ?? '1:30 PM'}
+            </p>
+            <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
+              Prep 15 minutes before.
+            </p>
+            <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
+              <div style={{ padding: '6px', background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.18)', borderRadius: 10, textAlign: 'center' }}>
+                <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View details →</span>
               </div>
             </Link>
-          ))}
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div style={{ ...G, borderRadius: 22, padding: '13px 14px' }}>
+          <div style={LBL}><Zap style={{ width: 10, height: 10 }} />Quick Actions</div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <LunaActionTile icon={<Mic size={16} strokeWidth={1.6} />} label="Dictate" href="/luna?tab=dictate" />
+            <LunaActionTile icon={<Brain size={16} strokeWidth={1.6} />} label="Brain Dump" href="/brain-dump" />
+            <LunaActionTile icon={<Calendar size={16} strokeWidth={1.6} />} label="Plan My Day" href="/plan-my-day" />
+            <LunaActionTile icon={<Plus size={16} strokeWidth={1.6} />} label="New Task" href="/tasks" />
+          </div>
         </div>
       </div>
 
+      {/* ── RIGHT column: LUNA'S MESSAGE, full height ────────────────────── */}
+      <div style={{ ...G, borderRadius: 26, padding: '20px 20px', display: 'flex', flexDirection: 'column' }}>
+        <div style={LBL}><span>✦</span>LUNA'S MESSAGE</div>
+        {lmLoading ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {[100, 100, 82].map((w, i) => (
+              <div key={i} style={{ height: 10, borderRadius: 4, background: 'rgba(255,255,255,0.07)', width: `${w}%` }} />
+            ))}
+          </div>
+        ) : (
+          <p style={{
+            fontSize: 14, color: 'rgba(255,255,255,0.78)', lineHeight: 1.65, margin: '0 0 10px',
+            overflow: messageExpanded ? 'visible' : 'hidden',
+            display: messageExpanded ? 'block' : '-webkit-box',
+            WebkitLineClamp: messageExpanded ? 'unset' : 6, WebkitBoxOrient: 'vertical',
+          }}>
+            {lunaMessage?.message ?? guidance?.energy ?? 'Your energy needs structure before speed. Pick one priority, answer the message that unlocks work, and protect your body before you start spiraling.'}
+            {messageExpanded && (lunaMessage?.affirmation ?? guidance?.affirmation) && (
+              <><br /><br />{lunaMessage?.affirmation ?? guidance?.affirmation}</>
+            )}
+          </p>
+        )}
+
+        <div style={{ flex: 1, minHeight: 24, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/brand/ui/luna-star-sigil.png" alt="" style={{ width: 96, height: 96, objectFit: 'contain', animation: 'breathe 4s ease-in-out infinite' }} />
+        </div>
+
+        <button
+          onClick={() => setMessageExpanded(v => !v)}
+          style={{
+            alignSelf: 'flex-start', marginTop: 'auto',
+            padding: '9px 18px', borderRadius: 999,
+            background: 'rgba(155,92,255,0.14)', border: '1px solid var(--luna-border)',
+            cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--luna-purple-2)',
+          }}
+        >
+          {messageExpanded ? 'Show less ←' : 'Tell me more →'}
+        </button>
+      </div>
     </div>
   )
 }
@@ -282,27 +267,47 @@ function PreviewCard({ label, icon, href, linkText, children }: {
       <div style={{ ...G, borderRadius: 24, padding: '13px 14px 11px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={LBL}>{icon}{label}</div>
         {children}
-        <span style={{ fontSize: 10.5, color: '#8B6FB8', fontWeight: 600, marginTop: 5, flexShrink: 0 }}>{linkText} →</span>
+        <span style={{ fontSize: 10.5, color: '#9b5cff', fontWeight: 600, marginTop: 5, flexShrink: 0 }}>{linkText} →</span>
       </div>
     </Link>
   )
 }
 
-function Slide2({ guidance }: { guidance: GuidanceData | null }) {
+interface MoonPreviewData { phase?: { name: string; emoji?: string }; sign?: { name: string; emoji?: string } }
+interface MoneyPreviewData { bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number }
+interface StylePreviewData { hasProfile: boolean; summary?: string }
+
+function Slide2({ guidance, moonData, moneyData, styleData }: {
+  guidance: GuidanceData | null
+  moonData: MoonPreviewData | null
+  moneyData: MoneyPreviewData | null
+  styleData: StylePreviewData | null
+}) {
+  const astroHeadline = moonData?.sign?.name
+    ? `${moonData.sign.name} Moon`
+    : moonData?.phase?.name ?? 'Astrology'
+
   return (
     <div style={{ minHeight: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 }}>
       <PreviewCard label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
         <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 6s ease-in-out infinite' }} />
-        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Moon in Cancer</p>
+        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{astroHeadline}</p>
         <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
         </p>
       </PreviewCard>
 
       <PreviewCard label="Style Preview" icon={<Scissors style={{ width: 9, height: 9 }} />} href="/creative" linkText="Open Atelier">
-        <StyleVisual />
-        <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Soft power dressing</p>
-        <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.40)', margin: '3px 0 0', lineHeight: 1.3, flexShrink: 0 }}>Neutrals · Structure · Effortless</p>
+        {styleData?.hasProfile ? (
+          <>
+            <StyleVisual />
+            <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{styleData.summary ?? 'Your style profile'}</p>
+          </>
+        ) : (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Connect your style preferences in Atelier to get a personalized daily look.</p>
+          </div>
+        )}
       </PreviewCard>
 
       <PreviewCard label="Money Preview" icon={
@@ -310,17 +315,25 @@ function Slide2({ guidance }: { guidance: GuidanceData | null }) {
           <span style={{ fontSize: 7, fontWeight: 800, color: 'white', lineHeight: 1 }}>$</span>
         </div>
       } href="/money/transactions" linkText="View">
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 5, paddingBottom: 3 }}>
-          <p style={{ fontSize: 14, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>2 bills due<br />this week</p>
-          <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.32)', margin: '6px 0 1px' }}>Total</p>
-          <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: 0 }}>$320.00</p>
-        </div>
+        {moneyData?.has_transactions ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 5, paddingBottom: 3 }}>
+            <p style={{ fontSize: 14, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>
+              {moneyData.bills_due_soon?.length ?? 0} bill{moneyData.bills_due_soon?.length === 1 ? '' : 's'} due<br />this week
+            </p>
+            <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.32)', margin: '6px 0 1px' }}>Spent this week</p>
+            <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
+          </div>
+        ) : (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
+          </div>
+        )}
       </PreviewCard>
 
       <PreviewCard label="Night Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/night" linkText="View">
         <img src="/brand/ui/night-cloud.png" alt="" style={{ width: 84, height: 50, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 7s ease-in-out infinite' }} />
-        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Protect tomorrow.</p>
-        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Wind down. Rest. Reset.</p>
+        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Wind down tonight.</p>
+        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Plan tomorrow, protect your rest.</p>
       </PreviewCard>
     </div>
   )
@@ -329,12 +342,20 @@ function Slide2({ guidance }: { guidance: GuidanceData | null }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // SLIDE 3 — Wellness & Energy  (gauge + flow chart + journal prompt, no scroll)
 // ─────────────────────────────────────────────────────────────────────────────
-const ENERGY_STATS = [
-  { icon: Moon,        label: 'Sleep',       value: '7h 42m',   status: 'Good',        delta: '↑ 12%', color: '#6BE38B' },
-  { icon: Droplet,     label: 'Hydration',   value: '1.6 L',    status: 'On Track',    delta: '↑ 8%',  color: '#B7AED6' },
-  { icon: Flame,       label: 'Movement',    value: '6,421 steps', status: 'Good',     delta: '↑ 15%', color: '#6BE38B' },
-  { icon: TrendingUp,  label: 'Energy Peak', value: '4:00 – 6:00 PM', status: 'Later Today', delta: 'Prepare for flow', color: '#E6B84A' },
-]
+interface TodayCheckIn {
+  sleep_rating?: number | null
+  energy_rating?: number | null
+  mood_rating?: number | null
+  type?: string
+  date?: string
+}
+
+function ratingLabel(n: number | null | undefined): { status: string; color: string } {
+  if (n == null) return { status: 'Not logged', color: 'rgba(255,255,255,0.32)' }
+  if (n >= 8) return { status: 'Great', color: '#6BE38B' }
+  if (n >= 5) return { status: 'Okay', color: '#E6B84A' }
+  return { status: 'Low', color: '#E08B4A' }
+}
 
 function EnergyGauge({ pct = 78, size = 108 }: { pct?: number; size?: number }) {
   const stroke = size * 0.09
@@ -345,7 +366,7 @@ function EnergyGauge({ pct = 78, size = 108 }: { pct?: number; size?: number }) 
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0, animation: 'breathe 5s ease-in-out infinite' }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(139,111,184,0.16)" strokeWidth={stroke} />
+        <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(155,92,255,0.16)" strokeWidth={stroke} />
         <circle
           cx={c} cy={c} r={r} fill="none" stroke="#8D5CFF" strokeWidth={stroke}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
@@ -366,10 +387,10 @@ function TodaysFlowChart() {
     <div style={{ position: 'relative', width: '100%' }}>
       <div style={{
         position: 'absolute', left: '46%', top: -6, transform: 'translateX(-50%)',
-        padding: '3px 9px', borderRadius: 10, background: 'rgba(139,111,184,0.22)',
-        border: '1px solid rgba(196,169,232,0.35)', whiteSpace: 'nowrap', zIndex: 2,
+        padding: '3px 9px', borderRadius: 10, background: 'rgba(155,92,255,0.22)',
+        border: '1px solid rgba(185,139,255,0.35)', whiteSpace: 'nowrap', zIndex: 2,
       }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: '#C4A9E8' }}>Peak 4–6 PM</span>
+        <span style={{ fontSize: 9, fontWeight: 800, color: '#b98bff' }}>Peak 4–6 PM</span>
       </div>
       <svg viewBox="0 0 320 70" width="100%" height="70" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
         <path
@@ -385,15 +406,22 @@ function TodaysFlowChart() {
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-        <span style={{ fontSize: 9, color: 'rgba(196,169,232,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Rest</span>
+        <span style={{ fontSize: 9, color: 'rgba(185,139,255,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Rest</span>
         <span style={{ fontSize: 9, color: 'rgba(230,184,74,0.7)', display: 'flex', alignItems: 'center', gap: 3 }}><Sun style={{ width: 9, height: 9 }} />Focus</span>
-        <span style={{ fontSize: 9, color: 'rgba(196,169,232,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Wind Down</span>
+        <span style={{ fontSize: 9, color: 'rgba(185,139,255,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Wind Down</span>
       </div>
     </div>
   )
 }
 
-function Slide3() {
+function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; checkInLoading: boolean }) {
+  const sleep  = ratingLabel(checkIn?.sleep_rating)
+  const energy = ratingLabel(checkIn?.energy_rating)
+  const mood   = ratingLabel(checkIn?.mood_rating)
+  const gaugePct = checkIn
+    ? Math.round((((checkIn.sleep_rating ?? 5) + (checkIn.energy_rating ?? 5) + (checkIn.mood_rating ?? 5)) / 3) * 10)
+    : 0
+
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
 
@@ -401,26 +429,44 @@ function Slide3() {
       <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flexShrink: 0 }}>
         <div style={LBL}><Heart style={{ width: 10, height: 10 }} />Wellness &amp; Energy</div>
         <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '-4px 0 10px' }}>Your mind, body &amp; spirit today</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <EnergyGauge pct={78} size={104} />
-          <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {ENERGY_STATS.map(({ icon: Icon, label, value, status, delta, color }) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, background: 'rgba(139,111,184,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon style={{ width: 11, height: 11, color: '#C4A9E8' }} strokeWidth={1.8} />
+        {checkInLoading ? (
+          <LunaLoadingState compact />
+        ) : checkIn ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <EnergyGauge pct={gaugePct} size={104} />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {[
+                { icon: Moon, label: 'Sleep', value: checkIn.sleep_rating != null ? `${checkIn.sleep_rating}/10` : '—', ...sleep },
+                { icon: Flame, label: 'Energy', value: checkIn.energy_rating != null ? `${checkIn.energy_rating}/10` : '—', ...energy },
+                { icon: Heart, label: 'Mood', value: checkIn.mood_rating != null ? `${checkIn.mood_rating}/10` : '—', ...mood },
+              ].map(({ icon: Icon, label, value, status, color }) => (
+                <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Icon style={{ width: 11, height: 11, color: '#b98bff' }} strokeWidth={1.8} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.2 }}>{label}</p>
+                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', margin: 0, lineHeight: 1.2 }}>{value}</p>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <p style={{ fontSize: 9.5, fontWeight: 700, color, margin: 0, lineHeight: 1.2 }}>{status}</p>
+                  </div>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.2 }}>{label}</p>
-                  <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', margin: 0, lineHeight: 1.2 }}>{value}</p>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <p style={{ fontSize: 9.5, fontWeight: 700, color, margin: 0, lineHeight: 1.2 }}>{status}</p>
-                  <p style={{ fontSize: 8, color: 'rgba(255,255,255,0.32)', margin: 0, lineHeight: 1.2 }}>{delta}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <LunaEmptyState
+            icon={<Heart size={22} />}
+            title="You haven't checked in today"
+            message="Log a quick morning, midday, or night check-in and LUNA will track your real energy here."
+            action={
+              <Link href="/morning" style={{ textDecoration: 'none' }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)' }}>Check in now →</span>
+              </Link>
+            }
+          />
+        )}
       </div>
 
       {/* 2. Today's Flow */}
@@ -428,7 +474,7 @@ function Slide3() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ ...LBL, marginBottom: 4 }}><Waves style={{ width: 10, height: 10 }} />Today's Flow</div>
           <Link href="/health" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 9.5, color: '#8B6FB8', fontWeight: 600 }}>See full day →</span>
+            <span style={{ fontSize: 9.5, color: '#9b5cff', fontWeight: 600 }}>See full day →</span>
           </Link>
         </div>
         <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: '0 0 10px' }}>Energy throughout your day</p>
@@ -445,7 +491,7 @@ function Slide3() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={LBL}><PenLine style={{ width: 10, height: 10 }} />Daily Journal Prompt</div>
             <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.35)', margin: '-4px 0 8px' }}>For your reflection</p>
-            <p style={{ fontSize: 12, color: 'rgba(196,169,232,0.88)', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 10px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.88)', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 10px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               "What is one area of my life that is asking for more patience?"
             </p>
             <div style={{
@@ -456,7 +502,7 @@ function Slide3() {
               <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>Start Journaling →</span>
             </div>
           </div>
-          <BookOpen style={{ width: 44, height: 44, color: 'rgba(196,169,232,0.55)', flexShrink: 0, animation: 'breathe 9s ease-in-out infinite' }} strokeWidth={1.3} />
+          <BookOpen style={{ width: 44, height: 44, color: 'rgba(185,139,255,0.55)', flexShrink: 0, animation: 'breathe 9s ease-in-out infinite' }} strokeWidth={1.3} />
         </div>
       </Link>
 
@@ -474,7 +520,7 @@ const RESET_MODES = [
   { label: 'I need softness',    mode: 'soft'     },
 ]
 
-function Slide4() {
+function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
   const [activeMode, setActiveMode] = useState<string | null>(null)
   const [bodyDone,   setBodyDone]   = useState<Set<string>>(new Set())
   const [focusDone,  setFocusDone]  = useState(false)
@@ -491,7 +537,7 @@ function Slide4() {
       <div style={{
         ...G,
         background: 'linear-gradient(140deg, rgba(50,25,100,0.75) 0%, rgba(20,10,55,0.82) 100%)',
-        border: '1px solid rgba(139,111,184,0.22)',
+        border: '1px solid rgba(155,92,255,0.22)',
         borderRadius: 24, padding: '12px 14px',
         flexShrink: 0, boxShadow: '0 0 28px rgba(100,50,200,0.12), inset 0 1px 0 rgba(255,255,255,0.06)',
       }}>
@@ -504,9 +550,9 @@ function Slide4() {
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {[['Mood', '🫧 scattered'], ['Energy', 'medium'], ['Sleep', '7h 24m'], ['Support', 'grounding']].map(([k, v]) => (
-            <div key={k} style={{ padding: '3px 8px', borderRadius: 24, background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.22)' }}>
+            <div key={k} style={{ padding: '3px 8px', borderRadius: 24, background: 'rgba(155,92,255,0.14)', border: '1px solid rgba(155,92,255,0.22)' }}>
               <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', fontWeight: 600 }}>{k}: </span>
-              <span style={{ fontSize: 9, color: '#C4A9E8', fontWeight: 700 }}>{v}</span>
+              <span style={{ fontSize: 9, color: '#b98bff', fontWeight: 700 }}>{v}</span>
             </div>
           ))}
         </div>
@@ -535,10 +581,10 @@ function Slide4() {
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: '0 0 4px', lineHeight: 1.4 }}>
             One 25-min block. No multitasking.
           </p>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#C4A9E8', margin: '0 0 auto', lineHeight: 1.35 }}>
-            Reply to priority client email
+          <p style={{ fontSize: 10, fontWeight: 700, color: '#b98bff', margin: '0 0 auto', lineHeight: 1.35 }}>
+            {topTasks[0]?.title ?? 'No priority task set — add one'}
           </p>
-          <button onClick={() => setFocusDone(!focusDone)} style={{ marginTop: 7, padding: '5px 6px', borderRadius: 13, border: `1px solid ${focusDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.32)'}`, background: focusDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: focusDone ? '#8AB88A' : '#C4A9E8', fontSize: 9.5, fontWeight: 700, cursor: 'pointer' }}>
+          <button onClick={() => setFocusDone(!focusDone)} style={{ marginTop: 7, padding: '5px 6px', borderRadius: 13, border: `1px solid ${focusDone ? 'rgba(138,184,138,0.38)' : 'rgba(155,92,255,0.32)'}`, background: focusDone ? 'rgba(138,184,138,0.12)' : 'rgba(155,92,255,0.12)', color: focusDone ? '#8AB88A' : '#b98bff', fontSize: 9.5, fontWeight: 700, cursor: 'pointer' }}>
             {focusDone ? '✓ Done' : 'Start focus block →'}
           </button>
         </div>
@@ -549,13 +595,13 @@ function Slide4() {
         <div style={LBL}><Moon style={{ width: 9, height: 9 }} />CHOOSE RESET MODE</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 }}>
           {RESET_MODES.map(({ label, mode }) => (
-            <button key={mode} onClick={() => setActiveMode(activeMode === mode ? null : mode)} style={{ padding: '6px 8px', borderRadius: 14, border: `1px solid ${activeMode === mode ? 'rgba(139,111,184,0.45)' : 'rgba(255,255,255,0.08)'}`, background: activeMode === mode ? 'rgba(139,111,184,0.18)' : 'rgba(255,255,255,0.03)', color: activeMode === mode ? '#C4A9E8' : 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textAlign: 'left', lineHeight: 1.3 }}>
+            <button key={mode} onClick={() => setActiveMode(activeMode === mode ? null : mode)} style={{ padding: '6px 8px', borderRadius: 14, border: `1px solid ${activeMode === mode ? 'rgba(155,92,255,0.45)' : 'rgba(255,255,255,0.08)'}`, background: activeMode === mode ? 'rgba(155,92,255,0.18)' : 'rgba(255,255,255,0.03)', color: activeMode === mode ? '#b98bff' : 'rgba(255,255,255,0.45)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textAlign: 'left', lineHeight: 1.3 }}>
               {label}
             </button>
           ))}
         </div>
         {activeMode && (
-          <p style={{ fontSize: 10, color: 'rgba(196,169,232,0.55)', margin: '6px 0 0', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 10, color: 'rgba(185,139,255,0.55)', margin: '6px 0 0', lineHeight: 1.4 }}>
             {activeMode === 'recovery' ? '🌿 Recovery Mode: gentle, slow, restore.' :
              activeMode === 'rush'     ? '⚡ Rush Mode: single task, protect energy.' :
              activeMode === 'ground'   ? '🌍 Grounding: breathe, body first, then one step.' :
@@ -571,7 +617,7 @@ function Slide4() {
           <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.80)', margin: '0 0 1px' }}>Small reset. Big energy.</p>
           <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: 0 }}>Start one load of laundry</p>
         </div>
-        <button onClick={() => setHomeDone(!homeDone)} style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 14, border: `1px solid ${homeDone ? 'rgba(138,184,138,0.38)' : 'rgba(139,111,184,0.30)'}`, background: homeDone ? 'rgba(138,184,138,0.12)' : 'rgba(139,111,184,0.12)', color: homeDone ? '#8AB88A' : '#C4A9E8', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        <button onClick={() => setHomeDone(!homeDone)} style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 14, border: `1px solid ${homeDone ? 'rgba(138,184,138,0.38)' : 'rgba(155,92,255,0.30)'}`, background: homeDone ? 'rgba(138,184,138,0.12)' : 'rgba(155,92,255,0.12)', color: homeDone ? '#8AB88A' : '#b98bff', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
           {homeDone ? '✓ Done' : 'Start task →'}
         </button>
       </div>
@@ -583,7 +629,11 @@ function Slide4() {
 // ─────────────────────────────────────────────────────────────────────────────
 // SLIDE 5 — Weekly / Growth  (5 cards, no scroll)
 // ─────────────────────────────────────────────────────────────────────────────
-const PARKED = ['Fashion line ideas', 'Website polish', 'Content concepts']
+// Same source of truth as /vault — no second hardcoded parked-items list.
+const PARKED = VAULT_CATEGORIES.flatMap(c => c.items)
+  .filter(i => i.status === 'parked')
+  .slice(0, 3)
+  .map(i => i.name)
 
 function Slide5({ guidance }: { guidance: GuidanceData | null }) {
   return (
@@ -595,7 +645,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         flex: 1, minHeight: 0, overflow: 'hidden',
         display: 'flex', flexDirection: 'column',
         background: 'linear-gradient(148deg, rgba(58,18,115,0.90) 0%, rgba(28,8,78,0.94) 50%, rgba(10,4,38,0.97) 100%)',
-        border: '1px solid rgba(196,169,232,0.20)',
+        border: '1px solid rgba(185,139,255,0.20)',
         boxShadow: '0 0 48px rgba(100,40,210,0.18), inset 0 1px 0 rgba(255,255,255,0.07)',
         position: 'relative',
         backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
@@ -608,8 +658,8 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         {/* Header row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div style={{ ...LBL, marginBottom: 0 }}><Target style={{ width: 9, height: 9 }} />Weekly Focus</div>
-          <div style={{ padding: '3px 10px', borderRadius: 24, background: 'rgba(139,111,184,0.22)', border: '1px solid rgba(196,169,232,0.24)' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#C4A9E8', letterSpacing: '0.08em' }}>
+          <div style={{ padding: '3px 10px', borderRadius: 24, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(185,139,255,0.24)' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: '#b98bff', letterSpacing: '0.08em' }}>
               WK {Math.ceil((new Date().getTime() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 604800000)}
             </span>
           </div>
@@ -626,7 +676,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         </p>
 
         {/* Affirmation */}
-        <p style={{ fontSize: 11, color: 'rgba(196,169,232,0.68)', margin: '0 0 auto', lineHeight: 1.6, textAlign: 'center', fontStyle: 'italic', position: 'relative', zIndex: 1, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <p style={{ fontSize: 11, color: 'rgba(185,139,255,0.68)', margin: '0 0 auto', lineHeight: 1.6, textAlign: 'center', fontStyle: 'italic', position: 'relative', zIndex: 1, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {guidance?.affirmation ?? 'Finish what unlocks momentum.'}
         </p>
 
@@ -639,8 +689,8 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
             const isToday = i === weekPos
             return (
               <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ width: isToday ? 9 : 6, height: isToday ? 9 : 6, borderRadius: '50%', background: isToday ? '#C4A9E8' : isPast ? 'rgba(139,111,184,0.58)' : 'rgba(255,255,255,0.10)', boxShadow: isToday ? '0 0 8px rgba(196,169,232,0.60)' : 'none', transition: 'all 0.2s' }} />
-                <span style={{ fontSize: 7.5, fontWeight: 700, color: isToday ? '#C4A9E8' : isPast ? 'rgba(196,169,232,0.38)' : 'rgba(255,255,255,0.18)', letterSpacing: '0.04em' }}>{day}</span>
+                <div style={{ width: isToday ? 9 : 6, height: isToday ? 9 : 6, borderRadius: '50%', background: isToday ? '#b98bff' : isPast ? 'rgba(155,92,255,0.58)' : 'rgba(255,255,255,0.10)', boxShadow: isToday ? '0 0 8px rgba(185,139,255,0.60)' : 'none', transition: 'all 0.2s' }} />
+                <span style={{ fontSize: 7.5, fontWeight: 700, color: isToday ? '#b98bff' : isPast ? 'rgba(185,139,255,0.38)' : 'rgba(255,255,255,0.18)', letterSpacing: '0.04em' }}>{day}</span>
               </div>
             )
           })}
@@ -649,8 +699,8 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         {/* Theme pills */}
         <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 10, flexShrink: 0, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
           {['Refinement', 'Visibility', 'Momentum'].map((theme, i) => (
-            <div key={theme} style={{ padding: '3px 10px', borderRadius: 24, background: `rgba(139,111,184,${0.12 + i * 0.04})`, border: '1px solid rgba(196,169,232,0.16)' }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(196,169,232,0.62)', letterSpacing: '0.04em' }}>{theme}</span>
+            <div key={theme} style={{ padding: '3px 10px', borderRadius: 24, background: `rgba(155,92,255,${0.12 + i * 0.04})`, border: '1px solid rgba(185,139,255,0.16)' }}>
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(185,139,255,0.62)', letterSpacing: '0.04em' }}>{theme}</span>
             </div>
           ))}
         </div>
@@ -679,7 +729,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {PARKED.map((p, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#8B6FB8', flexShrink: 0 }} />
+              <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#9b5cff', flexShrink: 0 }} />
               <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>{p}</p>
             </div>
           ))}
@@ -691,12 +741,12 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         <div style={{
           ...G,
           borderRadius: 22, padding: '12px 16px',
-          background: 'rgba(139,111,184,0.14)', border: '1px solid rgba(139,111,184,0.28)',
+          background: 'rgba(155,92,255,0.14)', border: '1px solid rgba(155,92,255,0.28)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           boxShadow: '0 0 18px rgba(100,50,200,0.08)',
         }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#C4A9E8' }}>Plan my week →</span>
-          <Star style={{ width: 14, height: 14, color: 'rgba(196,169,232,0.45)' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#b98bff' }}>Plan my week →</span>
+          <Star style={{ width: 14, height: 14, color: 'rgba(185,139,255,0.45)' }} />
         </div>
       </Link>
 
@@ -716,9 +766,16 @@ function HomePageInner() {
   const [hour,       setHour]       = useState(new Date().getHours())
   const [guidance,   setGuidance]   = useState<GuidanceData | null>(null)
   const [gLoading,   setGLoading]   = useState(true)
+  const [lunaMessage, setLunaMessage] = useState<{ message: string; affirmation: string } | null>(null)
+  const [lmLoading,  setLmLoading]  = useState(true)
   const [calEvents,  setCalEvents]  = useState<HomeCalEvent[]>([])
   const [topTasks,   setTopTasks]   = useState<HomeTask[]>([])
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [moonData,   setMoonData]   = useState<{ phase?: { name: string; emoji?: string }; sign?: { name: string; emoji?: string } } | null>(null)
+  const [moneyData,  setMoneyData]  = useState<{ bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number } | null>(null)
+  const [styleData,  setStyleData]  = useState<{ hasProfile: boolean; summary?: string } | null>(null)
+  const [checkIn,    setCheckIn]    = useState<TodayCheckIn | null>(null)
+  const [checkInLoading, setCheckInLoading] = useState(true)
 
   useEffect(() => {
     const t = setInterval(() => setHour(new Date().getHours()), 60_000)
@@ -732,12 +789,29 @@ function HomePageInner() {
         fetch('/api/ai/spiritual-guidance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
           .then(r => r.json()).then(d => setGuidance(d)).catch(() => {})
       ).finally(() => setGLoading(false))
+    setLmLoading(true)
+    fetch(`/api/luna/daily-message?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(r => r.json()).then(d => setLunaMessage(d)).catch(() => {}).finally(() => setLmLoading(false))
     fetch('/api/home/summary')
       .then(r => r.json())
       .then(d => {
         if (d.calendar?.today) setCalEvents(d.calendar.today)
         if (d.tasks?.top)      setTopTasks(d.tasks.top)
       }).catch(() => {}).finally(() => setDataLoaded(true))
+    fetch(`/api/astrology/moon?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(r => r.json()).then(d => setMoonData(d)).catch(() => {})
+    fetch('/api/money/summary')
+      .then(r => r.json()).then(d => setMoneyData(d)).catch(() => {})
+    fetch('/api/atelier/style-profile')
+      .then(r => r.json()).then(d => setStyleData(d)).catch(() => {})
+    setCheckInLoading(true)
+    fetch('/api/check-ins?limit=5')
+      .then(r => r.json())
+      .then((d: { checkIns?: (TodayCheckIn & { created_at?: string })[] }) => {
+        const todayKey = new Date().toDateString()
+        const today = (d.checkIns ?? []).find(c => c.created_at && new Date(c.created_at).toDateString() === todayKey)
+        setCheckIn(today ?? null)
+      }).catch(() => {}).finally(() => setCheckInLoading(false))
   }, [])
 
   useEffect(() => { loadData() }, [loadData])
@@ -748,48 +822,18 @@ function HomePageInner() {
   const pages = [
     {
       id: 'today', label: 'Today',
-      content: <Slide1 greeting={greeting} moon={moon} guidance={guidance} gLoading={gLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
+      content: <Slide1 greeting={greeting} moon={moon} guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
     },
-    { id: 'previews', label: 'Previews', content: <Slide2 guidance={guidance} /> },
-    { id: 'wellness', label: 'Wellness', content: <Slide3 /> },
-    { id: 'energy',   label: 'Energy',   content: <Slide4 /> },
+    { id: 'previews', label: 'Previews', content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
+    { id: 'wellness', label: 'Wellness', content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
+    { id: 'energy',   label: 'Energy',   content: <Slide4 topTasks={topTasks} /> },
     { id: 'weekly',   label: 'Weekly',   content: <Slide5 guidance={guidance} /> },
   ]
 
   return (
-    <SwipeContainer
-      style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
-      className="bg-app"
-    >
-      <DesktopSidebar />
-      <DesktopHeader />
-
-      <div className="lg:hidden" style={{ flexShrink: 0 }}>
-        <MobileTopBar />
-      </div>
-
-      <main
-        style={{
-          flex: 1, minHeight: 0, overflow: 'hidden',
-          display: 'flex', flexDirection: 'column',
-          paddingBottom: 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)',
-        }}
-        className="w-full lg:pt-16 lg:pl-56"
-      >
-        <div
-          style={{
-            flex: 1, minHeight: 0, overflow: 'hidden',
-            display: 'flex', flexDirection: 'column',
-            paddingLeft: 16, paddingRight: 16,
-          }}
-          className="mx-auto w-full max-w-[1120px]"
-        >
-          <CategoryPager pages={pages} hidePills accentColor="#8B6FB8" activeIndex={activeSlide} onChangeIndex={setActiveSlide} />
-        </div>
-      </main>
-
-      <BottomNav />
-    </SwipeContainer>
+    <LunaShell noScroll wide>
+      <LunaSwipePager pages={pages} hidePills accentColor="#9b5cff" activeIndex={activeSlide} onChangeIndex={setActiveSlide} />
+    </LunaShell>
   )
 }
 

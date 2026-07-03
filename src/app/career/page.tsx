@@ -40,7 +40,7 @@ const GLASS: React.CSSProperties = {
 const HEALTH_STYLES: Record<string, { color: string; label: string }> = {
   excellent: { color: '#5A8A5A', label: 'Excellent' },
   good:      { color: '#8BAD78', label: 'Good'      },
-  new:       { color: '#8B6FB8', label: 'New'       },
+  new:       { color: '#9b5cff', label: 'New'       },
   at_risk:   { color: '#E08B4A', label: 'At risk'   },
   churning:  { color: '#E05E5E', label: 'Churning'  },
 }
@@ -96,7 +96,7 @@ function ClientCard({ account, tasks }: { account: DryphubAccount; tasks: Dryphu
           </div>
         </div>
         {tasks.length > 0 && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(139,111,184,0.8)', background: 'rgba(139,111,184,0.1)', padding: '4px 8px', borderRadius: 8 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(155,92,255,0.8)', background: 'rgba(155,92,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -232,9 +232,9 @@ export default function CareerCompassScreen() {
         {/* CRM stat pills */}
         {!crmLoading && !crmError && accounts.length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(139,111,184,0.1)', border: '1px solid rgba(139,111,184,0.18)' }}>
-              <Users className="h-3 w-3" style={{ color: '#8B6FB8' }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#8B6FB8' }}>{accounts.length} clients</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.18)' }}>
+              <Users className="h-3 w-3" style={{ color: '#9b5cff' }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#9b5cff' }}>{accounts.length} clients</span>
             </div>
             {totalMRR > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.18)' }}>
@@ -298,7 +298,7 @@ export default function CareerCompassScreen() {
                 )}
                 <button onClick={generateCompass} disabled={compassLoading} style={{
                   width: '100%', padding: '16px', borderRadius: 18, fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, rgba(168,196,218,0.3), rgba(139,111,184,0.3))',
+                  background: 'linear-gradient(135deg, rgba(168,196,218,0.3), rgba(155,92,255,0.3))',
                   border: '1px solid rgba(168,196,218,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}>
                   {compassLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Reading your career energy…</> : <><Sparkles className="h-4 w-4" /> Generate Career Compass</>}
@@ -314,10 +314,10 @@ export default function CareerCompassScreen() {
 
                 {compassResult.highest_use_work && compassResult.highest_use_work.length > 0 && (
                   <GlassCard soul>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8B6FB8', marginBottom: 10 }}>Highest-use work today</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 10 }}>Highest-use work today</p>
                     {compassResult.highest_use_work.map((w, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 10, paddingTop: 8, paddingBottom: 8, borderBottom: i < compassResult.highest_use_work!.length - 1 ? '1px solid rgba(139,111,184,0.08)' : 'none' }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#8B6FB8', minWidth: 20 }}>0{i+1}</span>
+                      <div key={i} style={{ display: 'flex', gap: 10, paddingTop: 8, paddingBottom: 8, borderBottom: i < compassResult.highest_use_work!.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: '#9b5cff', minWidth: 20 }}>0{i+1}</span>
                         <p style={{ fontSize: 14, color: 'white' }}>{w}</p>
                       </div>
                     ))}
@@ -337,11 +337,11 @@ export default function CareerCompassScreen() {
                 )}
 
                 {compassResult.voice_clarity_prompt && (
-                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(139,111,184,0.06)' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8B6FB8', marginBottom: 8 }}>Voice clarity</p>
+                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(155,92,255,0.06)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 8 }}>Voice clarity</p>
                     <p style={{ fontSize: 14, fontStyle: 'italic', color: 'white', lineHeight: 1.6 }}>{compassResult.voice_clarity_prompt}</p>
                     <Link href="/dictation">
-                      <button style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#8B6FB8', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <button style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#9b5cff', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <Mic className="h-3.5 w-3.5" /> Speak it out →
                       </button>
                     </Link>
@@ -438,7 +438,7 @@ export default function CareerCompassScreen() {
                   : ['EHM Strategies', 'Flanagan\'s Irish Pub', 'Villa Residential', 'Babe Coffee Lounge'],
                 live: accounts.length > 0,
               },
-              { label: 'DRYP Growth',       color: '#8B6FB8',           items: ['DRYP Digital', 'DRYPHub CRM', 'Newsletter Studio', 'DRYP Studio', 'Social content'],   live: false },
+              { label: 'DRYP Growth',       color: '#9b5cff',           items: ['DRYP Digital', 'DRYPHub CRM', 'Newsletter Studio', 'DRYP Studio', 'Social content'],   live: false },
               { label: 'Money Moves',        color: '#C9A96E',           items: ['TikTok Shop', 'Dropshipping', 'Trading', 'Passive income streams'],                    live: false },
               { label: 'Creative Identity',  color: 'var(--blush)',      items: ['Content creation', 'Sewing + clothing brand', 'Painting', 'Dance', 'Tattoo art'],      live: false },
               { label: 'Future Projects',    color: 'var(--herb)',       items: ['Nurturly', 'LINK\'d UP', 'Bikini brand', 'Books', '144-client prep'],                  live: false },
@@ -493,7 +493,7 @@ export default function CareerCompassScreen() {
                 ))}
                 <button onClick={submitWeek} disabled={weekLoading || Object.keys(weekAnswers).length === 0} style={{
                   width: '100%', padding: '14px', borderRadius: 16, fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer', marginTop: 4,
-                  background: 'linear-gradient(135deg, rgba(168,196,218,0.25), rgba(139,111,184,0.25))',
+                  background: 'linear-gradient(135deg, rgba(168,196,218,0.25), rgba(155,92,255,0.25))',
                   border: '1px solid rgba(168,196,218,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   opacity: Object.keys(weekAnswers).length === 0 ? 0.5 : 1,
                 }}>
@@ -503,8 +503,8 @@ export default function CareerCompassScreen() {
             ) : (
               <>
                 {weekResult.week_theme && (
-                  <div style={{ ...GLASS, padding: '18px 20px', background: 'rgba(139,111,184,0.08)', border: '1px solid rgba(139,111,184,0.2)', borderRadius: 20, textAlign: 'center' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8B6FB8', marginBottom: 8 }}>This week's theme</p>
+                  <div style={{ ...GLASS, padding: '18px 20px', background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)', borderRadius: 20, textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 8 }}>This week's theme</p>
                     <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'white' }}>{weekResult.week_theme}</p>
                   </div>
                 )}

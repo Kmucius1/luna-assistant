@@ -1,0 +1,44 @@
+{
+  "ZODIAC_SIGNS": [
+    "Aries",
+    "Taurus",
+    "Gemini",
+    "Cancer",
+    "Leo",
+    "Virgo",
+    "Libra",
+    "Scorpio",
+    "Sagittarius",
+    "Capricorn",
+    "Aquarius",
+    "Pisces"
+  ],
+  "SIGN_EMOJIS": {
+    "Aries": "♈",
+    "Taurus": "♉",
+    "Gemini": "♊",
+    "Cancer": "♋",
+    "Leo": "♌",
+    "Virgo": "♍",
+    "Libra": "♎",
+    "Scorpio": "♏",
+    "Sagittarius": "♐",
+    "Capricorn": "♑",
+    "Aquarius": "♒",
+    "Pisces": "♓"
+  },
+  "SIGN_KEYWORDS": {
+    "Aries": "Initiation · boldness · new energy",
+    "Taurus": "Grounding · pleasure · stability · body",
+    "Gemini": "Communication · curiosity · ideas · movement",
+    "Cancer": "Emotion · nurturing · home · memory · safety",
+    "Leo": "Creativity · confidence · heart · visibility",
+    "Virgo": "Clarity · service · refinement · systems",
+    "Libra": "Balance · beauty · relationships · peace",
+    "Scorpio": "Depth · transformation · truth · power",
+    "Sagittarius": "Expansion · truth · freedom · vision · fire",
+    "Capricorn": "Ambition · structure · mastery · discipline",
+    "Aquarius": "Innovation · community · liberation · future",
+    "Pisces": "Intuition · compassion · dissolution · dreams"
+  }
+}

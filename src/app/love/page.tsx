@@ -198,13 +198,13 @@ export default function LovePage() {
                     {/* Navigate now */}
                     <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                        <Eye className="h-4 w-4" style={{ color: '#8B6FB8' }} />
-                        <Label text="Navigate Love Right Now" color="#8B6FB8" />
+                        <Eye className="h-4 w-4" style={{ color: '#9b5cff' }} />
+                        <Label text="Navigate Love Right Now" color="#9b5cff" />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {(data.navigate_now ?? []).map((tip, i) => (
                           <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                            <div style={{ width: 22, height: 22, borderRadius: 11, background: 'rgba(139,111,184,0.2)', border: '1px solid rgba(139,111,184,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#8B6FB8', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                            <div style={{ width: 22, height: 22, borderRadius: 11, background: 'rgba(155,92,255,0.2)', border: '1px solid rgba(155,92,255,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#9b5cff', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
                             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>{tip}</p>
                           </div>
                         ))}
@@ -313,7 +313,7 @@ export default function LovePage() {
 
                 {/* Projector in love */}
                 <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
-                  <Label text="Your HD Love Strategy" color="#8B6FB8" />
+                  <Label text="Your HD Love Strategy" color="#9b5cff" />
                   <p style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 10 }}>Self-Projected Projector · 4/6 Profile</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {[
@@ -325,7 +325,7 @@ export default function LovePage() {
                       <div key={item.title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: 12, borderRadius: 14, background: 'rgba(255,255,255,0.04)' }}>
                         <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
                         <div>
-                          <p style={{ fontSize: 12, fontWeight: 700, color: '#8B6FB8', marginBottom: 4 }}>{item.title}</p>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: '#9b5cff', marginBottom: 4 }}>{item.title}</p>
                           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.55 }}>{item.body}</p>
                         </div>
                       </div>

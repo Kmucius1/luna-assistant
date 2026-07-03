@@ -17,7 +17,7 @@ const RESET_SECTIONS = [
   },
   {
     title: '📅 Mind',
-    color: '#8B6FB8',
+    color: '#9b5cff',
     items: ['Review calendar for the week', 'Catch up on emails', 'Set top 3 weekly priorities', 'Review open client tasks', 'Update DRYPHub'],
   },
   {
@@ -98,7 +98,7 @@ export default function WeeklyResetPage() {
 
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(139,111,184,0.1)' }}>
+              style={{ background: 'rgba(155,92,255,0.1)' }}>
               <RefreshCw className="h-5 w-5" style={{ color: 'var(--violet)' }} />
             </div>
             <div>
@@ -120,7 +120,7 @@ export default function WeeklyResetPage() {
               <button key={v} onClick={() => setActiveView(v)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 style={{
-                  background: activeView === v ? 'var(--violet)' : 'rgba(139,111,184,0.08)',
+                  background: activeView === v ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
                   color: activeView === v ? 'white' : 'var(--mid)',
                 }}>
                 {v === 'reset' ? '✅ Ritual Checklist' : '💜 Weekly Reflection'}
@@ -138,7 +138,7 @@ export default function WeeklyResetPage() {
                   </p>
                   <p className="text-sm font-bold" style={{ color: 'var(--violet)' }}>{pct}%</p>
                 </div>
-                <div className="h-2 rounded-full" style={{ background: 'rgba(139,111,184,0.1)' }}>
+                <div className="h-2 rounded-full" style={{ background: 'rgba(155,92,255,0.1)' }}>
                   <div className="h-2 rounded-full transition-all duration-500"
                     style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet-mid), var(--violet))' }} />
                 </div>
@@ -248,7 +248,7 @@ export default function WeeklyResetPage() {
               )}
 
               <div className="rounded-2xl p-5 text-center"
-                style={{ background: 'rgba(139,111,184,0.06)', border: '1px solid rgba(139,111,184,0.1)' }}>
+                style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
                 <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>
                   &ldquo;{result.affirmation}&rdquo;
                 </p>
@@ -260,7 +260,7 @@ export default function WeeklyResetPage() {
 
               <button onClick={() => setResult(null)}
                 className="w-full py-3.5 rounded-2xl font-semibold"
-                style={{ background: 'rgba(139,111,184,0.08)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
                 Edit reflection
               </button>
             </div>

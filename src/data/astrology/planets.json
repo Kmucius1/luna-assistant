@@ -1,0 +1,31 @@
+{
+  "PLANET_EMOJIS": {
+    "Sun": "☀️",
+    "Moon": "🌙",
+    "Mercury": "☿",
+    "Venus": "♀",
+    "Mars": "♂",
+    "Jupiter": "♃",
+    "Saturn": "♄",
+    "Uranus": "⛢",
+    "Neptune": "♆",
+    "Pluto": "♇",
+    "NNode": "☊",
+    "Chiron": "⚷",
+    "Lilith": "⚸",
+    "Midheaven": "MC",
+    "Rising": "ASC"
+  },
+  "PLANET_KEYWORDS": {
+    "Sun": "Identity · vitality · core self · life force",
+    "Moon": "Emotions · instincts · safety needs · cycles",
+    "Mercury": "Mind · communication · thought · learning",
+    "Venus": "Love · beauty · values · pleasure · attraction",
+    "Mars": "Drive · action · desire · anger · motivation",
+    "Jupiter": "Expansion · abundance · wisdom · opportunity",
+    "Saturn": "Discipline · limits · lessons · mastery · time",
+    "Uranus": "Disruption · liberation · awakening · innovation",
+    "Neptune": "Illusion · dreams · spirituality · dissolution",
+    "Pluto": "Transformation · power · death/rebirth · shadow"
+  }
+}

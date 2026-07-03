@@ -111,11 +111,11 @@ export default function BirthChartPage() {
 
         {/* Chart summary card */}
         <div className="relative rounded-[22px] p-5 mb-5 overflow-hidden"
-          style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(139,111,184,0.25)' }}>
+          style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
           <div className="absolute top-0 right-0 w-40 h-40 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(139,111,184,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
+            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
           <div className="relative z-10">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(196,169,232,0.6)' }}>Zoe Taylor · Natal Chart</p>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.6)' }}>Zoe Taylor · Natal Chart</p>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {ZOE_CHART.bigThree.map(p => (
                 <div key={p.label} className="text-center rounded-xl p-3"
