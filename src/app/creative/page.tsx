@@ -1,14 +1,14 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { CategoryPager } from '@/components/ui/CategoryPager'
+import { CategoryPager, type CPage } from '@/components/ui/CategoryPager'
 import {
   Sparkles, Star, Scissors, ShirtIcon, Image, BookOpen, Gem, Plus,
   ChevronDown, ChevronRight, Check, RotateCcw, Wand2, Camera,
   Layers, ArrowRight, Moon, Sun, Wind, Zap, Heart, Music,
   Package, Hammer, Coffee, AlertCircle, Loader2, ShoppingBag
 } from 'lucide-react'
-import Link from 'next/link'
 
 interface OracleResult {
   style_lane?: string
@@ -129,7 +129,7 @@ function SectionHeader({ icon: Icon, title, sub }: { icon: React.ComponentType<{
   )
 }
 
-function OracleCompact() {
+function OracleCompact({ onOpenFull }: { onOpenFull: () => void }) {
   const [selectedMood, setSelectedMood] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<OracleResult | null>(null)
@@ -223,12 +223,10 @@ function OracleCompact() {
         </div>
       )}
 
-      <Link href="/creative/oracle" style={{ textDecoration: 'none' }}>
-        <div className="rounded-2xl py-3 text-center text-sm font-semibold"
-          style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', color: 'rgba(201,169,110,0.8)' }}>
-          Full Style Oracle with context →
-        </div>
-      </Link>
+      <button onClick={onOpenFull} className="w-full rounded-2xl py-3 text-center text-sm font-semibold"
+        style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', color: 'rgba(201,169,110,0.8)' }}>
+        Full Style Oracle with context →
+      </button>
     </div>
   )
 }
@@ -1025,27 +1023,58 @@ function VaultSection() {
   )
 }
 
+interface WishlistItem {
+  id: string
+  list: 'Buy' | 'Thrift' | 'Fabric' | 'Accessory'
+  text: string
+}
+
 function ShoppingSection() {
-  const [items, setItems] = useState([
-    { id: 1, list: 'Thrift',    text: 'Wide-leg linen trousers — cream or sand' },
-    { id: 2, list: 'Thrift',    text: 'Vintage blazer — oversized, earth tone' },
-    { id: 3, list: 'Fabric',    text: '2 yards of silk charmeuse — dusty rose' },
-    { id: 4, list: 'Buy',       text: 'Ribbed tank bodysuit — black' },
-    { id: 5, list: 'Accessory', text: 'Gold hoop earrings — medium, thick gauge' },
-    { id: 6, list: 'Accessory', text: 'Brown leather belt — thin strap' },
-  ])
+  const [items, setItems] = useState<WishlistItem[]>([])
+  const [loading, setLoading] = useState(true)
   const [newItem, setNewItem] = useState('')
   const [newList, setNewList] = useState<'Thrift' | 'Fabric' | 'Buy' | 'Accessory'>('Buy')
+  const [saving, setSaving] = useState(false)
   const lists = ['Buy', 'Thrift', 'Fabric', 'Accessory'] as const
 
-  function addItem() {
-    if (!newItem.trim()) return
-    setItems(prev => [...prev, { id: Date.now(), list: newList, text: newItem.trim() }])
-    setNewItem('')
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch('/api/atelier/shopping')
+      const data = await res.json()
+      setItems(data.items ?? [])
+    } catch { /* table might not exist yet */ }
+    finally { setLoading(false) }
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  async function addItem() {
+    if (!newItem.trim() || saving) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/atelier/shopping', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ list: newList, text: newItem.trim() }),
+      })
+      const data = await res.json()
+      if (data.item) {
+        setItems(prev => [...prev, data.item])
+        setNewItem('')
+      }
+    } catch { /* ignore */ }
+    finally { setSaving(false) }
   }
 
-  function removeItem(id: number) {
+  async function removeItem(id: string) {
     setItems(prev => prev.filter(i => i.id !== id))
+    try {
+      await fetch('/api/atelier/shopping', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      })
+    } catch { /* ignore — item already removed from view */ }
   }
 
   return (
@@ -1065,10 +1094,15 @@ function ShoppingSection() {
           <input value={newItem} onChange={e => setNewItem(e.target.value)} onKeyDown={e => e.key === 'Enter' && addItem()} placeholder="What are you looking for?"
             className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none"
             style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-1)', border: '1px solid rgba(155,92,255,0.15)' }} />
-          <button onClick={addItem} className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" style={{ background: 'var(--violet)', color: 'white' }}>Add</button>
+          <button onClick={addItem} disabled={saving || !newItem.trim()} className="px-4 py-2.5 rounded-xl text-sm font-semibold flex-shrink-0" style={{ background: 'var(--violet)', color: 'white', opacity: saving ? 0.7 : 1 }}>Add</button>
         </div>
       </ACard>
-      {lists.map(list => {
+      {loading && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-5 h-5 animate-spin" style={{ color: 'var(--text-3)' }} />
+        </div>
+      )}
+      {!loading && lists.map(list => {
         const listItems = items.filter(i => i.list === list)
         if (!listItems.length) return null
         return (
@@ -1088,40 +1122,33 @@ function ShoppingSection() {
           </ACard>
         )
       })}
+      {!loading && !items.length && (
+        <p className="text-sm text-center py-4" style={{ color: 'var(--text-3)' }}>Nothing on your list yet — add what you're hunting for above.</p>
+      )}
     </div>
   )
 }
 
-const CREATIVE_APPS = [
-  { emoji: '✨', label: 'Style Oracle',  href: '/creative/oracle'      },
-  { emoji: '👕', label: 'Closet',        href: '/creative/closet'      },
-  { emoji: '🖼', label: 'Inspiration',   href: '/creative/inspiration' },
-  { emoji: '✂️', label: 'Sewing',        href: '/creative/sewing'      },
-  { emoji: '🎬', label: 'Generated',     href: '/creative/studio'      },
-  { emoji: '💎', label: 'Fashion Vault', href: '/creative/vault'       },
-  { emoji: '🛍', label: 'Wishlist',      href: '/creative/shopping'    },
-]
+// Order here is the pager's tab order — also what `?tab=` matches against.
+const TAB_IDS = ['style', 'oracle', 'closet', 'inspiration', 'sewing', 'studio', 'vault', 'shopping'] as const
 
-export default function AtelierPage() {
-  const appsContent = (
-    <div>
-      <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.55)', marginBottom: 14, paddingTop: 4 }}>All Sections</p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-        {CREATIVE_APPS.map(item => (
-          <Link key={item.label} href={item.href} style={{ textDecoration: 'none' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '16px 8px 12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 18, cursor: 'pointer', textAlign: 'center' }}>
-              <span style={{ fontSize: 26 }}>{item.emoji}</span>
-              <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.75)', lineHeight: 1.2 }}>{item.label}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
+function CreativePageInner() {
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab')
+  const [activeIndex, setActiveIndex] = useState(() => {
+    const i = TAB_IDS.indexOf((initialTab ?? '') as typeof TAB_IDS[number])
+    return i === -1 ? 0 : i
+  })
 
-  const creativePages = [
-    { id: 'style', label: '✨ Style', content: <OracleCompact /> },
-    { id: 'apps',  label: 'Apps',    content: appsContent },
+  const creativePages: CPage[] = [
+    { id: 'style',       label: '✨ Style',    content: <OracleCompact onOpenFull={() => setActiveIndex(TAB_IDS.indexOf('oracle'))} /> },
+    { id: 'oracle',      label: 'Oracle',      content: <OracleSection /> },
+    { id: 'closet',      label: 'Closet',      content: <ClosetSection /> },
+    { id: 'inspiration', label: 'Inspiration', content: <InspirationSection /> },
+    { id: 'sewing',      label: 'Sewing',      content: <ProjectsSection /> },
+    { id: 'studio',      label: 'Generated',   content: <StudioSection /> },
+    { id: 'vault',       label: 'Vault',       content: <VaultSection /> },
+    { id: 'shopping',    label: 'Wishlist',    content: <ShoppingSection /> },
   ]
 
   return (
@@ -1136,7 +1163,15 @@ export default function AtelierPage() {
         </div>
       </div>
 
-      <CategoryPager pages={creativePages} accentColor="#C9A96E" />
+      <CategoryPager pages={creativePages} accentColor="#C9A96E" activeIndex={activeIndex} onChangeIndex={setActiveIndex} />
     </AppLayout>
+  )
+}
+
+export default function AtelierPage() {
+  return (
+    <Suspense fallback={null}>
+      <CreativePageInner />
+    </Suspense>
   )
 }

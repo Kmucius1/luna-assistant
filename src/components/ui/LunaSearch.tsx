@@ -39,7 +39,7 @@ const ALL_APPS: AppEntry[] = [
   { href: '/messages',         label: 'Messages',          emoji: '💬', desc: 'Communication coaching',                 tags: ['messages','communicate','coach','respond'],       category: 'Personal' },
   { href: '/relationships',    label: 'Relationships',     emoji: '💜', desc: 'Love, connection, boundaries',           tags: ['relationships','love','connection','people'],     category: 'Personal' },
   { href: '/money',            label: 'Money',             emoji: '💸', desc: 'Slow wealth and financial clarity',      tags: ['money','finances','wealth','income'],             category: 'Personal' },
-  { href: '/atelier',          label: 'Atelier',           emoji: '✂️', desc: 'Style Oracle, outfit, beauty',           tags: ['style','fashion','outfit','beauty','atelier'],    category: 'Personal' },
+  { href: '/creative',         label: 'Atelier',           emoji: '✂️', desc: 'Style Oracle, outfit, beauty',           tags: ['style','fashion','outfit','beauty','atelier'],    category: 'Personal' },
   { href: '/vault',            label: 'Vault',             emoji: '🗄', desc: 'Safe space for your ideas',              tags: ['vault','ideas','save','store','park'],            category: 'Personal' },
   // Soul & Growth
   { href: '/spirit',           label: 'Spirit',            emoji: '🔮', desc: 'Spiritual guidance, tarot, ritual',      tags: ['spirit','spiritual','tarot','ritual','divine'],   category: 'Soul & Growth' },

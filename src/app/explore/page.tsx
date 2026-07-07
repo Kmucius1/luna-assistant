@@ -85,8 +85,7 @@ const ALL_APPS: AppDef[] = [
   { label: 'Health',         emoji: '🌿', href: '/health',               color: '#8AB88A', desc: 'Body + wellness tracking'     },
 
   // ── Atelier + Style ────────────────────────────────────────────────
-  { label: 'Atelier',        emoji: '🪡', href: '/atelier',              color: '#D4A8C4', desc: 'Style oracle + closet'        },
-  { label: 'Style Oracle',   emoji: '✂️', href: '/creative',             color: '#D4A8C4', desc: 'Style, mood & aesthetics'     },
+  { label: 'Atelier',        emoji: '🪡', href: '/creative',             color: '#D4A8C4', desc: 'Style oracle + closet'        },
 
   // ── Settings + Connections ─────────────────────────────────────────
   { label: 'Settings',       emoji: '⚙️', href: '/settings',             color: '#b98bff', desc: 'Profile + AI preferences'     },
@@ -103,7 +102,7 @@ const CATEGORIES = [
   { id: 'work',       label: 'Work',               apps: ALL_APPS.filter(a => ['Work Overview','Calendar','Email','Tasks','Projects','DRYP Hub','Career','Money','Transactions','Bills','Subscriptions','Business Exp.','Money Insights','Budget Planning','EHM Strategies'].includes(a.label)) },
   { id: 'luna',       label: 'LUNA Tools',         apps: ALL_APPS.filter(a => ['LUNA Chat','Dictate','Dictation','Brain Dump','Messages','Journal','Highest Self','Vault','Memory','Growth','Check-in'].includes(a.label)) },
   { id: 'astrology',  label: 'Astrology + Spirit',  apps: ALL_APPS.filter(a => ['Astrology','Daily Read','Transits','Birth Chart','Moon','Crystals','Rituals','Forecasts','Deep Dives','Retrogrades','Spirit','Tarot','Love','Relationships','Manifestation','Health'].includes(a.label)) },
-  { id: 'atelier',    label: 'Atelier + Style',    apps: ALL_APPS.filter(a => ['Atelier','Style Oracle'].includes(a.label)) },
+  { id: 'atelier',    label: 'Atelier + Style',    apps: ALL_APPS.filter(a => ['Atelier'].includes(a.label)) },
   { id: 'settings',   label: 'Settings',           apps: ALL_APPS.filter(a => ['Settings','Profile','Bank Accounts','Connect a Bank','Privacy Policy','Terms'].includes(a.label)) },
 ]
 
@@ -135,7 +134,7 @@ function AppGrid({ apps }: { apps: AppDef[] }) {
             {tile}
           </a>
         ) : (
-          <Link key={app.label} href={app.href} style={wrapperStyle}>
+          <Link key={app.label} href={app.href} prefetch={false} style={wrapperStyle}>
             {tile}
           </Link>
         )

@@ -27,7 +27,13 @@ export async function GET(req: NextRequest) {
   const readings: StoredReading[] = []
   for (const dateKey of dateKeys) {
     const cached = existing.get(dateKey)
-    const needsGeneration = !cached || (refresh && dateKey === dateKeys[0])
+    // A reading that only made it to the real-data fallback (e.g. the AI call
+    // failed at generation time) isn't actually done — retry it automatically
+    // on the next load instead of leaving template text stuck until someone
+    // clicks Regenerate or the hourly cron happens to catch it.
+    const lastSource = cached?.source_log_json?.[cached.source_log_json.length - 1] as { source?: string } | undefined
+    const isUpgradeable = cached?.status === 'ready' && lastSource?.source === 'fallback'
+    const needsGeneration = !cached || (refresh && dateKey === dateKeys[0]) || isUpgradeable
 
     if (!needsGeneration && cached) {
       readings.push(cached)
