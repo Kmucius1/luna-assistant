@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
       wakeTime      = '6:00 AM',
       gymTime       = '',
       location      = 'home',
+      morningPlans  = '',
+      workPlans     = '',
       workEndTime   = '6:00 PM',
       hairWashDay   = false,
       eveningPlans  = '',
@@ -144,16 +146,18 @@ ${routineContext}
 Wake time: ${wakeTime}
 Gym: ${gymTime ? `${gymTime} — this is a real anchor, schedule it right after wake` : 'Not going to the gym today'}
 Location: ${location === 'home' ? 'Working from home' : 'Going into the DRYP office'}
+${morningPlans ? `Morning plans (real, fixed commitments — schedule around these): ${morningPlans}` : ''}
 Work end target: ${workEndTime}
+${workPlans ? `Work plans (real, fixed commitments — schedule around these): ${workPlans}` : ''}
 Hair today: ${hairWashDay ? 'WASH DAY — add 20 extra mins to shower/hair block for perm care' : 'Refresh day — 5 extra mins for curl refresh'}
 ${eveningPlans ? `Evening plans: ${eveningPlans}` : 'No specific evening plans — free evening'}
 
 ${taskList}
 
 Build her complete day from wake to sleep. Time-block her morning routine first (honoring her real
-stated routine and gym time above), then slot her real tasks into the work window before
-${workEndTime}, then build her evening down to lights out. Be realistic — Projector energy, max 6
-focused work hours, 20-30 min buffers built in.`
+stated routine, gym time, and any morning plans above), then slot her real tasks and any stated work
+plans into the work window before ${workEndTime}, then build her evening down to lights out. Be
+realistic — Projector energy, max 6 focused work hours, 20-30 min buffers built in.`
 
     const raw    = await callAI(SYSTEM, userPrompt, 3000)
     const parsed = parseAIJson(raw)

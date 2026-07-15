@@ -57,6 +57,8 @@ export default function PlanMyDayPage() {
   const [wakeTime,     setWakeTime]     = useState('6:00 AM')
   const [gymTime,      setGymTime]      = useState<string | null>('6:30 AM')
   const [location,     setLocation]     = useState<'home'|'office'>('home')
+  const [morningPlans, setMorningPlans] = useState('')
+  const [workPlans,    setWorkPlans]    = useState('')
   const [workEndTime,  setWorkEndTime]  = useState('6:00 PM')
   const [hairWashDay,  setHairWashDay]  = useState(false)
   const [eveningPlans, setEveningPlans] = useState('')
@@ -73,7 +75,7 @@ export default function PlanMyDayPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          wakeTime, gymTime: gymTime ?? '', location, workEndTime, hairWashDay, eveningPlans,
+          wakeTime, gymTime: gymTime ?? '', location, morningPlans, workPlans, workEndTime, hairWashDay, eveningPlans,
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
@@ -178,6 +180,28 @@ export default function PlanMyDayPage() {
                       }}>{opt.icon}{opt.label}</button>
                     ))}
                   </div>
+                </div>
+
+                {/* Morning plans */}
+                <div style={{ ...GLASS, padding: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Morning plans (optional)</p>
+                  <input
+                    value={morningPlans}
+                    onChange={e => setMorningPlans(e.target.value)}
+                    placeholder="doctor's appointment, coffee with a friend, errands…"
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                {/* Work plans */}
+                <div style={{ ...GLASS, padding: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Work plans (optional)</p>
+                  <input
+                    value={workPlans}
+                    onChange={e => setWorkPlans(e.target.value)}
+                    placeholder="client call at 2, big deadline, meeting with Mick…"
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                  />
                 </div>
 
                 {/* End time */}
