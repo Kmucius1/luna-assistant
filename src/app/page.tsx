@@ -7,6 +7,7 @@ import { LunaHeroCard } from '@/components/luna/LunaHeroCard'
 import { LunaActionTile } from '@/components/luna/LunaActionTile'
 import { LunaSwipePager } from '@/components/luna/LunaSwipePager'
 import { LunaEmptyState, LunaLoadingState } from '@/components/luna'
+import { useLocation } from '@/hooks/useLocation'
 import VAULT_CATEGORIES from '@/data/vault/categories.json'
 import {
   Star, Moon, Sparkles, Target, Calendar,
@@ -389,11 +390,13 @@ interface MoonPreviewData { phase?: { name: string; emoji?: string }; sign?: { n
 interface MoneyPreviewData { bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number }
 interface StylePreviewData { hasProfile: boolean; summary?: string }
 
-function Slide2({ guidance, moonData, moneyData, styleData }: {
+function Slide2({ guidance, moonData, moneyData, styleData, dailyOutfit, outfitLoading }: {
   guidance: GuidanceData | null
   moonData: MoonPreviewData | null
   moneyData: MoneyPreviewData | null
   styleData: StylePreviewData | null
+  dailyOutfit: { occasion: string; why: string; outfit_caption: string; image_url: string | null } | null
+  outfitLoading: boolean
 }) {
   const astroHeadline = moonData?.sign?.name
     ? `${moonData.sign.name} Moon`
@@ -410,18 +413,33 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
       </PreviewCard>
 
       <PreviewCard
-        label="Style Preview" icon={<Scissors style={{ width: 9, height: 9 }} />}
-        href={styleData?.hasProfile ? '/creative' : '/atelier/style-board'}
-        linkText={styleData?.hasProfile ? 'Open Atelier' : 'Pick your style'}
+        label="What To Wear Today" icon={<Scissors style={{ width: 9, height: 9 }} />}
+        href="/creative"
+        linkText="Open Style"
       >
-        {styleData?.hasProfile ? (
+        {outfitLoading ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="animate-spin" style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.15)', borderTopColor: 'white' }} />
+          </div>
+        ) : dailyOutfit?.image_url ? (
+          <>
+            <div style={{ flex: 1, minHeight: 0, borderRadius: 12, overflow: 'hidden', margin: '2px 0 6px', position: 'relative' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={dailyOutfit.image_url} alt={dailyOutfit.outfit_caption} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            </div>
+            <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{dailyOutfit.occasion}</p>
+            <p style={{ fontSize: 10, color: 'white', margin: '2px 0 0', lineHeight: 1.35, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+              {dailyOutfit.outfit_caption}
+            </p>
+          </>
+        ) : styleData?.hasProfile ? (
           <>
             <StyleVisual />
             <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{styleData.summary ?? 'Your style profile'}</p>
           </>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>Pick a few looks you like and LUNA will build your daily style from there.</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>LUNA is putting today's look together — check back in a moment.</p>
           </div>
         )}
       </PreviewCard>
@@ -932,12 +950,33 @@ function HomePageInner() {
   const [styleData,  setStyleData]  = useState<{ hasProfile: boolean; summary?: string } | null>(null)
   const [checkIn,    setCheckIn]    = useState<TodayCheckIn | null>(null)
   const [checkInLoading, setCheckInLoading] = useState(true)
+  const [dailyOutfit, setDailyOutfit] = useState<{ occasion: string; why: string; outfit_caption: string; image_url: string | null } | null>(null)
+  const [outfitLoading, setOutfitLoading] = useState(true)
+  const location = useLocation()
 
   useEffect(() => {
     setHour(new Date().getHours())
     const t = setInterval(() => setHour(new Date().getHours()), 60_000)
     return () => clearInterval(t)
   }, [])
+
+  // Waits for geolocation to resolve (granted or denied) before generating,
+  // since today's outfit is cached once per day and should factor in real
+  // weather when it's available rather than being generated without it.
+  useEffect(() => {
+    if (location.permitted === null) return
+    const params = new URLSearchParams({ tz: Intl.DateTimeFormat().resolvedOptions().timeZone })
+    if (location.lat != null && location.lon != null) {
+      params.set('lat', String(location.lat))
+      params.set('lon', String(location.lon))
+    }
+    setOutfitLoading(true)
+    fetch(`/api/atelier/daily-outfit?${params}`)
+      .then(r => r.json())
+      .then(d => setDailyOutfit(d))
+      .catch(() => setDailyOutfit(null))
+      .finally(() => setOutfitLoading(false))
+  }, [location.permitted, location.lat, location.lon])
 
   const loadData = useCallback(() => {
     setGLoading(true)
@@ -994,7 +1033,7 @@ function HomePageInner() {
       id: 'focus', label: 'Focus', noScroll: true,
       content: <Slide1B guidance={guidance} lunaMessage={lunaMessage} lmLoading={lmLoading} />,
     },
-    { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} /> },
+    { id: 'previews', label: 'Previews', noScroll: true, content: <Slide2 guidance={guidance} moonData={moonData} moneyData={moneyData} styleData={styleData} dailyOutfit={dailyOutfit} outfitLoading={outfitLoading} /> },
     { id: 'wellness', label: 'Wellness', noScroll: true, content: <Slide3 checkIn={checkIn} checkInLoading={checkInLoading} /> },
     { id: 'flow',     label: 'Flow',     noScroll: true, content: <Slide3B /> },
     { id: 'energy',   label: 'Energy',   noScroll: true, content: <Slide4 topTasks={topTasks} /> },
