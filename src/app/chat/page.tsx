@@ -39,6 +39,7 @@ export default function ChatPage() {
   const [sending,    setSending]    = useState(false)
   const [listening,  setListening]  = useState(false)
   const [loaded,     setLoaded]     = useState(false)
+  const [historyError, setHistoryError] = useState(false)
   const [speakingId, setSpeakingId] = useState<string | null>(null)
   const [speakLoadingId, setSpeakLoadingId] = useState<string | null>(null)
   const tz = typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
@@ -84,13 +85,26 @@ export default function ChatPage() {
   useEffect(() => () => { audioRef.current?.pause() }, [])
 
   // ─── Load history ──────────────────────────────────────────────
-  const loadHistory = useCallback(async () => {
+  // Mobile PWAs frequently hit a transient network blip right as a
+  // backgrounded tab comes back to the foreground — retry once before
+  // giving up, and if it still fails, show a visible retry affordance
+  // instead of silently leaving the conversation looking empty/lost.
+  const loadHistory = useCallback(async (isRetry = false) => {
+    setHistoryError(false)
     try {
-      const res = await fetch(`/api/chat/history?tz=${encodeURIComponent(tz)}`)
+      const res = await fetch(`/api/chat/history?tz=${encodeURIComponent(tz)}`, { cache: 'no-store' })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json() as { messages: Message[] }
       if (data.messages?.length) setMessages(data.messages)
-    } catch { /* show nothing, user can start fresh */ }
-    setLoaded(true)
+      setLoaded(true)
+    } catch {
+      if (!isRetry) {
+        await new Promise(r => setTimeout(r, 1200))
+        return loadHistory(true)
+      }
+      setHistoryError(true)
+      setLoaded(true)
+    }
   }, [tz])
 
   useEffect(() => { void loadHistory() }, [loadHistory])
@@ -243,6 +257,20 @@ export default function ChatPage() {
           {!loaded && (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
               <div style={{ fontSize: 22, opacity: 0.3 }}>✦</div>
+            </div>
+          )}
+
+          {loaded && historyError && messages.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>
+                Couldn&apos;t load your conversation — it&apos;s still there, this is just a connection hiccup.
+              </p>
+              <button
+                onClick={() => { setLoaded(false); void loadHistory() }}
+                style={{ padding: '10px 20px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Try again
+              </button>
             </div>
           )}
 

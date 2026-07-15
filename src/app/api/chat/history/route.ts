@@ -4,6 +4,11 @@ import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
+// Per-user, time-sensitive data — never let a CDN/browser cache serve a
+// stale snapshot of the conversation.
+export const dynamic = 'force-dynamic'
+const NO_STORE = { headers: { 'Cache-Control': 'no-store, must-revalidate' } }
+
 function getTimePeriod(hour: number): string {
   if (hour >= 5  && hour < 8)  return 'early morning'
   if (hour >= 8  && hour < 10) return 'morning routine'
@@ -64,13 +69,13 @@ export async function GET(req: NextRequest) {
         }],
         session_id,
         is_new: true,
-      })
+      }, NO_STORE)
     }
 
-    return NextResponse.json({ messages, session_id, is_new: false })
+    return NextResponse.json({ messages, session_id, is_new: false }, NO_STORE)
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('[chat/history]', msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    return NextResponse.json({ error: msg }, { status: 500, ...NO_STORE })
   }
 }
