@@ -1,8 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { useRouter } from 'next/navigation'
-import { loadStripe } from '@stripe/stripe-js'
+import { usePlaidLink, type PlaidLinkOnSuccessMetadata } from 'react-plaid-link'
 import { Building2, CheckCircle, Loader2, AlertTriangle } from 'lucide-react'
 
 const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
@@ -18,58 +18,62 @@ const CARD: React.CSSProperties = {
   padding: 20,
 }
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-
 export default function ConnectBankPage() {
   const router = useRouter()
-  const [status, setStatus]   = useState<'idle' | 'connecting' | 'importing' | 'done' | 'error'>('idle')
+  const [linkToken, setLinkToken] = useState<string | null>(null)
+  const [status, setStatus]   = useState<'idle' | 'loading-token' | 'importing' | 'done' | 'error'>('idle')
   const [message, setMessage] = useState('')
   const [imported, setImported] = useState(0)
 
-  async function handleConnect() {
-    setStatus('connecting')
-    setMessage('Opening bank connection…')
+  const fetchLinkToken = useCallback(async () => {
+    setStatus('loading-token')
+    setMessage('Preparing bank connection…')
     try {
-      // 1. Create a Financial Connections session server-side
-      const res = await fetch('/api/stripe/create-session', { method: 'POST' })
-      const { client_secret, error: sessionErr } = await res.json() as { client_secret?: string; error?: string }
-      if (sessionErr || !client_secret) throw new Error(sessionErr ?? 'Could not create session')
-
-      // 2. Open Stripe Financial Connections UI
-      const stripe = await stripePromise
-      if (!stripe) throw new Error('Stripe failed to load')
-
-      const { financialConnectionsSession, error: fcError } = await stripe.collectFinancialConnectionsAccounts({ clientSecret: client_secret })
-      if (fcError) throw new Error(fcError.message)
-      if (!financialConnectionsSession?.accounts?.length) {
-        setStatus('idle')
-        setMessage('No accounts were connected.')
-        return
-      }
-
-      // 3. Import transactions for each connected account
-      setStatus('importing')
-      let totalImported = 0
-      for (const account of financialConnectionsSession.accounts) {
-        setMessage(`Importing ${account.display_name ?? account.institution_name ?? 'account'}…`)
-        const impRes = await fetch('/api/stripe/import-transactions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ account_id: account.id }),
-        })
-        const impData = await impRes.json() as { imported?: number; error?: string }
-        if (impData.error) console.warn('Import warning:', impData.error)
-        totalImported += impData.imported ?? 0
-      }
-
-      setImported(totalImported)
-      setStatus('done')
-      setMessage(`${totalImported} transactions imported successfully`)
+      const res = await fetch('/api/plaid/create-link-token', { method: 'POST' })
+      const data = await res.json() as { link_token?: string; error?: string }
+      if (!res.ok || !data.link_token) throw new Error(data.error ?? 'Could not start the connection')
+      setLinkToken(data.link_token)
+      setStatus('idle')
+      setMessage('')
     } catch (err) {
       setStatus('error')
       setMessage(err instanceof Error ? err.message : 'Something went wrong')
     }
-  }
+  }, [])
+
+  useEffect(() => { fetchLinkToken() }, [fetchLinkToken])
+
+  const onSuccess = useCallback(async (public_token: string, metadata: PlaidLinkOnSuccessMetadata) => {
+    setStatus('importing')
+    setMessage(`Importing ${metadata.institution?.name ?? 'your account'}…`)
+    try {
+      const res = await fetch('/api/plaid/exchange-token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          public_token,
+          institution_id: metadata.institution?.institution_id ?? null,
+          institution_name: metadata.institution?.name ?? null,
+        }),
+      })
+      const data = await res.json() as { imported?: number; institution_name?: string; error?: string }
+      if (!res.ok) throw new Error(data.error ?? 'Import failed')
+      setImported(data.imported ?? 0)
+      setStatus('done')
+      setMessage(`${data.imported ?? 0} transactions imported successfully`)
+    } catch (err) {
+      setStatus('error')
+      setMessage(err instanceof Error ? err.message : 'Something went wrong')
+    }
+  }, [])
+
+  const { open, ready } = usePlaidLink({
+    token: linkToken,
+    onSuccess,
+    onExit: (err) => {
+      if (err) { setStatus('error'); setMessage(err.error_message || 'Connection was cancelled.') }
+    },
+  })
 
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
@@ -88,7 +92,7 @@ export default function ConnectBankPage() {
             </div>
             <h1 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 6 }}>Connect Your Bank</h1>
             <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
-              Securely link your bank account through Stripe. Your credentials are never stored — only read-only access.
+              Securely link your bank account through Plaid. Your credentials are never stored — only read-only access.
             </p>
           </div>
 
@@ -108,7 +112,7 @@ export default function ConnectBankPage() {
             <div style={{ ...CARD, background: 'rgba(201,107,90,0.08)', border: '1px solid rgba(201,107,90,0.25)', textAlign: 'center', padding: 24 }}>
               <AlertTriangle style={{ width: 28, height: 28, color: '#C96B5A', margin: '0 auto 10px' }} />
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 14 }}>{message}</p>
-              <button onClick={() => setStatus('idle')} style={{ fontSize: 13, color: GOLDEN, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={() => { setStatus('idle'); fetchLinkToken() }} style={{ fontSize: 13, color: GOLDEN, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                 Try again
               </button>
             </div>
@@ -116,9 +120,9 @@ export default function ConnectBankPage() {
             <>
               {/* Info cards */}
               {[
-                { icon: '🔒', title: 'Bank-level security', desc: 'Powered by Stripe — the same infrastructure used by millions of businesses worldwide' },
+                { icon: '🔒', title: 'Bank-level security', desc: 'Powered by Plaid — used by Venmo, Betterment, and thousands of banking apps' },
                 { icon: '👁️', title: 'Read-only access', desc: 'LUNA can only read your transactions. It cannot move money or make changes' },
-                { icon: '⚡', title: 'Instant import', desc: 'Up to 200 recent transactions imported automatically after you connect' },
+                { icon: '⚡', title: 'Instant import', desc: 'Recent transactions imported automatically after you connect' },
               ].map(item => (
                 <div key={item.title} style={{ ...CARD, display: 'flex', gap: 14, padding: 16 }}>
                   <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{item.icon}</span>
@@ -134,16 +138,16 @@ export default function ConnectBankPage() {
               )}
 
               <button
-                onClick={() => void handleConnect()}
-                disabled={status === 'connecting' || status === 'importing'}
+                onClick={() => open()}
+                disabled={!ready || status === 'loading-token' || status === 'importing'}
                 style={{
                   width: '100%', height: 52, borderRadius: 16, border: 'none',
-                  background: status !== 'idle' ? 'rgba(201,169,110,0.4)' : 'linear-gradient(135deg, #C9A96E 0%, #B8903A 100%)',
-                  color: '#1A1240', fontSize: 16, fontWeight: 800, cursor: status !== 'idle' ? 'wait' : 'pointer',
+                  background: (!ready || status !== 'idle') ? 'rgba(201,169,110,0.4)' : 'linear-gradient(135deg, #C9A96E 0%, #B8903A 100%)',
+                  color: '#1A1240', fontSize: 16, fontWeight: 800, cursor: (!ready || status !== 'idle') ? 'wait' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}>
-                {status === 'connecting' || status === 'importing'
-                  ? <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} /> {message}</>
+                {status === 'loading-token' || status === 'importing'
+                  ? <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} /> {message || 'Loading…'}</>
                   : 'Connect Bank Account'}
               </button>
             </>

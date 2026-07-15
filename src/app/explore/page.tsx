@@ -91,7 +91,7 @@ const ALL_APPS: AppDef[] = [
   { label: 'Settings',       emoji: '⚙️', href: '/settings',             color: '#b98bff', desc: 'Profile + AI preferences'     },
   { label: 'Profile',        emoji: '👤', href: '/profile',              color: '#b98bff', desc: 'Who I Am'                     },
   { label: 'Bank Accounts',  emoji: '🏦', href: '/money/accounts',       color: '#8AB88A', desc: 'Linked bank accounts'         },
-  { label: 'Connect a Bank', emoji: '🔗', href: '/money/connect',        color: '#8AB88A', desc: 'Connect Plaid / Stripe'       },
+  { label: 'Connect a Bank', emoji: '🔗', href: '/money/connect',        color: '#8AB88A', desc: 'Securely link your accounts via Plaid'       },
   { label: 'Privacy Policy', emoji: '📜', href: '/privacy',              color: '#b98bff', desc: 'Privacy policy'               },
   { label: 'Terms',          emoji: '📄', href: '/terms',                color: '#b98bff', desc: 'Terms of service'             },
 ]
