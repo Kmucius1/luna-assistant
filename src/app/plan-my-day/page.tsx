@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Sparkles, RefreshCw, ArrowLeft, Clock, Home, Building2, Droplets, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
@@ -65,8 +65,20 @@ export default function PlanMyDayPage() {
   const [loading,      setLoading]      = useState(false)
   const [plan,         setPlan]         = useState<DayPlan | null>(null)
   const [error,        setError]        = useState('')
+  const [checkingSaved, setCheckingSaved] = useState(true)
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
+
+  // If she already built today's plan, show it — this page should be a
+  // review of what's actually happening today, not a fresh empty form
+  // every time she opens it.
+  useEffect(() => {
+    fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(r => r.json())
+      .then(d => { if (d.plan) setPlan(d.plan) })
+      .catch(() => {})
+      .finally(() => setCheckingSaved(false))
+  }, [])
 
   async function generate() {
     setLoading(true); setError(''); setPlan(null)
@@ -120,8 +132,15 @@ export default function PlanMyDayPage() {
 
           <div style={{ padding: '16px 16px 0' }}>
 
+            {/* Checking for an already-built plan */}
+            {checkingSaved && (
+              <div style={{ ...GLASS, padding: 32, textAlign: 'center', marginBottom: 16 }}>
+                <RefreshCw className="h-5 w-5 animate-spin" style={{ color: '#9b5cff', margin: '0 auto' }} />
+              </div>
+            )}
+
             {/* Setup card */}
-            {!plan && !loading && (
+            {!checkingSaved && !plan && !loading && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
 
                 {/* Wake time */}
