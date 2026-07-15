@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 export async function POST(req: NextRequest) {
@@ -59,7 +62,7 @@ export async function GET(req: NextRequest) {
       console.error('[check-ins] GET error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
-    return NextResponse.json({ checkIns: data || [] })
+    return NextResponse.json({ checkIns: data || [] }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } })
   } catch (err) {
     console.error('[check-ins] GET error:', err)
     return NextResponse.json({ error: 'Failed to fetch check-ins' }, { status: 500 })

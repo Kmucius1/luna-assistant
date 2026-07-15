@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as Astronomy from 'astronomy-engine'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const ZODIAC_SIGNS = [
   'Aries', 'Taurus', 'Gemini', 'Cancer', 'Leo', 'Virgo',
   'Libra', 'Scorpio', 'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
@@ -167,7 +170,7 @@ export async function GET(request: NextRequest) {
       source: 'astronomy-engine (Swiss Ephemeris compatible)',
       timezone: tz,
       calculated_at: now.toISOString(),
-    })
+    }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } })
 
   } catch (err) {
     console.error('Moon calculation error:', err)

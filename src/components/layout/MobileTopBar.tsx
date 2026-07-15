@@ -1,19 +1,33 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { Bell } from 'lucide-react'
 
-const MOON_PHASES = [
-  { name: 'New Moon',        pct: 0   },
-  { name: 'Waxing Crescent', pct: 14  },
-  { name: 'First Quarter',   pct: 28  },
-  { name: 'Waxing Gibbous',  pct: 82  },
-  { name: 'Full Moon',       pct: 100 },
-  { name: 'Waning Gibbous',  pct: 72  },
-  { name: 'Last Quarter',    pct: 50  },
-  { name: 'Waning Crescent', pct: 18  },
-]
-function getMoon() {
-  const days = (Date.now() - new Date('2024-01-11').getTime()) / 86_400_000
-  return MOON_PHASES[Math.floor(((days % 29.53) / 29.53) * 8)] ?? MOON_PHASES[0]
+interface MoonNow { name: string; illumination: number }
+
+// Real astronomy-engine calculation via the same endpoint the rest of the
+// app uses (/api/astrology/moon) — no approximated phase table. Starts
+// null so the header shows "Not synced" instead of a fabricated phase
+// before the real value loads.
+function useRealMoon(): MoonNow | null {
+  const [moon, setMoon] = useState<MoonNow | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    function load() {
+      fetch(`/api/astrology/moon?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
+        .then(r => r.json())
+        .then(d => {
+          if (cancelled || !d?.phase?.name) return
+          setMoon({ name: d.phase.name, illumination: d.phase.illumination })
+        })
+        .catch(() => {})
+    }
+    load()
+    const interval = setInterval(load, 60_000)
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [])
+
+  return moon
 }
 
 function SmallMoon() {
@@ -28,7 +42,7 @@ function SmallMoon() {
 }
 
 export function MobileTopBar() {
-  const moon = getMoon()
+  const moon = useRealMoon()
 
   return (
     <div style={{
@@ -42,7 +56,7 @@ export function MobileTopBar() {
         <SmallMoon />
         <div>
           <p style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>
-            {moon.name} · {moon.pct}%
+            {moon ? `${moon.name} · ${moon.illumination}%` : 'Not synced'}
           </p>
           <p style={{ fontSize: 10, color: 'rgba(185,139,255,0.42)', margin: 0, lineHeight: 1.25 }}>
             Illuminating your next step

@@ -5,6 +5,9 @@ import { getGmailTokens, getGmailInboxCounts } from '@/lib/gmail'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { isMickEvent } from '@/lib/calendarPeople'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 function adminDb() {
@@ -103,5 +106,5 @@ export async function GET() {
       top:        tasks,
       totalOpen:  tasks.length,
     },
-  })
+  }, { headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } })
 }

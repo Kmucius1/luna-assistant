@@ -22,7 +22,6 @@ interface GuidanceData {
   shadow_question?: string; moon_note?: string; crystal?: string
 }
 interface HomeTask     { id: string; title: string; urgency_level?: string }
-interface HomeCalEvent { id: string; title: string; startTime: string; allDay: boolean }
 interface DayPlanBlock { time: string; label: string; detail?: string; type: string; anchor?: boolean; emoji?: string }
 interface DayPlan      { schedule?: DayPlanBlock[] }
 
@@ -41,20 +40,6 @@ function timeStrToMinutes(t: string | undefined): number | null {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const MOON_PHASES = [
-  { name: 'New Moon',        emoji: '🌑', pct: 0   },
-  { name: 'Waxing Crescent', emoji: '🌒', pct: 14  },
-  { name: 'First Quarter',   emoji: '🌓', pct: 28  },
-  { name: 'Waxing Gibbous',  emoji: '🌔', pct: 82  },
-  { name: 'Full Moon',       emoji: '🌕', pct: 100 },
-  { name: 'Waning Gibbous',  emoji: '🌖', pct: 72  },
-  { name: 'Last Quarter',    emoji: '🌗', pct: 50  },
-  { name: 'Waning Crescent', emoji: '🌘', pct: 18  },
-]
-function getMoonPhase() {
-  const days = (Date.now() - new Date('2024-01-11').getTime()) / 86_400_000
-  return MOON_PHASES[Math.floor(((days % 29.53) / 29.53) * 8)] ?? MOON_PHASES[0]
-}
 type HeroTimeBucket = 'morning' | 'afternoon' | 'evening' | 'night'
 
 function getHeroTimeBucket(h: number): HeroTimeBucket {
@@ -152,38 +137,36 @@ function StarSigil({ size = 52 }: { size?: number }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 1 — Today  (4 compact cards, no scroll, fits iPhone 14)
+// SLIDE 1 — Today  (header, hero, Today at a Glance, dots, dock — no scroll)
 // ─────────────────────────────────────────────────────────────────────────────
-const FALLBACK_TASKS = [
-  { id: 'f1', title: 'Reply to priority client email', source: 'Work'     },
-  { id: 'f2', title: 'Finish DRYP task',               source: 'DRYPHub' },
-  { id: 'f3', title: 'Plan one clear work block',       source: 'Calendar'},
-]
-
 function Slide1({
-  greeting, moon, heroBg, heroTagline, topTasks, calEvents, dataLoaded, dayPlan,
+  greeting, moonData, heroBg, heroTagline, topTasks, dataLoaded, dayPlan, checkIn, checkInLoading,
 }: {
-  greeting: string; moon: typeof MOON_PHASES[0]
+  greeting: string; moonData: MoonPreviewData | null
   heroBg: string; heroTagline: string
-  topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean; dayPlan: DayPlan | null
+  topTasks: HomeTask[]; dataLoaded: boolean; dayPlan: DayPlan | null
+  checkIn: TodayCheckIn | null; checkInLoading: boolean
 }) {
-  const tasks     = (dataLoaded && topTasks.length > 0) ? topTasks.slice(0, 3) : FALLBACK_TASKS
-  const nextEvent = calEvents[0] ?? null
-
-  // What's actually next from her planned day, right now — not just a
-  // generic task list. Falls back to tasks below if she hasn't planned
-  // today yet.
+  // What's actually next from her planned day, right now. Falls back to her
+  // real top tasks if she hasn't planned today yet — never fabricated ones.
   const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
   const upNext = (dayPlan?.schedule ?? [])
     .map(b => ({ ...b, mins: timeStrToMinutes(b.time) }))
     .filter((b): b is DayPlanBlock & { mins: number } => b.mins !== null && b.mins >= nowMinutes)
     .sort((a, b) => a.mins - b.mins)
     .slice(0, 3)
+  const tasks = upNext.length > 0 ? null : (dataLoaded ? topTasks.slice(0, 3) : [])
+
+  const gaugePct = checkIn
+    ? Math.round((((checkIn.sleep_rating ?? 0) + (checkIn.energy_rating ?? 0) + (checkIn.mood_rating ?? 0)) / 3) * 10)
+    : null
+  const mood = ratingLabel(checkIn?.mood_rating)
+  const moonIllum = moonData?.phase?.illumination
 
   return (
     <div className="flex flex-col gap-3" style={{ minHeight: '100%' }}>
 
-      {/* Hero — background + tagline swap with time of day */}
+      {/* Hero — background + tagline swap with time of day, real moon phase */}
       <LunaHeroCard backgroundImage={heroBg} className="p-5 lg:p-6" >
         <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
           {greeting}, Zoe ✦
@@ -192,66 +175,74 @@ function Slide1({
           {heroTagline}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <span style={{ fontSize: 12 }}>{moon.emoji}</span>
+          <span style={{ fontSize: 12 }}>{moonData?.phase?.emoji ?? '🌙'}</span>
           <p style={{ fontSize: 11, color: 'white', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
-            {moon.name} · {moon.pct}% illuminated
+            {moonData?.phase?.name && moonIllum != null ? `${moonData.phase.name} · ${moonIllum}% illuminated` : 'Not synced'}
           </p>
         </div>
       </LunaHeroCard>
 
-      {/* Today's Top 3 + Next Event */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          {upNext.length > 0 ? (
-            <>
-              <div style={LBL}><Target style={{ width: 10, height: 10 }} />What's Next</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
-                {upNext.map(b => (
-                  <div key={`${b.time}-${b.label}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                    <span style={{ fontSize: 9, fontWeight: 800, color: '#C9A96E', flexShrink: 0, minWidth: 44, marginTop: 1 }}>{b.time}</span>
-                    <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{b.label}</p>
-                  </div>
-                ))}
-              </div>
-              <Link href="/plan-my-day" style={{ textDecoration: 'none' }}>
-                <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View full plan →</span>
-              </Link>
-            </>
-          ) : (
-            <>
-              <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
-                {tasks.map((t, i) => (
-                  <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                    <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                      <span style={{ fontSize: 8, fontWeight: 800, color: 'white' }}>{i + 1}</span>
-                    </div>
-                    <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
-                  </div>
-                ))}
-              </div>
-              <Link href="/tasks" style={{ textDecoration: 'none' }}>
-                <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View all tasks →</span>
-              </Link>
-            </>
-          )}
-        </div>
+      {/* Today at a Glance — real energy/mood/sleep/tasks, nothing fabricated */}
+      <div style={{ ...G, borderRadius: 24, padding: '14px 15px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today at a Glance</div>
 
-        <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Calendar style={{ width: 10, height: 10 }} />Next Event</div>
-          <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {nextEvent?.title ?? 'Client Call'}
-          </p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: '0 0 3px' }}>
-            Today · {nextEvent?.startTime ?? '1:30 PM'}
-          </p>
-          <p style={{ fontSize: 10.5, color: 'white', margin: '0 0 auto', lineHeight: 1.4 }}>
-            Prep 15 minutes before.
-          </p>
-          <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
-            <div style={{ padding: '6px', background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.18)', borderRadius: 10, textAlign: 'center' }}>
-              <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View details →</span>
+        {checkInLoading ? (
+          <LunaLoadingState compact />
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <EnergyGauge pct={gaugePct ?? 0} size={92} />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 5 }}>
+                <div style={{ flex: 1, padding: '5px 7px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                  <p style={{ fontSize: 9, color: 'white', opacity: 0.6, margin: 0 }}>Mood</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'white', margin: '2px 0 0' }}>{mood.status}</p>
+                </div>
+                <div style={{ flex: 1, padding: '5px 7px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                  <p style={{ fontSize: 9, color: 'white', opacity: 0.6, margin: 0 }}>Sleep</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'white', margin: '2px 0 0' }}>{checkIn?.sleep_rating != null ? `${checkIn.sleep_rating}/10` : 'Not synced'}</p>
+                </div>
+                <div style={{ flex: 1, padding: '5px 7px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                  <p style={{ fontSize: 9, color: 'white', opacity: 0.6, margin: 0 }}>Peak</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'white', margin: '2px 0 0' }}>Not synced</p>
+                </div>
+              </div>
             </div>
+          </div>
+        )}
+
+        {!checkIn && !checkInLoading && (
+          <Link href="/morning" style={{ textDecoration: 'none' }}>
+            <p style={{ fontSize: 10.5, color: 'white', opacity: 0.75, margin: '8px 0 0' }}>No check-in logged today — check in →</p>
+          </Link>
+        )}
+
+        <div style={{ marginTop: 10, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+          <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'white', opacity: 0.6, margin: '0 0 6px' }}>
+            {upNext.length > 0 ? "What's Next" : "Today's Top 3"}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, minHeight: 0 }}>
+            {upNext.length > 0 ? (
+              upNext.map(b => (
+                <div key={`${b.time}-${b.label}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, color: '#C9A96E', flexShrink: 0, minWidth: 44, marginTop: 1 }}>{b.time}</span>
+                  <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{b.label}</p>
+                </div>
+              ))
+            ) : tasks && tasks.length > 0 ? (
+              tasks.map((t, i) => (
+                <div key={t.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                  <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                    <span style={{ fontSize: 8, fontWeight: 800, color: 'white' }}>{i + 1}</span>
+                  </div>
+                  <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+                </div>
+              ))
+            ) : (
+              <p style={{ fontSize: 11.5, color: 'white', opacity: 0.55, margin: 0 }}>{dataLoaded ? 'No priority tasks yet.' : 'Loading…'}</p>
+            )}
+          </div>
+          <Link href={upNext.length > 0 ? '/plan-my-day' : '/tasks'} style={{ textDecoration: 'none' }}>
+            <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>{upNext.length > 0 ? 'View full plan →' : 'View all tasks →'}</span>
           </Link>
         </div>
       </div>
@@ -343,7 +334,7 @@ function PreviewCard({ label, icon, href, linkText, children }: {
   )
 }
 
-interface MoonPreviewData { phase?: { name: string; emoji?: string }; sign?: { name: string; emoji?: string } }
+interface MoonPreviewData { phase?: { name: string; emoji?: string; illumination?: number }; sign?: { name: string; emoji?: string } }
 interface MoneyPreviewData { bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number }
 interface StylePreviewData { hasProfile: boolean; summary?: string }
 
@@ -887,11 +878,10 @@ function HomePageInner() {
   const [gLoading,   setGLoading]   = useState(true)
   const [lunaMessage, setLunaMessage] = useState<{ message: string; affirmation: string } | null>(null)
   const [lmLoading,  setLmLoading]  = useState(true)
-  const [calEvents,  setCalEvents]  = useState<HomeCalEvent[]>([])
   const [topTasks,   setTopTasks]   = useState<HomeTask[]>([])
   const [dataLoaded, setDataLoaded] = useState(false)
   const [dayPlan,    setDayPlan]    = useState<DayPlan | null>(null)
-  const [moonData,   setMoonData]   = useState<{ phase?: { name: string; emoji?: string }; sign?: { name: string; emoji?: string } } | null>(null)
+  const [moonData,   setMoonData]   = useState<MoonPreviewData | null>(null)
   const [moneyData,  setMoneyData]  = useState<{ bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number } | null>(null)
   const [styleData,  setStyleData]  = useState<{ hasProfile: boolean; summary?: string } | null>(null)
   const [checkIn,    setCheckIn]    = useState<TodayCheckIn | null>(null)
@@ -926,32 +916,31 @@ function HomePageInner() {
 
   const loadData = useCallback(() => {
     setGLoading(true)
-    fetch('/api/astrology/daily-guidance')
+    fetch('/api/astrology/daily-guidance', { cache: 'no-store' })
       .then(r => r.json()).then(d => setGuidance(d)).catch(() =>
         fetch('/api/ai/spiritual-guidance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) })
           .then(r => r.json()).then(d => setGuidance(d)).catch(() => {})
       ).finally(() => setGLoading(false))
     setLmLoading(true)
-    fetch(`/api/luna/daily-message?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+    fetch(`/api/luna/daily-message?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
       .then(r => r.json()).then(d => setLunaMessage(d)).catch(() => {}).finally(() => setLmLoading(false))
-    fetch('/api/home/summary')
+    fetch('/api/home/summary', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
-        if (d.calendar?.today) setCalEvents(d.calendar.today)
-        if (d.tasks?.top)      setTopTasks(d.tasks.top)
+        if (d.tasks?.top) setTopTasks(d.tasks.top)
       }).catch(() => {}).finally(() => setDataLoaded(true))
-    fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+    fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => setDayPlan(d.plan ?? null))
       .catch(() => setDayPlan(null))
-    fetch(`/api/astrology/moon?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+    fetch(`/api/astrology/moon?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
       .then(r => r.json()).then(d => setMoonData(d)).catch(() => {})
-    fetch('/api/money/summary')
+    fetch('/api/money/summary', { cache: 'no-store' })
       .then(r => r.json()).then(d => setMoneyData(d)).catch(() => {})
-    fetch('/api/atelier/style-profile')
+    fetch('/api/atelier/style-profile', { cache: 'no-store' })
       .then(r => r.json()).then(d => setStyleData(d)).catch(() => {})
     setCheckInLoading(true)
-    fetch('/api/check-ins?limit=5')
+    fetch('/api/check-ins?limit=5', { cache: 'no-store' })
       .then(r => r.json())
       .then((d: { checkIns?: (TodayCheckIn & { created_at?: string })[] }) => {
         const todayKey = new Date().toDateString()
@@ -962,7 +951,21 @@ function HomePageInner() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  const moon        = getMoonPhase()
+  // Keep Home's real data current: refresh every 60s, and immediately
+  // whenever she comes back to the tab/app rather than waiting on the timer.
+  useEffect(() => {
+    const interval = setInterval(() => loadData(), 60_000)
+    const onFocus = () => loadData()
+    const onVisibility = () => { if (document.visibilityState === 'visible') loadData() }
+    window.addEventListener('focus', onFocus)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('focus', onFocus)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [loadData])
+
   // Neutral fallback (noon) until the client-only effect sets the real local hour —
   // keeps server render and first client render identical, no hydration mismatch.
   const effectiveHour = hour ?? 12
@@ -973,7 +976,7 @@ function HomePageInner() {
   const pages = [
     {
       id: 'today', label: 'Today', noScroll: true,
-      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} dayPlan={dayPlan} />,
+      content: <Slide1 greeting={greeting} moonData={moonData} heroBg={heroBg} heroTagline={heroTagline} topTasks={topTasks} dataLoaded={dataLoaded} dayPlan={dayPlan} checkIn={checkIn} checkInLoading={checkInLoading} />,
     },
     {
       id: 'focus', label: 'Focus', noScroll: true,
