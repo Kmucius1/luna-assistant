@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { getTodayEvents, type CalendarEvent } from '@/lib/calendar'
 import { getGmailTokens, getGmailInboxCounts } from '@/lib/gmail'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { isMickEvent } from '@/lib/calendarPeople'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -36,7 +37,12 @@ async function getExternalSummary(): Promise<ExternalSummary> {
           return getGmailInboxCounts(tokens.access_token)
         })(),
       ])
-      const events = calendarResult.status === 'fulfilled' ? calendarResult.value.filter(e => e.isToday) : []
+      // Home is Zoe's own day at a glance — Mick's calendar (a secondary
+      // calendar attached under the same connected account) never belongs
+      // here, only on the full Calendar page where it can be toggled on.
+      const events = calendarResult.status === 'fulfilled'
+        ? calendarResult.value.filter(e => e.isToday && !isMickEvent(e))
+        : []
       const counts = emailResult.status === 'fulfilled' ? emailResult.value : null
       return {
         payload: { events, unreadCount: counts?.unreadCount ?? null, starredCount: counts?.starredCount ?? null },

@@ -27,6 +27,26 @@ function formatDateLabel(ev: CalendarEvent): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 }
 
+// Persists which people's calendars are hidden, so the toggle survives
+// reloads instead of resetting every visit. Defaults to Mick hidden on
+// the very first visit (no stored preference yet).
+const HIDDEN_PEOPLE_KEY = 'luna_calendar_hidden_people_v1'
+
+function loadHiddenPeople(): Set<string> {
+  if (typeof window === 'undefined') return new Set(['Mick'])
+  try {
+    const raw = localStorage.getItem(HIDDEN_PEOPLE_KEY)
+    if (raw === null) return new Set(['Mick'])
+    return new Set(JSON.parse(raw) as string[])
+  } catch {
+    return new Set(['Mick'])
+  }
+}
+
+function saveHiddenPeople(people: Set<string>) {
+  try { localStorage.setItem(HIDDEN_PEOPLE_KEY, JSON.stringify([...people])) } catch {}
+}
+
 function groupByDate(events: CalendarEvent[]): { label: string; key: string; events: CalendarEvent[] }[] {
   const map = new Map<string, CalendarEvent[]>()
   for (const ev of events) {
@@ -97,12 +117,13 @@ export default function CalendarPage() {
   const [error,     setError]     = useState('')
   const [filter,    setFilter]    = useState<'all' | 'today' | 'week'>('all')
   const [fetchedAt, setFetchedAt] = useState('')
-  const [hiddenPeople, setHiddenPeople] = useState<Set<string>>(new Set())
+  const [hiddenPeople, setHiddenPeople] = useState<Set<string>>(loadHiddenPeople)
 
   function togglePerson(label: string) {
     setHiddenPeople(prev => {
       const next = new Set(prev)
       next.has(label) ? next.delete(label) : next.add(label)
+      saveHiddenPeople(next)
       return next
     })
   }
