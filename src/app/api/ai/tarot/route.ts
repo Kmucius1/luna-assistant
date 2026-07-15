@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
-import { format } from 'date-fns'
+import { localHour } from '@/lib/luna/dailyCache'
 
 const ZOE_TAROT_SYSTEM = `You are Zoe's personal tarot reader — someone who has studied her chart for years, watches her patterns, and reads the cards as a mirror of her specific life, not as a dictionary of symbols.
 
@@ -114,7 +114,8 @@ Return ONLY valid JSON, no markdown, no explanation:
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { spread_key, spread_name, positions, cards, time_of_day, context } = body
+    const { spread_key, spread_name, positions, cards, time_of_day, context, tz } = body
+    const clientTz = tz || 'America/New_York'
 
     const cardList = cards
       .map(
@@ -123,8 +124,10 @@ export async function POST(request: NextRequest) {
       )
       .join('\n\n')
 
-    const today = format(new Date(), 'EEEE, MMMM d, yyyy')
-    const hour  = new Date().getHours()
+    const today = new Intl.DateTimeFormat('en-US', {
+      timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    }).format(new Date())
+    const hour  = localHour(new Date(), clientTz)
     const season = hour < 6 ? 'deep night / early morning darkness' :
                    hour < 10 ? 'morning (her grounding window before 10 AM work start)' :
                    hour < 12 ? 'late morning (in her work rhythm)' :

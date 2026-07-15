@@ -14,6 +14,21 @@ export function localDateKey(date: Date, timezone: string = DEFAULT_TIMEZONE): s
   return `${get('year')}-${get('month')}-${get('day')}`
 }
 
+/**
+ * Hour (0-23) in the given IANA timezone. Vercel's serverless runtime has no
+ * TZ set, so plain `new Date().getHours()` returns UTC hour on the server —
+ * several hours off from the user's actual local time. Always use this for
+ * any server-side "what time of day is it for her" logic.
+ */
+export function localHour(date: Date, timezone: string = DEFAULT_TIMEZONE): number {
+  const hourPart = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hour: 'numeric',
+    hourCycle: 'h23',
+  }).formatToParts(date).find(p => p.type === 'hour')?.value
+  return hourPart ? parseInt(hourPart, 10) : date.getHours()
+}
+
 export interface DailyContentResult<T> {
   payload: T
   source: string

@@ -76,21 +76,19 @@ export default function LovePage() {
   const [refresh, setRefresh] = useState(false)
 
   const load = useCallback(async (forceRefresh = false) => {
-    if (!location.localTime && !forceRefresh) return
     setLoading(true)
     try {
-      const tz   = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-      const url  = `/api/astrology/love-guidance?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}${forceRefresh ? '&refresh=1' : ''}`
+      const tz  = encodeURIComponent(location.tz || 'America/New_York')
+      const url = `/api/astrology/love-guidance?tz=${tz}${forceRefresh ? '&refresh=1' : ''}`
       const res  = await fetch(url)
       if (!res.ok) throw new Error()
       setData(await res.json())
     } catch { /* keep previous data or null */ }
     setLoading(false)
     setRefresh(false)
-  }, [location.localTime])
+  }, [location.tz])
 
-  useEffect(() => { if (location.localTime) load() }, [location.localTime, load])
+  useEffect(() => { load() }, [load])
 
   const handleRefresh = () => { setRefresh(true); load(true) }
 

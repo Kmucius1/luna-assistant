@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createClient } from '@supabase/supabase-js'
-import { format } from 'date-fns'
+import { localHour } from '@/lib/luna/dailyCache'
 
 const ZOE_IDS = [
   '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb',
@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
       workEndTime   = '6:00 PM',
       hairWashDay   = false,
       eveningPlans  = '',
+      tz            = 'America/New_York',
     } = body
 
     // Pull open tasks from DRYP CRM — only if the key is available
@@ -88,8 +89,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const today = format(new Date(), 'EEEE, MMMM d, yyyy')
-    const hour  = new Date().getHours()
+    const today = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+    }).format(new Date())
+    const hour  = localHour(new Date(), tz)
     const timeContext = hour < 10 ? 'morning' : hour < 14 ? 'midday' : hour < 18 ? 'afternoon' : 'evening'
 
     const userPrompt = `Today: ${today} (${timeContext})

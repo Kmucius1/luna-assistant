@@ -113,7 +113,7 @@ const G: React.CSSProperties = {
 // ─── Section label inside cards ───────────────────────────────────────────────
 const LBL: React.CSSProperties = {
   fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: 'var(--luna-purple-2)',
+  textTransform: 'uppercase', color: 'white',
   display: 'flex', alignItems: 'center', gap: 5,
   marginBottom: 8, flexShrink: 0,
 }
@@ -171,7 +171,7 @@ function StyleVisual() {
       {/* Pinterest credit */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, flexShrink: 0 }}>
         <svg width="8" height="8" viewBox="0 0 24 24" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
-        <span style={{ fontSize: 8, color: 'rgba(220,190,140,0.45)', fontWeight: 600, letterSpacing: '0.04em' }}>PINTEREST INSPO</span>
+        <span style={{ fontSize: 8, color: 'white', fontWeight: 600, letterSpacing: '0.04em' }}>PINTEREST INSPO</span>
       </div>
     </div>
   )
@@ -204,12 +204,12 @@ function Slide1({
         <p style={{ fontSize: 22, fontWeight: 900, color: 'white', lineHeight: 1.15, margin: '0 0 6px', textShadow: '0 2px 12px rgba(0,0,0,0.45)' }}>
           {greeting}, Zoe ✦
         </p>
-        <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--luna-purple-2)', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)', whiteSpace: 'pre-line' }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1.4, margin: '0 0 10px', textShadow: '0 2px 10px rgba(0,0,0,0.45)', whiteSpace: 'pre-line' }}>
           {heroTagline}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <span style={{ fontSize: 12 }}>{moon.emoji}</span>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
+          <p style={{ fontSize: 11, color: 'white', margin: 0, lineHeight: 1.3, textShadow: '0 1px 8px rgba(0,0,0,0.45)' }}>
             {moon.name} · {moon.pct}% illuminated
           </p>
         </div>
@@ -223,14 +223,14 @@ function Slide1({
             {tasks.map((t, i) => (
               <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
                 <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                  <span style={{ fontSize: 8, fontWeight: 800, color: 'var(--luna-purple-2)' }}>{i + 1}</span>
+                  <span style={{ fontSize: 8, fontWeight: 800, color: 'white' }}>{i + 1}</span>
                 </div>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+                <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
               </div>
             ))}
           </div>
           <Link href="/tasks" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View all tasks →</span>
+            <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View all tasks →</span>
           </Link>
         </div>
 
@@ -239,15 +239,15 @@ function Slide1({
           <p style={{ fontSize: 16, fontWeight: 900, color: 'white', margin: '0 0 3px', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {nextEvent?.title ?? 'Client Call'}
           </p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)', margin: '0 0 3px' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: '0 0 3px' }}>
             Today · {nextEvent?.startTime ?? '1:30 PM'}
           </p>
-          <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', margin: '0 0 auto', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 10.5, color: 'white', margin: '0 0 auto', lineHeight: 1.4 }}>
             Prep 15 minutes before.
           </p>
           <Link href="/calendar" style={{ textDecoration: 'none', marginTop: 8 }}>
             <div style={{ padding: '6px', background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.18)', borderRadius: 10, textAlign: 'center' }}>
-              <span style={{ fontSize: 10.5, color: 'var(--luna-purple-2)', fontWeight: 600 }}>View details →</span>
+              <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View details →</span>
             </div>
           </Link>
         </div>
@@ -291,7 +291,7 @@ function Slide1B({ guidance, lunaMessage, lmLoading }: {
           </div>
         ) : (
           <p style={{
-            fontSize: 14, color: 'rgba(255,255,255,0.78)', lineHeight: 1.65, margin: '0 0 10px',
+            fontSize: 14, color: 'white', lineHeight: 1.65, margin: '0 0 10px',
             overflow: messageExpanded ? 'visible' : 'hidden',
             display: messageExpanded ? 'block' : '-webkit-box',
             WebkitLineClamp: messageExpanded ? 'unset' : 6, WebkitBoxOrient: 'vertical',
@@ -313,7 +313,7 @@ function Slide1B({ guidance, lunaMessage, lmLoading }: {
             alignSelf: 'flex-start', marginTop: 'auto',
             padding: '9px 18px', borderRadius: 999,
             background: 'rgba(155,92,255,0.14)', border: '1px solid var(--luna-border)',
-            cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'var(--luna-purple-2)',
+            cursor: 'pointer', fontSize: 13, fontWeight: 700, color: 'white',
           }}
         >
           {messageExpanded ? 'Show less ←' : 'Tell me more →'}
@@ -334,7 +334,7 @@ function PreviewCard({ label, icon, href, linkText, children }: {
       <div style={{ ...G, borderRadius: 24, padding: '13px 14px 11px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={LBL}>{icon}{label}</div>
         {children}
-        <span style={{ fontSize: 10.5, color: '#9b5cff', fontWeight: 600, marginTop: 5, flexShrink: 0 }}>{linkText} →</span>
+        <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600, marginTop: 5, flexShrink: 0 }}>{linkText} →</span>
       </div>
     </Link>
   )
@@ -359,7 +359,7 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
       <PreviewCard label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
         <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 6s ease-in-out infinite' }} />
         <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{astroHeadline}</p>
-        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <p style={{ fontSize: 10.5, color: 'white', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
         </p>
       </PreviewCard>
@@ -376,7 +376,7 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
           </>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Pick a few looks you like and LUNA will build your daily style from there.</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>Pick a few looks you like and LUNA will build your daily style from there.</p>
           </div>
         )}
       </PreviewCard>
@@ -391,12 +391,12 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
             <p style={{ fontSize: 14, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>
               {moneyData.bills_due_soon?.length ?? 0} bill{moneyData.bills_due_soon?.length === 1 ? '' : 's'} due<br />this week
             </p>
-            <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.32)', margin: '6px 0 1px' }}>Spent this week</p>
-            <p style={{ fontSize: 18, fontWeight: 900, color: '#4ADE80', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
+            <p style={{ fontSize: 9.5, color: 'white', margin: '6px 0 1px' }}>Spent this week</p>
+            <p style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
           </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.62)', margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
+            <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
           </div>
         )}
       </PreviewCard>
@@ -404,7 +404,7 @@ function Slide2({ guidance, moonData, moneyData, styleData }: {
       <PreviewCard label="Night Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/night" linkText="View">
         <img src="/brand/ui/night-cloud.png" alt="" style={{ width: 84, height: 50, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 7s ease-in-out infinite' }} />
         <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Wind down tonight.</p>
-        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Plan tomorrow, protect your rest.</p>
+        <p style={{ fontSize: 10.5, color: 'white', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Plan tomorrow, protect your rest.</p>
       </PreviewCard>
     </div>
   )
@@ -422,10 +422,10 @@ interface TodayCheckIn {
 }
 
 function ratingLabel(n: number | null | undefined): { status: string; color: string } {
-  if (n == null) return { status: 'Not logged', color: 'rgba(255,255,255,0.32)' }
-  if (n >= 8) return { status: 'Great', color: '#6BE38B' }
-  if (n >= 5) return { status: 'Okay', color: '#E6B84A' }
-  return { status: 'Low', color: '#E08B4A' }
+  if (n == null) return { status: 'Not logged', color: 'white' }
+  if (n >= 8) return { status: 'Great', color: 'white' }
+  if (n >= 5) return { status: 'Okay', color: 'white' }
+  return { status: 'Low', color: 'white' }
 }
 
 function EnergyGauge({ pct = 78, size = 108 }: { pct?: number; size?: number }) {
@@ -446,8 +446,8 @@ function EnergyGauge({ pct = 78, size = 108 }: { pct?: number; size?: number }) 
       </svg>
       <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ fontSize: size * 0.26, fontWeight: 900, color: 'white', lineHeight: 1 }}>{pct}</span>
-        <span style={{ fontSize: size * 0.085, fontWeight: 700, color: 'rgba(255,255,255,0.55)', marginTop: 2 }}>Good Energy</span>
-        <span style={{ fontSize: size * 0.09, marginTop: 2, color: '#E6B84A' }}>✦</span>
+        <span style={{ fontSize: size * 0.085, fontWeight: 700, color: 'white', marginTop: 2 }}>Good Energy</span>
+        <span style={{ fontSize: size * 0.09, marginTop: 2, color: 'white' }}>✦</span>
       </div>
     </div>
   )
@@ -461,7 +461,7 @@ function TodaysFlowChart() {
         padding: '3px 9px', borderRadius: 10, background: 'rgba(155,92,255,0.22)',
         border: '1px solid rgba(185,139,255,0.35)', whiteSpace: 'nowrap', zIndex: 2,
       }}>
-        <span style={{ fontSize: 9, fontWeight: 800, color: '#b98bff' }}>Peak 4–6 PM</span>
+        <span style={{ fontSize: 9, fontWeight: 800, color: 'white' }}>Peak 4–6 PM</span>
       </div>
       <svg viewBox="0 0 320 70" width="100%" height="70" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
         <path
@@ -473,13 +473,13 @@ function TodaysFlowChart() {
       </svg>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
         {['12 AM', '4 AM', '8 AM', '12 PM', '4 PM', '8 PM', '12 AM'].map(t => (
-          <span key={t} style={{ fontSize: 8, color: 'rgba(255,255,255,0.32)', fontWeight: 600 }}>{t}</span>
+          <span key={t} style={{ fontSize: 8, color: 'white', fontWeight: 600 }}>{t}</span>
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-        <span style={{ fontSize: 9, color: 'rgba(185,139,255,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Rest</span>
-        <span style={{ fontSize: 9, color: 'rgba(230,184,74,0.7)', display: 'flex', alignItems: 'center', gap: 3 }}><Sun style={{ width: 9, height: 9 }} />Focus</span>
-        <span style={{ fontSize: 9, color: 'rgba(185,139,255,0.6)', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Wind Down</span>
+        <span style={{ fontSize: 9, color: 'white', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Rest</span>
+        <span style={{ fontSize: 9, color: 'white', display: 'flex', alignItems: 'center', gap: 3 }}><Sun style={{ width: 9, height: 9 }} />Focus</span>
+        <span style={{ fontSize: 9, color: 'white', display: 'flex', alignItems: 'center', gap: 3 }}><Moon style={{ width: 9, height: 9 }} />Wind Down</span>
       </div>
     </div>
   )
@@ -499,7 +499,7 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
       {/* Wellness & Energy */}
       <div style={{ ...G, borderRadius: 26, padding: '14px 15px', flex: 1, minHeight: 0 }}>
         <div style={LBL}><Heart style={{ width: 10, height: 10 }} />Wellness &amp; Energy</div>
-        <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.42)', margin: '-4px 0 10px' }}>Your mind, body &amp; spirit today</p>
+        <p style={{ fontSize: 10.5, color: 'white', margin: '-4px 0 10px' }}>Your mind, body &amp; spirit today</p>
         {checkInLoading ? (
           <LunaLoadingState compact />
         ) : checkIn ? (
@@ -513,11 +513,11 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
               ].map(({ icon: Icon, label, value, status, color }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '5px 8px', borderRadius: 11, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon style={{ width: 11, height: 11, color: '#b98bff' }} strokeWidth={1.8} />
+                    <Icon style={{ width: 11, height: 11, color: 'white' }} strokeWidth={1.8} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 10.5, fontWeight: 700, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.2 }}>{label}</p>
-                    <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.40)', margin: 0, lineHeight: 1.2 }}>{value}</p>
+                    <p style={{ fontSize: 10.5, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.2 }}>{label}</p>
+                    <p style={{ fontSize: 9, color: 'white', margin: 0, lineHeight: 1.2 }}>{value}</p>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <p style={{ fontSize: 9.5, fontWeight: 700, color, margin: 0, lineHeight: 1.2 }}>{status}</p>
@@ -533,7 +533,7 @@ function Slide3({ checkIn, checkInLoading }: { checkIn: TodayCheckIn | null; che
             message="Log a quick morning, midday, or night check-in and LUNA will track your real energy here."
             action={
               <Link href="/morning" style={{ textDecoration: 'none' }}>
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--luna-purple-2)' }}>Check in now →</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>Check in now →</span>
               </Link>
             }
           />
@@ -556,10 +556,10 @@ function Slide3B() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ ...LBL, marginBottom: 4 }}><Waves style={{ width: 10, height: 10 }} />Today's Flow</div>
           <Link href="/health" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 9.5, color: '#9b5cff', fontWeight: 600 }}>See full day →</span>
+            <span style={{ fontSize: 9.5, color: 'white', fontWeight: 600 }}>See full day →</span>
           </Link>
         </div>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: '0 0 10px' }}>Energy throughout your day</p>
+        <p style={{ fontSize: 10, color: 'white', margin: '0 0 10px' }}>Energy throughout your day</p>
         <TodaysFlowChart />
       </div>
 
@@ -572,8 +572,8 @@ function Slide3B() {
         }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={LBL}><PenLine style={{ width: 10, height: 10 }} />Daily Journal Prompt</div>
-            <p style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.35)', margin: '-4px 0 8px' }}>For your reflection</p>
-            <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.88)', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 10px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            <p style={{ fontSize: 9.5, color: 'white', margin: '-4px 0 8px' }}>For your reflection</p>
+            <p style={{ fontSize: 12, color: 'white', fontStyle: 'italic', lineHeight: 1.45, margin: '0 0 10px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               "What is one area of my life that is asking for more patience?"
             </p>
             <div style={{
@@ -584,7 +584,7 @@ function Slide3B() {
               <span style={{ fontSize: 11, fontWeight: 700, color: 'white' }}>Start Journaling →</span>
             </div>
           </div>
-          <BookOpen style={{ width: 44, height: 44, color: 'rgba(185,139,255,0.55)', flexShrink: 0, animation: 'breathe 9s ease-in-out infinite' }} strokeWidth={1.3} />
+          <BookOpen style={{ width: 44, height: 44, color: 'white', flexShrink: 0, animation: 'breathe 9s ease-in-out infinite' }} strokeWidth={1.3} />
         </div>
       </Link>
 
@@ -625,14 +625,14 @@ function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
         <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: '0 0 4px', lineHeight: 1.25 }}>
           Scattered but capable
         </p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.58)', lineHeight: 1.55, margin: '0 0 8px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <p style={{ fontSize: 11, color: 'white', lineHeight: 1.55, margin: '0 0 8px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           Your mind is moving faster than your body. Start with grounding, then choose one clean action.
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
           {[['Mood', '🫧 scattered'], ['Energy', 'medium'], ['Sleep', '7h 24m'], ['Support', 'grounding']].map(([k, v]) => (
             <div key={k} style={{ padding: '3px 8px', borderRadius: 24, background: 'rgba(155,92,255,0.14)', border: '1px solid rgba(155,92,255,0.22)' }}>
-              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.38)', fontWeight: 600 }}>{k}: </span>
-              <span style={{ fontSize: 9, color: '#b98bff', fontWeight: 700 }}>{v}</span>
+              <span style={{ fontSize: 9, color: 'white', fontWeight: 600 }}>{k}: </span>
+              <span style={{ fontSize: 9, color: 'white', fontWeight: 700 }}>{v}</span>
             </div>
           ))}
         </div>
@@ -643,7 +643,7 @@ function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
         {/* Body Basics */}
         <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><Sparkles style={{ width: 9, height: 9 }} />BODY BASICS</div>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: '0 0 7px', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 10, color: 'white', margin: '0 0 7px', lineHeight: 1.4 }}>
             You need water + food before decisions.
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -658,10 +658,10 @@ function Slide4({ topTasks }: { topTasks: HomeTask[] }) {
         {/* Focus Reset */}
         <div style={{ ...G, borderRadius: 22, padding: '10px 11px', display: 'flex', flexDirection: 'column' }}>
           <div style={LBL}><Target style={{ width: 9, height: 9 }} />FOCUS RESET</div>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.50)', margin: '0 0 4px', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 10, color: 'white', margin: '0 0 4px', lineHeight: 1.4 }}>
             One 25-min block. No multitasking.
           </p>
-          <p style={{ fontSize: 10, fontWeight: 700, color: '#b98bff', margin: '0 0 auto', lineHeight: 1.35 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, color: 'white', margin: '0 0 auto', lineHeight: 1.35 }}>
             {topTasks[0]?.title ?? 'No priority task set — add one'}
           </p>
           <button onClick={() => setFocusDone(!focusDone)} style={{ marginTop: 7, padding: '5px 6px', borderRadius: 13, border: `1px solid ${focusDone ? 'rgba(138,184,138,0.38)' : 'rgba(155,92,255,0.32)'}`, background: focusDone ? 'rgba(138,184,138,0.12)' : 'rgba(155,92,255,0.12)', color: focusDone ? '#8AB88A' : '#b98bff', fontSize: 9.5, fontWeight: 700, cursor: 'pointer' }}>
@@ -696,7 +696,7 @@ function Slide4B() {
           ))}
         </div>
         {activeMode && (
-          <p style={{ fontSize: 10, color: 'rgba(185,139,255,0.55)', margin: '6px 0 0', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 10, color: 'white', margin: '6px 0 0', lineHeight: 1.4 }}>
             {activeMode === 'recovery' ? '🌿 Recovery Mode: gentle, slow, restore.' :
              activeMode === 'rush'     ? '⚡ Rush Mode: single task, protect energy.' :
              activeMode === 'ground'   ? '🌍 Grounding: breathe, body first, then one step.' :
@@ -709,8 +709,8 @@ function Slide4B() {
       <div style={{ ...G, borderRadius: 22, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={LBL}><Star style={{ width: 9, height: 9 }} />HOME ENERGY</div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.80)', margin: '0 0 1px' }}>Small reset. Big energy.</p>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', margin: 0 }}>Start one load of laundry</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: 'white', margin: '0 0 1px' }}>Small reset. Big energy.</p>
+          <p style={{ fontSize: 10, color: 'white', margin: 0 }}>Start one load of laundry</p>
         </div>
         <button onClick={() => setHomeDone(!homeDone)} style={{ flexShrink: 0, padding: '6px 10px', borderRadius: 14, border: `1px solid ${homeDone ? 'rgba(138,184,138,0.38)' : 'rgba(155,92,255,0.30)'}`, background: homeDone ? 'rgba(138,184,138,0.12)' : 'rgba(155,92,255,0.12)', color: homeDone ? '#8AB88A' : '#b98bff', fontSize: 10, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
           {homeDone ? '✓ Done' : 'Start task →'}
@@ -754,7 +754,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, flexShrink: 0, position: 'relative', zIndex: 1 }}>
           <div style={{ ...LBL, marginBottom: 0 }}><Target style={{ width: 9, height: 9 }} />Weekly Focus</div>
           <div style={{ padding: '3px 10px', borderRadius: 24, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(185,139,255,0.24)' }}>
-            <span style={{ fontSize: 9, fontWeight: 800, color: '#b98bff', letterSpacing: '0.08em' }}>
+            <span style={{ fontSize: 9, fontWeight: 800, color: 'white', letterSpacing: '0.08em' }}>
               WK {Math.ceil((new Date().getTime() - new Date(new Date().getFullYear(), 0, 1).getTime()) / 604800000)}
             </span>
           </div>
@@ -771,7 +771,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         </p>
 
         {/* Affirmation */}
-        <p style={{ fontSize: 11, color: 'rgba(185,139,255,0.68)', margin: '0 0 auto', lineHeight: 1.6, textAlign: 'center', fontStyle: 'italic', position: 'relative', zIndex: 1, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <p style={{ fontSize: 11, color: 'white', margin: '0 0 auto', lineHeight: 1.6, textAlign: 'center', fontStyle: 'italic', position: 'relative', zIndex: 1, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {guidance?.affirmation ?? 'Finish what unlocks momentum.'}
         </p>
 
@@ -795,7 +795,7 @@ function Slide5({ guidance }: { guidance: GuidanceData | null }) {
         <div style={{ display: 'flex', gap: 5, justifyContent: 'center', marginTop: 10, flexShrink: 0, position: 'relative', zIndex: 1, flexWrap: 'wrap' }}>
           {['Refinement', 'Visibility', 'Momentum'].map((theme, i) => (
             <div key={theme} style={{ padding: '3px 10px', borderRadius: 24, background: `rgba(155,92,255,${0.12 + i * 0.04})`, border: '1px solid rgba(185,139,255,0.16)' }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(185,139,255,0.62)', letterSpacing: '0.04em' }}>{theme}</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: 'white', letterSpacing: '0.04em' }}>{theme}</span>
             </div>
           ))}
         </div>
@@ -817,13 +817,13 @@ function Slide5B({ guidance }: { guidance: GuidanceData | null }) {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, flexShrink: 0 }}>
         <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><BookOpen style={{ width: 9, height: 9 }} />LESSON</div>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: 0, fontStyle: 'italic', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
+          <p style={{ fontSize: 10, color: 'white', lineHeight: 1.55, margin: 0, fontStyle: 'italic', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
             {guidance?.shadow_question ?? 'Recognition over chasing. Speak clearly, then let the right doors open.'}
           </p>
         </div>
         <div style={{ ...G, borderRadius: 22, padding: '10px 11px' }}>
           <div style={LBL}><Calendar style={{ width: 9, height: 9 }} />UPCOMING ENERGY</div>
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)', lineHeight: 1.55, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
+          <p style={{ fontSize: 10, color: 'white', lineHeight: 1.55, margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical' }}>
             This week favors refinement, planning, and one brave visible step.
           </p>
         </div>
@@ -832,12 +832,12 @@ function Slide5B({ guidance }: { guidance: GuidanceData | null }) {
       {/* Parked Priorities */}
       <div style={{ ...G, borderRadius: 22, padding: '10px 12px', flexShrink: 0 }}>
         <div style={LBL}><Star style={{ width: 9, height: 9 }} />PARKED PRIORITIES</div>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', margin: '0 0 7px' }}>Your ideas are safe here.</p>
+        <p style={{ fontSize: 10, color: 'white', margin: '0 0 7px' }}>Your ideas are safe here.</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {PARKED.map((p, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ width: 4, height: 4, borderRadius: '50%', background: '#9b5cff', flexShrink: 0 }} />
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>{p}</p>
+              <p style={{ fontSize: 11, color: 'white', margin: 0, lineHeight: 1.3 }}>{p}</p>
             </div>
           ))}
         </div>
@@ -852,8 +852,8 @@ function Slide5B({ guidance }: { guidance: GuidanceData | null }) {
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           boxShadow: '0 0 18px rgba(100,50,200,0.08)',
         }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#b98bff' }}>Plan my week →</span>
-          <Star style={{ width: 14, height: 14, color: 'rgba(185,139,255,0.45)' }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>Plan my week →</span>
+          <Star style={{ width: 14, height: 14, color: 'white' }} />
         </div>
       </Link>
 

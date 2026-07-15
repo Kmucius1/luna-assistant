@@ -60,6 +60,7 @@ export default function ProjectsPage() {
   const [showForm,   setShowForm]   = useState(false)
   const [expanded,   setExpanded]   = useState<string | null>(null)
   const [newProject, setNewProject] = useState({ name: '', description: '', status: 'active' as Project['status'], priority_level: 'medium' as Project['priority_level'], next_action: '', deadline: '', waiting_on: '' })
+  const [formError,  setFormError]  = useState('')
   const supabase = createClient()
 
   const loadData = useCallback(async () => {
@@ -83,9 +84,19 @@ export default function ProjectsPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
+    setFormError('')
     const { data: { user } } = await supabase.auth.getUser()
     if (!user || !newProject.name.trim()) return
-    const { data } = await supabase.from('projects').insert({ ...newProject, user_id: user.id }).select().single()
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({ ...newProject, deadline: newProject.deadline || null, user_id: user.id })
+      .select()
+      .single()
+    if (error) {
+      console.error('[projects] insert error:', error)
+      setFormError("Couldn't save that project — try again.")
+      return
+    }
     if (data) { setProjects(prev => [data, ...prev]); setShowForm(false); setNewProject({ name: '', description: '', status: 'active', priority_level: 'medium', next_action: '', deadline: '', waiting_on: '' }) }
   }
 
@@ -146,6 +157,7 @@ export default function ProjectsPage() {
                     </div>
                   </div>
                   <div><FieldLabel text="Next action" /><input value={newProject.next_action} onChange={e => setNewProject(p => ({ ...p, next_action: e.target.value }))} style={INPUT_S} placeholder="What needs to happen next?" /></div>
+                  {formError && <p style={{ fontSize: 12, color: '#E05E5E', margin: 0 }}>{formError}</p>}
                   <div style={{ display: 'flex', gap: 8 }}>
                     <button type="submit" style={{ flex: 1, padding: '11px 0', borderRadius: 14, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create project</button>
                     <button type="button" onClick={() => setShowForm(false)} style={{ padding: '11px 18px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', fontSize: 13, cursor: 'pointer' }}>Cancel</button>

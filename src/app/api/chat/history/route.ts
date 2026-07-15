@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -30,19 +31,26 @@ function getOpener(hour: number): string {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const session_id = searchParams.get('session_id') ?? 'default'
-    const limit = parseInt(searchParams.get('limit') ?? '50')
+    const tz = searchParams.get('tz') || 'America/New_York'
+    // Today's messages only (in the user's local timezone) — conversation
+    // rolls over to a fresh session_id at local midnight. Prior days are
+    // never deleted, just addressed under their own date-keyed session_id.
+    const session_id = localDateKey(new Date(), tz)
 
     const db = createAdminClient()
-    const hour = new Date().getHours()
+    const hour = localHour(new Date(), tz)
 
-    const { data: messages } = await db
+    // Fetch the most recent messages first (so a busy day never gets silently
+    // truncated to its earliest messages), then restore chronological order.
+    const { data: recent } = await db
       .from('luna_messages')
       .select('id, role, content, created_at, time_period')
       .eq('user_id', ZOE_USER_ID)
       .eq('session_id', session_id)
-      .order('created_at', { ascending: true })
-      .limit(limit)
+      .order('created_at', { ascending: false })
+      .limit(500)
+
+    const messages = (recent ?? []).slice().reverse()
 
     // If no history yet, return the time-aware opener
     if (!messages || messages.length === 0) {

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { MORNING_MESSAGE_PROMPT, callAI, parseAIJson } from '@/lib/ai'
+import { localHour } from '@/lib/luna/dailyCache'
 
 // ─── Mode auto-selection ──────────────────────────────────────
-function selectMode(sleep: number, energy: number, mood: number, supportNeed: string, wakeTime: string): string {
-  const hour = wakeTime ? parseInt(wakeTime.split(':')[0]) : new Date().getHours()
+function selectMode(sleep: number, energy: number, mood: number, supportNeed: string, wakeTime: string, tz: string): string {
+  const hour = wakeTime ? parseInt(wakeTime.split(':')[0]) : localHour(new Date(), tz)
 
   if (hour >= 10) return 'Late Wake-Up Recalibration'
   if (sleep <= 4 || (sleep <= 5 && energy <= 4)) return 'Recovery Morning'
@@ -20,6 +21,7 @@ function selectMode(sleep: number, energy: number, mood: number, supportNeed: st
 }
 
 export async function POST(request: NextRequest) {
+  let clientTz = 'America/New_York'
   try {
     const body = await request.json()
     const {
@@ -39,9 +41,9 @@ export async function POST(request: NextRequest) {
       moon_data = null,     // From /api/astrology/moon
     } = body
 
-    const auto_mode = selectMode(sleep_rating, energy_rating, mood_rating, support_need, wake_time)
-    // Use client's local timezone if provided so date is correct for Zoe (not UTC)
-    const clientTz = (body.tz as string) || 'America/New_York'
+    // Use client's local timezone if provided so date/time is correct for Zoe (not UTC)
+    clientTz = (body.tz as string) || 'America/New_York'
+    const auto_mode = selectMode(sleep_rating, energy_rating, mood_rating, support_need, wake_time, clientTz)
     const today = new Intl.DateTimeFormat('en-US', {
       timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric',
     }).format(new Date())
@@ -110,7 +112,7 @@ Generate her morning message. Make it feel like it was written specifically for 
     console.error('Morning message error:', err)
 
     // ── Fallback — never leave her without a message ──────────
-    const hour = new Date().getHours()
+    const hour = localHour(new Date(), clientTz)
     const fallbacks = [
       {
         greeting: 'Good morning, beautiful.',
@@ -147,6 +149,6 @@ Generate her morning message. Make it feel like it was written specifically for 
     ]
 
     const fallback = fallbacks[Math.floor(Math.random() * fallbacks.length)]
-    return NextResponse.json({ ...fallback, date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) })
+    return NextResponse.json({ ...fallback, date: new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: clientTz }) })
   }
 }

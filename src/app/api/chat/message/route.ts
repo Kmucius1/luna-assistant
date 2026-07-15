@@ -3,6 +3,7 @@ import { callAI } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { buildLunaContext, formatLunaContextForPrompt } from '@/lib/luna/context'
+import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -125,7 +126,7 @@ const PRESENCE_FALLBACKS = [
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, session_id } = await req.json() as { message: string; session_id?: string }
+    const { message, tz } = await req.json() as { message: string; tz?: string }
 
     if (!message?.trim()) {
       return NextResponse.json({ error: 'Message required' }, { status: 400 })
@@ -134,11 +135,14 @@ export async function POST(req: NextRequest) {
     const db = createAdminClient()
     const userId = await resolveUserId()
     const now = new Date()
-    const hour = now.getHours()
+    const hour = localHour(now, tz || 'America/New_York')
     const { period, context } = getTimePeriod(hour)
 
-    // Load recent conversation history (last 12 messages for context)
-    const sid = session_id ?? 'default'
+    // Each calendar day (in the user's local timezone) gets its own session —
+    // conversation stays intact and reviewable all day, then rolls over to a
+    // fresh session at local midnight. Nothing is ever deleted; prior days
+    // remain in luna_messages under their own date-keyed session_id forever.
+    const sid = localDateKey(now, tz || 'America/New_York')
     const { data: history } = await db
       .from('luna_messages')
       .select('role, content, created_at')
@@ -165,7 +169,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = contextBlock ? `${LUNA_SYSTEM}\n\n${contextBlock}` : LUNA_SYSTEM
 
     // Build conversation context for AI
-    const timeContext = `Current time: ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} (${period})\nContext: ${context}`
+    const timeContext = `Current time: ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: tz || 'America/New_York' })} (${period})\nContext: ${context}`
 
     const conversationHistory = recentMessages
       .map((m: { role: string; content: string }) => `${m.role === 'user' ? 'Zoe' : 'LUNA'}: ${m.content}`)

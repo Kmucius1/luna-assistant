@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
+import type { CalendarEvent } from '@/lib/calendar'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function dueDateLabel(dateStr?: string): { label: string; color: string; urgent: boolean } {
@@ -120,11 +121,13 @@ function AppBtn({ icon: Icon, label, href, color, desc, external }: {
 // ─────────────────────────────────────────────────────────────────────────────
 function Slide1({
   stats, loading, error, activeTasks, urgentTasks, done, onToggle, onSync,
+  events, eventsLoading,
 }: {
   stats: { openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null
   loading: boolean; error: boolean
   activeTasks: DryphubTask[]; urgentTasks: DryphubTask[]
   done: Set<string>; onToggle: (id: string) => void; onSync: () => void
+  events: CalendarEvent[]; eventsLoading: boolean
 }) {
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -163,6 +166,44 @@ function Slide1({
         ))}
       </div>
 
+      {/* Today + tomorrow's schedule — actual calendar events */}
+      <div style={{ ...G, borderRadius: 22, flexShrink: 0, maxHeight: 220, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
+          <div style={LBL}><Calendar style={{ width: 9, height: 9 }} />Schedule</div>
+          <Link href="/calendar" style={{ fontSize: 10.5, color: '#9b5cff', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
+        </div>
+        {eventsLoading ? (
+          <div style={{ padding: '16px 14px', display: 'flex', justifyContent: 'center' }}>
+            <Loader2 style={{ width: 18, height: 18, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
+          </div>
+        ) : events.length > 0 ? (
+          <div style={{ overflowY: 'auto', minHeight: 0 }}>
+            {events.some(e => e.isToday) && (
+              <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: 0, padding: '8px 14px 4px' }}>Today</p>
+            )}
+            {events.filter(e => e.isToday).map(e => (
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: '#8AAEC8', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
+              </div>
+            ))}
+            {events.some(e => e.isTomorrow) && (
+              <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: 0, padding: '8px 14px 4px' }}>Tomorrow</p>
+            )}
+            {events.filter(e => e.isTomorrow).map(e => (
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: '#8AAEC8', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ padding: '16px 14px', textAlign: 'center' }}>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.28)', margin: 0 }}>Nothing on your calendar today or tomorrow</p>
+          </div>
+        )}
+      </div>
+
       {/* Needs attention — flex:1, inner scroll */}
       <div style={{ ...G, borderRadius: 22, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
@@ -186,7 +227,7 @@ function Slide1({
           </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>All clear — nothing urgent today</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks right now</p>
           </div>
         )}
       </div>
@@ -395,6 +436,8 @@ export default function WorkPage() {
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(false)
   const [done,    setDone]    = useState<Set<string>>(new Set())
+  const [events,        setEvents]        = useState<CalendarEvent[]>([])
+  const [eventsLoading, setEventsLoading] = useState(true)
 
   const load = useCallback(() => {
     setLoading(true); setError(false)
@@ -402,6 +445,13 @@ export default function WorkPage() {
       fetch('/api/dryp/tasks').then(r => r.json()).then(d => { if (d.tasks) setTasks(d.tasks) }),
       fetch('/api/dryp/stats').then(r => r.json()).then(s => { if (s.connected) setStats(s) }),
     ]).finally(() => setLoading(false))
+
+    setEventsLoading(true)
+    fetch('/api/calendar/upcoming?days=2')
+      .then(r => r.json())
+      .then(d => setEvents((d.events ?? []).filter((e: CalendarEvent) => e.isToday || e.isTomorrow)))
+      .catch(() => setEvents([]))
+      .finally(() => setEventsLoading(false))
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -431,6 +481,7 @@ export default function WorkPage() {
           stats={stats} loading={loading} error={error}
           activeTasks={activeTasks} urgentTasks={urgentTasks}
           done={done} onToggle={toggle} onSync={load}
+          events={events} eventsLoading={eventsLoading}
         />
       ),
     },

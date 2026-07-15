@@ -38,8 +38,8 @@ export default function ChatPage() {
   const [input,      setInput]      = useState('')
   const [sending,    setSending]    = useState(false)
   const [listening,  setListening]  = useState(false)
-  const [sessionId]                 = useState('default')
   const [loaded,     setLoaded]     = useState(false)
+  const tz = typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
 
   const bottomRef   = useRef<HTMLDivElement>(null)
   const inputRef    = useRef<HTMLTextAreaElement>(null)
@@ -49,12 +49,12 @@ export default function ChatPage() {
   // ─── Load history ──────────────────────────────────────────────
   const loadHistory = useCallback(async () => {
     try {
-      const res = await fetch(`/api/chat/history?session_id=${sessionId}`)
+      const res = await fetch(`/api/chat/history?tz=${encodeURIComponent(tz)}`)
       const data = await res.json() as { messages: Message[] }
       if (data.messages?.length) setMessages(data.messages)
     } catch { /* show nothing, user can start fresh */ }
     setLoaded(true)
-  }, [sessionId])
+  }, [tz])
 
   useEffect(() => { void loadHistory() }, [loadHistory])
 
@@ -90,7 +90,7 @@ export default function ChatPage() {
       const res = await fetch('/api/chat/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, session_id: sessionId }),
+        body: JSON.stringify({ message: trimmed, tz }),
       })
       const data = await res.json() as { response?: string; error?: string }
       const reply = data.response ?? "I'm here with you — try again in a moment."

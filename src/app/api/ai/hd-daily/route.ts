@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson, ZOE_SOUL } from '@/lib/ai'
-import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { getOrCreateDailyContent, localHour } from '@/lib/luna/dailyCache'
 import { createClient } from '@/lib/supabase/server'
-import { format } from 'date-fns'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -65,8 +64,10 @@ export async function POST(request: NextRequest) {
       forceRegenerate: refresh,
       generate: async () => {
         try {
-          const today = format(new Date(), 'EEEE, MMMM d, yyyy')
-          const hour = new Date().getHours()
+          const today = new Intl.DateTimeFormat('en-US', {
+            timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+          }).format(new Date())
+          const hour = localHour(new Date(), tz)
           const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening'
           const message = `Today is ${today}, ${timeOfDay}. Generate Zoe's Human Design daily focus. Be specific to her actual life at DRYP right now.`
 

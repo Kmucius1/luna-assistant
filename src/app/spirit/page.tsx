@@ -315,6 +315,7 @@ export default function SpiritScreen() {
           positions:   selectedSpread.positions,
           cards: drawnCards.map(c => ({ name: c.name, reversed: c.reversed, position: c.position ?? '', keywords: c.keywords })),
           time_of_day: tod,
+          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
           context: tarotContext.trim() || undefined,
         }),
       })

@@ -93,12 +93,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const refresh  = searchParams.get('refresh') === '1'
     const clientTz = searchParams.get('tz')   || 'America/New_York'
-    const localDate = searchParams.get('date') || ''
 
     const now = new Date()
-    const dateKey = localDate
-      ? `love_${localDate.replace(/[^a-zA-Z0-9]/g, '_')}`
-      : `love_${new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)}`
 
     const planets  = getCurrentPlanets(now)
     const transits = getTransitsToNatal(now).slice(0, 8)
@@ -120,11 +116,10 @@ export async function GET(req: NextRequest) {
       userId: ZOE_USER_ID,
       generationType: 'love_guidance',
       timezone: clientTz,
-      dateKey,
       forceRegenerate: refresh,
       generate: async () => {
         try {
-          const dateStr = localDate || new Intl.DateTimeFormat('en-US', {
+          const dateStr = new Intl.DateTimeFormat('en-US', {
             timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
           }).format(now)
 
