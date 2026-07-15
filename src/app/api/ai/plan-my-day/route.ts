@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createClient } from '@supabase/supabase-js'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { localHour } from '@/lib/luna/dailyCache'
+import { localHour, localDateKey } from '@/lib/luna/dailyCache'
 import { buildLunaContext } from '@/lib/luna/context'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
@@ -161,6 +161,24 @@ realistic — Projector energy, max 6 focused work hours, 20-30 min buffers buil
 
     const raw    = await callAI(SYSTEM, userPrompt, 3000)
     const parsed = parseAIJson(raw)
+
+    // Persist so the Home page can reflect "what's next" from her actual
+    // planned day, not just generic task priority — she built this plan
+    // on purpose, it should show up somewhere after she leaves this page.
+    try {
+      const db = createAdminClient()
+      await db.from('daily_generation_cache').upsert({
+        user_id: ZOE_USER_ID,
+        date_key: localDateKey(new Date(), tz),
+        timezone: tz,
+        generation_type: 'day_plan',
+        payload: parsed,
+        source: 'ai',
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,date_key,generation_type' })
+    } catch (saveErr) {
+      console.error('[plan-my-day] failed to persist plan:', saveErr instanceof Error ? saveErr.message : saveErr)
+    }
 
     return NextResponse.json(parsed)
   } catch (err) {

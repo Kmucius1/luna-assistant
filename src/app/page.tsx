@@ -22,6 +22,22 @@ interface GuidanceData {
 }
 interface HomeTask     { id: string; title: string; urgency_level?: string }
 interface HomeCalEvent { id: string; title: string; startTime: string; allDay: boolean }
+interface DayPlanBlock { time: string; label: string; detail?: string; type: string; anchor?: boolean; emoji?: string }
+interface DayPlan      { schedule?: DayPlanBlock[] }
+
+// Parses "6:30 AM" / "12:00 PM" style strings into minutes-since-midnight —
+// returns null for anything else (e.g. "null", missing time).
+function timeStrToMinutes(t: string | undefined): number | null {
+  if (!t) return null
+  const m = t.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i)
+  if (!m) return null
+  let h = parseInt(m[1], 10)
+  const min = parseInt(m[2], 10)
+  const ap = m[3].toUpperCase()
+  if (ap === 'PM' && h !== 12) h += 12
+  if (ap === 'AM' && h === 12) h = 0
+  return h * 60 + min
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const MOON_PHASES = [
@@ -187,14 +203,24 @@ const FALLBACK_TASKS = [
 ]
 
 function Slide1({
-  greeting, moon, heroBg, heroTagline, topTasks, calEvents, dataLoaded,
+  greeting, moon, heroBg, heroTagline, topTasks, calEvents, dataLoaded, dayPlan,
 }: {
   greeting: string; moon: typeof MOON_PHASES[0]
   heroBg: string; heroTagline: string
-  topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean
+  topTasks: HomeTask[]; calEvents: HomeCalEvent[]; dataLoaded: boolean; dayPlan: DayPlan | null
 }) {
   const tasks     = (dataLoaded && topTasks.length > 0) ? topTasks.slice(0, 3) : FALLBACK_TASKS
   const nextEvent = calEvents[0] ?? null
+
+  // What's actually next from her planned day, right now — not just a
+  // generic task list. Falls back to tasks below if she hasn't planned
+  // today yet.
+  const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
+  const upNext = (dayPlan?.schedule ?? [])
+    .map(b => ({ ...b, mins: timeStrToMinutes(b.time) }))
+    .filter((b): b is DayPlanBlock & { mins: number } => b.mins !== null && b.mins >= nowMinutes)
+    .sort((a, b) => a.mins - b.mins)
+    .slice(0, 3)
 
   return (
     <div className="flex flex-col gap-3" style={{ minHeight: '100%' }}>
@@ -218,20 +244,39 @@ function Slide1({
       {/* Today's Top 3 + Next Event */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div style={{ ...G, borderRadius: 22, padding: '12px 13px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
-            {tasks.map((t, i) => (
-              <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
-                <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
-                  <span style={{ fontSize: 8, fontWeight: 800, color: 'white' }}>{i + 1}</span>
-                </div>
-                <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+          {upNext.length > 0 ? (
+            <>
+              <div style={LBL}><Target style={{ width: 10, height: 10 }} />What's Next</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
+                {upNext.map(b => (
+                  <div key={`${b.time}-${b.label}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                    <span style={{ fontSize: 9, fontWeight: 800, color: '#C9A96E', flexShrink: 0, minWidth: 44, marginTop: 1 }}>{b.time}</span>
+                    <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{b.label}</p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <Link href="/tasks" style={{ textDecoration: 'none' }}>
-            <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View all tasks →</span>
-          </Link>
+              <Link href="/plan-my-day" style={{ textDecoration: 'none' }}>
+                <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View full plan →</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <div style={LBL}><Target style={{ width: 10, height: 10 }} />Today's Top 3</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 7 }}>
+                {tasks.map((t, i) => (
+                  <div key={'id' in t ? t.id : i} style={{ display: 'flex', alignItems: 'flex-start', gap: 7 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0, background: 'rgba(155,92,255,0.22)', border: '1px solid rgba(155,92,255,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>
+                      <span style={{ fontSize: 8, fontWeight: 800, color: 'white' }}>{i + 1}</span>
+                    </div>
+                    <p style={{ fontSize: 12, color: 'white', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{t.title}</p>
+                  </div>
+                ))}
+              </div>
+              <Link href="/tasks" style={{ textDecoration: 'none' }}>
+                <span style={{ fontSize: 10.5, color: 'white', fontWeight: 600 }}>View all tasks →</span>
+              </Link>
+            </>
+          )}
         </div>
 
         <div style={{ ...G, borderRadius: 22, padding: '12px 13px', display: 'flex', flexDirection: 'column' }}>
@@ -881,6 +926,7 @@ function HomePageInner() {
   const [calEvents,  setCalEvents]  = useState<HomeCalEvent[]>([])
   const [topTasks,   setTopTasks]   = useState<HomeTask[]>([])
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [dayPlan,    setDayPlan]    = useState<DayPlan | null>(null)
   const [moonData,   setMoonData]   = useState<{ phase?: { name: string; emoji?: string }; sign?: { name: string; emoji?: string } } | null>(null)
   const [moneyData,  setMoneyData]  = useState<{ bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number } | null>(null)
   const [styleData,  setStyleData]  = useState<{ hasProfile: boolean; summary?: string } | null>(null)
@@ -909,6 +955,10 @@ function HomePageInner() {
         if (d.calendar?.today) setCalEvents(d.calendar.today)
         if (d.tasks?.top)      setTopTasks(d.tasks.top)
       }).catch(() => {}).finally(() => setDataLoaded(true))
+    fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(r => r.json())
+      .then(d => setDayPlan(d.plan ?? null))
+      .catch(() => setDayPlan(null))
     fetch(`/api/astrology/moon?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
       .then(r => r.json()).then(d => setMoonData(d)).catch(() => {})
     fetch('/api/money/summary')
@@ -938,7 +988,7 @@ function HomePageInner() {
   const pages = [
     {
       id: 'today', label: 'Today', noScroll: true,
-      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} />,
+      content: <Slide1 greeting={greeting} moon={moon} heroBg={heroBg} heroTagline={heroTagline} topTasks={topTasks} calEvents={calEvents} dataLoaded={dataLoaded} dayPlan={dayPlan} />,
     },
     {
       id: 'focus', label: 'Focus', noScroll: true,
