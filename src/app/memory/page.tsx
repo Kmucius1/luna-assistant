@@ -459,6 +459,17 @@ export default function MemoryPage() {
   const [showCheckIns, setShowCheckIns] = useState(true)
   const [showPatterns, setShowPatterns] = useState(false)
   const [showCoaching, setShowCoaching] = useState(true)
+  const [showFullRecord, setShowFullRecord] = useState(true)
+
+  interface DayArchive {
+    chat: { id: string; role: string; content: string; created_at: string }[]
+    brainDumps: { id: string; raw_text: string; ai_summary?: string; created_at: string }[]
+    tasks: { id: string; title: string; category?: string; created_at: string }[]
+    journal: { id: string; entry_type: string; mood?: string; content: string; created_at: string }[]
+    intentions: { id: string; text: string; done: boolean; created_at: string }[]
+  }
+  const [dayArchive, setDayArchive] = useState<DayArchive | null>(null)
+  const [loadingArchive, setLoadingArchive] = useState(true)
 
   const loadCheckIns = useCallback(async () => {
     try {
@@ -493,6 +504,15 @@ export default function MemoryPage() {
     setDayCheckIns(allCheckIns.filter(c => c.date === selectedDate))
   }, [allCheckIns, selectedDate])
 
+  useEffect(() => {
+    setLoadingArchive(true)
+    fetch(`/api/luna/day-archive?date=${selectedDate}`)
+      .then(r => r.json())
+      .then(d => setDayArchive(d))
+      .catch(() => setDayArchive(null))
+      .finally(() => setLoadingArchive(false))
+  }, [selectedDate])
+
   // Build available date list
   const availableDates = (() => {
     const ciDates = allCheckIns.map(c => c.date)
@@ -506,7 +526,10 @@ export default function MemoryPage() {
   const avgMood        = allMoods.length ? (allMoods.reduce((s, v) => s + v, 0) / allMoods.length).toFixed(1) : null
   const totalReflCount = reflDates.reduce((sum, d) => sum + getTransitReflectionsForDate(d).length, 0)
 
-  const hasAnything = dayCheckIns.length > 0 || dayRefl.length > 0 || dayPatterns.length > 0
+  const archiveCount = dayArchive
+    ? dayArchive.chat.length + dayArchive.brainDumps.length + dayArchive.tasks.length + dayArchive.journal.length + dayArchive.intentions.length
+    : 0
+  const hasAnything = dayCheckIns.length > 0 || dayRefl.length > 0 || dayPatterns.length > 0 || archiveCount > 0
   const cachedScore = getDayCoaching(selectedDate)?.growth_score
 
   return (
@@ -589,7 +612,7 @@ export default function MemoryPage() {
           )}
         </div>
 
-        {loadingCI ? (
+        {loadingCI || loadingArchive ? (
           <div className="space-y-3">
             {[1,2,3].map(i => <div key={i} className="h-16 rounded-2xl shimmer" />)}
           </div>
@@ -606,6 +629,87 @@ export default function MemoryPage() {
           </div>
         ) : (
           <div className="space-y-5">
+
+            {/* Full Record — everything said/logged this day, raw, not curated */}
+            {archiveCount > 0 && (
+              <div>
+                <SectionHeader icon="📼" label="Full Record" count={archiveCount}
+                  open={showFullRecord} onToggle={() => setShowFullRecord(o => !o)} accent="var(--golden)" />
+                {showFullRecord && dayArchive && (
+                  <div className="space-y-4">
+                    {dayArchive.chat.length > 0 && (
+                      <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-3)' }}>
+                          Chat with LUNA ({dayArchive.chat.length})
+                        </p>
+                        <div className="space-y-2.5 max-h-96 overflow-y-auto">
+                          {dayArchive.chat.map(m => (
+                            <div key={m.id}>
+                              <p className="text-xs font-semibold mb-0.5" style={{ color: m.role === 'user' ? 'var(--violet)' : 'var(--golden)' }}>
+                                {m.role === 'user' ? 'You' : 'LUNA'} · {new Date(m.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                              </p>
+                              <p className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-2)' }}>{m.content}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {dayArchive.brainDumps.length > 0 && (
+                      <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-3)' }}>
+                          Brain Dumps ({dayArchive.brainDumps.length})
+                        </p>
+                        <div className="space-y-3">
+                          {dayArchive.brainDumps.map(b => (
+                            <p key={b.id} className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-2)' }}>{b.raw_text}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {dayArchive.journal.length > 0 && (
+                      <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-3)' }}>
+                          Journal ({dayArchive.journal.length})
+                        </p>
+                        <div className="space-y-3">
+                          {dayArchive.journal.map(j => (
+                            <p key={j.id} className="text-sm whitespace-pre-wrap" style={{ color: 'var(--text-2)' }}>{j.content}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {dayArchive.tasks.length > 0 && (
+                      <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-3)' }}>
+                          Tasks created ({dayArchive.tasks.length})
+                        </p>
+                        <div className="space-y-1.5">
+                          {dayArchive.tasks.map(t => (
+                            <p key={t.id} className="text-sm" style={{ color: 'var(--text-2)' }}>• {t.title}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {dayArchive.intentions.length > 0 && (
+                      <div className="rounded-[18px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
+                        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-3)' }}>
+                          Intentions set ({dayArchive.intentions.length})
+                        </p>
+                        <div className="space-y-1.5">
+                          {dayArchive.intentions.map(i => (
+                            <p key={i.id} className="text-sm" style={{ color: 'var(--text-2)' }}>{i.done ? '✓' : '○'} {i.text}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Transit Reflections */}
             {dayRefl.length > 0 && (

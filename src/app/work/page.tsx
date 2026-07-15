@@ -190,6 +190,26 @@ function Slide1({
         ))}
       </div>
 
+      {/* Prep for tomorrow — surfaced a day ahead so nothing sneaks up */}
+      {!eventsLoading && events.some(e => e.isTomorrow && !e.allDay) && (
+        <div style={{ ...G, borderRadius: 18, padding: '11px 14px', flexShrink: 0, background: 'rgba(224,140,74,0.10)', border: '1px solid rgba(224,140,74,0.28)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
+            <Zap style={{ width: 12, height: 12, color: '#E08C4A' }} />
+            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#E08C4A' }}>
+              Prep for tomorrow
+            </span>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {events.filter(e => e.isTomorrow && !e.allDay).map(e => (
+              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: '#E08C4A', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
+                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Today + tomorrow's schedule — actual calendar events */}
       <div style={{ ...G, borderRadius: 22, flexShrink: 0, maxHeight: 220, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>

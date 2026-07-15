@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { callAI } from '@/lib/ai'
-import { localDateKey } from '@/lib/luna/dailyCache'
+import { localDateKey, localDayBoundsUTC } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_TIMEZONE = 'America/New_York'
 
-const MEMORY_SYSTEM = `You are LUNA's memory system. You read one day of Zoe's chat messages and
-check-ins and extract what is actually worth remembering long-term — not a
-transcript recap, but durable facts: patterns, preferences, commitments,
-struggles, wins, relationships, and anything she'd want LUNA to still know
-weeks from now. Be specific and concrete, in third person, 3-6 sentences.
-Skip small talk with no lasting content. If truly nothing memorable happened,
-say so in one sentence.`
+const MEMORY_SYSTEM = `You are LUNA's memory system. You read one full day of Zoe's activity across
+the app — chat messages, check-ins, brain dumps, journal entries, tasks she
+created, and intentions she set — and extract what is actually worth
+remembering long-term — not a transcript recap, but durable facts: patterns,
+preferences, commitments, struggles, wins, relationships, and anything she'd
+want LUNA to still know weeks from now. Be specific and concrete, in third
+person, 3-6 sentences. Skip small talk with no lasting content. If truly
+nothing memorable happened, say so in one sentence. This is a supplementary
+reflection, not the only record — the complete raw content is preserved and
+reviewable separately, so it's fine to be selective here.`
 
 // Vercel Cron always invokes via GET — both GET and POST share this handler.
 async function handle(req: NextRequest) {
@@ -41,7 +44,11 @@ async function handle(req: NextRequest) {
       return NextResponse.json({ status: 'already_done', date_key: dateKey })
     }
 
-    const [{ data: messages }, { data: checkIns }] = await Promise.all([
+    const { start, end } = localDayBoundsUTC(dateKey, ZOE_TIMEZONE)
+    const startISO = start.toISOString()
+    const endISO = end.toISOString()
+
+    const [{ data: messages }, { data: checkIns }, { data: brainDumps }, { data: journalEntries }, { data: tasksCreated }, { data: intentionsSet }] = await Promise.all([
       db.from('luna_messages')
         .select('role, content, created_at')
         .eq('user_id', ZOE_USER_ID)
@@ -51,9 +58,28 @@ async function handle(req: NextRequest) {
         .select('type, feeling, on_mind, support_need, pride_goal, mood_rating, energy_rating, sleep_rating')
         .eq('user_id', ZOE_USER_ID)
         .eq('date', dateKey),
+      db.from('brain_dumps')
+        .select('raw_text')
+        .eq('user_id', ZOE_USER_ID)
+        .gte('created_at', startISO).lt('created_at', endISO),
+      db.from('journal_page_entries')
+        .select('entry_type, content')
+        .eq('user_id', ZOE_USER_ID)
+        .gte('created_at', startISO).lt('created_at', endISO),
+      db.from('tasks')
+        .select('title')
+        .eq('user_id', ZOE_USER_ID)
+        .gte('created_at', startISO).lt('created_at', endISO),
+      db.from('intentions')
+        .select('text')
+        .eq('user_id', ZOE_USER_ID)
+        .gte('created_at', startISO).lt('created_at', endISO),
     ])
 
-    if (!messages?.length && !checkIns?.length) {
+    const hasAnyActivity = [messages, checkIns, brainDumps, journalEntries, tasksCreated, intentionsSet]
+      .some(rows => (rows?.length ?? 0) > 0)
+
+    if (!hasAnyActivity) {
       return NextResponse.json({ status: 'nothing_to_summarize', date_key: dateKey })
     }
 
@@ -69,6 +95,13 @@ async function handle(req: NextRequest) {
       .map((c: CheckInRow) => `[${c.type} check-in] mood ${c.mood_rating ?? '—'}/10, energy ${c.energy_rating ?? '—'}/10, sleep ${c.sleep_rating ?? '—'}/10.${c.feeling ? ` Feeling: ${c.feeling}.` : ''}${c.on_mind ? ` On her mind: ${c.on_mind}.` : ''}${c.support_need ? ` Needed: ${c.support_need}.` : ''}${c.pride_goal ? ` Wanted to be proud of: ${c.pride_goal}.` : ''}`)
       .join('\n')
 
+    const brainDumpText = (brainDumps ?? []).map((b: { raw_text: string }) => b.raw_text).join('\n---\n')
+    const journalText = (journalEntries ?? [])
+      .map((j: { entry_type: string; content: string }) => `[${j.entry_type}] ${j.content}`)
+      .join('\n---\n')
+    const tasksText = (tasksCreated ?? []).map((t: { title: string }) => `- ${t.title}`).join('\n')
+    const intentionsText = (intentionsSet ?? []).map((i: { text: string }) => `- ${i.text}`).join('\n')
+
     const userPrompt = `DATE: ${dateKey}
 
 CHAT MESSAGES THAT DAY:
@@ -76,6 +109,18 @@ ${chatTranscript || '(no chat messages)'}
 
 CHECK-INS THAT DAY:
 ${checkInSummary || '(no check-ins logged)'}
+
+BRAIN DUMPS THAT DAY:
+${brainDumpText || '(none)'}
+
+JOURNAL ENTRIES THAT DAY:
+${journalText || '(none)'}
+
+TASKS SHE CREATED THAT DAY:
+${tasksText || '(none)'}
+
+INTENTIONS SHE SET THAT DAY:
+${intentionsText || '(none)'}
 
 Extract what LUNA should remember long-term from this day.`
 
@@ -86,7 +131,15 @@ Extract what LUNA should remember long-term from this day.`
       source = 'ai'
     } catch (aiErr) {
       console.error('[nightly-memory] AI call failed:', aiErr instanceof Error ? aiErr.message : aiErr)
-      summary = `${dateKey}: ${messages?.length ?? 0} chat message(s) and ${checkIns?.length ?? 0} check-in(s) logged — summary generation failed, raw activity preserved in luna_messages/check_ins.`
+      const counts = [
+        (messages?.length ?? 0) && `${messages!.length} chat message(s)`,
+        (checkIns?.length ?? 0) && `${checkIns!.length} check-in(s)`,
+        (brainDumps?.length ?? 0) && `${brainDumps!.length} brain dump(s)`,
+        (journalEntries?.length ?? 0) && `${journalEntries!.length} journal entr${journalEntries!.length === 1 ? 'y' : 'ies'}`,
+        (tasksCreated?.length ?? 0) && `${tasksCreated!.length} task(s)`,
+        (intentionsSet?.length ?? 0) && `${intentionsSet!.length} intention(s)`,
+      ].filter(Boolean).join(', ')
+      summary = `${dateKey}: ${counts} logged — summary generation failed, raw activity preserved and reviewable in the Full Record.`
       source = 'fallback'
     }
 

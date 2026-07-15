@@ -9,13 +9,21 @@ import { addPattern } from '@/lib/patterns'
 
 interface JournalEntry {
   id: string
-  date: string
   type: 'journal' | 'dream' | 'gratitude' | 'shadow' | 'lesson'
   mood?: string
   energy?: number
   content: string
   tags?: string[]
   created_at: string
+}
+
+function dateLabel(iso: string): string {
+  const d = new Date(iso)
+  const now = new Date()
+  if (d.toDateString() === now.toDateString()) return 'Today'
+  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
+  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 const PROMPTS = [
@@ -47,58 +55,53 @@ const TYPE_LABELS: Record<string, { label: string; emoji: string; color: string 
   lesson:    { label: 'Lesson',    emoji: '📖', color: '#8A9E6B' },
 }
 
-const SAMPLE_ENTRIES: JournalEntry[] = [
-  {
-    id: '1',
-    date: 'Today',
-    type: 'journal',
-    mood: 'Focused',
-    energy: 7,
-    content: 'Starting the day with intention. I have a lot on my plate but I know what matters most. The DRYP meeting this morning was energizing.',
-    tags: ['work', 'clarity'],
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    date: 'Yesterday',
-    type: 'dream',
-    content: 'I was in a familiar house but all the rooms were rearranged. I kept trying to find my old bedroom but everything had shifted.',
-    tags: ['change', 'searching'],
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-  },
-]
-
 export default function JournalPage() {
   const [view, setView] = useState<'home' | 'write' | 'entry'>('home')
   const [writeType, setWriteType] = useState<JournalEntry['type']>('journal')
   const [content, setContent] = useState('')
   const [selectedMood, setSelectedMood] = useState('')
   const [selectedPrompt, setSelectedPrompt] = useState('')
-  const [entries, setEntries] = useState<JournalEntry[]>(SAMPLE_ENTRIES)
+  const [entries, setEntries] = useState<JournalEntry[]>([])
   const [viewEntry, setViewEntry] = useState<JournalEntry | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => { setMounted(true) }, [])
+  useEffect(() => {
+    setMounted(true)
+    fetch('/api/journal')
+      .then(r => r.json())
+      .then(d => setEntries((d.entries ?? []).map((e: { id: string; entry_type: string; mood?: string; content: string; tags?: string[]; created_at: string }) => ({
+        id: e.id, type: e.entry_type as JournalEntry['type'], mood: e.mood, content: e.content, tags: e.tags, created_at: e.created_at,
+      }))))
+      .catch(() => setEntries([]))
+  }, [])
   if (!mounted) return null
 
-  const todayEntry = entries.find(e => e.date === 'Today')
+  const todayEntry = entries.find(e => dateLabel(e.created_at) === 'Today')
 
-  function saveEntry() {
-    if (!content.trim()) return
-    const newEntry: JournalEntry = {
-      id: Date.now().toString(),
-      date: 'Today',
-      type: writeType,
-      mood: selectedMood || undefined,
-      content,
-      tags: [],
-      created_at: new Date().toISOString(),
+  async function saveEntry() {
+    if (!content.trim() || saving) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entry_type: writeType, mood: selectedMood || undefined, content, tags: [] }),
+      })
+      if (!res.ok) throw new Error()
+      const { entry } = await res.json()
+      setEntries(prev => [{
+        id: entry.id, type: entry.entry_type, mood: entry.mood, content: entry.content, tags: entry.tags, created_at: entry.created_at,
+      }, ...prev])
+      setContent('')
+      setSelectedMood('')
+      setSelectedPrompt('')
+      setView('home')
+    } catch {
+      /* keep the draft in place so nothing typed is lost */
+    } finally {
+      setSaving(false)
     }
-    setEntries(prev => [newEntry, ...prev])
-    setContent('')
-    setSelectedMood('')
-    setSelectedPrompt('')
-    setView('home')
   }
 
   if (view === 'write') return (
@@ -192,11 +195,11 @@ export default function JournalPage() {
           history={selectedMood ? [selectedMood] : []}
         />
 
-        <button onClick={saveEntry}
+        <button onClick={() => void saveEntry()}
           className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold"
           style={{ background: content.trim() ? 'var(--violet)' : 'var(--surface-border)', color: content.trim() ? 'white' : 'var(--text-4)' }}
-          disabled={!content.trim()}>
-          Save entry
+          disabled={!content.trim() || saving}>
+          {saving ? 'Saving...' : 'Save entry'}
         </button>
       </div>
     </AppLayout>
@@ -220,7 +223,7 @@ export default function JournalPage() {
             </span>
           )}
         </div>
-        <p className="text-xs mb-4" style={{ color: 'var(--text-3)' }}>{viewEntry.date}</p>
+        <p className="text-xs mb-4" style={{ color: 'var(--text-3)' }}>{dateLabel(viewEntry.created_at)}</p>
         <p className="text-base leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-1)', fontFamily: 'var(--font-display)' }}>
           {viewEntry.content}
         </p>
@@ -326,7 +329,7 @@ export default function JournalPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: meta.color }}>{meta.label}</span>
-                    <span className="text-xs ml-auto" style={{ color: 'rgba(255,255,255,0.4)' }}>{entry.date}</span>
+                    <span className="text-xs ml-auto" style={{ color: 'rgba(255,255,255,0.4)' }}>{dateLabel(entry.created_at)}</span>
                   </div>
                   <p className="text-sm leading-snug truncate" style={{ color: 'rgba(255,255,255,0.75)' }}>{entry.content}</p>
                   {entry.mood && <span className="text-xs mt-1 inline-block" style={{ color: 'rgba(255,255,255,0.45)' }}>{entry.mood}</span>}

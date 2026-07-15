@@ -29,6 +29,32 @@ export function localHour(date: Date, timezone: string = DEFAULT_TIMEZONE): numb
   return hourPart ? parseInt(hourPart, 10) : date.getHours()
 }
 
+function wallTimeToUTC(y: number, m: number, d: number, timezone: string): Date {
+  const guess = new Date(Date.UTC(y, m - 1, d, 0, 0, 0))
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  }).formatToParts(guess)
+  const get = (t: string) => parseInt(parts.find(p => p.type === t)?.value ?? '0', 10)
+  const asIfLocalWereUTC = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  const offset = asIfLocalWereUTC - guess.getTime()
+  return new Date(guess.getTime() - offset)
+}
+
+/**
+ * UTC instant range [start, end) covering one local calendar day for the
+ * given IANA timezone — for filtering plain `created_at timestamptz`
+ * columns (tables with no date-keyed session_id of their own) down to
+ * "everything from this local day."
+ */
+export function localDayBoundsUTC(dateKey: string, timezone: string = DEFAULT_TIMEZONE): { start: Date; end: Date } {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  return {
+    start: wallTimeToUTC(y, m, d, timezone),
+    end: wallTimeToUTC(y, m, d + 1, timezone), // JS Date normalizes day overflow correctly
+  }
+}
+
 export interface DailyContentResult<T> {
   payload: T
   source: string
