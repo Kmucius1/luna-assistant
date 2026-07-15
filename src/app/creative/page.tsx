@@ -129,104 +129,153 @@ function SectionHeader({ icon: Icon, title, sub }: { icon: React.ComponentType<{
   )
 }
 
-function OracleCompact({ onOpenFull }: { onOpenFull: () => void }) {
-  const [selectedMood, setSelectedMood] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<OracleResult | null>(null)
-  const [error, setError] = useState('')
+interface StylePoolImage { id: string; image_url: string; label?: string }
 
-  async function askOracle() {
-    if (!selectedMood) return
+function StylePoolBoard() {
+  const [images,   setImages]   = useState<StylePoolImage[]>([])
+  const [loading,  setLoading]  = useState(true)
+  const [likedCount,  setLikedCount]  = useState(0)
+  const [deniedCount, setDeniedCount] = useState(0)
+  const [remainingUnvoted, setRemainingUnvoted] = useState(0)
+  const [pending,  setPending]  = useState<Set<string>>(new Set())
+  const [addUrl,   setAddUrl]   = useState('')
+  const [adding,   setAdding]   = useState(false)
+  const [addMsg,   setAddMsg]   = useState('')
+
+  const load = useCallback(() => {
     setLoading(true)
-    setError('')
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    fetch(`/api/atelier/style-pool?tz=${encodeURIComponent(tz)}`)
+      .then(r => r.json())
+      .then(d => {
+        setImages(d.images ?? [])
+        setLikedCount(d.likedCount ?? 0)
+        setDeniedCount(d.deniedCount ?? 0)
+        setRemainingUnvoted(d.remainingUnvoted ?? 0)
+      })
+      .catch(() => setImages([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  async function vote(img: StylePoolImage, choice: 'liked' | 'denied') {
+    setPending(p => new Set(p).add(img.id))
+    setImages(prev => prev.filter(i => i.id !== img.id))
+    choice === 'liked' ? setLikedCount(c => c + 1) : setDeniedCount(c => c + 1)
     try {
-      const res = await fetch('/api/atelier/oracle', {
+      await fetch('/api/atelier/style-pool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood: selectedMood }),
+        body: JSON.stringify({ image_id: img.id, vote: choice }),
       })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      setResult(data)
+    } catch { /* vote is optimistic; a failed save just means it may resurface tomorrow */ }
+    finally {
+      setPending(p => { const n = new Set(p); n.delete(img.id); return n })
+    }
+  }
+
+  async function addPin() {
+    if (!addUrl.trim() || adding) return
+    setAdding(true)
+    setAddMsg('')
+    try {
+      const res = await fetch('/api/atelier/style-pool/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_url: addUrl.trim() }),
+      })
+      if (!res.ok) throw new Error()
+      setAddUrl('')
+      setAddMsg('Added — it\'ll show up in a future rotation.')
+      setRemainingUnvoted(c => c + 1)
     } catch {
-      setError('Oracle is resting — try again in a moment.')
+      setAddMsg('Couldn\'t add that one — check the URL and try again.')
     } finally {
-      setLoading(false)
+      setAdding(false)
     }
   }
 
   return (
     <div className="space-y-4">
       <ACard>
-        <SLabel>Your mood today</SLabel>
-        <div className="grid grid-cols-4 gap-2">
-          {MOOD_GRID.map(m => (
-            <button key={m.label}
-              onClick={() => setSelectedMood(m.label)}
-              className="flex flex-col items-center gap-1 rounded-2xl py-3 px-2 transition-all"
-              style={{
-                background: selectedMood === m.label ? 'rgba(155,92,255,0.20)' : 'var(--surface-subtle)',
-                border: selectedMood === m.label ? '1.5px solid rgba(155,92,255,0.5)' : '1.5px solid var(--surface-border)',
-              }}>
-              <span className="text-xl">{m.emoji}</span>
-              <span style={{ color: selectedMood === m.label ? 'var(--violet)' : 'var(--text-3)', fontSize: '0.72rem' }}
-                className="font-medium text-center leading-tight">{m.label}</span>
-            </button>
-          ))}
+        <SLabel>Today's style pull</SLabel>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
+          A new random set every day. Heart what feels like you, deny what doesn't —
+          LUNA uses this to learn your actual taste.
+        </p>
+        <div className="flex items-center gap-4 mt-3">
+          <span className="text-xs font-semibold" style={{ color: 'var(--violet)' }}>♥ {likedCount} liked</span>
+          <span className="text-xs font-semibold" style={{ color: 'var(--text-3)' }}>✕ {deniedCount} denied</span>
         </div>
       </ACard>
 
-      <button
-        onClick={askOracle}
-        disabled={loading || !selectedMood}
-        className="w-full rounded-2xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2"
-        style={{
-          background: !selectedMood ? 'var(--surface)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
-          color: !selectedMood ? 'var(--text-3)' : '#fff',
-          opacity: loading ? 0.7 : 1,
-        }}>
-        {loading
-          ? <><Loader2 className="w-5 h-5 animate-spin" /> Reading your energy...</>
-          : <><Sparkles className="w-5 h-5" /> Ask the Oracle</>
-        }
-      </button>
-
-      {error && <p className="text-center text-sm" style={{ color: 'var(--blush)' }}>{error}</p>}
-
-      {result && (
-        <div className="rounded-3xl p-5 space-y-4"
-          style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.18), rgba(106,79,155,0.12))', border: '1px solid rgba(155,92,255,0.25)' }}>
-          {result.style_lane && (
-            <div className="flex items-center gap-2">
-              <div className="rounded-full px-3 py-1 text-sm font-bold"
-                style={{ background: 'rgba(155,92,255,0.25)', color: 'var(--violet)' }}>
-                {result.style_lane}
-              </div>
-              {result.outfit_energy && (
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-2)' }}>{result.outfit_energy}</p>
-              )}
-            </div>
-          )}
-          {result.why_it_works && (
-            <div className="rounded-2xl p-4"
-              style={{ background: 'rgba(155,92,255,0.10)', border: '1px solid rgba(155,92,255,0.15)' }}>
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>✨ {result.why_it_works}</p>
-            </div>
-          )}
-          {result.highest_self_message && (
-            <div className="text-center">
-              <p className="font-display text-base font-bold leading-relaxed" style={{ color: 'var(--text-1)' }}>
-                &ldquo;{result.highest_self_message}&rdquo;
-              </p>
-            </div>
-          )}
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {[1,2,3,4,5,6].map(i => <div key={i} className="rounded-2xl shimmer" style={{ aspectRatio: '3/4' }} />)}
         </div>
+      ) : images.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {images.map(img => (
+            <div key={img.id} style={{
+              position: 'relative', borderRadius: 18, overflow: 'hidden', aspectRatio: '3/4',
+              background: 'var(--surface)', opacity: pending.has(img.id) ? 0.5 : 1, transition: 'opacity 0.15s',
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.image_url} alt={img.label ?? ''} loading="lazy"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <div style={{ position: 'absolute', bottom: 8, left: 8, right: 8, display: 'flex', gap: 6 }}>
+                <button onClick={() => vote(img, 'denied')} disabled={pending.has(img.id)}
+                  style={{
+                    flex: 1, height: 34, borderRadius: 12, border: 'none', cursor: 'pointer',
+                    background: 'rgba(10,4,28,0.6)', backdropFilter: 'blur(6px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <span style={{ color: 'white', fontSize: 15, fontWeight: 700 }}>✕</span>
+                </button>
+                <button onClick={() => vote(img, 'liked')} disabled={pending.has(img.id)}
+                  style={{
+                    flex: 1, height: 34, borderRadius: 12, border: 'none', cursor: 'pointer',
+                    background: 'rgba(155,92,255,0.85)', backdropFilter: 'blur(6px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                  <Heart size={15} color="white" fill="white" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ACard>
+          <p className="text-sm text-center leading-relaxed" style={{ color: 'var(--text-2)' }}>
+            {remainingUnvoted === 0 && (likedCount > 0 || deniedCount > 0)
+              ? 'You\'ve reviewed everything in your style pool — add more pins below to keep going.'
+              : 'No pins yet — add one below to start.'}
+          </p>
+        </ACard>
       )}
 
-      <button onClick={onOpenFull} className="w-full rounded-2xl py-3 text-center text-sm font-semibold"
-        style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.15)', color: 'rgba(201,169,110,0.8)' }}>
-        Full Style Oracle with context →
-      </button>
+      <ACard>
+        <SLabel>Add a pin</SLabel>
+        <p className="text-xs mb-3" style={{ color: 'var(--text-3)' }}>
+          Paste an image URL from a Pinterest pin (or anywhere) to grow the pool.
+        </p>
+        <div className="flex gap-2">
+          <input
+            value={addUrl}
+            onChange={e => setAddUrl(e.target.value)}
+            placeholder="https://i.pinimg.com/..."
+            className="flex-1 rounded-xl px-3 py-2 text-sm outline-none"
+            style={{ background: 'var(--surface-subtle)', border: '1px solid var(--surface-border)', color: 'var(--text-1)' }}
+          />
+          <button onClick={() => void addPin()} disabled={!addUrl.trim() || adding}
+            className="rounded-xl px-4 py-2 text-sm font-semibold"
+            style={{ background: addUrl.trim() ? 'var(--violet)' : 'var(--surface)', color: addUrl.trim() ? 'white' : 'var(--text-3)', border: 'none', cursor: addUrl.trim() ? 'pointer' : 'default' }}>
+            {adding ? '...' : 'Add'}
+          </button>
+        </div>
+        {addMsg && <p className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>{addMsg}</p>}
+      </ACard>
     </div>
   )
 }
@@ -1141,7 +1190,7 @@ function CreativePageInner() {
   })
 
   const creativePages: CPage[] = [
-    { id: 'style',       label: '✨ Style',    content: <OracleCompact onOpenFull={() => setActiveIndex(TAB_IDS.indexOf('oracle'))} /> },
+    { id: 'style',       label: '✨ Style',    content: <StylePoolBoard /> },
     { id: 'oracle',      label: 'Oracle',      content: <OracleSection /> },
     { id: 'closet',      label: 'Closet',      content: <ClosetSection /> },
     { id: 'inspiration', label: 'Inspiration', content: <InspirationSection /> },
