@@ -133,9 +133,6 @@ function StylePoolBoard() {
   const [deniedCount, setDeniedCount] = useState(0)
   const [remainingUnvoted, setRemainingUnvoted] = useState(0)
   const [pending,  setPending]  = useState<Set<string>>(new Set())
-  const [addUrl,   setAddUrl]   = useState('')
-  const [adding,   setAdding]   = useState(false)
-  const [addMsg,   setAddMsg]   = useState('')
 
   const load = useCallback(() => {
     setLoading(true)
@@ -167,27 +164,6 @@ function StylePoolBoard() {
     } catch { /* vote is optimistic; a failed save just means it may resurface tomorrow */ }
     finally {
       setPending(p => { const n = new Set(p); n.delete(img.id); return n })
-    }
-  }
-
-  async function addPin() {
-    if (!addUrl.trim() || adding) return
-    setAdding(true)
-    setAddMsg('')
-    try {
-      const res = await fetch('/api/atelier/style-pool/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_url: addUrl.trim() }),
-      })
-      if (!res.ok) throw new Error()
-      setAddUrl('')
-      setAddMsg('Added — it\'ll show up in a future rotation.')
-      setRemainingUnvoted(c => c + 1)
-    } catch {
-      setAddMsg('Couldn\'t add that one — check the URL and try again.')
-    } finally {
-      setAdding(false)
     }
   }
 
@@ -244,33 +220,11 @@ function StylePoolBoard() {
         <ACard>
           <p className="text-sm text-center leading-relaxed" style={{ color: 'var(--text-2)' }}>
             {remainingUnvoted === 0 && (likedCount > 0 || deniedCount > 0)
-              ? 'You\'ve reviewed everything in your style pool — add more pins below to keep going.'
-              : 'No pins yet — add one below to start.'}
+              ? 'You\'ve reviewed everything for now — check back tomorrow for a fresh set.'
+              : 'Building your first set — check back in a moment.'}
           </p>
         </ACard>
       )}
-
-      <ACard>
-        <SLabel>Add a pin</SLabel>
-        <p className="text-xs mb-3" style={{ color: 'var(--text-3)' }}>
-          Paste an image URL from a Pinterest pin (or anywhere) to grow the pool.
-        </p>
-        <div className="flex gap-2">
-          <input
-            value={addUrl}
-            onChange={e => setAddUrl(e.target.value)}
-            placeholder="https://i.pinimg.com/..."
-            className="flex-1 rounded-xl px-3 py-2 text-sm outline-none"
-            style={{ background: 'var(--surface-subtle)', border: '1px solid var(--surface-border)', color: 'var(--text-1)' }}
-          />
-          <button onClick={() => void addPin()} disabled={!addUrl.trim() || adding}
-            className="rounded-xl px-4 py-2 text-sm font-semibold"
-            style={{ background: addUrl.trim() ? 'var(--violet)' : 'var(--surface)', color: addUrl.trim() ? 'white' : 'var(--text-3)', border: 'none', cursor: addUrl.trim() ? 'pointer' : 'default' }}>
-            {adding ? '...' : 'Add'}
-          </button>
-        </div>
-        {addMsg && <p className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>{addMsg}</p>}
-      </ACard>
     </div>
   )
 }

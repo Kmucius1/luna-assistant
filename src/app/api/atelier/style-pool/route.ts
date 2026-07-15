@@ -5,10 +5,10 @@ import { generateFashionImage } from '@/lib/higgsfield'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const DAILY_COUNT = 12
-const DAILY_GENERATE_COUNT = 3
+const DAILY_GENERATE_COUNT = 4
 
-// Real Pinterest pin images, verified loading — starter pool until Zoe adds
-// more of her own via POST /api/atelier/style-pool/add.
+// Real Pinterest pin images, verified loading — starter pool for a
+// brand-new account before any real taste signal exists.
 const SEED_PINS = [
   { image_url: 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg', label: 'Chic Workwear' },
   { image_url: 'https://i.pinimg.com/736x/0b/f7/2f/0bf72f36fe8ef8c3e2260069ebc7c9b8.jpg', label: 'Business Casual' },
@@ -19,14 +19,18 @@ const SEED_PINS = [
   { image_url: 'https://i.pinimg.com/736x/0f/ab/ab/0fabab24cecd50492cc8a572b5665ae0.jpg', label: 'Office Chic' },
 ]
 
-// Default direction when there's no like signal yet (day one).
-const DEFAULT_LANES = ['Old Money', 'Effortless', 'Chic Workwear']
+// Default direction when there's no like signal yet — her actual confirmed
+// aesthetic (from reviewing her real liked pins directly, 2026-07-15):
+// downtown streetwear/Y2K baddie, not polished editorial. The earlier
+// "Old Money"/"Chic Workwear" defaults were wrong and got denied repeatedly.
+const DEFAULT_LANES = ['Downtown Streetwear', 'Y2K Baddie', 'Street Style', 'Cool-Girl Casual']
 
 function buildPrompt(lane: string, avoid: string[]): string {
   const avoidNote = avoid.length ? ` Avoid: ${avoid.join(', ')} styling.` : ''
-  return `Editorial fashion photograph, full-body outfit shot, ${lane} aesthetic. ` +
-    `Magazine-quality styling, natural lighting, upscale real-world background, ` +
-    `sharp focus, true-to-life color grading.${avoidNote}`
+  return `Candid mirror selfie or street style photo, ${lane} aesthetic — cropped top or ` +
+    `bandeau paired with oversized wide-leg denim or cargo pants, layered jewelry, chunky ` +
+    `sneakers or boots. Messy-chic hair, natural indoor or urban lighting, iPhone photo ` +
+    `quality, not overly posed or editorial.${avoidNote}`
 }
 
 // Simple string hash -> seeded PRNG (mulberry32), so "random" is stable for
