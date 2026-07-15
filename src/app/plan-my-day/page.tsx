@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Sparkles, RefreshCw, ArrowLeft, Clock, Home, Building2, Droplets } from 'lucide-react'
+import { Sparkles, RefreshCw, ArrowLeft, Clock, Home, Building2, Droplets, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 
 const GLASS: React.CSSProperties = {
@@ -36,6 +36,7 @@ interface DayPlan {
   ai_message:   string
   key_anchors: {
     wake:       string
+    gym:        string | null
     out_door:   string | null
     at_work:    string
     lunch:      string
@@ -46,11 +47,15 @@ interface DayPlan {
   schedule: ScheduleBlock[]
 }
 
-const WAKE_TIMES = ['6:30 AM','7:00 AM','7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM']
+const WAKE_TIMES = ['6:00 AM','6:30 AM','7:00 AM','7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM']
+const GYM_TIMES  = ['6:30 AM','7:00 AM','12:00 PM','5:30 PM','6:00 PM']
 const END_TIMES  = ['4:00 PM','5:00 PM','6:00 PM','7:00 PM','8:00 PM']
 
 export default function PlanMyDayPage() {
-  const [wakeTime,     setWakeTime]     = useState('7:30 AM')
+  // Defaults match her actual stated routine (wake 6 AM, gym 6:30 AM) —
+  // she's adjusting from something real, not filling a blank form.
+  const [wakeTime,     setWakeTime]     = useState('6:00 AM')
+  const [gymTime,      setGymTime]      = useState<string | null>('6:30 AM')
   const [location,     setLocation]     = useState<'home'|'office'>('home')
   const [workEndTime,  setWorkEndTime]  = useState('6:00 PM')
   const [hairWashDay,  setHairWashDay]  = useState(false)
@@ -68,7 +73,7 @@ export default function PlanMyDayPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          wakeTime, location, workEndTime, hairWashDay, eveningPlans,
+          wakeTime, gymTime: gymTime ?? '', location, workEndTime, hairWashDay, eveningPlans,
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
@@ -127,6 +132,30 @@ export default function PlanMyDayPage() {
                         background: wakeTime === t ? 'rgba(201,169,110,0.18)' : 'rgba(255,255,255,0.05)',
                         border: wakeTime === t ? '1.5px solid rgba(201,169,110,0.45)' : '1px solid rgba(255,255,255,0.08)',
                         color: wakeTime === t ? '#C9A96E' : 'rgba(255,255,255,0.45)',
+                      }}>{t}</button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gym time */}
+                <div style={{ ...GLASS, padding: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+                    <Dumbbell className="h-3.5 w-3.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gym</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <button onClick={() => setGymTime(null)} style={{
+                      padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      background: gymTime === null ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)',
+                      border: gymTime === null ? '1.5px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.08)',
+                      color: gymTime === null ? 'white' : 'rgba(255,255,255,0.45)',
+                    }}>Not today</button>
+                    {GYM_TIMES.map(t => (
+                      <button key={t} onClick={() => setGymTime(t)} style={{
+                        padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                        background: gymTime === t ? 'rgba(224,140,74,0.18)' : 'rgba(255,255,255,0.05)',
+                        border: gymTime === t ? '1.5px solid rgba(224,140,74,0.45)' : '1px solid rgba(255,255,255,0.08)',
+                        color: gymTime === t ? '#E08C4A' : 'rgba(255,255,255,0.45)',
                       }}>{t}</button>
                     ))}
                   </div>
@@ -253,6 +282,7 @@ export default function PlanMyDayPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       {[
                         { label: 'Wake up',     time: anchors.wake,       emoji: '☀️', color: '#C9A96E' },
+                        ...(anchors.gym ? [{ label: 'Gym', time: anchors.gym, emoji: '💪', color: '#E08C4A' }] : []),
                         { label: 'Start work',  time: anchors.at_work,    emoji: '💻', color: '#7BAEC8' },
                         { label: 'Lunch',       time: anchors.lunch,      emoji: '🍽️', color: '#8AB88A' },
                         { label: 'Leave work',  time: anchors.leave_work, emoji: '🏁', color: '#9b5cff' },

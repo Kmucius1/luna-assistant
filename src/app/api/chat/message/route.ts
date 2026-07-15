@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { callAI } from '@/lib/ai'
+import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { buildLunaContext, formatLunaContextForPrompt } from '@/lib/luna/context'
@@ -124,6 +124,41 @@ const PRESENCE_FALLBACKS = [
   "Say that again for me? I want to sit with it properly before I respond.",
 ]
 
+// When Zoe states a real commitment in chat, it should land in her actual
+// task list without her having to re-enter it anywhere — this is deliberately
+// narrow (returns null far more often than not) so casual chat never spawns
+// noise tasks.
+const TASK_EXTRACT_SYSTEM = `You detect ONE new actionable commitment from a single message Zoe just sent LUNA, if any.
+
+Only extract if she is clearly stating a NEW ongoing routine, challenge, or plan she's committing to right now
+— e.g. starting a wellness challenge, deciding to go to the gym regularly, committing to a daily habit,
+picking a specific recurring action. Do NOT extract from: vague musings, past/completed events, feelings,
+questions, or small talk. When in doubt, return null — false negatives are fine, false positives are not.
+
+If she references a known named challenge or routine (e.g. "75 Soft" — wake early, gym, journal, drink
+water, read, eat healthy, no alcohol), extract the single most concrete, schedulable action tied to it
+(for 75 Soft that's "Go to the gym"), not the challenge's name itself.
+
+Return ONLY valid JSON: {"task": "short actionable task title" | null}`
+
+async function extractTaskFromMessage(db: ReturnType<typeof createAdminClient>, userId: string, message: string) {
+  try {
+    const raw = await callAI(TASK_EXTRACT_SYSTEM, message, 60)
+    const { task } = parseAIJson<{ task: string | null }>(raw)
+    if (task?.trim()) {
+      await db.from('tasks').insert({
+        user_id: userId,
+        title: task.trim(),
+        source: 'message',
+        status: 'todo',
+        category: 'personal',
+      })
+    }
+  } catch (err) {
+    console.error('[chat/message] task extraction failed:', err instanceof Error ? err.message : err)
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { message, tz } = await req.json() as { message: string; tz?: string }
@@ -179,6 +214,10 @@ export async function POST(req: NextRequest) {
       ? `${timeContext}\n\nConversation so far:\n${conversationHistory}\n\nZoe: ${message}\n\nRespond as LUNA:`
       : `${timeContext}\n\nZoe just opened a conversation. Her first message:\n"${message}"\n\nRespond as LUNA:`
 
+    // Runs alongside the main reply, not after — keeps this from adding
+    // latency to every message even though it fires on nearly all of them.
+    const taskExtraction = extractTaskFromMessage(db, userId, message)
+
     let response: string
     try {
       response = await callAI(systemPrompt, userPrompt, 450)
@@ -186,6 +225,7 @@ export async function POST(req: NextRequest) {
       console.error('[chat/message] AI call failed:', aiErr instanceof Error ? aiErr.message : aiErr)
       response = PRESENCE_FALLBACKS[Math.floor(Math.random() * PRESENCE_FALLBACKS.length)]
     }
+    await taskExtraction
 
     // Save LUNA response
     await db.from('luna_messages').insert({
