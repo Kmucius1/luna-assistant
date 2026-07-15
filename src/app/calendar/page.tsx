@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Calendar, Clock, MapPin, RefreshCw, ExternalLink, ArrowLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { CalendarEvent } from '@/lib/calendar'
+import { PEOPLE, personFor } from '@/lib/calendarPeople'
 
 const G: React.CSSProperties = {
   background: 'rgba(20,12,50,0.68)',
@@ -11,20 +12,6 @@ const G: React.CSSProperties = {
   borderRadius: 20,
   backdropFilter: 'blur(18px)',
   WebkitBackdropFilter: 'blur(18px)',
-}
-
-// ─── People with their own accent color, so their events are recognizable at a glance ──
-const PEOPLE: { email: string; label: string; color: string }[] = [
-  { email: 'mick@hooverdigital.com', label: 'Mick', color: '#E08B4A' },
-]
-
-function personFor(ev: CalendarEvent): { label: string; color: string } | null {
-  const emails = [ev.organizer, ...(ev.attendeeEmails ?? [])].filter(Boolean).map(e => e!.toLowerCase())
-  const calendarName = ev.calendar?.toLowerCase() ?? ''
-  for (const p of PEOPLE) {
-    if (emails.includes(p.email.toLowerCase()) || calendarName.includes(p.label.toLowerCase())) return p
-  }
-  return null
 }
 
 function eventDay(ev: CalendarEvent): Date {
@@ -110,6 +97,15 @@ export default function CalendarPage() {
   const [error,     setError]     = useState('')
   const [filter,    setFilter]    = useState<'all' | 'today' | 'week'>('all')
   const [fetchedAt, setFetchedAt] = useState('')
+  const [hiddenPeople, setHiddenPeople] = useState<Set<string>>(new Set())
+
+  function togglePerson(label: string) {
+    setHiddenPeople(prev => {
+      const next = new Set(prev)
+      next.has(label) ? next.delete(label) : next.add(label)
+      return next
+    })
+  }
 
   const load = useCallback(async () => {
     setLoading(true); setError('')
@@ -132,15 +128,20 @@ export default function CalendarPage() {
   const now     = new Date()
   const weekOut = new Date(now.getTime() + 7 * 86400000)
 
+  const visibleEvents = events.filter(e => {
+    const person = personFor(e)
+    return !person || !hiddenPeople.has(person.label)
+  })
+
   const filtered = filter === 'today'
-    ? events.filter(e => e.isToday)
+    ? visibleEvents.filter(e => e.isToday)
     : filter === 'week'
-    ? events.filter(e => eventDay(e) <= weekOut)
-    : events
+    ? visibleEvents.filter(e => eventDay(e) <= weekOut)
+    : visibleEvents
 
   const grouped    = groupByDate(filtered)
-  const todayCount = events.filter(e => e.isToday).length
-  const weekCount  = events.filter(e => eventDay(e) <= weekOut).length
+  const todayCount = visibleEvents.filter(e => e.isToday).length
+  const weekCount  = visibleEvents.filter(e => eventDay(e) <= weekOut).length
   const peopleInView = PEOPLE.filter(p => events.some(e => personFor(e)?.label === p.label))
 
   return (
@@ -168,13 +169,26 @@ export default function CalendarPage() {
             </div>
 
             {peopleInView.length > 0 && (
-              <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
-                {peopleInView.map(p => (
-                  <span key={p.email} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: p.color, flexShrink: 0 }} />
-                    {p.label}'s schedule
-                  </span>
-                ))}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+                {peopleInView.map(p => {
+                  const shown = !hiddenPeople.has(p.label)
+                  return (
+                    <button
+                      key={p.email}
+                      onClick={() => togglePerson(p.label)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 600,
+                        color: shown ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.35)',
+                        background: shown ? `${p.color}1A` : 'rgba(255,255,255,0.04)',
+                        border: `1px solid ${shown ? `${p.color}44` : 'rgba(255,255,255,0.08)'}`,
+                        borderRadius: 20, padding: '5px 11px', cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: shown ? p.color : 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                      Show {p.label}'s schedule
+                    </button>
+                  )
+                })}
               </div>
             )}
 

@@ -11,6 +11,7 @@ import {
 import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
 import type { CalendarEvent } from '@/lib/calendar'
+import { isMickEvent } from '@/lib/calendarPeople'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function dueDateLabel(dateStr?: string): { label: string; color: string; urgent: boolean } {
@@ -475,7 +476,7 @@ export default function WorkPage() {
     setEventsLoading(true)
     fetch('/api/calendar/upcoming?days=2')
       .then(r => r.json())
-      .then(d => setEvents((d.events ?? []).filter((e: CalendarEvent) => e.isToday || e.isTomorrow)))
+      .then(d => setEvents((d.events ?? []).filter((e: CalendarEvent) => (e.isToday || e.isTomorrow) && !isMickEvent(e))))
       .catch(() => setEvents([]))
       .finally(() => setEventsLoading(false))
 
