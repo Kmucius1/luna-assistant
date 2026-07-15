@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Moon, Clock, Home, Sparkles } from 'lucide-react'
+import { NIGHT_REMINDERS } from '@/lib/luna/reminders'
 
 const LOCATIONS = [
   { value: 'home',         label: '🏠 Home',         drive: 0  },
@@ -207,6 +208,18 @@ export default function NightScreen() {
           <p className="text-base mb-6" style={{ color: 'rgba(255,255,255,0.65)' }}>
             Your morning starts tonight.
           </p>
+
+          {/* Today's reminders */}
+          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#D4BBFF' }}>
+              Tonight's Reminders
+            </p>
+            <div className="space-y-2">
+              {NIGHT_REMINDERS.map(r => (
+                <p key={r.id} className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>{r.label}</p>
+              ))}
+            </div>
+          </div>
 
           {/* Tabs */}
           <div className="flex gap-2 mb-6">

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Sun, Sparkles, Droplets, Apple, RefreshCw } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
+import { MIDDAY_REMINDERS } from '@/lib/luna/reminders'
 
 const ENERGY_CHIPS = [
   { emoji: '🔥', label: 'Flowing',   value: 'flowing'   },
@@ -101,6 +102,18 @@ export default function MiddayPage() {
 
           {!result ? (
             <div className="space-y-4">
+              {/* Today's reminders */}
+              <div className="glass-card p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--golden)' }}>
+                  Today's Reminders
+                </p>
+                <div className="space-y-2">
+                  {MIDDAY_REMINDERS.map(r => (
+                    <p key={r.id} className="text-sm" style={{ color: 'var(--mid)' }}>{r.label}</p>
+                  ))}
+                </div>
+              </div>
+
               {/* Energy check */}
               <div className="glass-card p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--mist)' }}>

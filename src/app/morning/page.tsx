@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { addPattern } from '@/lib/patterns'
 import { useLocation } from '@/hooks/useLocation'
+import { MORNING_REMINDERS } from '@/lib/luna/reminders'
 
 type CheckInType = 'morning' | 'midday' | 'night'
 
@@ -184,6 +185,24 @@ export default function MorningCheckIn() {
               <p className="text-base mb-8" style={{ color: 'var(--text-2)' }}>
                 {CHECK_IN_CONFIG[checkInType].subtitle}
               </p>
+
+              {/* Today's reminders — surfaced immediately, no need to finish the form */}
+              <div className="glass-card p-5 mb-6">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>
+                  Today's Reminders
+                </p>
+                <div className="space-y-2.5">
+                  {MORNING_REMINDERS.map(r => (
+                    <div key={r.id} className="flex items-center gap-2.5">
+                      {r.time && (
+                        <span className="text-xs font-bold flex-shrink-0" style={{ color: 'var(--violet)' }}>{r.time}</span>
+                      )}
+                      <span className="text-sm" style={{ color: 'var(--text-2)' }}>{r.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div className="glass-card p-5 mb-6">
                 <p className="text-sm font-semibold mb-3" style={{ color: 'var(--depth)' }}>What time did you wake up?</p>
                 <input

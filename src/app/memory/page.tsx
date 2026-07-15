@@ -440,9 +440,12 @@ function SectionHeader({ icon, label, count, open, onToggle, accent }: {
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────────
+interface LunaMemoryEntry { date_key: string; summary: string; source: string }
+
 export default function MemoryPage() {
   const today = toDateStr(new Date())
 
+  const [lunaMemory,   setLunaMemory]   = useState<LunaMemoryEntry[]>([])
   const [allCheckIns,  setAllCheckIns]  = useState<CheckIn[]>([])
   const [loadingCI,    setLoadingCI]    = useState(true)
   const [reflDates,    setReflDates]    = useState<string[]>([])
@@ -467,6 +470,13 @@ export default function MemoryPage() {
   }, [])
 
   useEffect(() => { loadCheckIns() }, [loadCheckIns])
+
+  useEffect(() => {
+    fetch('/api/luna/memory')
+      .then(r => r.json())
+      .then(d => setLunaMemory(d.entries ?? []))
+      .catch(() => setLunaMemory([]))
+  }, [])
 
   // Load localStorage data whenever selected date changes
   useEffect(() => {
@@ -512,6 +522,33 @@ export default function MemoryPage() {
           <p className="text-sm" style={{ color: 'var(--text-3)' }}>
             Your reflections, check-ins, and daily coaching — all in one place.
           </p>
+        </div>
+
+        {/* What LUNA Remembers — durable, cross-day memory built nightly from chat + check-ins */}
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
+            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>
+              What LUNA Remembers
+            </p>
+          </div>
+          {lunaMemory.length === 0 ? (
+            <p className="text-sm" style={{ color: 'var(--text-3)' }}>
+              Nothing yet — each night, LUNA reviews that day's chat and check-ins and keeps
+              what's worth remembering here. Chat with her today and check back tomorrow.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {lunaMemory.slice(0, 7).map(m => (
+                <div key={m.date_key}>
+                  <p className="text-xs font-semibold mb-0.5" style={{ color: 'var(--text-3)' }}>
+                    {humanDate(m.date_key)}
+                  </p>
+                  <p className="text-sm" style={{ color: 'var(--text-2)' }}>{m.summary}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Stats strip */}

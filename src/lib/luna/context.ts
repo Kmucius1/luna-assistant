@@ -43,7 +43,13 @@ export interface LunaContext {
     bannedPhrases: string[]
     responseStyle: string | null
     mainProjects: string[]
+    dailyRoutine: string | null
+    personalGoals: string | null
+    commonContacts: string | null
   } | null
+  /** Most recent daily memory summaries, newest first — the durable record
+   *  built by the nightly-memory cron. Survives the chat's midnight reset. */
+  recentMemory: { dateKey: string; summary: string }[]
 }
 
 type Row = Record<string, unknown> | null | undefined
@@ -63,12 +69,13 @@ function settledRow(r: PromiseSettledResult<{ data: Row }>): Row {
 export async function buildLunaContext(userId: string): Promise<LunaContext> {
   const db = createAdminClient()
 
-  const [identityR, hdR, astroR, prefsR, assistantR] = await Promise.allSettled([
+  const [identityR, hdR, astroR, prefsR, assistantR, memoryR] = await Promise.allSettled([
     db.from('luna_identity_profile').select('*').eq('user_id', userId).maybeSingle(),
     db.from('human_design_profile').select('*').eq('user_id', userId).maybeSingle(),
     db.from('astrology_profiles').select('*').eq('user_id', userId).maybeSingle(),
     db.from('user_preferences').select('*').eq('user_id', userId).maybeSingle(),
     db.from('assistant_profile').select('*').eq('user_id', userId).maybeSingle(),
+    db.from('luna_memory').select('date_key, summary').eq('user_id', userId).order('date_key', { ascending: false }).limit(10),
   ])
 
   const identity = settledRow(identityR)
@@ -76,6 +83,7 @@ export async function buildLunaContext(userId: string): Promise<LunaContext> {
   const astro = settledRow(astroR)
   const prefs = settledRow(prefsR)
   const assistant = settledRow(assistantR)
+  const memoryRows = memoryR.status === 'fulfilled' ? (memoryR.value.data as { date_key: string; summary: string }[] | null) : null
 
   return {
     identity: identity ? {
@@ -120,7 +128,11 @@ export async function buildLunaContext(userId: string): Promise<LunaContext> {
       bannedPhrases: (assistant.banned_phrases as string[]) ?? [],
       responseStyle: (assistant.response_style as string) ?? null,
       mainProjects: (assistant.main_projects as string[]) ?? [],
+      dailyRoutine: (assistant.daily_routine as string) ?? null,
+      personalGoals: (assistant.personal_goals as string) ?? null,
+      commonContacts: (assistant.common_contacts as string) ?? null,
     } : null,
+    recentMemory: (memoryRows ?? []).map(r => ({ dateKey: r.date_key, summary: r.summary })),
   }
 }
 
@@ -162,7 +174,23 @@ export function formatLunaContextForPrompt(ctx: LunaContext): string {
   if (ctx.assistantProfile?.mainProjects.length) {
     lines.push(`Currently focused on: ${ctx.assistantProfile.mainProjects.join(', ')}.`)
   }
+  if (ctx.assistantProfile?.dailyRoutine) {
+    lines.push(`Her daily routine: ${ctx.assistantProfile.dailyRoutine}`)
+  }
+  if (ctx.assistantProfile?.personalGoals) {
+    lines.push(`Her personal goals: ${ctx.assistantProfile.personalGoals}`)
+  }
+  if (ctx.assistantProfile?.commonContacts) {
+    lines.push(`People in her orbit: ${ctx.assistantProfile.commonContacts}`)
+  }
 
-  if (!lines.length) return ''
-  return `REAL CONTEXT ON ZOE TODAY:\n${lines.map(l => `- ${l}`).join('\n')}`
+  const memoryBlock = ctx.recentMemory.length
+    ? `\n\nWHAT YOU'VE LEARNED ABOUT ZOE RECENTLY (most recent first — use this, don't ask her to repeat herself):\n${
+        ctx.recentMemory.map(m => `- [${m.dateKey}] ${m.summary}`).join('\n')
+      }`
+    : ''
+
+  if (!lines.length && !memoryBlock) return ''
+  const base = lines.length ? `REAL CONTEXT ON ZOE TODAY:\n${lines.map(l => `- ${l}`).join('\n')}` : ''
+  return `${base}${memoryBlock}`.trim()
 }

@@ -89,6 +89,28 @@ function TaskRow({ task, done, onToggle }: { task: DryphubTask; done: boolean; o
   )
 }
 
+// ─── Email row ───────────────────────────────────────────────────────────────
+interface NeedsAttentionEmail { id: string; from: string; subject: string; snippet: string; isPriority: boolean }
+
+function EmailRow({ email }: { email: NeedsAttentionEmail }) {
+  return (
+    <Link href="/email" style={{ textDecoration: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <Mail style={{ width: 15, height: 15, color: '#A8C4DA', flexShrink: 0 }} strokeWidth={1.8} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+            {email.subject || '(no subject)'}
+          </p>
+          <p style={{ fontSize: 11, color: 'rgba(168,196,218,0.65)', fontWeight: 600, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {email.from}
+          </p>
+        </div>
+        {email.isPriority && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#E08B4A', flexShrink: 0 }} />}
+      </div>
+    </Link>
+  )
+}
+
 // ─── App button ───────────────────────────────────────────────────────────────
 function AppBtn({ icon: Icon, label, href, color, desc, external }: {
   icon: React.ElementType; label: string; href: string; color: string; desc: string; external?: boolean
@@ -121,13 +143,14 @@ function AppBtn({ icon: Icon, label, href, color, desc, external }: {
 // ─────────────────────────────────────────────────────────────────────────────
 function Slide1({
   stats, loading, error, activeTasks, urgentTasks, done, onToggle, onSync,
-  events, eventsLoading,
+  events, eventsLoading, emails, emailsLoading,
 }: {
   stats: { openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null
   loading: boolean; error: boolean
   activeTasks: DryphubTask[]; urgentTasks: DryphubTask[]
   done: Set<string>; onToggle: (id: string) => void; onSync: () => void
   events: CalendarEvent[]; eventsLoading: boolean
+  emails: NeedsAttentionEmail[]; emailsLoading: boolean
 }) {
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -215,19 +238,20 @@ function Slide1({
             <AlertCircle style={{ width: 16, height: 16, color: '#E05E5E', flexShrink: 0, marginTop: 1 }} />
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>DRYP CRM unavailable — tap Sync to retry.</p>
           </div>
-        ) : loading ? (
+        ) : loading || emailsLoading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Loader2 style={{ width: 22, height: 22, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
           </div>
-        ) : urgentTasks.length > 0 ? (
+        ) : urgentTasks.length > 0 || emails.length > 0 ? (
           <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
             {urgentTasks.map(t => (
               <TaskRow key={t.id} task={t} done={done.has(t.id)} onToggle={() => onToggle(t.id)} />
             ))}
+            {emails.map(e => <EmailRow key={e.id} email={e} />)}
           </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks right now</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks or emails right now</p>
           </div>
         )}
       </div>
@@ -438,6 +462,8 @@ export default function WorkPage() {
   const [done,    setDone]    = useState<Set<string>>(new Set())
   const [events,        setEvents]        = useState<CalendarEvent[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
+  const [emails,        setEmails]        = useState<NeedsAttentionEmail[]>([])
+  const [emailsLoading, setEmailsLoading] = useState(true)
 
   const load = useCallback(() => {
     setLoading(true); setError(false)
@@ -452,6 +478,13 @@ export default function WorkPage() {
       .then(d => setEvents((d.events ?? []).filter((e: CalendarEvent) => e.isToday || e.isTomorrow)))
       .catch(() => setEvents([]))
       .finally(() => setEventsLoading(false))
+
+    setEmailsLoading(true)
+    fetch('/api/gmail/needs-attention')
+      .then(r => r.json())
+      .then(d => setEmails(d.top ?? []))
+      .catch(() => setEmails([]))
+      .finally(() => setEmailsLoading(false))
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -482,6 +515,7 @@ export default function WorkPage() {
           activeTasks={activeTasks} urgentTasks={urgentTasks}
           done={done} onToggle={toggle} onSync={load}
           events={events} eventsLoading={eventsLoading}
+          emails={emails} emailsLoading={emailsLoading}
         />
       ),
     },
