@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Sparkles, Plus, Check, Star } from 'lucide-react'
 
@@ -17,13 +17,7 @@ const LBL: React.CSSProperties = {
   marginBottom: 10,
 }
 
-interface Intention { id: number; text: string; done: boolean }
-
-const STARTER_INTENTIONS: Intention[] = [
-  { id: 1, text: 'Build DRYP Digital into a recognized, trusted brand', done: false },
-  { id: 2, text: 'Move through work with calm instead of urgency',      done: false },
-  { id: 3, text: 'Protect time for rest without guilt',                 done: true  },
-]
+interface Intention { id: string; text: string; done: boolean }
 
 const AFFIRMATIONS = [
   'I am becoming, not behind.',
@@ -32,18 +26,61 @@ const AFFIRMATIONS = [
 ]
 
 export default function ManifestationPage() {
-  const [intentions, setIntentions] = useState<Intention[]>(STARTER_INTENTIONS)
+  const [intentions, setIntentions] = useState<Intention[]>([])
   const [draft, setDraft] = useState('')
+  const [loading, setLoading] = useState(true)
   const affirmation = AFFIRMATIONS[new Date().getDate() % AFFIRMATIONS.length]
 
-  function addIntention() {
-    if (!draft.trim()) return
-    setIntentions(list => [{ id: Date.now(), text: draft.trim(), done: false }, ...list])
+  useEffect(() => {
+    fetch('/api/intentions')
+      .then(res => res.json())
+      .then(data => setIntentions(data.intentions ?? []))
+      .catch(err => console.error('[manifestation] failed to load intentions:', err))
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function addIntention() {
+    const text = draft.trim()
+    if (!text) return
     setDraft('')
+
+    const tempId = `temp-${Date.now()}`
+    setIntentions(list => [{ id: tempId, text, done: false }, ...list])
+
+    try {
+      const res = await fetch('/api/intentions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      if (!res.ok) throw new Error('save failed')
+      const { intention } = await res.json()
+      setIntentions(list => list.map(i => i.id === tempId ? intention : i))
+    } catch (err) {
+      console.error('[manifestation] failed to save intention:', err)
+      setIntentions(list => list.filter(i => i.id !== tempId))
+      setDraft(text)
+    }
   }
 
-  function toggle(id: number) {
-    setIntentions(list => list.map(i => i.id === id ? { ...i, done: !i.done } : i))
+  async function toggle(id: string) {
+    const prev = intentions
+    const target = intentions.find(i => i.id === id)
+    if (!target) return
+    const nextDone = !target.done
+    setIntentions(list => list.map(i => i.id === id ? { ...i, done: nextDone } : i))
+
+    try {
+      const res = await fetch('/api/intentions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, done: nextDone }),
+      })
+      if (!res.ok) throw new Error('update failed')
+    } catch (err) {
+      console.error('[manifestation] failed to update intention:', err)
+      setIntentions(prev)
+    }
   }
 
   return (
@@ -90,6 +127,11 @@ export default function ManifestationPage() {
         <div style={{ ...G, padding: '16px 18px' }}>
           <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Vision Board</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {!loading && intentions.length === 0 && (
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+                Nothing here yet — set an intention above to start your vision board.
+              </p>
+            )}
             {intentions.map(i => (
               <button
                 key={i.id}
