@@ -3,6 +3,7 @@ import sharp from 'sharp'
 import Groq from 'groq-sdk'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
+import { localDateKey } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -57,6 +58,21 @@ export async function POST(req: NextRequest) {
     const fullWidth = meta.width ?? 1200
     const fullHeight = meta.height ?? 1600
 
+    const db = createAdminClient()
+
+    // Log the actual outfit-of-the-day photo itself — a real day-by-day
+    // record of what she wore, independent of whether garment detection
+    // below succeeds.
+    try {
+      await db.from('worn_outfits').insert({
+        user_id: userId,
+        date_key: localDateKey(new Date()),
+        photo_url: `data:image/jpeg;base64,${normalized.toString('base64')}`,
+      })
+    } catch (logErr) {
+      console.error('[wardrobe/detect] worn_outfits log failed:', logErr)
+    }
+
     // Ask the vision model where each garment is
     let regions: DetectedRegion[]
     try {
@@ -87,7 +103,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ items: [], message: 'No distinct pieces detected — try a clearer photo.' })
     }
 
-    const db = createAdminClient()
     const label = sourceLabel || new Date().toLocaleDateString()
     const created: unknown[] = []
 

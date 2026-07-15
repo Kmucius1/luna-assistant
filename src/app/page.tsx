@@ -151,49 +151,6 @@ function StarSigil({ size = 52 }: { size?: number }) {
   )
 }
 
-// ─── Pinterest outfit inspo strip ────────────────────────────────────────────
-const OUTFIT_PINS = [
-  { src: 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg', label: 'Chic Workwear' },
-  { src: 'https://i.pinimg.com/736x/0b/f7/2f/0bf72f36fe8ef8c3e2260069ebc7c9b8.jpg', label: 'Business Casual' },
-  { src: 'https://i.pinimg.com/736x/9e/22/4e/9e224e109889a66d84689073f5fd3453.jpg', label: 'Old Money' },
-  { src: 'https://i.pinimg.com/736x/90/a0/83/90a083f4aa1d32c00d420bfdd3baa212.jpg', label: 'Classy' },
-  { src: 'https://i.pinimg.com/736x/98/40/10/984010c8f122ff9fc08d9a918d91173a.jpg', label: 'Wide-Leg' },
-  { src: 'https://i.pinimg.com/736x/dd/85/71/dd8571499b11785dd01ecf717acb0465.jpg', label: 'Effortless' },
-  { src: 'https://i.pinimg.com/736x/0f/ab/ab/0fabab24cecd50492cc8a572b5665ae0.jpg', label: 'Office Chic' },
-]
-
-function StyleVisual() {
-  return (
-    <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', margin: '4px 0' }}>
-      {/* Scrollable outfit strip */}
-      <div style={{
-        display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none',
-        WebkitOverflowScrolling: 'touch', paddingBottom: 2,
-      }}>
-        {OUTFIT_PINS.map((pin, i) => (
-          <div key={i} style={{ flexShrink: 0, position: 'relative' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={pin.src}
-              alt={pin.label}
-              style={{
-                width: 54, height: 72, objectFit: 'cover',
-                borderRadius: 9, display: 'block',
-                border: '1px solid rgba(220,190,140,0.15)',
-              }}
-            />
-          </div>
-        ))}
-      </div>
-      {/* Pinterest credit */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 3, marginTop: 4, flexShrink: 0 }}>
-        <svg width="8" height="8" viewBox="0 0 24 24" fill="#E60023"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
-        <span style={{ fontSize: 8, color: 'white', fontWeight: 600, letterSpacing: '0.04em' }}>PINTEREST INSPO</span>
-      </div>
-    </div>
-  )
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // SLIDE 1 — Today  (4 compact cards, no scroll, fits iPhone 14)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -390,7 +347,11 @@ interface MoonPreviewData { phase?: { name: string; emoji?: string }; sign?: { n
 interface MoneyPreviewData { bills_due_soon?: unknown[]; has_transactions?: boolean; spending_this_week?: number }
 interface StylePreviewData { hasProfile: boolean; summary?: string }
 
-function Slide2({ guidance, moonData, moneyData, styleData, dailyOutfit, outfitLoading }: {
+// What To Wear Today grew into its own full page (bigger tile, upload
+// flow, worn-outfit history) — this tile is now just the door to it.
+// Astrology/Money/Night previews moved to /daily-glance as three stacked
+// rows so neither one crowds the 2×2 grid this slide used to be.
+function Slide2({ guidance, moonData, moneyData, dailyOutfit, outfitLoading }: {
   guidance: GuidanceData | null
   moonData: MoonPreviewData | null
   moneyData: MoneyPreviewData | null
@@ -403,40 +364,29 @@ function Slide2({ guidance, moonData, moneyData, styleData, dailyOutfit, outfitL
     : moonData?.phase?.name ?? 'Astrology'
 
   return (
-    <div style={{ minHeight: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: '1fr 1fr', gap: 8 }}>
-      <PreviewCard label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
-        <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 6s ease-in-out infinite' }} />
-        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{astroHeadline}</p>
-        <p style={{ fontSize: 10.5, color: 'white', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
-        </p>
-      </PreviewCard>
-
+    <div style={{ minHeight: '100%', display: 'grid', gridTemplateRows: '1fr 1fr', gap: 8 }}>
       <PreviewCard
         label="What To Wear Today" icon={<Scissors style={{ width: 9, height: 9 }} />}
-        href="/creative"
-        linkText="Open Style"
+        href="/outfit-today"
+        linkText="Open"
       >
         {outfitLoading ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <div className="animate-spin" style={{ width: 18, height: 18, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.15)', borderTopColor: 'white' }} />
           </div>
         ) : dailyOutfit?.image_url ? (
-          <>
-            <div style={{ flex: 1, minHeight: 0, borderRadius: 12, overflow: 'hidden', margin: '2px 0 6px', position: 'relative' }}>
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 10, alignItems: 'stretch' }}>
+            <div style={{ width: 78, borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={dailyOutfit.image_url} alt={dailyOutfit.outfit_caption} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
-            <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{dailyOutfit.occasion}</p>
-            <p style={{ fontSize: 10, color: 'white', margin: '2px 0 0', lineHeight: 1.35, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-              {dailyOutfit.outfit_caption}
-            </p>
-          </>
-        ) : styleData?.hasProfile ? (
-          <>
-            <StyleVisual />
-            <p style={{ fontSize: 12, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>{styleData.summary ?? 'Your style profile'}</p>
-          </>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <p style={{ fontSize: 14, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.25 }}>{dailyOutfit.occasion}</p>
+              <p style={{ fontSize: 11, color: 'white', margin: '3px 0 0', lineHeight: 1.35, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                {dailyOutfit.outfit_caption}
+              </p>
+            </div>
+          </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>LUNA is putting today's look together — check back in a moment.</p>
@@ -444,30 +394,26 @@ function Slide2({ guidance, moonData, moneyData, styleData, dailyOutfit, outfitL
         )}
       </PreviewCard>
 
-      <PreviewCard label="Money Preview" icon={
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#16A34A', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 7, fontWeight: 800, color: 'white', lineHeight: 1 }}>$</span>
+      <PreviewCard label="Today's Glance" icon={<Moon style={{ width: 9, height: 9 }} />} href="/daily-glance" linkText="Open">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: 'white', opacity: 0.7 }}>Astrology</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>{astroHeadline}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: 'white', opacity: 0.7 }}>Spent this week</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>
+              {moneyData?.has_transactions ? `$${(moneyData.spending_this_week ?? 0).toFixed(2)}` : '—'}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 11, color: 'white', opacity: 0.7 }}>Tonight</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Wind down</span>
+          </div>
         </div>
-      } href="/money/transactions" linkText="View">
-        {moneyData?.has_transactions ? (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingTop: 5, paddingBottom: 3 }}>
-            <p style={{ fontSize: 14, fontWeight: 900, color: 'white', margin: 0, lineHeight: 1.3 }}>
-              {moneyData.bills_due_soon?.length ?? 0} bill{moneyData.bills_due_soon?.length === 1 ? '' : 's'} due<br />this week
-            </p>
-            <p style={{ fontSize: 9.5, color: 'white', margin: '6px 0 1px' }}>Spent this week</p>
-            <p style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
-          </div>
-        ) : (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
-          </div>
-        )}
-      </PreviewCard>
-
-      <PreviewCard label="Night Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/night" linkText="View">
-        <img src="/brand/ui/night-cloud.png" alt="" style={{ width: 84, height: 50, margin: '4px auto 8px', objectFit: 'contain', animation: 'float 7s ease-in-out infinite' }} />
-        <p style={{ fontSize: 13, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2, flexShrink: 0 }}>Wind down tonight.</p>
-        <p style={{ fontSize: 10.5, color: 'white', margin: '3px 0 0', lineHeight: 1.4, flexShrink: 0 }}>Plan tomorrow, protect your rest.</p>
+        <p style={{ fontSize: 10, color: 'white', margin: '6px 0 0', opacity: 0.6, lineHeight: 1.35, flexShrink: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+          {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
+        </p>
       </PreviewCard>
     </div>
   )
