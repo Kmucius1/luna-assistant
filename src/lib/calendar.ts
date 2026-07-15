@@ -1,7 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
+import { localDateKey } from '@/lib/luna/dailyCache'
 
 const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID!
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
+
+// Vercel's serverless runtime has no TZ set, so plain Date/Intl formatting
+// without an explicit timeZone renders in UTC — several hours off from
+// Zoe's actual local time. This app is single-tenant for her (Tampa, FL).
+const ZOE_TIMEZONE = 'America/New_York'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -90,7 +96,7 @@ export interface CalendarEvent {
 function formatTime(dateStr: string, allDay: boolean): string {
   if (allDay) return 'All day'
   return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric', minute: '2-digit', hour12: true,
+    hour: 'numeric', minute: '2-digit', hour12: true, timeZone: ZOE_TIMEZONE,
   }).format(new Date(dateStr))
 }
 
@@ -111,8 +117,8 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
   const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1)
   const maxTime  = new Date(now); maxTime.setDate(maxTime.getDate() + daysAhead)
 
-  const todayStr    = now.toDateString()
-  const tomorrowStr = tomorrow.toDateString()
+  const todayKey    = localDateKey(now, ZOE_TIMEZONE)
+  const tomorrowKey = localDateKey(tomorrow, ZOE_TIMEZONE)
 
   const allEvents: CalendarEvent[] = []
 
@@ -145,7 +151,7 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
             const endStr   = ev.end?.dateTime   ?? ev.end?.date   ?? ''
             const allDay   = !ev.start?.dateTime
             const startD   = new Date(startStr)
-            const startDS  = startD.toDateString()
+            const startKey = localDateKey(startD, ZOE_TIMEZONE)
 
             allEvents.push({
               id:            ev.id,
@@ -162,8 +168,8 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
               calendar:      cal.summary,
               calendarId:    cal.id,
               account:       tok.email,
-              isToday:       startDS === todayStr,
-              isTomorrow:    startDS === tomorrowStr,
+              isToday:       startKey === todayKey,
+              isTomorrow:    startKey === tomorrowKey,
               isPast:        startD < now && !allDay,
               status:        ev.status,
               organizer:     ev.organizer?.email,
