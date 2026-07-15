@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Mic, MicOff, Send, RotateCcw } from 'lucide-react'
+import { Mic, MicOff, Send, RotateCcw, Volume2, Loader2 } from 'lucide-react'
 
 const BG     = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
 const GOLDEN = '#C9A96E'
@@ -39,12 +39,49 @@ export default function ChatPage() {
   const [sending,    setSending]    = useState(false)
   const [listening,  setListening]  = useState(false)
   const [loaded,     setLoaded]     = useState(false)
+  const [speakingId, setSpeakingId] = useState<string | null>(null)
+  const [speakLoadingId, setSpeakLoadingId] = useState<string | null>(null)
   const tz = typeof window !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'America/New_York'
 
   const bottomRef   = useRef<HTMLDivElement>(null)
   const inputRef    = useRef<HTMLTextAreaElement>(null)
+  const audioRef    = useRef<HTMLAudioElement | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recogRef    = useRef<any>(null)
+
+  // ─── Read aloud ────────────────────────────────────────────────
+  async function speak(msg: Message) {
+    if (speakingId === msg.id) {
+      audioRef.current?.pause()
+      setSpeakingId(null)
+      return
+    }
+    audioRef.current?.pause()
+    setSpeakingId(null)
+    setSpeakLoadingId(msg.id)
+    try {
+      const res = await fetch('/api/chat/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: msg.content }),
+      })
+      if (!res.ok) throw new Error()
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => { setSpeakingId(null); URL.revokeObjectURL(url) }
+      audio.onerror = () => { setSpeakingId(null); URL.revokeObjectURL(url) }
+      await audio.play()
+      setSpeakingId(msg.id)
+    } catch {
+      /* voice unavailable — fail silently, text is already on screen */
+    } finally {
+      setSpeakLoadingId(null)
+    }
+  }
+
+  useEffect(() => () => { audioRef.current?.pause() }, [])
 
   // ─── Load history ──────────────────────────────────────────────
   const loadHistory = useCallback(async () => {
@@ -260,14 +297,34 @@ export default function ChatPage() {
                         ))}
                       </div>
                     ) : (
-                      <p style={{
-                        fontSize: 15,
-                        fontWeight: isLuna ? 450 : 500,
-                        color: 'rgba(255,255,255,0.92)',
-                        lineHeight: 1.65,
-                        whiteSpace: 'pre-wrap',
-                        margin: 0,
-                      }}>{msg.content}</p>
+                      <>
+                        <p style={{
+                          fontSize: 15,
+                          fontWeight: isLuna ? 450 : 500,
+                          color: 'rgba(255,255,255,0.92)',
+                          lineHeight: 1.65,
+                          whiteSpace: 'pre-wrap',
+                          margin: 0,
+                        }}>{msg.content}</p>
+                        {isLuna && (
+                          <button
+                            onClick={() => void speak(msg)}
+                            title={speakingId === msg.id ? 'Stop' : 'Read aloud'}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 5, marginTop: 8,
+                              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                              color: speakingId === msg.id ? GOLDEN : 'rgba(255,255,255,0.35)',
+                            }}
+                          >
+                            {speakLoadingId === msg.id
+                              ? <Loader2 style={{ width: 13, height: 13 }} className="animate-spin" />
+                              : <Volume2 style={{ width: 13, height: 13 }} />}
+                            <span style={{ fontSize: 10.5, fontWeight: 600 }}>
+                              {speakingId === msg.id ? 'Stop' : 'Read aloud'}
+                            </span>
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
