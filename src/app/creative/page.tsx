@@ -92,11 +92,6 @@ const PROJECT_STAGES = ['idea','sketch','materials needed','cut','pinned','sewn'
 
 const WARDROBE_CATEGORIES = ['tops','bottoms','dresses','outerwear','shoes','accessories','swimwear','lingerie','activewear','bags']
 
-const REFERENCE_IMAGES = Array.from({ length: 54 }, (_, i) => {
-  const num = String(i + 1).padStart(3, '0')
-  return `/fashion-refs/luna_fashion_ref_${num}.png`
-})
-
 function SLabel({ children }: { children: React.ReactNode }) {
   return (
     <p style={{ color: 'var(--text-3)', fontSize: '0.7rem', letterSpacing: '0.12em' }}
@@ -682,93 +677,6 @@ function ClosetSection() {
   )
 }
 
-function InspirationSection() {
-  const [activeImage, setActiveImage] = useState<string | null>(null)
-  const [analysisResult, setAnalysisResult] = useState<Record<string, unknown> | null>(null)
-  const [analyzing, setAnalyzing] = useState(false)
-
-  async function analyzeImage(url: string) {
-    setActiveImage(url)
-    setAnalysisResult(null)
-    setAnalyzing(true)
-    try {
-      const res = await fetch('/api/atelier/inspiration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_url: url, source: 'luna_reference', analyze: true, description: 'LUNA fashion reference image from the style board', is_preloaded: true })
-      })
-      const data = await res.json()
-      setAnalysisResult(data.analysis)
-    } catch { /* ignore */ }
-    finally { setAnalyzing(false) }
-  }
-
-  return (
-    <div className="space-y-5">
-      <SectionHeader icon={Image} title="Inspiration Board" sub="54 reference images — tap any to get a style analysis." />
-      {activeImage && (
-        <ACard>
-          <div className="flex items-start gap-4">
-            <img src={activeImage} alt="Style ref" className="w-20 h-20 rounded-2xl object-cover flex-shrink-0"
-              style={{ border: '2px solid rgba(155,92,255,0.3)' }} />
-            <div className="flex-1 min-w-0">
-              {analyzing ? (
-                <div className="flex items-center gap-2 py-2">
-                  <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'var(--violet)' }} />
-                  <p className="text-sm" style={{ color: 'var(--text-2)' }}>Analyzing your style reference...</p>
-                </div>
-              ) : analysisResult ? (
-                <div className="space-y-2">
-                  {(analysisResult.style_lane as string) && (
-                    <div className="rounded-full inline-block px-3 py-1 text-sm font-bold"
-                      style={{ background: 'rgba(155,92,255,0.2)', color: 'var(--violet)' }}>
-                      {analysisResult.style_lane as string}
-                    </div>
-                  )}
-                  {(analysisResult.zoe_translation as string) && (
-                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{analysisResult.zoe_translation as string}</p>
-                  )}
-                  {(analysisResult.key_elements as string[]) && (
-                    <div className="flex flex-wrap gap-1">
-                      {(analysisResult.key_elements as string[]).slice(0, 4).map((el: string) => (
-                        <span key={el} className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)', color: 'var(--text-2)' }}>
-                          {el}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-sm" style={{ color: 'var(--text-3)' }}>Tap an image to analyze its style energy</p>
-              )}
-            </div>
-            <button onClick={() => { setActiveImage(null); setAnalysisResult(null) }}
-              className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: 'var(--surface-subtle)', color: 'var(--text-3)' }}>
-              ×
-            </button>
-          </div>
-        </ACard>
-      )}
-      <div className="grid grid-cols-3 gap-2">
-        {REFERENCE_IMAGES.map((src, i) => (
-          <button key={i}
-            onClick={() => analyzeImage(src)}
-            className="aspect-square rounded-2xl overflow-hidden transition-all relative group"
-            style={{ border: activeImage === src ? '2.5px solid var(--violet)' : '1px solid var(--surface-border)' }}>
-            <img src={src} alt={`Style ref ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-2xl"
-              style={{ background: 'rgba(155,92,255,0.5)' }}>
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function ProjectsSection() {
   const [projects, setProjects] = useState<SewingProject[]>([])
   const [loading, setLoading] = useState(true)
@@ -1179,7 +1087,7 @@ function ShoppingSection() {
 }
 
 // Order here is the pager's tab order — also what `?tab=` matches against.
-const TAB_IDS = ['style', 'oracle', 'closet', 'inspiration', 'sewing', 'studio', 'vault', 'shopping'] as const
+const TAB_IDS = ['style', 'oracle', 'closet', 'sewing', 'studio', 'vault', 'shopping'] as const
 
 function CreativePageInner() {
   const searchParams = useSearchParams()
@@ -1193,7 +1101,6 @@ function CreativePageInner() {
     { id: 'style',       label: '✨ Style',    content: <StylePoolBoard /> },
     { id: 'oracle',      label: 'Oracle',      content: <OracleSection /> },
     { id: 'closet',      label: 'Closet',      content: <ClosetSection /> },
-    { id: 'inspiration', label: 'Inspiration', content: <InspirationSection /> },
     { id: 'sewing',      label: 'Sewing',      content: <ProjectsSection /> },
     { id: 'studio',      label: 'Generated',   content: <StudioSection /> },
     { id: 'vault',       label: 'Vault',       content: <VaultSection /> },

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { localDateKey } from '@/lib/luna/dailyCache'
+import { localDateKey, getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { generateFashionImage } from '@/lib/higgsfield'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const DAILY_COUNT = 12
+const DAILY_GENERATE_COUNT = 3
 
 // Real Pinterest pin images, verified loading — starter pool until Zoe adds
 // more of her own via POST /api/atelier/style-pool/add.
@@ -16,6 +18,16 @@ const SEED_PINS = [
   { image_url: 'https://i.pinimg.com/736x/dd/85/71/dd8571499b11785dd01ecf717acb0465.jpg', label: 'Effortless' },
   { image_url: 'https://i.pinimg.com/736x/0f/ab/ab/0fabab24cecd50492cc8a572b5665ae0.jpg', label: 'Office Chic' },
 ]
+
+// Default direction when there's no like signal yet (day one).
+const DEFAULT_LANES = ['Old Money', 'Effortless', 'Chic Workwear']
+
+function buildPrompt(lane: string, avoid: string[]): string {
+  const avoidNote = avoid.length ? ` Avoid: ${avoid.join(', ')} styling.` : ''
+  return `Editorial fashion photograph, full-body outfit shot, ${lane} aesthetic. ` +
+    `Magazine-quality styling, natural lighting, upscale real-world background, ` +
+    `sharp focus, true-to-life color grading.${avoidNote}`
+}
 
 // Simple string hash -> seeded PRNG (mulberry32), so "random" is stable for
 // a given day (reloading today shows the same set) but different tomorrow.
@@ -69,8 +81,51 @@ export async function GET(req: NextRequest) {
 
     const votes: { image_id: string; vote: string }[] = votesData ?? []
     const votedIds = new Set(votes.map(v => v.image_id))
-    const unvoted = pool.filter(p => !votedIds.has(p.id))
 
+    // Style profile from her actual heart/deny history — what to lean into,
+    // what to steer away from.
+    const poolById = new Map(pool.map(p => [p.id, p]))
+    const likedLabels = [...new Set(votes.filter(v => v.vote === 'liked')
+      .map(v => poolById.get(v.image_id)?.label).filter((l): l is string => Boolean(l)))]
+    const deniedLabels = [...new Set(votes.filter(v => v.vote === 'denied')
+      .map(v => poolById.get(v.image_id)?.label).filter((l): l is string => Boolean(l)))]
+    const lanes = (likedLabels.length ? likedLabels : DEFAULT_LANES).slice(0, DAILY_GENERATE_COUNT)
+
+    // Once per local day, generate a few new AI images matching her taste so
+    // far — a real, growing "similar to what I like" pool, not just what she
+    // manually pastes in. No-ops gracefully if HIGGSFIELD_API_KEY isn't set.
+    await getOrCreateDailyContent<{ generated: number }>({
+      userId: ZOE_USER_ID,
+      generationType: 'style_pool_ai_gen',
+      timezone: tz,
+      dateKey,
+      generate: async () => {
+        try {
+          const inserted: { image_url: string; label: string }[] = []
+          for (const lane of lanes) {
+            try {
+              const url = await generateFashionImage(buildPrompt(lane, deniedLabels))
+              inserted.push({ image_url: url, label: lane })
+            } catch (e) {
+              console.error('[style-pool] generateFashionImage failed:', e instanceof Error ? e.message : e)
+            }
+          }
+          if (inserted.length) {
+            const { data: newRows } = await db
+              .from('style_pool_images')
+              .insert(inserted.map(i => ({ ...i, user_id: ZOE_USER_ID, added_by: 'ai_generated' as const })))
+              .select('id, image_url, label')
+            if (newRows) pool = [...pool, ...newRows]
+          }
+          return { payload: { generated: inserted.length }, source: inserted.length ? 'ai' as const : 'fallback' as const }
+        } catch (err) {
+          console.error('[style-pool] daily generation error:', err)
+          return { payload: { generated: 0 }, source: 'fallback' as const }
+        }
+      },
+    })
+
+    const unvoted = pool.filter(p => !votedIds.has(p.id))
     const todaysSet = seededShuffle(unvoted, dateKey).slice(0, DAILY_COUNT)
 
     return NextResponse.json({
