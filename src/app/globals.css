@@ -29,6 +29,14 @@
   --text-3: #5E5474;
   --text-4: #9188A0;
 
+  /* legacy tokens (var(--depth/mid/mist/faint)) — scoped here so dark
+     mode's override in [data-theme="dark"] isn't clobbered by the later
+     unscoped :root block that used to redeclare these for every theme */
+  --depth: #231A3A;
+  --mid:   #6B6080;
+  --mist:  #9E95AC;
+  --faint: #C4BECE;
+
   /* surface / card */
   --surface:        rgba(255,255,255,0.88);
   --surface-border: rgba(139,111,184,0.15);
@@ -115,10 +123,6 @@
   --blush:       #E8C0C2;
   --herb:        #B8C9B4;
   --golden:      #C9A96E;
-  --depth:       #231A3A;
-  --mid:         #6B6080;
-  --mist:        #9E95AC;
-  --faint:       #C4BECE;
 
   --glass-bg:     rgba(255,255,255,0.72);
   --glass-border: rgba(255,255,255,0.60);
