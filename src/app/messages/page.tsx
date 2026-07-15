@@ -1,32 +1,49 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { MessageSquare, Sparkles, Copy, Check, AlertTriangle, Shield, ChevronDown, ChevronUp, ArrowLeft, ArrowRight } from 'lucide-react'
-import { SmartInput } from '@/components/ui/SmartInput'
+import {
+  MessageSquare, Sparkles, Copy, Check, Mic, MicOff, Camera, X,
+  Loader2, ChevronDown, ChevronUp, RotateCcw, Plus, AlertCircle,
+} from 'lucide-react'
 
-const ACTIVATED_LEVELS = [
-  { value: 1, label: 'Calm',      emoji: '😌', color: '#8AB88A' },
-  { value: 2, label: 'Mild',      emoji: '🌀', color: '#8B9BC4' },
-  { value: 3, label: 'Stirred',   emoji: '😤', color: '#C9A96E' },
-  { value: 4, label: 'Activated', emoji: '🔥', color: '#E05E5E' },
-  { value: 5, label: 'Reactive',  emoji: '⚡', color: '#E05E5E' },
-]
+// ─── Types ────────────────────────────────────────────────────────────────
+interface Contact { id: string; name: string; relationship_type: string; notes: string | null }
+interface Analysis {
+  relationship: string; tone_detected: string; likely_intent: string
+  zoe_goal: string; recommended_approach: string; confidence: number
+}
+interface ReplyOption { label: string; strategy?: string; text: string; reason?: string }
+interface CoachResult {
+  needs_clarification: boolean
+  clarifying_question?: string | null
+  analysis?: Analysis
+  best_response?: ReplyOption
+  alternatives?: ReplyOption[]
+  response_id?: string | null
+}
 
 const RELATIONSHIP_TYPES = [
-  { label: '💼 Client',             short: 'Client'   },
-  { label: '🤝 Business partner',   short: 'Business' },
-  { label: '👨‍👩‍👧 Family',           short: 'Family'   },
-  { label: '💕 Partner / romantic', short: 'Romantic' },
-  { label: '👯 Friend',             short: 'Friend'   },
-  { label: '👥 Team member',        short: 'Team'     },
-  { label: '🙍 Acquaintance',       short: 'Acquaint' },
+  { value: '', label: 'Detect automatically' },
+  { value: 'romantic', label: 'Romantic' },
+  { value: 'friend', label: 'Friend' },
+  { value: 'family', label: 'Family' },
+  { value: 'client', label: 'Client' },
+  { value: 'business_partner', label: 'Business partner' },
+  { value: 'employee', label: 'Employee' },
 ]
 
-const STEPS = [
-  { id: 1, label: 'Sender',       question: 'Who sent this?'                    },
-  { id: 2, label: 'Relationship', question: 'What is your relationship?'        },
-  { id: 3, label: 'Your energy',  question: 'How activated are you right now?'  },
-  { id: 4, label: 'The message',  question: 'Paste or speak the message'        },
+const GOALS = [
+  '', 'Respond naturally', 'Be warm', 'Set a boundary', 'Clear up confusion',
+  'Say no', 'Repair the conversation', 'Follow up', 'Be playful', 'Be professional',
+]
+
+const FEEDBACK_TAGS: { tag: string; label: string }[] = [
+  { tag: 'sounds_like_me', label: 'Sounds like me' },
+  { tag: 'too_soft', label: 'Too soft' },
+  { tag: 'too_harsh', label: 'Too harsh' },
+  { tag: 'too_long', label: 'Too long' },
+  { tag: 'too_formal', label: 'Too formal' },
+  { tag: 'not_what_i_meant', label: 'Not what I meant' },
 ]
 
 const GLASS: React.CSSProperties = {
@@ -37,408 +54,550 @@ const GLASS: React.CSSProperties = {
   WebkitBackdropFilter: 'blur(14px)',
 }
 
-interface CoachResult {
-  what_they_mean?: string
-  emotional_tone?: string
-  reactive_warning?: 'yes' | 'no'
-  reactive_reason?: string
-  what_not_to_say?: string
-  wound_reply?: string
-  soft_reply?: string
-  direct_reply?: string
-  confident_reply?: string
-  wisdom_reply?: string
-  reflection?: string
+interface SpeechRecognitionEvent extends Event { results: SpeechRecognitionResultList; resultIndex: number }
+interface SpeechRecognitionErrorEvent extends Event { error: string }
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean; interimResults: boolean; lang: string
+  start(): void; stop(): void
+  onresult: ((e: SpeechRecognitionEvent) => void) | null
+  onerror: ((e: SpeechRecognitionErrorEvent) => void) | null
+  onend: (() => void) | null
+}
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognitionInstance
+    webkitSpeechRecognition: new () => SpeechRecognitionInstance
+  }
 }
 
-function ReplyCard({ label, text, highlight, onEdit }: {
-  label: string; text: string; highlight?: boolean; onEdit: (t: string) => void
+// ─── Chip row ─────────────────────────────────────────────────────────────
+function ChipRow({ options, value, onChange }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void }) {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+      {options.map(o => (
+        <button key={o.value || '_none'} onClick={() => onChange(value === o.value ? '' : o.value)}
+          style={{
+            padding: '8px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none',
+            background: value === o.value ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
+            color: value === o.value ? 'white' : 'rgba(255,255,255,0.72)',
+            outline: value === o.value ? '1.5px solid rgba(155,92,255,0.7)' : '1px solid rgba(255,255,255,0.1)',
+            transition: 'all 0.15s ease',
+          }}>
+          {o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ─── Feedback row under a reply ────────────────────────────────────────────
+function FeedbackRow({ responseId, onGiven }: { responseId: string | null; onGiven: (tag: string) => void }) {
+  const [given, setGiven] = useState<string | null>(null)
+  const [sending, setSending] = useState(false)
+
+  async function send(tag: string) {
+    if (!responseId || sending || given) return
+    setSending(true)
+    try {
+      await fetch('/api/ai/communication-coach/feedback', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ response_id: responseId, tag }),
+      })
+      setGiven(tag)
+      onGiven(tag)
+    } catch { /* non-fatal */ }
+    finally { setSending(false) }
+  }
+
+  if (!responseId) return null
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 10 }}>
+      {FEEDBACK_TAGS.map(f => (
+        <button key={f.tag} onClick={() => send(f.tag)} disabled={sending || !!given}
+          style={{
+            padding: '4px 9px', borderRadius: 10, fontSize: 10.5, fontWeight: 600, cursor: given ? 'default' : 'pointer', border: 'none',
+            background: given === f.tag ? 'rgba(155,92,255,0.35)' : 'rgba(255,255,255,0.05)',
+            color: given === f.tag ? '#C4A8E8' : 'rgba(255,255,255,0.4)',
+            opacity: given && given !== f.tag ? 0.4 : 1,
+          }}>
+          {given === f.tag ? '✓ ' : ''}{f.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ─── Reply card (best response or alternative) ─────────────────────────────
+function ReplyCard({ option, responseId, highlight, extraActions }: {
+  option: ReplyOption; responseId: string | null; highlight?: boolean
+  extraActions?: React.ReactNode
 }) {
   const [copied, setCopied] = useState(false)
   function copy() {
-    navigator.clipboard.writeText(text)
+    navigator.clipboard.writeText(option.text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <div style={{ ...GLASS, padding: '16px', background: highlight ? 'rgba(155,92,255,0.12)' : 'rgba(255,255,255,0.06)', border: `1.5px solid ${highlight ? 'rgba(155,92,255,0.3)' : 'rgba(255,255,255,0.1)'}` }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? '#C4A8E8' : 'rgba(255,255,255,0.45)' }}>{label}</p>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => onEdit(text)} style={{ fontSize: 11, padding: '4px 10px', borderRadius: 8, background: 'rgba(155,92,255,0.15)', color: '#C4A8E8', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-            Edit & Use
-          </button>
-          <button onClick={copy} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>
-            {copied ? <Check style={{ width: 14, height: 14, color: '#7FD97F' }} /> : <Copy style={{ width: 14, height: 14 }} />}
-            {copied ? 'Copied' : 'Copy'}
-          </button>
+    <div style={{ ...GLASS, padding: 16, background: highlight ? 'rgba(155,92,255,0.12)' : 'rgba(255,255,255,0.06)', border: `1.5px solid ${highlight ? 'rgba(155,92,255,0.3)' : 'rgba(255,255,255,0.1)'}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 8 }}>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: highlight ? '#C4A8E8' : 'rgba(255,255,255,0.45)', margin: 0 }}>
+            {option.label}
+          </p>
+          {option.strategy && (
+            <p style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.35)', margin: '2px 0 0' }}>{option.strategy}</p>
+          )}
         </div>
+        <button onClick={copy} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'rgba(255,255,255,0.5)', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 8, padding: '5px 10px', cursor: 'pointer', flexShrink: 0 }}>
+          {copied ? <Check style={{ width: 13, height: 13, color: '#7FD97F' }} /> : <Copy style={{ width: 13, height: 13 }} />}
+          {copied ? 'Copied' : 'Copy'}
+        </button>
       </div>
-      <p style={{ fontSize: 14, lineHeight: 1.65, color: 'rgba(255,255,255,0.88)' }}>{text}</p>
+      <p style={{ fontSize: 14, lineHeight: 1.65, color: 'rgba(255,255,255,0.9)', whiteSpace: 'pre-wrap' }}>{option.text}</p>
+      {option.reason && (
+        <p style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.45)', marginTop: 8, fontStyle: 'italic' }}>{option.reason}</p>
+      )}
+      {extraActions}
+      <FeedbackRow responseId={responseId} onGiven={() => {}} />
     </div>
   )
 }
 
-// ─── Progress bar with completed answers ─────────────────────────────────────
-function ProgressBar({ step, sender, relationship, activated }: {
-  step: number; sender: string; relationship: string; activated: number
-}) {
-  const activatedInfo = ACTIVATED_LEVELS.find(l => l.value === activated)
-  const relShort = RELATIONSHIP_TYPES.find(r => r.label === relationship)?.short ?? relationship.split(' ').slice(-1)[0] ?? ''
-
-  const answers = [
-    sender || null,
-    relShort || null,
-    activatedInfo ? `${activatedInfo.emoji} ${activatedInfo.label}` : null,
-    null,
-  ]
-
-  return (
-    <div style={{ marginBottom: 28 }}>
-      {/* Segment bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 14 }}>
-        {STEPS.map((s, i) => {
-          const done    = step > s.id
-          const current = step === s.id
-          return (
-            <div key={s.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-              {/* Connector line before */}
-              {i > 0 && (
-                <div style={{ flex: 1, height: 2, background: done || current ? 'rgba(155,92,255,0.7)' : 'rgba(255,255,255,0.1)', transition: 'background 0.3s ease' }} />
-              )}
-              {/* Step dot */}
-              <div style={{
-                width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: done ? 'rgba(155,92,255,0.9)' : current ? 'rgba(155,92,255,0.15)' : 'rgba(255,255,255,0.07)',
-                border: done ? '2px solid #9b5cff' : current ? '2px solid rgba(155,92,255,0.8)' : '2px solid rgba(255,255,255,0.12)',
-                transition: 'all 0.3s ease',
-                boxShadow: current ? '0 0 12px rgba(155,92,255,0.35)' : undefined,
-              }}>
-                {done ? (
-                  <Check style={{ width: 13, height: 13, color: 'white' }} />
-                ) : (
-                  <span style={{ fontSize: 11, fontWeight: 800, color: current ? '#C4A8E8' : 'rgba(255,255,255,0.3)' }}>{s.id}</span>
-                )}
-              </div>
-              {/* Connector line after (last step) */}
-              {i === STEPS.length - 1 && (
-                <div style={{ flex: 1, height: 2, background: 'rgba(255,255,255,0.1)' }} />
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Answer chips */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-        {answers.map((ans, i) => {
-          if (!ans || i >= step - 1) return null
-          return (
-            <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', color: '#C4A8E8' }}>
-              {ans}
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-// ─── Main component ──────────────────────────────────────────────────────────
+// ─── Main component ─────────────────────────────────────────────────────────
 export default function CommunicationCoach() {
-  const [step,         setStep]         = useState(1)
-  const [sender,       setSender]       = useState('')
-  const [relationship, setRelationship] = useState('')
-  const [activated,    setActivated]    = useState(1)
-  const [message,      setMessage]      = useState('')
-  const [loading,      setLoading]      = useState(false)
-  const [result,       setResult]       = useState<CoachResult | null>(null)
-  const [showWound,    setShowWound]    = useState(false)
-  const [showNotSay,   setShowNotSay]   = useState(false)
-  const [editText,     setEditText]     = useState('')
-  const [editCopied,   setEditCopied]   = useState(false)
+  const [message, setMessage] = useState('')
+  const [image, setImage] = useState<string | null>(null)
+  const [direction, setDirection] = useState<'received' | 'written'>('received')
+  const [relationshipType, setRelationshipType] = useState('')
+  const [goal, setGoal] = useState('')
 
-  function next() { if (step < 4) setStep(s => s + 1) }
-  function back() { if (step > 1) setStep(s => s - 1) }
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [contactId, setContactId] = useState<string | null>(null)
+  const [showNewContact, setShowNewContact] = useState(false)
+  const [newContactName, setNewContactName] = useState('')
+  const [newContactType, setNewContactType] = useState('friend')
+  const [savingContact, setSavingContact] = useState(false)
 
-  function handleEdit(text: string) {
-    setEditText(text)
-    setTimeout(() => document.getElementById('edit-reply-box')?.focus(), 50)
+  const [listening, setListening] = useState(false)
+  const [interim, setInterim] = useState('')
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [result, setResult] = useState<CoachResult | null>(null)
+  const [clarifyAnswer, setClarifyAnswer] = useState('')
+  const [editText, setEditText] = useState('')
+  const [showAllAlts, setShowAllAlts] = useState(true)
+  const [adjusting, setAdjusting] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/coach-contacts').then(r => r.json()).then(d => setContacts(d.contacts ?? [])).catch(() => {})
+  }, [])
+
+  const selectedContact = contacts.find(c => c.id === contactId) ?? null
+
+  function selectContact(id: string) {
+    if (contactId === id) { setContactId(null); return }
+    setContactId(id)
+    const c = contacts.find(x => x.id === id)
+    if (c?.relationship_type) setRelationshipType(c.relationship_type)
   }
-  function copyEdit() {
-    navigator.clipboard.writeText(editText)
-    setEditCopied(true)
-    setTimeout(() => setEditCopied(false), 2000)
-  }
 
-  async function analyze() {
-    if (!message.trim()) return
-    setLoading(true)
-    setResult(null)
-    setEditText('')
+  async function saveNewContact() {
+    if (!newContactName.trim()) return
+    setSavingContact(true)
     try {
-      const res = await fetch('/api/ai/message-suggestions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message, sender_name: sender, context: relationship, activated_level: activated }),
+      const res = await fetch('/api/coach-contacts', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newContactName.trim(), relationship_type: newContactType }),
       })
-      if (!res.ok) throw new Error('non-2xx')
-      setResult(await res.json())
+      const data = await res.json()
+      if (data.contact) {
+        setContacts(prev => [...prev, data.contact].sort((a, b) => a.name.localeCompare(b.name)))
+        setContactId(data.contact.id)
+        setRelationshipType(data.contact.relationship_type)
+        setNewContactName('')
+        setShowNewContact(false)
+      }
+    } catch { /* ignore */ }
+    finally { setSavingContact(false) }
+  }
+
+  function startListening() {
+    const SpeechRecognition = window.SpeechRecognition ?? window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Voice dictation is not supported in this browser. Try Chrome or Safari.')
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognitionRef.current = recognition
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'en-US'
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let finalText = message
+      let interimText = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript
+        if (event.results[i].isFinal) finalText += (finalText ? ' ' : '') + transcript
+        else interimText += transcript
+      }
+      setMessage(finalText)
+      setInterim(interimText)
+    }
+    recognition.onend = () => { setListening(false); setInterim('') }
+    recognition.onerror = () => { setListening(false); setInterim('') }
+    recognition.start()
+    setListening(true)
+  }
+  function stopListening() {
+    recognitionRef.current?.stop()
+    setListening(false)
+    setInterim('')
+  }
+
+  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => setImage(reader.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const submit = useCallback(async (opts?: { adjust?: string; previousResponseId?: string | null; overrideMessage?: string }) => {
+    const msgToSend = opts?.overrideMessage ?? message
+    if (!msgToSend.trim() && !image) return
+    setLoading(true)
+    setError(null)
+    if (!opts?.adjust) setResult(null)
+    try {
+      const res = await fetch('/api/ai/communication-coach', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: msgToSend,
+          image: opts?.adjust ? undefined : image,
+          direction,
+          relationship: relationshipType,
+          goal,
+          contact_id: contactId,
+          contact_name: selectedContact?.name ?? null,
+          adjust: opts?.adjust ?? null,
+          previous_response_id: opts?.previousResponseId ?? result?.response_id ?? null,
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Something went wrong. Try again.')
+        return
+      }
+      if (opts?.adjust && opts.adjust !== 'regenerate') {
+        // Lightweight adjust — only best_response comes back, keep the rest.
+        setResult(prev => prev ? { ...prev, best_response: data.best_response } : prev)
+      } else {
+        setResult(data)
+        setEditText('')
+      }
     } catch {
-      setResult({
-        what_they_mean: 'Take a breath before responding.',
-        reactive_warning: activated >= 3 ? 'yes' : 'no',
-        reactive_reason: activated >= 3 ? 'Your activation level is high. Wait before sending.' : undefined,
-        soft_reply: 'Thank you for reaching out. Let me get back to you with clarity.',
-        direct_reply: "I'll look into this and follow up shortly.",
-        confident_reply: 'I hear you. I will respond when I am ready.',
-        wisdom_reply: 'I appreciate your message. Give me a moment to respond with intention.',
-        reflection: 'Am I responding from my wound or from my wisdom right now?',
-      })
+      setError('Network error — check your connection and try again.')
     } finally {
       setLoading(false)
+      setAdjusting(null)
     }
+  }, [message, image, direction, relationshipType, goal, contactId, selectedContact, result])
+
+  async function answerClarification() {
+    if (!clarifyAnswer.trim()) return
+    const combined = `${message}\n\n(Additional context: ${clarifyAnswer.trim()})`
+    setMessage(combined)
+    setClarifyAnswer('')
+    await submit({ overrideMessage: combined })
   }
 
-  function reset() { setResult(null); setMessage(''); setSender(''); setRelationship(''); setActivated(1); setStep(1) }
+  function handleAdjust(kind: 'shorter' | 'warmer' | 'firmer' | 'regenerate') {
+    if (!result?.response_id) return
+    setAdjusting(kind)
+    submit({ adjust: kind, previousResponseId: result.response_id })
+  }
 
-  const isReactive = result?.reactive_warning === 'yes' || activated >= 4
-  const activatedInfo = ACTIVATED_LEVELS.find(l => l.value === activated)!
+  function reset() {
+    setResult(null); setMessage(''); setImage(null); setError(null)
+    setContactId(null); setRelationshipType(''); setGoal('')
+  }
+
+  const canSubmit = (message.trim() || image) && !loading
 
   return (
     <div className="bg-app min-h-screen">
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 20px 180px' }}>
 
-          {/* Page header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
             <div style={{ width: 38, height: 38, borderRadius: 12, background: 'rgba(232,192,194,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <MessageSquare style={{ width: 18, height: 18, color: '#C87B7B' }} />
             </div>
             <div>
-              <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C87B7B' }}>Communication Coach</p>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Respond from wisdom, not wound.</p>
+              <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C87B7B' }}>LUNA Communication Coach</p>
+              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Paste it. Talk it out. Get the response that sounds like you.</p>
             </div>
           </div>
 
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 20 }}>
-            Before you respond.
-          </h1>
+          {!result && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 16 }}>
 
-          {!result ? (
-            <>
-              {/* Progress bar */}
-              <ProgressBar step={step} sender={sender} relationship={relationship} activated={activated} />
-
-              {/* Step label */}
-              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.13em', color: 'rgba(255,255,255,0.35)', marginBottom: 6 }}>
-                Step {step} of 4
-              </p>
-              <h2 style={{ fontSize: 19, fontWeight: 700, color: 'white', marginBottom: 20, fontFamily: 'var(--font-display)' }}>
-                {STEPS[step - 1].question}
-              </h2>
-
-              {/* ── Step 1: Who sent this ── */}
-              {step === 1 && (
-                <div style={{ ...GLASS, padding: '20px' }}>
-                  <input
-                    type="text"
-                    value={sender}
-                    onChange={e => setSender(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && next()}
-                    placeholder="Kaleb, a client, mom, team member…"
-                    autoFocus
+              {/* Message input */}
+              <div style={{ ...GLASS, padding: 16 }}>
+                <div style={{ position: 'relative' }}>
+                  <textarea
+                    value={message + (interim ? ' ' + interim : '')}
+                    onChange={e => setMessage(e.target.value)}
+                    placeholder={listening ? '🎙 Listening…' : 'Paste or type the message here…'}
+                    rows={6}
                     className="luna-input"
                     style={{
-                      width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-                      borderRadius: 12, padding: '12px 16px', fontSize: 15, color: 'white',
-                      outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', colorScheme: 'dark',
+                      width: '100%', background: 'rgba(255,255,255,0.07)',
+                      border: `1px solid ${listening ? 'rgba(155,92,255,0.55)' : 'rgba(255,255,255,0.12)'}`,
+                      borderRadius: 14, padding: '12px 46px 12px 14px', fontSize: 14.5, color: 'white',
+                      outline: 'none', fontFamily: 'inherit', resize: 'none', lineHeight: 1.6,
+                      colorScheme: 'dark', boxSizing: 'border-box',
                     }}
                   />
+                  <button
+                    onClick={listening ? stopListening : startListening}
+                    className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center"
+                    style={{
+                      background: listening ? 'var(--violet)' : 'rgba(155,92,255,0.12)',
+                      border: `1px solid ${listening ? 'var(--violet)' : 'rgba(155,92,255,0.25)'}`,
+                    }}
+                    title={listening ? 'Stop dictation' : 'Dictate'}>
+                    {listening ? <MicOff className="h-3.5 w-3.5 text-white" /> : <Mic className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />}
+                  </button>
                 </div>
-              )}
 
-              {/* ── Step 2: Relationship ── */}
-              {step === 2 && (
-                <div style={{ ...GLASS, padding: '20px' }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {RELATIONSHIP_TYPES.map(r => (
-                      <button key={r.label} onClick={() => setRelationship(relationship === r.label ? '' : r.label)}
-                        style={{
-                          padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 600, cursor: 'pointer', border: 'none',
-                          background: relationship === r.label ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
-                          color: relationship === r.label ? 'white' : 'rgba(255,255,255,0.72)',
-                          outline: relationship === r.label ? '1.5px solid rgba(155,92,255,0.7)' : '1px solid rgba(255,255,255,0.1)',
-                          transition: 'all 0.15s ease',
-                        }}>
-                        {r.label}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.55)', cursor: 'pointer', padding: '6px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.05)' }}>
+                    <Camera style={{ width: 14, height: 14 }} />
+                    Upload screenshot
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  </label>
+                  {image && (
+                    <div style={{ position: 'relative', display: 'inline-flex' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={image} alt="Screenshot" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8 }} />
+                      <button onClick={() => setImage(null)} style={{ position: 'absolute', top: -5, right: -5, width: 16, height: 16, borderRadius: '50%', background: 'rgba(0,0,0,0.7)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <X style={{ width: 10, height: 10, color: 'white' }} />
                       </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* ── Step 3: Activation level ── */}
-              {step === 3 && (
-                <div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginBottom: 12 }}>
-                    {ACTIVATED_LEVELS.map(l => (
-                      <button key={l.value} onClick={() => setActivated(l.value)}
-                        style={{
-                          padding: '14px 0', borderRadius: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, cursor: 'pointer', border: 'none', transition: 'all 0.15s ease',
-                          background: activated === l.value ? `${l.color}18` : 'rgba(255,255,255,0.06)',
-                          outline: activated === l.value ? `2px solid ${l.color}60` : '1px solid rgba(255,255,255,0.1)',
-                        }}>
-                        <span style={{ fontSize: 22 }}>{l.emoji}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: activated === l.value ? l.color : 'rgba(255,255,255,0.4)' }}>{l.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                  {activated >= 4 && (
-                    <div style={{ padding: '12px 14px', borderRadius: 14, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.2)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <AlertTriangle style={{ width: 15, height: 15, flexShrink: 0, color: '#E05E5E' }} />
-                      <p style={{ fontSize: 12, color: '#E05E5E' }}>You are activated. LUNA will add extra protection in your replies.</p>
                     </div>
                   )}
                 </div>
-              )}
+              </div>
 
-              {/* ── Step 4: The message ── */}
-              {step === 4 && (
-                <SmartInput
-                  context="a message I received that I need help responding to wisely — not reactively"
-                  placeholder="Paste or speak the message here…"
-                  value={message}
-                  onChange={setMessage}
-                  patternType="messages"
-                  rows={6}
+              {/* Message type */}
+              <div>
+                <p style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>Message type</p>
+                <ChipRow
+                  options={[{ value: 'received', label: 'Message I received' }, { value: 'written', label: 'Draft I wrote' }]}
+                  value={direction}
+                  onChange={v => setDirection((v || 'received') as 'received' | 'written')}
                 />
-              )}
-
-              {/* Navigation */}
-              <div style={{ display: 'flex', gap: 10, marginTop: 20 }}>
-                {step > 1 && (
-                  <button onClick={back} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '13px 18px', borderRadius: 16, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                    <ArrowLeft style={{ width: 16, height: 16 }} /> Back
-                  </button>
-                )}
-                {step < 4 ? (
-                  <button
-                    onClick={next}
-                    disabled={step === 1 && !sender.trim()}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: step === 1 && !sender.trim() ? 0.45 : 1, boxShadow: '0 4px 20px rgba(155,92,255,0.3)', transition: 'opacity 0.2s ease' }}>
-                    Continue <ArrowRight style={{ width: 16, height: 16 }} />
-                  </button>
-                ) : (
-                  <button
-                    onClick={analyze}
-                    disabled={!message.trim() || loading}
-                    style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '13px', borderRadius: 16, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: !message.trim() || loading ? 0.45 : 1, boxShadow: '0 4px 20px rgba(155,92,255,0.3)', transition: 'opacity 0.2s ease' }}>
-                    <Sparkles style={{ width: 16, height: 16 }} />
-                    {loading ? 'Reading between the lines…' : 'Help me respond from wisdom'}
-                  </button>
-                )}
-              </div>
-            </>
-          ) : (
-            // ── Results ────────────────────────────────────────────────────
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-              {/* Answer recap chips */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 4 }}>
-                {[sender, relationship, `${activatedInfo.emoji} ${activatedInfo.label}`].filter(Boolean).map((v, i) => (
-                  <span key={i} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', color: '#C4A8E8' }}>{v}</span>
-                ))}
               </div>
 
-              {isReactive && (
-                <div style={{ ...GLASS, padding: 16, background: 'rgba(224,94,94,0.07)', border: '1.5px solid rgba(224,94,94,0.22)' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <AlertTriangle style={{ width: 18, height: 18, flexShrink: 0, color: '#E05E5E', marginTop: 2 }} />
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#E05E5E', marginBottom: 5 }}>Pause before sending.</p>
-                      <p style={{ fontSize: 12, color: '#C87070', lineHeight: 1.6 }}>{result.reactive_reason ?? 'Breathe first. The replies below come from your highest self.'}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {result.reflection && (
-                <div style={{ ...GLASS, padding: '18px 20px', textAlign: 'center' }}>
-                  <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontStyle: 'italic', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>
-                    &ldquo;{result.reflection}&rdquo;
-                  </p>
-                </div>
-              )}
-
-              {result.what_they_mean && (
-                <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C4A8E8', marginBottom: 8 }}>What they actually mean</p>
-                  <p style={{ fontSize: 14, lineHeight: 1.65, color: 'rgba(255,255,255,0.85)' }}>{result.what_they_mean}</p>
-                  {result.emotional_tone && (
-                    <span style={{ display: 'inline-block', marginTop: 8, fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(155,92,255,0.12)', color: '#C4A8E8', textTransform: 'capitalize' }}>{result.emotional_tone}</span>
-                  )}
-                </div>
-              )}
-
-              {result.what_not_to_say && (
-                <div>
-                  <button onClick={() => setShowNotSay(!showNotSay)} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.45)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 8, fontWeight: 600 }}>
-                    <Shield style={{ width: 14, height: 14 }} />
-                    {showNotSay ? 'Hide' : 'Show'} what not to say
-                    {showNotSay ? <ChevronUp style={{ width: 12, height: 12 }} /> : <ChevronDown style={{ width: 12, height: 12 }} />}
-                  </button>
-                  {showNotSay && (
-                    <div style={{ ...GLASS, padding: 14, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)' }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A96E', marginBottom: 8 }}>Do not say this right now</p>
-                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.72)' }}>{result.what_not_to_say}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {result.wisdom_reply && <ReplyCard label="✨ Wisdom reply — send this one" text={result.wisdom_reply} highlight onEdit={handleEdit} />}
-
-              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>Or choose your tone</p>
-              {result.soft_reply      && <ReplyCard label="🌸 Soft + Warm"      text={result.soft_reply}      onEdit={handleEdit} />}
-              {result.direct_reply    && <ReplyCard label="🎯 Direct + Clear"    text={result.direct_reply}    onEdit={handleEdit} />}
-              {result.confident_reply && <ReplyCard label="🛡 Confident + Calm"  text={result.confident_reply} onEdit={handleEdit} />}
-
-              {editText && (
-                <div style={{ ...GLASS, padding: 16, background: 'rgba(90,180,90,0.07)', border: '1.5px solid rgba(90,180,90,0.2)' }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#7FD97F', marginBottom: 10 }}>Edit before sending</p>
-                  <textarea id="edit-reply-box" value={editText} onChange={e => setEditText(e.target.value)} rows={4}
-                    className="luna-input" style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: 'white', outline: 'none', fontFamily: 'inherit', resize: 'none', lineHeight: 1.6, colorScheme: 'dark' as React.CSSProperties['colorScheme'], boxSizing: 'border-box' }} />
-                  <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                    <button onClick={copyEdit} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 12, background: 'rgba(90,180,90,0.15)', color: '#7FD97F', border: '1px solid rgba(90,180,90,0.25)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                      {editCopied ? <><Check style={{ width: 14, height: 14 }} /> Copied!</> : <><Copy style={{ width: 14, height: 14 }} /> Copy final reply</>}
+              {/* Contact selector */}
+              <div>
+                <p style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>Who&apos;s this about?</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+                  {contacts.map(c => (
+                    <button key={c.id} onClick={() => selectContact(c.id)}
+                      style={{
+                        padding: '8px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none',
+                        background: contactId === c.id ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
+                        color: contactId === c.id ? 'white' : 'rgba(255,255,255,0.72)',
+                        outline: contactId === c.id ? '1.5px solid rgba(155,92,255,0.7)' : '1px solid rgba(255,255,255,0.1)',
+                      }}>
+                      {c.name}
                     </button>
-                    <button onClick={() => setEditText('')} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
-                  </div>
-                </div>
-              )}
-
-              {result.wound_reply && (
-                <div>
-                  <button onClick={() => setShowWound(!showWound)} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                    {showWound ? <ChevronUp style={{ width: 12, height: 12 }} /> : <ChevronDown style={{ width: 12, height: 12 }} />}
-                    {showWound ? 'Hide' : 'See'} wound reply (awareness only — do not send)
+                  ))}
+                  <button onClick={() => setShowNewContact(v => !v)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '8px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px dashed rgba(255,255,255,0.18)', color: 'rgba(255,255,255,0.55)' }}>
+                    <Plus style={{ width: 12, height: 12 }} /> New contact
                   </button>
-                  {showWound && (
-                    <div style={{ ...GLASS, padding: 14, marginTop: 8, background: 'rgba(224,94,94,0.05)', border: '1px solid rgba(224,94,94,0.12)' }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#E05E5E', marginBottom: 8 }}>Wound reply — do not send</p>
-                      <p style={{ fontSize: 13, fontStyle: 'italic', color: 'rgba(255,255,255,0.6)' }}>{result.wound_reply}</p>
-                    </div>
-                  )}
+                </div>
+                {showNewContact && (
+                  <div style={{ ...GLASS, padding: 14, marginTop: 10 }}>
+                    <input
+                      value={newContactName}
+                      onChange={e => setNewContactName(e.target.value)}
+                      placeholder="Name (e.g. Kaleb, Mom, a client's name)"
+                      className="luna-input"
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'dark' }}
+                    />
+                    <select
+                      value={newContactType}
+                      onChange={e => setNewContactType(e.target.value)}
+                      className="luna-input"
+                      style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', marginBottom: 10 }}>
+                      {RELATIONSHIP_TYPES.filter(r => r.value).map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                    </select>
+                    <button onClick={saveNewContact} disabled={savingContact || !newContactName.trim()}
+                      style={{ width: '100%', padding: '10px', borderRadius: 12, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: savingContact || !newContactName.trim() ? 0.5 : 1 }}>
+                      {savingContact ? 'Saving…' : 'Save contact'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Relationship */}
+              <div>
+                <p style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>Relationship</p>
+                <ChipRow options={RELATIONSHIP_TYPES} value={relationshipType} onChange={setRelationshipType} />
+              </div>
+
+              {/* Goal */}
+              <div>
+                <p style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: 8 }}>Goal</p>
+                <ChipRow options={GOALS.map(g => ({ value: g, label: g || 'Choose for me' }))} value={goal} onChange={setGoal} />
+              </div>
+
+              {error && (
+                <div style={{ ...GLASS, padding: 14, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.22)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <AlertCircle style={{ width: 16, height: 16, color: '#E05E5E', flexShrink: 0 }} />
+                  <p style={{ fontSize: 12.5, color: '#E88F8F' }}>{error}</p>
                 </div>
               )}
 
-              <button onClick={reset} style={{ width: '100%', padding: '14px', borderRadius: 16, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
-                New message
+              <button
+                onClick={() => submit()}
+                disabled={!canSubmit}
+                style={{ padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: canSubmit ? 1 : 0.45, boxShadow: '0 4px 20px rgba(155,92,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles style={{ width: 16, height: 16 }} />}
+                {loading ? 'Writing your best response…' : 'Write my best response ✦'}
               </button>
             </div>
           )}
+
+          {/* ── Results ── */}
+          {result && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 16 }}>
+
+              {result.needs_clarification ? (
+                <div style={{ ...GLASS, padding: 18 }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C4A8E8', marginBottom: 8 }}>LUNA needs one more thing</p>
+                  <p style={{ fontSize: 14.5, color: 'white', lineHeight: 1.6, marginBottom: 14 }}>{result.clarifying_question}</p>
+                  <textarea
+                    value={clarifyAnswer}
+                    onChange={e => setClarifyAnswer(e.target.value)}
+                    placeholder="Your answer…"
+                    rows={2}
+                    className="luna-input"
+                    style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', resize: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'dark' }}
+                  />
+                  <button onClick={answerClarification} disabled={!clarifyAnswer.trim() || loading}
+                    style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: !clarifyAnswer.trim() || loading ? 0.5 : 1 }}>
+                    {loading ? 'Thinking…' : 'Continue'}
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* LUNA's Read */}
+                  {result.analysis && (
+                    <div style={{ ...GLASS, padding: 16 }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C4A8E8', marginBottom: 10 }}>LUNA&apos;s Read</p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+                        {[
+                          ['Relationship', result.analysis.relationship],
+                          ['Tone detected', result.analysis.tone_detected],
+                          ['What they may need', result.analysis.likely_intent],
+                          ['Your goal', result.analysis.zoe_goal],
+                          ['Best approach', result.analysis.recommended_approach],
+                        ].map(([k, v]) => v && (
+                          <div key={k} style={{ display: 'flex', gap: 8, fontSize: 13 }}>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0, minWidth: 130 }}>{k}</span>
+                            <span style={{ color: 'rgba(255,255,255,0.88)' }}>{v}</span>
+                          </div>
+                        ))}
+                      </div>
+                      {typeof result.analysis.confidence === 'number' && (
+                        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ flex: 1, height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                            <div style={{ width: `${Math.min(100, Math.max(0, result.analysis.confidence))}%`, height: '100%', background: 'linear-gradient(90deg, #9b5cff, #C4A8E8)' }} />
+                          </div>
+                          <span style={{ fontSize: 10.5, color: 'rgba(255,255,255,0.4)' }}>{result.analysis.confidence}% confident</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Best response */}
+                  {result.best_response && (
+                    <div>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)', marginBottom: 8 }}>Best response</p>
+                      <ReplyCard
+                        option={result.best_response}
+                        responseId={result.response_id ?? null}
+                        highlight
+                        extraActions={
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>
+                            <button onClick={() => setEditText(result.best_response!.text)} style={{ fontSize: 11.5, padding: '6px 12px', borderRadius: 10, background: 'rgba(155,92,255,0.15)', color: '#C4A8E8', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Edit</button>
+                            <button onClick={() => handleAdjust('regenerate')} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11.5, padding: '6px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                              {adjusting === 'regenerate' ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw style={{ width: 11, height: 11 }} />} Regenerate
+                            </button>
+                            <button onClick={() => handleAdjust('shorter')} disabled={loading} style={{ fontSize: 11.5, padding: '6px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                              {adjusting === 'shorter' ? 'Shortening…' : 'Make shorter'}
+                            </button>
+                            <button onClick={() => handleAdjust('warmer')} disabled={loading} style={{ fontSize: 11.5, padding: '6px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                              {adjusting === 'warmer' ? 'Warming…' : 'Make warmer'}
+                            </button>
+                            <button onClick={() => handleAdjust('firmer')} disabled={loading} style={{ fontSize: 11.5, padding: '6px 12px', borderRadius: 10, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                              {adjusting === 'firmer' ? 'Firming…' : 'Make firmer'}
+                            </button>
+                          </div>
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {editText && (
+                    <div style={{ ...GLASS, padding: 16, background: 'rgba(90,180,90,0.07)', border: '1.5px solid rgba(90,180,90,0.2)' }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#7FD97F', marginBottom: 10 }}>Edit before sending</p>
+                      <textarea value={editText} onChange={e => setEditText(e.target.value)} rows={4}
+                        className="luna-input" style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: 'white', outline: 'none', fontFamily: 'inherit', resize: 'none', lineHeight: 1.6, colorScheme: 'dark', boxSizing: 'border-box' }} />
+                      <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                        <button onClick={() => navigator.clipboard.writeText(editText)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 12, background: 'rgba(90,180,90,0.15)', color: '#7FD97F', border: '1px solid rgba(90,180,90,0.25)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                          <Copy style={{ width: 14, height: 14 }} /> Copy final reply
+                        </button>
+                        <button onClick={() => setEditText('')} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Alternatives */}
+                  {result.alternatives && result.alternatives.length > 0 && (
+                    <div>
+                      <button onClick={() => setShowAllAlts(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: 8 }}>
+                        Different approaches
+                        {showAllAlts ? <ChevronUp style={{ width: 12, height: 12 }} /> : <ChevronDown style={{ width: 12, height: 12 }} />}
+                      </button>
+                      {showAllAlts && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                          {result.alternatives.map((alt, i) => (
+                            <ReplyCard key={i} option={alt} responseId={result.response_id ?? null} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button onClick={reset} style={{ width: '100%', padding: '14px', borderRadius: 16, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 8 }}>
+                    New message
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
         </div>
       </AppLayout>
     </div>
