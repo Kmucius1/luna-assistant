@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { resolvePinterestImageUrl } from '@/lib/pinterest'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -11,10 +12,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'A valid image_url is required' }, { status: 400 })
     }
 
+    // Pinterest's share button gives a pin.it/pinterest.com page link, not a
+    // direct image file — resolve it to the real image URL so it renders.
+    const resolvedUrl = await resolvePinterestImageUrl(image_url.trim())
+
     const db = createAdminClient()
     const { data, error } = await db
       .from('style_pool_images')
-      .insert({ user_id: ZOE_USER_ID, image_url: image_url.trim(), label: label?.trim() || null, added_by: 'zoe' })
+      .insert({ user_id: ZOE_USER_ID, image_url: resolvedUrl, label: label?.trim() || null, added_by: 'zoe' })
       .select()
       .single()
 
