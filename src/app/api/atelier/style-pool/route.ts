@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey, getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { generateFashionImage } from '@/lib/higgsfield'
+import { searchPinterestImages } from '@/lib/pinterestSearch'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const DAILY_COUNT = 12
@@ -95,36 +96,57 @@ export async function GET(req: NextRequest) {
       .map(v => poolById.get(v.image_id)?.label).filter((l): l is string => Boolean(l)))]
     const lanes = (likedLabels.length ? likedLabels : DEFAULT_LANES).slice(0, DAILY_GENERATE_COUNT)
 
-    // Once per local day, generate a few new AI images matching her taste so
-    // far — a real, growing "similar to what I like" pool, not just what she
-    // manually pastes in. No-ops gracefully if HIGGSFIELD_API_KEY isn't set.
-    await getOrCreateDailyContent<{ generated: number }>({
+    // Once per local day, pull in a few new images matching her taste so far
+    // — a real, growing "similar to what I like" pool, not just what she
+    // manually pastes in. Pinterest live search is the primary source (real
+    // photos, no API key needed — see src/lib/pinterestSearch.ts for the
+    // tradeoffs); AI generation is the fallback whenever Pinterest returns
+    // nothing for a lane, so the pool still grows even if Pinterest's
+    // internal endpoint changes or HIGGSFIELD_API_KEY isn't set.
+    const existingUrls = new Set(pool.map(p => p.image_url))
+    await getOrCreateDailyContent<{ generated: number; fromPinterest: number; fromAi: number }>({
       userId: ZOE_USER_ID,
       generationType: 'style_pool_ai_gen',
       timezone: tz,
       dateKey,
       generate: async () => {
         try {
-          const inserted: { image_url: string; label: string }[] = []
+          const inserted: { image_url: string; label: string; added_by: 'pinterest' | 'ai_generated' }[] = []
           for (const lane of lanes) {
             try {
+              const pinResults = await searchPinterestImages(`${lane} outfit`, 6)
+              const fresh = pinResults.find(r => !existingUrls.has(r.image_url))
+              if (fresh) {
+                inserted.push({ image_url: fresh.image_url, label: lane, added_by: 'pinterest' })
+                existingUrls.add(fresh.image_url)
+                continue
+              }
+            } catch (e) {
+              console.error('[style-pool] Pinterest search failed for lane, falling back to AI:', lane, e instanceof Error ? e.message : e)
+            }
+            try {
               const url = await generateFashionImage(buildPrompt(lane, deniedLabels))
-              inserted.push({ image_url: url, label: lane })
+              inserted.push({ image_url: url, label: lane, added_by: 'ai_generated' })
             } catch (e) {
               console.error('[style-pool] generateFashionImage failed:', e instanceof Error ? e.message : e)
             }
           }
           if (inserted.length) {
-            const { data: newRows } = await db
+            const { data: newRows, error: insertErr } = await db
               .from('style_pool_images')
-              .insert(inserted.map(i => ({ ...i, user_id: ZOE_USER_ID, added_by: 'ai_generated' as const })))
+              .insert(inserted.map(i => ({ ...i, user_id: ZOE_USER_ID })))
               .select('id, image_url, label')
+            if (insertErr) console.error('[style-pool] insert failed:', insertErr.message)
             if (newRows) pool = [...pool, ...newRows]
           }
-          return { payload: { generated: inserted.length }, source: inserted.length ? 'ai' as const : 'fallback' as const }
+          const fromPinterest = inserted.filter(i => i.added_by === 'pinterest').length
+          return {
+            payload: { generated: inserted.length, fromPinterest, fromAi: inserted.length - fromPinterest },
+            source: inserted.length ? 'ai' as const : 'fallback' as const,
+          }
         } catch (err) {
           console.error('[style-pool] daily generation error:', err)
-          return { payload: { generated: 0 }, source: 'fallback' as const }
+          return { payload: { generated: 0, fromPinterest: 0, fromAi: 0 }, source: 'fallback' as const }
         }
       },
     })
