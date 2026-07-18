@@ -3,17 +3,25 @@
  * Global location hook — requests geolocation permission once, stores coordinates
  * in localStorage, and exposes timezone + coordinates to the whole app.
  * Timezone is always available (from browser); coordinates require permission.
+ *
+ * IMPORTANT: localHour/localTime/localDate/tz must NEVER be computed from
+ * `new Date()` inside the useState initializer or during render. That runs on
+ * both the server (Vercel's clock/timezone) and the client (browser's clock/
+ * timezone) — when they differ, React throws hydration error #418 ("text
+ * content did not match"), which was crashing the Home dashboard on load.
+ * These values are now only ever computed inside useEffect, which is
+ * guaranteed to run client-side only, after hydration.
  */
 import { useState, useEffect } from 'react'
 
 export interface LocationState {
-  tz:        string
-  lat:       number | null
-  lon:       number | null
-  permitted: boolean | null   // null = not asked yet, true = granted, false = denied
-  localHour: number           // current local hour (0-23) from browser
-  localTime: string           // formatted local time string e.g. "7:42 PM"
-  localDate: string           // formatted local date e.g. "Sunday, June 22, 2025"
+  tz: string
+  lat: number | null
+  lon: number | null
+  permitted: boolean | null // null = not asked yet, true = granted, false = denied
+  localHour: number // current local hour (0-23) from browser
+  localTime: string // formatted local time string e.g. "7:42 PM"
+  localDate: string // formatted local date e.g. "Sunday, June 22, 2025"
 }
 
 const STORAGE_KEY = 'luna_location_v1'
@@ -54,20 +62,33 @@ function storeCoords(lat: number, lon: number): void {
   } catch {}
 }
 
-export function useLocation(): LocationState {
-  const tz = typeof window !== 'undefined' ? getTimezone() : 'America/New_York'
+// Fixed, deterministic placeholder — identical on server and client's first
+// render, so hydration always matches. Replaced with real values the moment
+// the mount effect runs (client-only).
+const INITIAL_STATE: LocationState = {
+  tz: 'America/New_York',
+  lat: null,
+  lon: null,
+  permitted: null,
+  localHour: 12,
+  localTime: '',
+  localDate: '',
+}
 
-  const [state, setState] = useState<LocationState>({
-    tz,
-    lat:       null,
-    lon:       null,
-    permitted: null,
-    localHour: getLocalHour(),
-    localTime: getLocalTime(),
-    localDate: getLocalDate(tz),
-  })
+export function useLocation(): LocationState {
+  const [state, setState] = useState<LocationState>(INITIAL_STATE)
 
   useEffect(() => {
+    // Resolve the real timezone/clock now that we're guaranteed to be on the client.
+    const tz = getTimezone()
+    setState(prev => ({
+      ...prev,
+      tz,
+      localHour: getLocalHour(),
+      localTime: getLocalTime(),
+      localDate: getLocalDate(tz),
+    }))
+
     // Always refresh the time every minute
     const interval = setInterval(() => {
       setState(prev => ({
