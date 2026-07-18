@@ -183,24 +183,25 @@ function StylePoolBoard() {
       </div>
 
       {loading ? (
-        <div className="rounded-3xl shimmer mx-auto" style={{ aspectRatio: '3/4', maxWidth: 340 }} />
+        <div className="rounded-3xl shimmer mx-auto" style={{ aspectRatio: '3/4', height: '42vh', maxHeight: 360 }} />
       ) : top ? (
-        <div className="mx-auto" style={{ maxWidth: 340 }}>
-          {/* Card stack — one card at a time, Tinder/Bumble style. A second
-              card peeks from behind for depth and to hint more are coming. */}
-          <div style={{ position: 'relative' }}>
+        <div>
+          {/* Card stack — one card at a time, Tinder/Bumble style. Sized by
+              viewport HEIGHT (not just width) so the card never grows tall
+              enough to push the like/deny buttons off screen. */}
+          <div style={{ position: 'relative', height: '42vh', maxHeight: 360, aspectRatio: '3/4', margin: '0 auto' }}>
             {next && (
               <div style={{
                 position: 'absolute', inset: 0, borderRadius: 24, overflow: 'hidden',
                 transform: 'scale(0.94) translateY(10px)', opacity: 0.55, zIndex: 0,
-                background: 'var(--surface)', aspectRatio: '3/4',
+                background: 'var(--surface)',
               }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={next.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               </div>
             )}
             <div key={top.id} style={{
-              position: 'relative', zIndex: 1, borderRadius: 24, overflow: 'hidden', aspectRatio: '3/4',
+              position: 'absolute', inset: 0, zIndex: 1, borderRadius: 24, overflow: 'hidden',
               background: 'var(--surface)', opacity: pending.has(top.id) ? 0.5 : 1, transition: 'opacity 0.15s',
               boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
             }}>
