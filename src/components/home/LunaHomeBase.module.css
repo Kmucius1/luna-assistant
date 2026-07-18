@@ -1,105 +1,105 @@
 .homeExperience{
-  height: 100%;
-  min-height: 0;
-  --panel: linear-gradient(145deg, rgba(18, 19, 47, 0.94), rgba(10, 10, 31, 0.96));
-  --panel-soft: rgba(21, 21, 51, 0.82);
-  --border: rgba(205, 182, 255, 0.18);
-  --border-strong: rgba(159, 94, 255, 0.48);
-  --purple: #9b5cff;
-  --purple-soft: #c6a8ff;
-  --text-muted: rgba(255, 255, 255, 0.58);
-  --shadow: 0 22px 55px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+height: 100%;
+min-height: 0;
+--panel: linear-gradient(145deg, rgba(18, 19, 47, 0.94), rgba(10, 10, 31, 0.96));
+--panel-soft: rgba(21, 21, 51, 0.82);
+--border: rgba(205, 182, 255, 0.18);
+--border-strong: rgba(159, 94, 255, 0.48);
+--purple: #9b5cff;
+--purple-soft: #c6a8ff;
+--text-muted: rgba(255, 255, 255, 0.58);
+--shadow: 0 22px 55px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 .homeExperience :global(a){ color: inherit; }
 .homeExperience :global(button){ font-family: inherit; }
 .glassCard{
-  position: relative;
-  overflow: hidden;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+position: relative;
+overflow: hidden;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 28px;
+box-shadow: var(--shadow);
+backdrop-filter: blur(22px);
+-webkit-backdrop-filter: blur(22px);
 }
 .sectionLabel{
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: rgba(255,255,255,0.92);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  line-height: 1;
-  text-transform: uppercase;
+display: flex;
+align-items: center;
+gap: 9px;
+color: rgba(255,255,255,0.92);
+font-size: 12px;
+font-weight: 800;
+letter-spacing: 0.16em;
+line-height: 1;
+text-transform: uppercase;
 }
 .spark{ color: var(--purple-soft); }
 .cardSubtitle{ margin: 13px 0 0; color: var(--text-muted); font-size: 17px; }
 .slideOne,.twoColumnSlide,.previewSlide,.flowSlide,.energySlide,.resetSlide,.weekPlanSlide{ height:100%; min-height:0; padding:4px 0 0; }
 .slideOne{
-  display: grid;
-  grid-template-rows: minmax(148px, 0.92fr) minmax(150px, 0.88fr) minmax(140px, 0.82fr);
-  gap: 12px;
+display: grid;
+grid-template-rows: minmax(148px, 0.92fr) minmax(150px, 0.88fr) minmax(140px, 0.82fr);
+gap: 12px;
 }
 .heroCard{
-  background-image: linear-gradient(90deg, rgba(10,8,32,0.36), rgba(10,8,32,0.06));
-  background-size: cover;
-  background-position: center;
-  border-color: rgba(159, 94, 255, 0.55);
+background-image: linear-gradient(90deg, rgba(10,8,32,0.36), rgba(10,8,32,0.06));
+background-size: cover;
+background-position: center;
+border-color: rgba(159, 94, 255, 0.55);
 }
 .heroCopy{
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 24px 38px;
-  text-shadow: 0 4px 18px rgba(0,0,0,0.52);
+height: 100%;
+display: flex;
+flex-direction: column;
+justify-content: center;
+padding: 24px 38px;
+text-shadow: 0 4px 18px rgba(0,0,0,0.52);
 }
 .heroCopy h1{
-  margin: 0;
-  color: white;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(26px, 2.25vw, 38px);
-  font-weight: 700;
-  line-height: 1.05;
+margin: 0;
+color: white;
+font-family: var(--font-display), Georgia, serif;
+font-size: clamp(26px, 2.25vw, 38px);
+font-weight: 700;
+line-height: 1.05;
 }
 .heroCopy h1 span{ color: white; }
 .heroCopy > p{
-  margin: 10px 0 15px;
-  white-space: pre-line;
-  color: #cfa8ff;
-  font-size: clamp(15px, 1.3vw, 20px);
-  font-weight: 700;
-  line-height: 1.35;
+margin: 10px 0 15px;
+white-space: pre-line;
+color: #cfa8ff;
+font-size: clamp(15px, 1.3vw, 20px);
+font-weight: 700;
+line-height: 1.35;
 }
 .moonLine{ display: flex; align-items: center; gap: 9px; color: white; font-size: 13px; }
 .glanceCard{ padding: 19px 28px 21px; }
 .glanceBody{ display: grid; grid-template-columns: 190px 1fr; gap: 25px; align-items: center; height: calc(100% - 28px); }
 .metricGrid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .metricCard{
-  min-height: 114px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  border: 1px solid rgba(198,168,255,0.18);
-  border-radius: 22px;
-  background: linear-gradient(145deg, rgba(41,37,78,0.76), rgba(13,13,39,0.72));
+min-height: 114px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 5px;
+border: 1px solid rgba(198,168,255,0.18);
+border-radius: 22px;
+background: linear-gradient(145deg, rgba(41,37,78,0.76), rgba(13,13,39,0.72));
 }
 .metricCard > span{ color: rgba(255,255,255,0.68); font-size: 13px; }
 .metricCard > strong{ color: white; font-size: clamp(15px,1.35vw,20px); }
 .iconOrb{
-  width: 50px;
-  height: 50px;
-  flex: 0 0 auto;
-  display: inline-grid;
-  place-items: center;
-  border-radius: 50%;
-  color: #a969ff;
-  background: radial-gradient(circle at 38% 28%, rgba(189,136,255,0.28), rgba(83,40,151,0.17) 65%, rgba(10,8,32,0.2));
-  border: 1px solid rgba(171,112,255,0.34);
-  box-shadow: inset 0 0 20px rgba(146,78,255,0.08), 0 0 18px rgba(117,55,220,0.1);
+width: 50px;
+height: 50px;
+flex: 0 0 auto;
+display: inline-grid;
+place-items: center;
+border-radius: 50%;
+color: #a969ff;
+background: radial-gradient(circle at 38% 28%, rgba(189,136,255,0.28), rgba(83,40,151,0.17) 65%, rgba(10,8,32,0.2));
+border: 1px solid rgba(171,112,255,0.34);
+box-shadow: inset 0 0 20px rgba(146,78,255,0.08), 0 0 18px rgba(117,55,220,0.1);
 }
 .tone_pink{ color: #ff9ac9; }
 .tone_gold{ color: #ffbd76; }
@@ -139,11 +139,11 @@
 .outfitCard{ display: grid; grid-template-columns: 265px 1fr; min-height: 0; border-color: rgba(155,92,255,.35); background: radial-gradient(circle at 87% 16%, rgba(140,79,255,.2), transparent 30%), var(--panel); }
 .outfitImageWrap{ height: 100%; min-height: 0; overflow: hidden; border-radius: 27px 0 0 27px; display: grid; place-items: center; color: var(--purple-soft); background: linear-gradient(150deg,#241747,#0a0922); }
 .outfitImageWrap img{ width: 100%; height: 100%; object-fit: cover; }
-.outfitCopy{ min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 26px 52px; z-index: 2; }
-.outfitCopy h2{ color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(30px,3vw,48px); line-height: 1.05; margin: 24px 0 9px; }
-.outfitCopy > p{ margin: 0; color: rgba(255,255,255,.78); font-size: 17px; }
-.outfitTags{ display: flex; flex-wrap: wrap; gap: 10px; margin: 23px 0; }
-.outfitTags span{ padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(198,168,255,.24); background: rgba(255,255,255,.025); color: white; font-size: 13px; }
+.outfitCopy{ min-width: 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: 14px 32px; z-index: 2; overflow: hidden; }
+.outfitCopy h2{ color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(22px,2.4vw,32px); line-height: 1.1; margin: 4px 0 6px; }
+.outfitCopy > p{ margin: 0; color: rgba(255,255,255,.78); font-size: 14px; }
+.outfitTags{ display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.outfitTags span{ padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(198,168,255,.24); background: rgba(255,255,255,.025); color: white; font-size: 12px; }
 .outfitMoon{ position: absolute; right: 38px; top: 26px; color: rgba(214,177,255,.65); font-size: 92px; text-shadow: 0 0 40px rgba(172,97,255,.48); }
 .dailyGlanceCard{ display: grid; grid-template-columns: 28% 72%; min-height: 0; }
 .dailyGlanceArt{ background-size:cover; background-position:center; background-repeat:no-repeat; border-right: 1px solid rgba(198,168,255,.12); }
@@ -183,10 +183,10 @@
 .pillButton{ padding: 8px 14px; font-size: 11px; }
 .previewSlide{ grid-template-rows: 1fr 1fr; gap: 8px; }
 .outfitCard{ grid-template-columns: 112px 1fr; }
-.outfitCopy{ padding: 12px 14px; }
-.outfitCopy h2{ font-size: 20px; margin: 10px 0 5px; }
+.outfitCopy{ padding: 10px 12px; }
+.outfitCopy h2{ font-size: 18px; margin: 6px 0 4px; }
 .outfitCopy > p{ font-size: 10px; }
-.outfitTags{ gap: 4px; margin: 8px 0; }
+.outfitTags{ gap: 4px; margin: 6px 0; }
 .outfitTags span{ font-size: 8px; padding: 4px 6px; }
 .outfitMoon{ display:none; }
 .largeInlineLink{ font-size: 11px; }

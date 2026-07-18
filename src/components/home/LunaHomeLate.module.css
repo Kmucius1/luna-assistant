@@ -7,9 +7,9 @@
 .resetModeGrid .resetActive{ border-color: rgba(176,108,255,.78); background: linear-gradient(145deg,rgba(78,45,137,.92),rgba(22,14,58,.9)); }
 .resetResponse{ color: #cfadff; margin: 17px 0 0; font-size: 13px; }
 .homeEnergyCard{ display: grid; grid-template-columns: 51% 49%; min-height: 0; }
-.homeEnergyCopy{ padding: 28px 40px; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
-.homeEnergyCopy h2{ margin: 30px 0 9px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(28px,2.8vw,44px); }
-.homeEnergyCopy p{ color: #cda5ff; font-size: 20px; margin: 0 0 30px; }
+.homeEnergyCopy{ padding: 14px 26px; display: flex; flex-direction: column; justify-content: center; z-index: 2; overflow: hidden; min-height: 0; }
+.homeEnergyCopy h2{ margin: 4px 0 6px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(18px,2vw,26px); line-height: 1.15; }
+.homeEnergyCopy p{ color: #cda5ff; font-size: 14px; margin: 0 0 12px; }
 .homeEnergyArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
 .weeklyFocusCard{ height: 100%; padding: 33px 45px 42px; display: flex; flex-direction: column; align-items: center; text-align: center; background-size: cover; background-position: center; border-color: rgba(155,92,255,.55); }
 .weeklyTopRow{ width: 100%; display: flex; justify-content: space-between; align-items: center; }
@@ -28,24 +28,24 @@
 .weekDays .currentDay i{ background:#d3aeff; box-shadow:0 0 17px rgba(211,174,255,.95); }
 .weekThemes{ display:flex; flex-wrap:wrap; justify-content:center; gap:16px; margin-top:27px; }
 .weekThemes span{ padding:12px 23px; border-radius:999px; color:white; border:1px solid rgba(198,168,255,.28); background:rgba(87,42,151,.34); }
-.weekPlanSlide{ display:grid; grid-template-rows:.76fr 1fr auto; gap:14px; }
+.weekPlanSlide{ display:grid; grid-template-rows:.6fr 1fr .56fr; gap:10px; min-height:0; }
 .lessonGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; min-height:0; }
-.lessonCard{ display:grid; grid-template-columns:95px 1fr; gap:22px; align-items:center; padding:28px 34px; background-size:cover; background-position:center; }
+.lessonCard{ display:grid; grid-template-columns:56px 1fr; gap:14px; align-items:center; padding:14px 18px; background-size:cover; background-position:center; overflow:hidden; }
 .lessonBackground{ background-size:cover; background-position:center; }
 .upcomingBackground{ background-size:cover; background-position:center; }
-.lessonCard .iconOrb{ width:78px; height:78px; }
-.lessonCard p{ margin:19px 0 0; color:white; font-size:clamp(17px,1.65vw,24px); line-height:1.55; }
-.parkedCard{ padding:25px 30px 22px; }
-.parkedHeader{ display:flex; align-items:center; justify-content:space-between; color:#b879ff; }
-.parkedHeader p{ margin:10px 0 0; color:var(--text-muted); font-size:13px; }
-.parkedRows{ display:grid; gap:10px; margin-top:18px; }
-.parkedRows > div{ min-height:52px; display:grid; grid-template-columns:20px 1fr 26px; align-items:center; gap:10px; padding:0 20px; border:1px solid rgba(198,168,255,.18); border-radius:15px; background:rgba(255,255,255,.035); color:white; }
+.lessonCard .iconOrb{ width:52px; height:52px; }
+.lessonCard p{ margin:8px 0 0; color:white; font-size:clamp(13px,1.3vw,16px); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.parkedCard{ padding:14px 20px 12px; min-height:0; overflow:hidden; display:flex; flex-direction:column; }
+.parkedHeader{ display:flex; align-items:center; justify-content:space-between; color:#b879ff; flex-shrink:0; }
+.parkedHeader p{ margin:6px 0 0; color:var(--text-muted); font-size:12px; }
+.parkedRows{ display:grid; gap:6px; margin-top:10px; overflow:hidden; }
+.parkedRows > div{ min-height:38px; display:grid; grid-template-columns:20px 1fr 26px; align-items:center; gap:10px; padding:0 16px; border:1px solid rgba(198,168,255,.18); border-radius:13px; background:rgba(255,255,255,.035); color:white; }
 .parkedRows > div > span{ color:#a85fff; font-size:11px; }
-.parkedRows > div > strong{ font-size:16px; }
-.parkedRows > div > b{ color:rgba(255,255,255,.48); font-size:20px; }
-.planWeekButton{ min-height:84px; display:grid; grid-template-columns:74px 1fr 40px; align-items:center; gap:18px; padding:0 31px; border-radius:24px; border:1px solid rgba(198,168,255,.42); color:white !important; text-decoration:none; background:linear-gradient(100deg,#4d21a7,#7040e0 55%,#8e51ee); box-shadow:0 18px 42px rgba(83,37,183,.3); }
-.planWeekOrb{ width:55px;height:55px;display:grid;place-items:center;border-radius:50%;font-size:22px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08); }
-.planWeekButton strong{ display:flex;align-items:center;gap:4px;font-size:22px; }
+.parkedRows > div > strong{ font-size:14px; }
+.parkedRows > div > b{ color:rgba(255,255,255,.48); font-size:18px; }
+.planWeekButton{ min-height:52px; display:grid; grid-template-columns:40px 1fr 26px; align-items:center; gap:12px; padding:0 20px; border-radius:18px; border:1px solid rgba(198,168,255,.42); color:white !important; text-decoration:none; background:linear-gradient(100deg,#4d21a7,#7040e0 55%,#8e51ee); box-shadow:0 14px 32px rgba(83,37,183,.3); }
+.planWeekOrb{ width:38px;height:38px;display:grid;place-items:center;border-radius:50%;font-size:16px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08); }
+.planWeekButton strong{ display:flex;align-items:center;gap:4px;font-size:16px; }
 @media (max-width: 900px){
 .resetSlide{ grid-template-rows:1.2fr .8fr; gap:8px; }
 .resetModeCard{ padding:14px; }
@@ -69,7 +69,7 @@
 .weekDays i{ width:8px;height:8px; }
 .weekThemes{ gap:6px; margin-top:12px; }
 .weekThemes span{ padding:7px 10px; font-size:8px; }
-.weekPlanSlide{ grid-template-rows:.9fr 1.2fr auto; gap:8px; }
+.weekPlanSlide{ grid-template-rows:.75fr 1.15fr .45fr; gap:8px; }
 .lessonGrid{ gap:7px; }
 .lessonCard{ grid-template-columns:45px 1fr; gap:8px; padding:10px; }
 .lessonCard .iconOrb{ width:42px;height:42px; }
@@ -80,7 +80,7 @@
 .parkedRows{ gap:5px; margin-top:7px; }
 .parkedRows > div{ min-height:34px; border-radius:10px; padding:0 9px; grid-template-columns:10px 1fr 16px; }
 .parkedRows > div > strong{ font-size:10px; }
-.planWeekButton{ min-height:53px; grid-template-columns:37px 1fr 22px; gap:8px; padding:0 13px; border-radius:15px; }
-.planWeekOrb{ width:34px;height:34px;font-size:13px; }
-.planWeekButton strong{ font-size:13px; }
+.planWeekButton{ min-height:48px; grid-template-columns:34px 1fr 20px; gap:8px; padding:0 13px; border-radius:15px; }
+.planWeekOrb{ width:30px;height:30px;font-size:12px; }
+.planWeekButton strong{ font-size:12px; }
 }
