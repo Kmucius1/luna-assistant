@@ -57,7 +57,7 @@ export default function DailyGlancePage() {
     : moonData?.phase?.name ?? 'Astrology'
 
   return (
-    <LunaShell wide>
+    <LunaShell>
       <div className="flex flex-col gap-3" style={{ maxWidth: 720, margin: '0 auto', padding: '4px 2px 24px' }}>
 
         <div>

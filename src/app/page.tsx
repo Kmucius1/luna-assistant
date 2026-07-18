@@ -992,7 +992,7 @@ function HomePageInner() {
   ]
 
   return (
-    <LunaShell noScroll wide>
+    <LunaShell noScroll>
       <LunaSwipePager pages={pages} hidePills accentColor="#9b5cff" activeIndex={activeSlide} onChangeIndex={setActiveSlide} pageNoScroll />
     </LunaShell>
   )
