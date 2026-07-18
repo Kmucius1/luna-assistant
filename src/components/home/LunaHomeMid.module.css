@@ -1,0 +1,80 @@
+.wellnessCard{ height: 100%; padding: 38px 45px; }
+.wellnessBody{ height: calc(100% - 72px); display: grid; grid-template-columns: .8fr 1px 1.7fr; gap: 42px; align-items: center; }
+.wellnessDivider{ width: 1px; height: 72%; background: rgba(255,255,255,.14); }
+.wellnessRows{ display: grid; gap: 20px; }
+.wellnessRow{ min-height: 112px; display: grid; grid-template-columns: 70px 1fr auto 24px; align-items: center; gap: 19px; padding: 16px 24px; border: 1px solid rgba(198,168,255,.18); border-radius: 24px; background: linear-gradient(145deg,rgba(37,32,76,.74),rgba(12,12,38,.76)); color: white; }
+.wellnessRow .iconOrb{ width: 70px; height: 70px; }
+.wellnessRow > div{ display: flex; flex-direction: column; gap: 7px; }
+.wellnessRow > div strong{ font-size: 20px; }
+.wellnessRow > div span{ color: rgba(255,255,255,.65); font-size: 17px; }
+.wellnessRow > b{ color: #a9ff61; font-size: 16px; font-weight: 600; }
+.statusLow{ color: #ff9a89 !important; }
+.checkInLink{ color: #b879ff !important; text-decoration: none; font-weight: 700; }
+.flowSlide{ display: grid; grid-template-rows: .86fr 1.14fr; gap: 14px; }
+.flowCard{ padding: 24px 28px 16px; }
+.flowHeader{ display: flex; justify-content: space-between; align-items: flex-start; }
+.flowHeader p{ margin: 9px 0 0; color: var(--text-muted); font-size: 14px; }
+.flowHeader a{ display: flex; align-items: center; gap: 2px; color: #b879ff !important; text-decoration: none; font-size: 13px; font-weight: 700; }
+.flowChart{ position: relative; height: calc(100% - 60px); padding-top: 12px; }
+.flowChart svg{ width: 100%; height: calc(100% - 48px); min-height: 100px; overflow: visible; }
+.peakLabel{ position: absolute; z-index: 2; top: 5%; left: 58%; transform: translateX(-50%); padding: 9px 16px; border: 1px solid rgba(179,111,255,.7); border-radius: 11px; background: rgba(75,31,132,.72); color: white; font-size: 13px; box-shadow: 0 0 20px rgba(141,80,255,.22); }
+.flowTimes,.flowLabels{ display: flex; justify-content: space-between; color: rgba(255,255,255,.76); font-size: 12px; }
+.flowLabels{ margin-top: 10px; }
+.flowLabels span{ display: flex; align-items: center; gap: 5px; }
+.journalCard{ display: grid; grid-template-columns: 49% 51%; min-height: 0; background: linear-gradient(90deg,rgba(45,15,97,.92),rgba(15,9,40,.96)); border-color: rgba(160,93,255,.45); }
+.journalCopy{ padding: 35px 38px; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
+.journalCopy > span{ margin-top: 15px; color: var(--text-muted); font-size: 14px; }
+.journalCopy blockquote{ margin: 19px 0 25px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(24px,2.3vw,37px); font-style: italic; line-height: 1.35; }
+.journalArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
+.primaryButton{ display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: fit-content; padding: 13px 22px; border: 0; border-radius: 15px; color: white !important; text-decoration: none; font-size: 15px; font-weight: 800; background: linear-gradient(135deg,#6334e8,#8b4eff); box-shadow: 0 12px 30px rgba(92,40,205,.36); cursor: pointer; }
+.energySlide{ display: grid; grid-template-rows: 1fr .78fr; gap: 16px; }
+.energyReadCard{ background-image: linear-gradient(90deg,rgba(11,8,38,.92) 0%,rgba(12,8,38,.66) 46%,rgba(13,8,38,.12) 100%); background-size: cover; background-position: center; border-color: rgba(155,92,255,.52); }
+.energyReadOverlay{ height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 34px 44px; }
+.energyReadOverlay h2{ color: white; font-size: clamp(30px,3vw,48px); line-height: 1; margin: 24px 0 16px; }
+.energyReadOverlay > p{ max-width: 630px; color: rgba(255,255,255,.84); font-size: 17px; line-height: 1.55; margin: 0; }
+.energyPills{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.energyPills span{ display: flex; align-items: center; gap: 8px; padding: 12px 17px; border-radius: 16px; color: rgba(255,255,255,.83); border: 1px solid rgba(176,108,255,.52); background: rgba(76,35,132,.38); font-size: 14px; }
+.energyBottomGrid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 0; }
+.bodyBasicsCard,.focusResetCard{ padding: 29px 34px; }
+.bodyBasicsCard > p,.focusResetCard > p{ color: rgba(255,255,255,.84); font-size: 16px; margin: 22px 0 18px; }
+.basicButtons{ display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.basicButtons button{ min-height: 58px; display: flex; align-items: center; justify-content: center; gap: 9px; border-radius: 16px; border: 1px solid rgba(198,168,255,.2); color: rgba(255,255,255,.78); background: rgba(255,255,255,.035); cursor: pointer; }
+.basicButtons .basicDone{ background: rgba(141,255,181,.12); border-color: rgba(141,255,181,.34); color: #a7ffbf; }
+.focusResetCard{ display: flex; flex-direction: column; }
+.focusResetCard > strong{ color: white; font-size: 15px; line-height: 1.45; margin-bottom: 18px; }
+.focusButton{ margin-top: auto; width: 100%; min-height: 50px; display: flex; align-items: center; justify-content: center; gap: 5px; border-radius: 14px; border: 1px solid rgba(176,108,255,.52); color: #d8b9ff; background: linear-gradient(90deg,rgba(77,31,133,.5),rgba(93,40,161,.54)); font-weight: 800; cursor: pointer; }
+@media (max-width: 900px){
+.wellnessCard{ padding: 17px; }
+.wellnessBody{ height:calc(100% - 45px); grid-template-columns: 1fr; grid-template-rows: .85fr 1.15fr; gap: 5px; justify-items:center; }
+.wellnessDivider{ display:none; }
+.wellnessRows{ width:100%; gap:6px; }
+.wellnessRow{ min-height: 55px; grid-template-columns: 38px 1fr auto 14px; gap:7px; padding:7px 10px; border-radius:14px; }
+.wellnessRow .iconOrb{ width:34px;height:34px; }
+.wellnessRow > div strong{ font-size:11px; }
+.wellnessRow > div span,.wellnessRow > b{ font-size:9px; }
+.flowSlide{ grid-template-rows:.9fr 1.1fr; gap:8px; }
+.flowCard{ padding:13px; }
+.flowChart{ height:calc(100% - 45px); }
+.flowChart svg{ min-height:60px; }
+.peakLabel{ font-size:8px; padding:5px 8px; }
+.flowTimes,.flowLabels{ font-size:7px; }
+.journalCard{ grid-template-columns: 1fr; }
+.journalCopy{ padding:15px; z-index:2; }
+.journalCopy > span{ font-size:9px; margin-top:8px; }
+.journalCopy blockquote{ font-size:17px; margin:8px 0 12px; max-width:75%; }
+.journalArt{ position:absolute; inset:0 0 0 35%; opacity:.75; }
+.primaryButton{ padding:8px 12px; font-size:10px; }
+.energySlide{ grid-template-rows: 1fr 1fr; gap:8px; }
+.energyReadOverlay{ padding:17px; }
+.energyReadOverlay h2{ font-size:23px; margin:12px 0 7px; }
+.energyReadOverlay > p{ font-size:10px; max-width:75%; }
+.energyPills{ gap:5px; margin-top:11px; }
+.energyPills span{ padding:5px 7px; font-size:8px; border-radius:9px; }
+.energyBottomGrid{ grid-template-columns:1fr; grid-template-rows:1fr 1fr; gap:7px; }
+.bodyBasicsCard,.focusResetCard{ padding:12px; }
+.bodyBasicsCard > p,.focusResetCard > p{ margin:7px 0; font-size:9px; }
+.basicButtons{ gap:4px; }
+.basicButtons button{ min-height:34px; gap:3px; font-size:8px; border-radius:9px; }
+.focusResetCard > strong{ font-size:9px; margin-bottom:5px; }
+.focusButton{ min-height:30px; font-size:8px; }
+}

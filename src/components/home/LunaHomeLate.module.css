@@ -1,0 +1,86 @@
+.resetSlide{ display: grid; grid-template-rows: 1.12fr .88fr; gap: 16px; }
+.resetModeCard{ padding: 29px 34px; }
+.resetModeGrid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; margin-top: 24px; }
+.resetModeGrid button{ min-height: 124px; display: grid; grid-template-columns: 82px 1fr 30px; gap: 20px; align-items: center; padding: 16px 24px; border-radius: 26px; color: white; border: 1px solid rgba(198,168,255,.22); background: linear-gradient(145deg,rgba(42,36,82,.82),rgba(14,13,42,.82)); cursor: pointer; text-align: left; font-size: 20px; font-weight: 700; }
+.resetModeGrid button .iconOrb{ width: 82px; height: 82px; }
+.resetModeGrid button > svg{ color: rgba(255,255,255,.78); }
+.resetModeGrid .resetActive{ border-color: rgba(176,108,255,.78); background: linear-gradient(145deg,rgba(78,45,137,.92),rgba(22,14,58,.9)); }
+.resetResponse{ color: #cfadff; margin: 17px 0 0; font-size: 13px; }
+.homeEnergyCard{ display: grid; grid-template-columns: 51% 49%; min-height: 0; }
+.homeEnergyCopy{ padding: 28px 40px; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
+.homeEnergyCopy h2{ margin: 30px 0 9px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(28px,2.8vw,44px); }
+.homeEnergyCopy p{ color: #cda5ff; font-size: 20px; margin: 0 0 30px; }
+.homeEnergyArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
+.weeklyFocusCard{ height: 100%; padding: 33px 45px 42px; display: flex; flex-direction: column; align-items: center; text-align: center; background-size: cover; background-position: center; border-color: rgba(155,92,255,.55); }
+.weeklyTopRow{ width: 100%; display: flex; justify-content: space-between; align-items: center; }
+.weeklyTopRow > span{ padding: 11px 18px; border-radius: 999px; color: white; font-size: 13px; font-weight: 800; letter-spacing: .1em; background: rgba(128,68,212,.42); border: 1px solid rgba(198,168,255,.24); }
+.starSigil{ position: relative; width: 95px; height: 95px; margin-top: 25px; display: grid; place-items: center; filter: drop-shadow(0 0 17px rgba(207,170,255,.65)); }
+.starSigil::before,.starSigil::after{ content:''; position:absolute; background: linear-gradient(transparent,#f2dcff,transparent); }
+.starSigil::before{ width: 3px; height: 86px; }
+.starSigil::after{ width: 86px; height: 3px; }
+.starSigil span{ position:absolute; width: 42px; height: 42px; border: 1px solid rgba(219,191,255,.23); border-radius:50%; }
+.weeklyFocusCard h2{ color:white; font-family: var(--font-display),Georgia,serif; font-size: clamp(35px,3.6vw,56px); line-height:1.05; margin: 16px 0 22px; }
+.weeklyFocusCard blockquote{ max-width: 860px; color: rgba(255,255,255,.88); font-size: clamp(15px,1.5vw,20px); font-style: italic; line-height:1.6; margin:0; }
+.weekDays{ margin-top:auto; display:flex; gap:27px; }
+.weekDays span{ display:flex; flex-direction:column; align-items:center; gap:8px; color:rgba(255,255,255,.75); font-size:13px; }
+.weekDays i{ width:14px; height:14px; border-radius:50%; background:rgba(137,72,226,.86); }
+.weekDays .pastDay i{ opacity:.65; }
+.weekDays .currentDay i{ background:#d3aeff; box-shadow:0 0 17px rgba(211,174,255,.95); }
+.weekThemes{ display:flex; flex-wrap:wrap; justify-content:center; gap:16px; margin-top:27px; }
+.weekThemes span{ padding:12px 23px; border-radius:999px; color:white; border:1px solid rgba(198,168,255,.28); background:rgba(87,42,151,.34); }
+.weekPlanSlide{ display:grid; grid-template-rows:.76fr 1fr auto; gap:14px; }
+.lessonGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; min-height:0; }
+.lessonCard{ display:grid; grid-template-columns:95px 1fr; gap:22px; align-items:center; padding:28px 34px; background-size:cover; background-position:center; }
+.lessonBackground{ background-size:cover; background-position:center; }
+.upcomingBackground{ background-size:cover; background-position:center; }
+.lessonCard .iconOrb{ width:78px; height:78px; }
+.lessonCard p{ margin:19px 0 0; color:white; font-size:clamp(17px,1.65vw,24px); line-height:1.55; }
+.parkedCard{ padding:25px 30px 22px; }
+.parkedHeader{ display:flex; align-items:center; justify-content:space-between; color:#b879ff; }
+.parkedHeader p{ margin:10px 0 0; color:var(--text-muted); font-size:13px; }
+.parkedRows{ display:grid; gap:10px; margin-top:18px; }
+.parkedRows > div{ min-height:52px; display:grid; grid-template-columns:20px 1fr 26px; align-items:center; gap:10px; padding:0 20px; border:1px solid rgba(198,168,255,.18); border-radius:15px; background:rgba(255,255,255,.035); color:white; }
+.parkedRows > div > span{ color:#a85fff; font-size:11px; }
+.parkedRows > div > strong{ font-size:16px; }
+.parkedRows > div > b{ color:rgba(255,255,255,.48); font-size:20px; }
+.planWeekButton{ min-height:84px; display:grid; grid-template-columns:74px 1fr 40px; align-items:center; gap:18px; padding:0 31px; border-radius:24px; border:1px solid rgba(198,168,255,.42); color:white !important; text-decoration:none; background:linear-gradient(100deg,#4d21a7,#7040e0 55%,#8e51ee); box-shadow:0 18px 42px rgba(83,37,183,.3); }
+.planWeekOrb{ width:55px;height:55px;display:grid;place-items:center;border-radius:50%;font-size:22px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08); }
+.planWeekButton strong{ display:flex;align-items:center;gap:4px;font-size:22px; }
+@media (max-width: 900px){
+.resetSlide{ grid-template-rows:1.2fr .8fr; gap:8px; }
+.resetModeCard{ padding:14px; }
+.resetModeGrid{ gap:7px; margin-top:11px; }
+.resetModeGrid button{ min-height:65px; grid-template-columns:42px 1fr 14px; gap:8px; padding:7px 10px; border-radius:15px; font-size:11px; }
+.resetModeGrid button .iconOrb{ width:42px;height:42px; }
+.resetResponse{ font-size:8px; margin-top:6px; }
+.homeEnergyCard{ grid-template-columns:58% 42%; }
+.homeEnergyCopy{ padding:14px; }
+.homeEnergyCopy h2{ font-size:19px; margin:12px 0 4px; }
+.homeEnergyCopy p{ font-size:11px; margin-bottom:13px; }
+.weeklyFocusCard{ padding:18px; }
+.weeklyTopRow > span{ padding:6px 9px; font-size:8px; }
+.starSigil{ width:53px;height:53px;margin-top:10px; }
+.starSigil::before{ height:48px; }
+.starSigil::after{ width:48px; }
+.weeklyFocusCard h2{ font-size:27px; margin:9px 0 10px; }
+.weeklyFocusCard blockquote{ font-size:11px; line-height:1.45; max-height:48px; overflow:hidden; }
+.weekDays{ gap:14px; }
+.weekDays span{ font-size:8px; gap:4px; }
+.weekDays i{ width:8px;height:8px; }
+.weekThemes{ gap:6px; margin-top:12px; }
+.weekThemes span{ padding:7px 10px; font-size:8px; }
+.weekPlanSlide{ grid-template-rows:.9fr 1.2fr auto; gap:8px; }
+.lessonGrid{ gap:7px; }
+.lessonCard{ grid-template-columns:45px 1fr; gap:8px; padding:10px; }
+.lessonCard .iconOrb{ width:42px;height:42px; }
+.lessonCard p{ margin-top:7px; font-size:10px; line-height:1.35; }
+.parkedCard{ padding:12px; }
+.parkedHeader p{ font-size:8px; margin-top:5px; }
+.parkedHeader > svg{ width:25px; }
+.parkedRows{ gap:5px; margin-top:7px; }
+.parkedRows > div{ min-height:34px; border-radius:10px; padding:0 9px; grid-template-columns:10px 1fr 16px; }
+.parkedRows > div > strong{ font-size:10px; }
+.planWeekButton{ min-height:53px; grid-template-columns:37px 1fr 22px; gap:8px; padding:0 13px; border-radius:15px; }
+.planWeekOrb{ width:34px;height:34px;font-size:13px; }
+.planWeekButton strong{ font-size:13px; }
+}
