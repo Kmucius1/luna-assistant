@@ -23,11 +23,11 @@ interface WorkspaceLauncherProps {
 
 export function WorkspaceLauncher({ eyebrow, title, description, apps, theme }: WorkspaceLauncherProps) {
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <div className={`${styles.page} ${styles[theme]}`}>
         <section className={styles.hero}>
           <div className={styles.heroGlow} />
-          <div className={styles.heroIcon}><Sparkles size={24} strokeWidth={1.5} /></div>
+          <div className={styles.heroIcon}><Sparkles size={20} strokeWidth={1.5} /></div>
           <p>{eyebrow}</p>
           <h1>{title}</h1>
           <span>{description}</span>
@@ -38,16 +38,16 @@ export function WorkspaceLauncher({ eyebrow, title, description, apps, theme }: 
             <Link key={appTitle} href={href} className={`${styles.card} ${styles[`art_${art}`]}`}>
               <div className={styles.cardArt} aria-hidden="true">
                 <div className={styles.orbit} />
-                <Icon size={54} strokeWidth={1.15} />
+                <Icon size={40} strokeWidth={1.15} />
               </div>
               <div className={styles.cardCopy}>
-                <div className={styles.appIcon}><Icon size={22} strokeWidth={1.6} /></div>
+                <div className={styles.appIcon}><Icon size={18} strokeWidth={1.6} /></div>
                 <div>
                   <h2>{appTitle}</h2>
                   <p>{appDescription}</p>
                 </div>
               </div>
-              <div className={styles.openButton}>Open <ChevronRight size={17} /></div>
+              <div className={styles.openButton}>Open <ChevronRight size={15} /></div>
             </Link>
           ))}
         </section>
