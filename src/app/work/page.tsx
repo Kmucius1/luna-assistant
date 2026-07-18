@@ -12,6 +12,32 @@ import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
 import type { CalendarEvent } from '@/lib/calendar'
 import { isMickEvent } from '@/lib/calendarPeople'
+import type { Task as LocalTask } from '@/types'
+
+// A local LUNA-side task (from chat extraction, manual entry, brain dump,
+// dictation...) normalized into the same shape TaskRow already renders, so
+// "what I told LUNA I need to do" shows up right alongside DRYP CRM tasks
+// instead of living in a table nothing on this page ever reads.
+interface UnifiedTask extends DryphubTask { _local?: boolean }
+
+const SOURCE_LABEL: Record<string, string> = {
+  message: 'From LUNA chat', manual: 'Manual', brain_dump: 'Brain dump',
+  dictation: 'Dictation', email: 'Email', calendar: 'Calendar', crm: 'CRM',
+}
+
+function localTaskToUnified(t: LocalTask): UnifiedTask {
+  return {
+    id: t.id,
+    title: t.title,
+    status: t.status,
+    priority: t.urgency_level,
+    due_date: t.due_date,
+    account_name: SOURCE_LABEL[t.source] ?? 'LUNA',
+    created_at: t.created_at,
+    updated_at: t.updated_at,
+    _local: true,
+  }
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function dueDateLabel(dateStr?: string): { label: string; color: string; urgent: boolean } {
@@ -27,7 +53,7 @@ function dueDateLabel(dateStr?: string): { label: string; color: string; urgent:
 }
 
 const PO: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
-const sortPriority = (a: DryphubTask, b: DryphubTask) => (PO[a.priority ?? 'low'] ?? 3) - (PO[b.priority ?? 'low'] ?? 3)
+const sortPriority = (a: UnifiedTask, b: UnifiedTask) => (PO[a.priority ?? 'low'] ?? 3) - (PO[b.priority ?? 'low'] ?? 3)
 const PRIORITY_COLORS: Record<string, string> = {
   critical: '#E05E5E', high: '#E08B4A', medium: '#9b5cff', low: 'rgba(255,255,255,0.15)',
 }
@@ -48,7 +74,7 @@ const LBL: React.CSSProperties = {
 }
 
 // ─── Task row ────────────────────────────────────────────────────────────────
-function TaskRow({ task, done, onToggle }: { task: DryphubTask; done: boolean; onToggle: () => void }) {
+function TaskRow({ task, done, onToggle }: { task: UnifiedTask; done: boolean; onToggle: () => void }) {
   const due    = dueDateLabel(task.due_date)
   const pColor = PRIORITY_COLORS[task.priority ?? 'low']
   return (
@@ -112,6 +138,29 @@ function EmailRow({ email }: { email: NeedsAttentionEmail }) {
   )
 }
 
+interface UpcomingBill { id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }
+
+function BillRow({ bill }: { bill: UpcomingBill }) {
+  const amount = bill.expected_amount ?? bill.minimum_amount
+  const urgent = bill.days_until != null && bill.days_until <= 1
+  return (
+    <Link href="/money/bills" style={{ textDecoration: 'none' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <CreditCard style={{ width: 15, height: 15, color: '#C9A96E', flexShrink: 0 }} strokeWidth={1.8} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
+            {bill.name}{amount != null ? ` — $${amount.toFixed(2)}` : ''}
+          </p>
+          <p style={{ fontSize: 11, color: 'rgba(201,169,110,0.7)', fontWeight: 600, marginTop: 2 }}>
+            {bill.days_until === 0 ? 'Due today' : bill.days_until === 1 ? 'Due tomorrow' : `Due in ${bill.days_until} days`}
+          </p>
+        </div>
+        {urgent && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#E05E5E', flexShrink: 0 }} />}
+      </div>
+    </Link>
+  )
+}
+
 // ─── App button ───────────────────────────────────────────────────────────────
 function AppBtn({ icon: Icon, label, href, color, desc, external }: {
   icon: React.ElementType; label: string; href: string; color: string; desc: string; external?: boolean
@@ -144,14 +193,15 @@ function AppBtn({ icon: Icon, label, href, color, desc, external }: {
 // ─────────────────────────────────────────────────────────────────────────────
 function Slide1({
   stats, loading, error, activeTasks, urgentTasks, done, onToggle, onSync,
-  events, eventsLoading, emails, emailsLoading,
+  events, eventsLoading, emails, emailsLoading, bills,
 }: {
   stats: { openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null
   loading: boolean; error: boolean
-  activeTasks: DryphubTask[]; urgentTasks: DryphubTask[]
+  activeTasks: UnifiedTask[]; urgentTasks: UnifiedTask[]
   done: Set<string>; onToggle: (id: string) => void; onSync: () => void
   events: CalendarEvent[]; eventsLoading: boolean
   emails: NeedsAttentionEmail[]; emailsLoading: boolean
+  bills: { id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }[]
 }) {
   return (
     <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -165,7 +215,7 @@ function Slide1({
           <div>
             <p style={{ fontSize: 20, fontWeight: 800, color: 'white', lineHeight: 1.1, margin: 0 }}>Work</p>
             <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-              {loading ? 'Syncing…' : error ? "Couldn't reach DRYP" : `${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''}`}
+              {loading ? 'Syncing…' : error ? `DRYP unreachable — ${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''} from LUNA` : `${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''}`}
             </p>
           </div>
         </div>
@@ -254,7 +304,7 @@ function Slide1({
           <div style={LBL}><Zap style={{ width: 9, height: 9 }} />Needs attention</div>
           <Link href="/tasks" style={{ fontSize: 10.5, color: '#9b5cff', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
         </div>
-        {error && !loading ? (
+        {error && !loading && urgentTasks.length === 0 && emails.length === 0 && bills.length === 0 ? (
           <div style={{ padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
             <AlertCircle style={{ width: 16, height: 16, color: '#E05E5E', flexShrink: 0, marginTop: 1 }} />
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>DRYP CRM unavailable — tap Sync to retry.</p>
@@ -263,16 +313,17 @@ function Slide1({
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Loader2 style={{ width: 22, height: 22, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
           </div>
-        ) : urgentTasks.length > 0 || emails.length > 0 ? (
+        ) : urgentTasks.length > 0 || emails.length > 0 || bills.length > 0 ? (
           <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
             {urgentTasks.map(t => (
               <TaskRow key={t.id} task={t} done={done.has(t.id)} onToggle={() => onToggle(t.id)} />
             ))}
+            {bills.map(b => <BillRow key={b.id} bill={b} />)}
             {emails.map(e => <EmailRow key={e.id} email={e} />)}
           </div>
         ) : (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks or emails right now</p>
+            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks, bills, or emails right now</p>
           </div>
         )}
       </div>
@@ -288,7 +339,7 @@ function Slide1({
         <Link href="/calendar" style={{ textDecoration: 'none' }}>
           <div style={{ ...G, borderRadius: 22, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <Calendar style={{ width: 18, height: 18, color: '#8AAEC8', flexShrink: 0 }} strokeWidth={1.5} />
-            <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Calendar</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Today's events</p></div>
+            <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Calendar</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Today&apos;s events</p></div>
           </div>
         </Link>
       </div>
@@ -305,7 +356,7 @@ type Filter = 'all' | 'critical' | 'high' | 'today'
 function Slide2({
   tasks, done, onToggle,
 }: {
-  tasks: DryphubTask[]; done: Set<string>; onToggle: (id: string) => void
+  tasks: UnifiedTask[]; done: Set<string>; onToggle: (id: string) => void
 }) {
   const [filter, setFilter] = useState<Filter>('all')
 
@@ -476,7 +527,7 @@ function Slide4() {
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
 export default function WorkPage() {
-  const [tasks,   setTasks]   = useState<DryphubTask[]>([])
+  const [tasks,   setTasks]   = useState<UnifiedTask[]>([])
   const [stats,   setStats]   = useState<{ openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error,   setError]   = useState(false)
@@ -485,13 +536,36 @@ export default function WorkPage() {
   const [eventsLoading, setEventsLoading] = useState(true)
   const [emails,        setEmails]        = useState<NeedsAttentionEmail[]>([])
   const [emailsLoading, setEmailsLoading] = useState(true)
+  const [bills,          setBills]        = useState<{ id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }[]>([])
 
   const load = useCallback(() => {
     setLoading(true); setError(false)
     Promise.allSettled([
-      fetch('/api/dryp/tasks').then(r => r.json()).then(d => { if (d.tasks) setTasks(d.tasks) }),
-      fetch('/api/dryp/stats').then(r => r.json()).then(s => { if (s.connected) setStats(s) }),
-    ]).finally(() => setLoading(false))
+      fetch('/api/dryp/tasks').then(r => r.json()),
+      fetch('/api/tasks/prioritized').then(r => r.json()),
+      fetch('/api/dryp/stats').then(r => r.json()),
+    ]).then(([drypRes, localRes, statsRes]) => {
+      const drypTasks: UnifiedTask[] = drypRes.status === 'fulfilled' ? (drypRes.value.tasks ?? []) : []
+      const connected = drypRes.status === 'fulfilled' ? (drypRes.value.connected ?? true) : false
+      if (!connected) setError(true)
+
+      const localTasks: UnifiedTask[] = localRes.status === 'fulfilled'
+        ? ((localRes.value.tasks ?? []) as LocalTask[]).map(localTaskToUnified)
+        : []
+
+      setTasks([...drypTasks, ...localTasks])
+
+      const dryStats = statsRes.status === 'fulfilled' && statsRes.value.connected ? statsRes.value : null
+      const merged = [...drypTasks, ...localTasks].filter(t => t.status !== 'done')
+      const today = new Date(); today.setHours(0, 0, 0, 0)
+      const weekOut = new Date(today.getTime() + 7 * 86_400_000)
+      setStats({
+        openTasks: merged.length,
+        dueToday: merged.filter(t => t.due_date && new Date(t.due_date) <= today).length,
+        dueThisWeek: merged.filter(t => t.due_date && new Date(t.due_date) <= weekOut).length,
+        atRiskCount: dryStats?.atRiskCount ?? 0,
+      })
+    }).finally(() => setLoading(false))
 
     setEventsLoading(true)
     fetch('/api/calendar/upcoming?days=2')
@@ -506,12 +580,26 @@ export default function WorkPage() {
       .then(d => setEmails(d.top ?? []))
       .catch(() => setEmails([]))
       .finally(() => setEmailsLoading(false))
+
+    fetch('/api/money/bills')
+      .then(r => r.json())
+      .then(d => setBills((d.bills ?? []).filter((b: { days_until: number | null; status: string }) => b.days_until != null && b.days_until <= 7 && b.status !== 'paid')))
+      .catch(() => setBills([]))
   }, [])
 
   useEffect(() => { load() }, [load])
 
   function toggle(id: string) {
+    const task = tasks.find(t => t.id === id)
     setDone(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
+    // Local (LUNA-side) tasks actually persist as done — DRYP CRM tasks stay
+    // a session-local hide since completing those belongs in DRYP itself.
+    if (task?._local && !done.has(id)) {
+      fetch('/api/tasks/update', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: 'done' }),
+      }).catch(() => {})
+    }
   }
 
   const activeTasks = tasks.filter(t => t.status !== 'done' && !done.has(t.id))
@@ -537,6 +625,7 @@ export default function WorkPage() {
           done={done} onToggle={toggle} onSync={load}
           events={events} eventsLoading={eventsLoading}
           emails={emails} emailsLoading={emailsLoading}
+          bills={bills}
         />
       ),
     },

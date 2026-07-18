@@ -167,54 +167,74 @@ function StylePoolBoard() {
     }
   }
 
+  const top = images[0]
+  const next = images[1]
+
   return (
-    <div className="space-y-4">
-      <ACard>
-        <SLabel>Today's style pull</SLabel>
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
-          A new random set every day. Heart what feels like you, deny what doesn't —
-          LUNA uses this to learn your actual taste.
-        </p>
-        <div className="flex items-center gap-4 mt-3">
-          <span className="text-xs font-semibold" style={{ color: 'var(--violet)' }}>♥ {likedCount} liked</span>
-          <span className="text-xs font-semibold" style={{ color: 'var(--text-3)' }}>✕ {deniedCount} denied</span>
+    <div className="space-y-3 md:max-w-sm md:mx-auto">
+      {/* Compact header — a full paragraph card here is what made this tab
+          feel oversized on tablet/desktop. */}
+      <div className="flex items-center justify-between px-1">
+        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-3)' }}>Today&apos;s style pull</p>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-semibold" style={{ color: 'var(--violet)' }}>♥ {likedCount}</span>
+          <span className="text-xs font-semibold" style={{ color: 'var(--text-3)' }}>✕ {deniedCount}</span>
         </div>
-      </ACard>
+      </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {[1,2,3,4,5,6].map(i => <div key={i} className="rounded-2xl shimmer" style={{ aspectRatio: '3/4' }} />)}
-        </div>
-      ) : images.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {images.map(img => (
-            <div key={img.id} style={{
-              position: 'relative', borderRadius: 18, overflow: 'hidden', aspectRatio: '3/4',
-              background: 'var(--surface)', opacity: pending.has(img.id) ? 0.5 : 1, transition: 'opacity 0.15s',
+        <div className="rounded-3xl shimmer mx-auto" style={{ aspectRatio: '3/4', maxWidth: 340 }} />
+      ) : top ? (
+        <div className="mx-auto" style={{ maxWidth: 340 }}>
+          {/* Card stack — one card at a time, Tinder/Bumble style. A second
+              card peeks from behind for depth and to hint more are coming. */}
+          <div style={{ position: 'relative' }}>
+            {next && (
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: 24, overflow: 'hidden',
+                transform: 'scale(0.94) translateY(10px)', opacity: 0.55, zIndex: 0,
+                background: 'var(--surface)', aspectRatio: '3/4',
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={next.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            )}
+            <div key={top.id} style={{
+              position: 'relative', zIndex: 1, borderRadius: 24, overflow: 'hidden', aspectRatio: '3/4',
+              background: 'var(--surface)', opacity: pending.has(top.id) ? 0.5 : 1, transition: 'opacity 0.15s',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.35)',
             }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={img.image_url} alt={img.label ?? ''} loading="lazy"
+              <img src={top.image_url} alt={top.label ?? ''}
                 style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              <div style={{ position: 'absolute', bottom: 8, left: 8, right: 8, display: 'flex', gap: 6 }}>
-                <button onClick={() => vote(img, 'denied')} disabled={pending.has(img.id)}
-                  style={{
-                    flex: 1, height: 34, borderRadius: 12, border: 'none', cursor: 'pointer',
-                    background: 'rgba(10,4,28,0.6)', backdropFilter: 'blur(6px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                  <span style={{ color: 'white', fontSize: 15, fontWeight: 700 }}>✕</span>
-                </button>
-                <button onClick={() => vote(img, 'liked')} disabled={pending.has(img.id)}
-                  style={{
-                    flex: 1, height: 34, borderRadius: 12, border: 'none', cursor: 'pointer',
-                    background: 'rgba(155,92,255,0.85)', backdropFilter: 'blur(6px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                  <Heart size={15} color="white" fill="white" />
-                </button>
-              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Buttons live below the card — bigger, thumb-friendly, Tinder-style. */}
+          <div className="flex items-center justify-center gap-6 mt-4">
+            <button onClick={() => vote(top, 'denied')} disabled={pending.has(top.id)}
+              aria-label="Deny"
+              style={{
+                width: 56, height: 56, borderRadius: '50%', border: '1.5px solid var(--surface-border)', cursor: 'pointer',
+                background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+              }}>
+              <span style={{ color: '#E05E5E', fontSize: 22, fontWeight: 700, lineHeight: 1 }}>✕</span>
+            </button>
+            <button onClick={() => vote(top, 'liked')} disabled={pending.has(top.id)}
+              aria-label="Like"
+              style={{
+                width: 64, height: 64, borderRadius: '50%', border: 'none', cursor: 'pointer',
+                background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 18px rgba(155,92,255,0.45)',
+              }}>
+              <Heart size={26} color="white" fill="white" />
+            </button>
+          </div>
+
+          {images.length > 1 && (
+            <p className="text-center text-xs mt-3" style={{ color: 'var(--text-4)' }}>{images.length - 1} more today</p>
+          )}
         </div>
       ) : (
         <ACard>
@@ -1063,17 +1083,21 @@ function CreativePageInner() {
 
   return (
     <AppLayout noScroll>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.2)' }}>
-          <Scissors className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
+      {/* Capped width on tablet/desktop — full-bleed 1120px made text and
+          image grids feel oversized and sparse on wide viewports. */}
+      <div className="w-full md:max-w-xl lg:max-w-2xl md:mx-auto" style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8, flexShrink: 0 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.2)' }}>
+            <Scissors className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
+          </div>
+          <div>
+            <h1 className="font-display text-xl md:text-lg font-bold" style={{ color: 'white' }}>Creative</h1>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Your fashion world, fully yours.</p>
+          </div>
         </div>
-        <div>
-          <h1 className="font-display text-2xl font-bold" style={{ color: 'white' }}>Creative</h1>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Your fashion world, fully yours.</p>
-        </div>
-      </div>
 
-      <CategoryPager pages={creativePages} accentColor="#C9A96E" activeIndex={activeIndex} onChangeIndex={setActiveIndex} />
+        <CategoryPager pages={creativePages} accentColor="#C9A96E" activeIndex={activeIndex} onChangeIndex={setActiveIndex} />
+      </div>
     </AppLayout>
   )
 }
