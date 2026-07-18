@@ -153,7 +153,7 @@ function LunaPageInner() {
   const lunaPageIndex = PAGE_IDS.indexOf(page)
 
   const lunaPages = [
-    { id: 'chat', label: '✦ Chat', content: (
+    { id: 'chat', label: 'Chat', icon: MessageCircle, content: (
       <div className="flex flex-col h-full">
                 {/* Starter prompts */}
                 {messages.length <= 1 && (
@@ -204,7 +204,7 @@ function LunaPageInner() {
                 </div>
               </div>
     ) },
-    { id: 'dictate', label: '🎙 Dictate', content: (
+    { id: 'dictate', label: 'Dictate', icon: Mic, content: (
       <div className="space-y-3.5">
                 <div className="p-5 text-center" style={{ ...G, borderRadius: 24 }}>
                   <button onClick={() => setDictating(d => !d)}
@@ -244,7 +244,7 @@ function LunaPageInner() {
                 </div>
               </div>
     ) },
-    { id: 'messages', label: '💬 Messages', content: (
+    { id: 'messages', label: 'Messages', icon: Sparkles, content: (
       <div className="space-y-3.5">
                 <div className="p-4"
                   style={{ ...G, borderRadius: 22, background: 'linear-gradient(135deg, rgba(26,21,53,0.97), rgba(36,28,72,0.97))', border: '1px solid rgba(155,92,255,0.20)' }}>
@@ -294,7 +294,7 @@ function LunaPageInner() {
                 </Link>
               </div>
     ) },
-    { id: 'journal', label: '📓 Journal', content: (
+    { id: 'journal', label: 'Journal', icon: BookOpen, content: (
       <div className="space-y-3.5">
                 <div className="p-4" style={{ ...G, borderRadius: 22 }}>
                   <div style={LBL}>Today&apos;s prompt</div>
@@ -326,7 +326,7 @@ function LunaPageInner() {
                 </div>
               </div>
     ) },
-    { id: 'self', label: '🌟 Highest Self', content: (
+    { id: 'self', label: 'Highest Self', icon: Star, content: (
       <div className="space-y-3.5">
                 <div className="p-5 relative overflow-hidden"
                   style={{
@@ -367,7 +367,7 @@ function LunaPageInner() {
                 </Link>
               </div>
     ) },
-    { id: 'vault', label: '🗄 Vault', content: (
+    { id: 'vault', label: 'Vault', icon: Archive, content: (
       <div className="space-y-3.5">
                 <div className="p-4" style={{ ...G, borderRadius: 22 }}>
                   <div style={LBL}>Park something</div>

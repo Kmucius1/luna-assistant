@@ -1073,13 +1073,13 @@ function CreativePageInner() {
   })
 
   const creativePages: CPage[] = [
-    { id: 'style',       label: '✨ Style',    content: <StylePoolBoard /> },
-    { id: 'oracle',      label: 'Oracle',      content: <OracleSection /> },
-    { id: 'closet',      label: 'Closet',      content: <ClosetSection /> },
-    { id: 'sewing',      label: 'Sewing',      content: <ProjectsSection /> },
-    { id: 'studio',      label: 'Generated',   content: <StudioSection /> },
-    { id: 'vault',       label: 'Vault',       content: <VaultSection /> },
-    { id: 'shopping',    label: 'Wishlist',    content: <ShoppingSection /> },
+    { id: 'style',       label: 'Style',       icon: Sparkles,    content: <StylePoolBoard /> },
+    { id: 'oracle',      label: 'Oracle',      icon: Wand2,       content: <OracleSection /> },
+    { id: 'closet',      label: 'Closet',      icon: ShirtIcon,   content: <ClosetSection /> },
+    { id: 'sewing',      label: 'Sewing',      icon: Scissors,    content: <ProjectsSection /> },
+    { id: 'studio',      label: 'Generated',   icon: Image,       content: <StudioSection /> },
+    { id: 'vault',       label: 'Vault',       icon: Gem,         content: <VaultSection /> },
+    { id: 'shopping',    label: 'Wishlist',    icon: ShoppingBag, content: <ShoppingSection /> },
   ]
 
   return (

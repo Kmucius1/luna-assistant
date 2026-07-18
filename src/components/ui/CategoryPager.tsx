@@ -1,11 +1,14 @@
 'use client'
-import { useState, useRef, ReactNode } from 'react'
+import { useState, useRef, ReactNode, ComponentType } from 'react'
 
 export interface CPage {
   id: string
   label: string
   content: ReactNode
   noScroll?: boolean
+  /** When provided, the tab row renders as icon buttons (like the bottom
+   * dock) instead of text pills. */
+  icon?: ComponentType<{ className?: string; style?: React.CSSProperties }>
 }
 
 interface Props {
@@ -72,32 +75,60 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
         paddingLeft: 24, paddingRight: 24,
         marginBottom: 16,
       }}>
-        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          {pages.map((p, i) => {
-            const isActive = active === i
-            return (
-              <button
-                key={p.id}
-                onClick={() => goTo(i)}
-                style={{
-                  padding: '7px 16px',
-                  borderRadius: 20,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  whiteSpace: 'nowrap',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  background: isActive ? accentFaint : 'transparent',
-                  border: `1px solid ${isActive ? accent : 'rgba(255,255,255,0.09)'}`,
-                  color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)',
-                  transition: 'all 0.18s ease',
-                }}
-              >
-                {p.label}
-              </button>
-            )
-          })}
-        </div>
+        {pages.every(p => p.icon) ? (
+          // Icon tabs — same visual language as the bottom dock, not text pills.
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(${pages.length}, 1fr)`, gap: 2 }}>
+            {pages.map((p, i) => {
+              const isActive = active === i
+              const Icon = p.icon!
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => goTo(i)}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    gap: 3, padding: '7px 2px', borderRadius: 16, border: 'none', cursor: 'pointer',
+                    background: isActive ? accentFaint : 'transparent',
+                    boxShadow: isActive ? `0 0 14px ${accentColor}30` : 'none',
+                    transition: 'all 0.18s ease',
+                  }}
+                >
+                  <Icon style={{ width: 18, height: 18, color: isActive ? '#b98bff' : 'rgba(255,255,255,0.4)' }} />
+                  <span style={{ fontSize: 9.5, fontWeight: 700, color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)', whiteSpace: 'nowrap' }}>
+                    {p.label}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: 8, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {pages.map((p, i) => {
+              const isActive = active === i
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => goTo(i)}
+                  style={{
+                    padding: '7px 16px',
+                    borderRadius: 20,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    background: isActive ? accentFaint : 'transparent',
+                    border: `1px solid ${isActive ? accent : 'rgba(255,255,255,0.09)'}`,
+                    color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)',
+                    transition: 'all 0.18s ease',
+                  }}
+                >
+                  {p.label}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>}
 
       <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>

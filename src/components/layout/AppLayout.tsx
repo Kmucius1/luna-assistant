@@ -1,3 +1,5 @@
+'use client'
+import { usePathname } from 'next/navigation'
 import { BottomNav } from './BottomNav'
 import { DesktopHeader } from './DesktopHeader'
 import { DesktopTabBar } from './DesktopTabBar'
@@ -15,7 +17,15 @@ interface AppLayoutProps {
 
 const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 
+// The moon/LUNA/bell header only earns its space on the two pages it's
+// actually useful on — everywhere else it just ate screen height and
+// pushed content below the fold.
+const TOP_BAR_ROUTES = ['/', '/explore']
+
 export function AppLayout({ children, noScroll, noPad, className, wide }: AppLayoutProps) {
+  const pathname = usePathname()
+  const showTopBar = TOP_BAR_ROUTES.includes(pathname)
+
   return (
     <SwipeContainer
       style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
@@ -24,10 +34,12 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
       {/* Desktop fixed header */}
       <DesktopHeader />
 
-      {/* Mobile top bar — part of flex flow, hidden on desktop */}
-      <div className="lg:hidden" style={{ flexShrink: 0 }}>
-        <MobileTopBar />
-      </div>
+      {/* Mobile top bar — Home and Explore only, part of flex flow, hidden on desktop */}
+      {showTopBar && (
+        <div className="lg:hidden" style={{ flexShrink: 0 }}>
+          <MobileTopBar />
+        </div>
+      )}
 
       <main
         className={['mx-auto w-full', wide ? 'max-w-[1440px]' : 'max-w-[1120px]', 'lg:pt-16', className ?? ''].join(' ')}
