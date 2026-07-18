@@ -1,0 +1,286 @@
+[
+  {
+    "merchant": "Credit One Credit Protect",
+    "normalized_merchant": "Credit One",
+    "status": "cancel",
+    "expected_amount": 3.0,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Optional protection product while the card is charging interest."
+  },
+  {
+    "merchant": "Credit One annual fee installment",
+    "normalized_merchant": "Credit One",
+    "status": "review",
+    "expected_amount": 8.25,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Ask whether the fee can be removed."
+  },
+  {
+    "merchant": "eDreams Prime",
+    "normalized_merchant": "eDreams Prime",
+    "status": "cancel",
+    "expected_amount": 9.99,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Cancel unless actively used."
+  },
+  {
+    "merchant": "Acorns",
+    "normalized_merchant": "Acorns",
+    "status": "review",
+    "expected_amount": 3.0,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Keep only if actively used."
+  },
+  {
+    "merchant": "South Beach Tanning",
+    "normalized_merchant": "South Beach Tanning",
+    "status": "review",
+    "expected_amount": 32.99,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Cancel if no longer used."
+  },
+  {
+    "merchant": "Fanbasis",
+    "normalized_merchant": "Fanbasis",
+    "status": "review",
+    "observed_amounts": [
+      26.95,
+      59.95
+    ],
+    "frequency": "unknown",
+    "ownership": "unknown",
+    "reason": "Identify the product and account tied to both amounts."
+  },
+  {
+    "merchant": "Frontier AI",
+    "normalized_merchant": "Frontier AI",
+    "status": "review",
+    "expected_amount": 31.0,
+    "frequency": "unknown",
+    "ownership": "business",
+    "reason": "Keep only if tied to an active business need."
+  },
+  {
+    "merchant": "OpenAI / ChatGPT",
+    "normalized_merchant": "OpenAI / ChatGPT",
+    "status": "review",
+    "expected_amount": 20.0,
+    "frequency": "monthly",
+    "ownership": "business",
+    "duplicate_watch": true,
+    "reason": "Two $20 charges appeared in some months. Match each charge to an email or billing account."
+  },
+  {
+    "merchant": "Anthropic / Claude",
+    "normalized_merchant": "Anthropic / Claude",
+    "status": "review",
+    "expected_amount": 20.0,
+    "frequency": "monthly",
+    "ownership": "business",
+    "duplicate_watch": true,
+    "reason": "Two $20 charges appeared close together. Check for separate accounts or usage billing."
+  },
+  {
+    "merchant": "AutoDS",
+    "normalized_merchant": "AutoDS",
+    "status": "review",
+    "observed_amounts": [
+      36.8,
+      52.63,
+      6.67,
+      56.8
+    ],
+    "frequency": "multiple",
+    "ownership": "business",
+    "duplicate_watch": true,
+    "reason": "Separate subscription fees from balance reloads and cancel unused plans."
+  },
+  {
+    "merchant": "Vercel",
+    "normalized_merchant": "Vercel",
+    "status": "business",
+    "observed_amounts": [
+      20.0,
+      30.0,
+      31.17
+    ],
+    "frequency": "multiple",
+    "ownership": "business",
+    "reason": "Identify each team, project, or plan and move billing to a business payment method."
+  },
+  {
+    "merchant": "GoDaddy",
+    "normalized_merchant": "GoDaddy",
+    "status": "business",
+    "observed_amounts": [
+      1.19,
+      3.19,
+      19.99,
+      23.19
+    ],
+    "frequency": "multiple",
+    "ownership": "business",
+    "reason": "Match every charge to a domain, privacy product, email plan, or renewal."
+  },
+  {
+    "merchant": "Google Workspace",
+    "normalized_merchant": "Google Workspace",
+    "status": "business",
+    "observed_amounts": [
+      2.16,
+      16.8
+    ],
+    "frequency": "monthly",
+    "ownership": "business",
+    "reason": "Identify the domain and workspace tied to each amount."
+  },
+  {
+    "merchant": "Google purchase",
+    "normalized_merchant": "Google Purchase",
+    "status": "review",
+    "observed_amounts": [
+      35.76,
+      79.2
+    ],
+    "frequency": "unknown",
+    "ownership": "business",
+    "reason": "Determine whether charges are Ads, Cloud, app billing, or another service."
+  },
+  {
+    "merchant": "SiteSeeker Pro",
+    "normalized_merchant": "SiteSeeker Pro",
+    "status": "review",
+    "expected_amount": 29.0,
+    "frequency": "monthly",
+    "ownership": "business",
+    "reason": "Keep only if it is actively producing value."
+  },
+  {
+    "merchant": "Read.ai",
+    "normalized_merchant": "Read.ai",
+    "status": "review",
+    "expected_amount": 19.75,
+    "frequency": "monthly",
+    "ownership": "business",
+    "reason": "Keep only if meeting summaries are used regularly."
+  },
+  {
+    "merchant": "Opus Clip",
+    "normalized_merchant": "Opus Clip",
+    "status": "review",
+    "expected_amount": 15.0,
+    "frequency": "monthly",
+    "ownership": "business",
+    "reason": "Keep only if video clipping is used every month."
+  },
+  {
+    "merchant": "Crunch Fitness",
+    "normalized_merchant": "Crunch Fitness",
+    "status": "review",
+    "observed_amounts": [
+      34.49,
+      65.09
+    ],
+    "frequency": "monthly",
+    "ownership": "personal",
+    "duplicate_watch": true,
+    "reason": "Multiple retry or past-due amounts appeared. Confirm the membership balance."
+  },
+  {
+    "merchant": "Apple.com/bill",
+    "normalized_merchant": "Apple.com/bill",
+    "status": "review",
+    "observed_amounts": [
+      7.41,
+      9.99,
+      11.65,
+      12.11,
+      13.75,
+      30.72,
+      35.97,
+      38.13
+    ],
+    "frequency": "multiple",
+    "ownership": "unknown",
+    "duplicate_watch": true,
+    "reason": "Match each amount to an app, storage plan, subscription, or in-app purchase."
+  },
+  {
+    "merchant": "Hulu",
+    "normalized_merchant": "Hulu",
+    "status": "review",
+    "observed_amounts": [
+      5.65,
+      7.39,
+      14.7,
+      22.62
+    ],
+    "frequency": "monthly",
+    "ownership": "personal",
+    "duplicate_watch": true,
+    "reason": "Changing amounts suggest plan changes, add-ons, or more than one billing setup."
+  },
+  {
+    "merchant": "Netflix",
+    "normalized_merchant": "Netflix",
+    "status": "review",
+    "expected_amount": 22.62,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Keep only if used regularly."
+  },
+  {
+    "merchant": "Spotify",
+    "normalized_merchant": "Spotify",
+    "status": "review",
+    "expected_amount": 14.7,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Review the plan and any cheaper option."
+  },
+  {
+    "merchant": "Amazon Prime",
+    "normalized_merchant": "Amazon Prime",
+    "status": "review",
+    "expected_amount": 7.58,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Confirm this is the intended membership."
+  },
+  {
+    "merchant": "Amazon Digital",
+    "normalized_merchant": "Amazon Digital",
+    "status": "review",
+    "observed_amounts": [
+      11.3,
+      11.33,
+      19.23
+    ],
+    "frequency": "multiple",
+    "ownership": "unknown",
+    "reason": "Identify Kindle, channel, app, or digital-content charges."
+  },
+  {
+    "merchant": "Chase monthly service fee",
+    "normalized_merchant": "Chase Monthly Fee",
+    "status": "cancel",
+    "expected_amount": 15.0,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Meet waiver requirements or change account type."
+  },
+  {
+    "merchant": "Bank of America maintenance fee",
+    "normalized_merchant": "Bank of America Maintenance Fee",
+    "status": "cancel",
+    "expected_amount": 4.95,
+    "frequency": "monthly",
+    "ownership": "personal",
+    "reason": "Meet waiver requirements or change account type."
+  }
+]
