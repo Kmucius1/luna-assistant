@@ -1,651 +1,570 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
+import {
+  AlertCircle,
+  ArrowRight,
+  BarChart3,
+  Briefcase,
+  Building2,
+  Calendar,
+  Check,
+  CheckSquare,
+  ChevronRight,
+  CircleDollarSign,
+  CreditCard,
+  ExternalLink,
+  FileText,
+  Inbox,
+  Loader2,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  Target,
+  Upload,
+  Users,
+  Zap,
+} from 'lucide-react'
+
 import { AppLayout } from '@/components/layout/AppLayout'
 import { CategoryPager } from '@/components/ui/CategoryPager'
-import {
-  Briefcase, Clock, Check, AlertCircle,
-  Loader2, Mail, Calendar, Users, RefreshCw, Zap,
-  CheckSquare, CreditCard, BarChart2, Target, Lightbulb, Building2,
-  FileText, ArrowUpDown, Plus, ExternalLink,
-} from 'lucide-react'
-import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
 import type { CalendarEvent } from '@/lib/calendar'
 import { isMickEvent } from '@/lib/calendarPeople'
 import type { Task as LocalTask } from '@/types'
 
-// A local LUNA-side task (from chat extraction, manual entry, brain dump,
-// dictation...) normalized into the same shape TaskRow already renders, so
-// "what I told LUNA I need to do" shows up right alongside DRYP CRM tasks
-// instead of living in a table nothing on this page ever reads.
 interface UnifiedTask extends DryphubTask { _local?: boolean }
+interface NeedsAttentionEmail { id: string; from: string; subject: string; snippet: string; isPriority: boolean }
+interface UpcomingBill {
+  id: string
+  name: string
+  expected_amount: number | null
+  minimum_amount: number | null
+  days_until: number | null
+  status?: string
+}
+interface ClientAccount {
+  id: string
+  business_name: string
+  health_status: string
+  client_pipeline_stage?: string
+  monthly_retainer?: number
+  updated_at?: string
+}
+interface MoneyDashboardData {
+  safe_to_spend?: {
+    safeToSpend: number
+    dailySpendingAmount: number | null
+    daysUntilNextConfirmedIncome: number | null
+    safetyBuffer: number
+  }
+  subscription_alerts_count?: number
+  duplicate_charges_count?: number
+  unknown_transactions_count?: number
+}
 
 const SOURCE_LABEL: Record<string, string> = {
-  message: 'From LUNA chat', manual: 'Manual', brain_dump: 'Brain dump',
+  message: 'LUNA chat', manual: 'Manual', brain_dump: 'Brain dump',
   dictation: 'Dictation', email: 'Email', calendar: 'Calendar', crm: 'CRM',
 }
 
-function localTaskToUnified(t: LocalTask): UnifiedTask {
+const PRIORITY_COLORS: Record<string, string> = {
+  critical: '#ff6b75', high: '#f1a35b', medium: '#b98bff', low: 'rgba(255,255,255,0.18)',
+}
+const PRIORITY_ORDER: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
+const GLASS: React.CSSProperties = {
+  background: 'linear-gradient(145deg, rgba(28,18,65,0.84), rgba(12,8,35,0.84))',
+  border: '1px solid rgba(255,255,255,0.09)',
+  borderRadius: 24,
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  boxShadow: '0 18px 42px rgba(0,0,0,0.22)',
+}
+const LABEL: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 6,
+  fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
+  textTransform: 'uppercase', color: '#b98bff', margin: 0,
+}
+
+function localTaskToUnified(task: LocalTask): UnifiedTask {
   return {
-    id: t.id,
-    title: t.title,
-    status: t.status,
-    priority: t.urgency_level,
-    due_date: t.due_date,
-    account_name: SOURCE_LABEL[t.source] ?? 'LUNA',
-    created_at: t.created_at,
-    updated_at: t.updated_at,
+    id: task.id,
+    title: task.title,
+    status: task.status,
+    priority: task.urgency_level,
+    due_date: task.due_date,
+    account_name: SOURCE_LABEL[task.source] ?? 'LUNA',
+    created_at: task.created_at,
+    updated_at: task.updated_at,
     _local: true,
   }
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function dueDateLabel(dateStr?: string): { label: string; color: string; urgent: boolean } {
-  if (!dateStr) return { label: '', color: 'rgba(255,255,255,0.3)', urgent: false }
-  const d = new Date(dateStr); const now = new Date()
-  const dDay = new Date(d); dDay.setHours(0,0,0,0)
-  const today = new Date(now); today.setHours(0,0,0,0)
-  const diff = Math.round((dDay.getTime() - today.getTime()) / 86_400_000)
-  if (diff < 0)   return { label: 'Overdue',   color: '#E05E5E', urgent: true }
-  if (diff === 0) return { label: 'Due today',  color: '#E08B4A', urgent: true }
-  if (diff === 1) return { label: 'Tomorrow',   color: '#C9A96E', urgent: false }
-  return { label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), color: 'rgba(255,255,255,0.3)', urgent: false }
+function startOfLocalDay(date = new Date()) {
+  const result = new Date(date)
+  result.setHours(0, 0, 0, 0)
+  return result
 }
 
-const PO: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 }
-const sortPriority = (a: UnifiedTask, b: UnifiedTask) => (PO[a.priority ?? 'low'] ?? 3) - (PO[b.priority ?? 'low'] ?? 3)
-const PRIORITY_COLORS: Record<string, string> = {
-  critical: '#E05E5E', high: '#E08B4A', medium: '#9b5cff', low: 'rgba(255,255,255,0.15)',
+function isDueTodayOrEarlier(task: UnifiedTask) {
+  if (!task.due_date) return false
+  const due = startOfLocalDay(new Date(task.due_date))
+  return due <= startOfLocalDay()
 }
 
-// ─── Shared styles ────────────────────────────────────────────────────────────
-const G: React.CSSProperties = {
-  background: 'rgba(20,12,50,0.68)',
-  border: '1px solid rgba(255,255,255,0.08)',
-  borderRadius: 20,
-  backdropFilter: 'blur(18px)',
-  WebkitBackdropFilter: 'blur(18px)',
-}
-const LBL: React.CSSProperties = {
-  fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#9b5cff',
-  display: 'flex', alignItems: 'center', gap: 5,
-  marginBottom: 8, flexShrink: 0,
+function sortTasks(a: UnifiedTask, b: UnifiedTask) {
+  const priority = (PRIORITY_ORDER[a.priority ?? 'low'] ?? 3) - (PRIORITY_ORDER[b.priority ?? 'low'] ?? 3)
+  if (priority !== 0) return priority
+  if (a.due_date && b.due_date) return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+  if (a.due_date) return -1
+  if (b.due_date) return 1
+  return 0
 }
 
-// ─── Task row ────────────────────────────────────────────────────────────────
-function TaskRow({ task, done, onToggle }: { task: UnifiedTask; done: boolean; onToggle: () => void }) {
-  const due    = dueDateLabel(task.due_date)
-  const pColor = PRIORITY_COLORS[task.priority ?? 'low']
+function dueLabel(task: UnifiedTask) {
+  if (!task.due_date) return null
+  const due = startOfLocalDay(new Date(task.due_date))
+  const today = startOfLocalDay()
+  const diff = Math.round((due.getTime() - today.getTime()) / 86_400_000)
+  if (diff < 0) return { text: 'Overdue', color: '#ff6b75' }
+  if (diff === 0) return { text: 'Due today', color: '#f1a35b' }
+  if (diff === 1) return { text: 'Tomorrow', color: '#d8ba78' }
+  return { text: due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), color: 'rgba(255,255,255,0.38)' }
+}
+
+function formatMoney(value: number | null | undefined) {
+  if (value == null || Number.isNaN(value)) return 'Not set'
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
+}
+
+function TaskItem({ task, done, onToggle }: { task: UnifiedTask; done: boolean; onToggle: () => void }) {
+  const due = dueLabel(task)
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
-      borderBottom: '1px solid rgba(255,255,255,0.05)',
-      opacity: done ? 0.38 : 1, transition: 'opacity 0.2s',
-    }}>
-      <button onClick={onToggle} style={{
-        width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: done ? '#9b5cff' : 'transparent',
-        border: done ? 'none' : '1.5px solid rgba(155,92,255,0.3)',
-        cursor: 'pointer',
-      }}>
-        {done && <Check style={{ width: 12, height: 12, color: 'white' }} />}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderBottom: '1px solid rgba(255,255,255,0.055)', opacity: done ? 0.42 : 1 }}>
+      <button
+        onClick={onToggle}
+        aria-label={done ? 'Mark task open' : 'Mark task done'}
+        style={{ width: 24, height: 24, borderRadius: '50%', flexShrink: 0, display: 'grid', placeItems: 'center', cursor: 'pointer', background: done ? '#9b5cff' : 'rgba(155,92,255,0.08)', border: done ? 'none' : '1.5px solid rgba(185,139,255,0.38)' }}
+      >
+        {done && <Check style={{ width: 13, height: 13, color: 'white' }} />}
       </button>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{
-          fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35,
-          textDecoration: done ? 'line-through' : 'none',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0,
-        }}>{task.title}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 2 }}>
-          {task.account_name && (
-            <span style={{ fontSize: 11, color: 'rgba(168,196,218,0.65)', fontWeight: 600 }}>
-              {task.account_name}
-            </span>
-          )}
-          {due.label && (
-            <span style={{ fontSize: 11, color: due.color, fontWeight: due.urgent ? 700 : 400, display: 'flex', alignItems: 'center', gap: 3 }}>
-              {due.urgent && <Clock style={{ width: 9, height: 9 }} />}{due.label}
-            </span>
-          )}
+        <p style={{ margin: 0, fontSize: 13.5, fontWeight: 650, lineHeight: 1.35, color: 'rgba(255,255,255,0.92)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textDecoration: done ? 'line-through' : 'none' }}>{task.title}</p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center', minWidth: 0 }}>
+          {task.account_name && <span style={{ fontSize: 10.5, color: 'rgba(178,205,226,0.68)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{task.account_name}</span>}
+          {due && <span style={{ fontSize: 10.5, color: due.color, fontWeight: 700, flexShrink: 0 }}>{due.text}</span>}
         </div>
       </div>
-      <div style={{ width: 7, height: 7, borderRadius: '50%', background: pColor, flexShrink: 0 }} />
+      <span style={{ width: 8, height: 8, borderRadius: '50%', background: PRIORITY_COLORS[task.priority ?? 'low'], flexShrink: 0 }} />
     </div>
   )
 }
 
-// ─── Email row ───────────────────────────────────────────────────────────────
-interface NeedsAttentionEmail { id: string; from: string; subject: string; snippet: string; isPriority: boolean }
-
-function EmailRow({ email }: { email: NeedsAttentionEmail }) {
+function EmptyState({ icon: Icon, title, text }: { icon: React.ElementType; title: string; text: string }) {
   return (
-    <Link href="/email" style={{ textDecoration: 'none' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <Mail style={{ width: 15, height: 15, color: '#A8C4DA', flexShrink: 0 }} strokeWidth={1.8} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-            {email.subject || '(no subject)'}
-          </p>
-          <p style={{ fontSize: 11, color: 'rgba(168,196,218,0.65)', fontWeight: 600, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {email.from}
-          </p>
-        </div>
-        {email.isPriority && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#E08B4A', flexShrink: 0 }} />}
-      </div>
-    </Link>
-  )
-}
-
-interface UpcomingBill { id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }
-
-function BillRow({ bill }: { bill: UpcomingBill }) {
-  const amount = bill.expected_amount ?? bill.minimum_amount
-  const urgent = bill.days_until != null && bill.days_until <= 1
-  return (
-    <Link href="/money/bills" style={{ textDecoration: 'none' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-        <CreditCard style={{ width: 15, height: 15, color: '#C9A96E', flexShrink: 0 }} strokeWidth={1.8} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0 }}>
-            {bill.name}{amount != null ? ` — $${amount.toFixed(2)}` : ''}
-          </p>
-          <p style={{ fontSize: 11, color: 'rgba(201,169,110,0.7)', fontWeight: 600, marginTop: 2 }}>
-            {bill.days_until === 0 ? 'Due today' : bill.days_until === 1 ? 'Due tomorrow' : `Due in ${bill.days_until} days`}
-          </p>
-        </div>
-        {urgent && <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#E05E5E', flexShrink: 0 }} />}
-      </div>
-    </Link>
-  )
-}
-
-// ─── App button ───────────────────────────────────────────────────────────────
-function AppBtn({ icon: Icon, label, href, color, desc, external }: {
-  icon: React.ElementType; label: string; href: string; color: string; desc: string; external?: boolean
-}) {
-  const inner = (
-    <div style={{
-      ...G, borderRadius: 20, padding: '14px 10px 12px',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7,
-      cursor: 'pointer', textAlign: 'center',
-    }}>
-      <div style={{
-        width: 42, height: 42, borderRadius: 13,
-        background: `${color}1A`, border: `1px solid ${color}33`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <Icon style={{ width: 19, height: 19, color }} strokeWidth={1.6} />
-      </div>
+    <div style={{ minHeight: 150, display: 'grid', placeItems: 'center', textAlign: 'center', padding: 22 }}>
       <div>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.82)', lineHeight: 1.2, margin: 0 }}>{label}</p>
-        <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.32)', marginTop: 2, lineHeight: 1.2 }}>{desc}</p>
+        <div style={{ width: 48, height: 48, borderRadius: 16, display: 'grid', placeItems: 'center', margin: '0 auto 10px', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.2)' }}>
+          <Icon style={{ width: 21, height: 21, color: '#b98bff' }} strokeWidth={1.6} />
+        </div>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 750, color: 'white' }}>{title}</p>
+        <p style={{ margin: '5px auto 0', maxWidth: 300, fontSize: 12, lineHeight: 1.5, color: 'rgba(255,255,255,0.38)' }}>{text}</p>
       </div>
     </div>
   )
-  if (external) return <a href={href} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>{inner}</a>
-  return <Link href={href} style={{ textDecoration: 'none' }}>{inner}</Link>
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 1 — Today snapshot
-// ─────────────────────────────────────────────────────────────────────────────
-function Slide1({
-  stats, loading, error, activeTasks, urgentTasks, done, onToggle, onSync,
-  events, eventsLoading, emails, emailsLoading, bills,
-}: {
-  stats: { openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null
-  loading: boolean; error: boolean
-  activeTasks: UnifiedTask[]; urgentTasks: UnifiedTask[]
-  done: Set<string>; onToggle: (id: string) => void; onSync: () => void
-  events: CalendarEvent[]; eventsLoading: boolean
-  emails: NeedsAttentionEmail[]; emailsLoading: boolean
-  bills: { id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }[]
-}) {
+function MiniAction({ href, icon: Icon, label, value, color = '#b98bff' }: { href: string; icon: React.ElementType; label: string; value: string; color?: string }) {
   return (
-    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <Link href={href} style={{ textDecoration: 'none' }}>
+      <div style={{ ...GLASS, borderRadius: 20, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 10, minHeight: 66 }}>
+        <div style={{ width: 38, height: 38, borderRadius: 13, display: 'grid', placeItems: 'center', background: `${color}17`, border: `1px solid ${color}30`, flexShrink: 0 }}>
+          <Icon style={{ width: 18, height: 18, color }} strokeWidth={1.7} />
+        </div>
+        <div style={{ minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.42)' }}>{label}</p>
+          <p style={{ margin: '2px 0 0', fontSize: 13.5, fontWeight: 750, color: 'rgba(255,255,255,0.9)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{value}</p>
+        </div>
+      </div>
+    </Link>
+  )
+}
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 38, height: 38, borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(155,92,255,0.16)', border: '1px solid rgba(155,92,255,0.28)' }}>
-            <Briefcase style={{ width: 18, height: 18, color: '#b98bff' }} strokeWidth={1.6} />
-          </div>
+function TodaySlide({
+  tasks, done, onToggle, loading, error, onSync, events, eventsLoading, emails, bills, clients,
+}: {
+  tasks: UnifiedTask[]
+  done: Set<string>
+  onToggle: (id: string) => void
+  loading: boolean
+  error: boolean
+  onSync: () => void
+  events: CalendarEvent[]
+  eventsLoading: boolean
+  emails: NeedsAttentionEmail[]
+  bills: UpcomingBill[]
+  clients: ClientAccount[]
+}) {
+  const priorities = tasks.filter(t => t.status !== 'done' && !done.has(t.id)).sort(sortTasks).slice(0, 3)
+  const nextEvent = events.find(e => e.isToday && !e.allDay) ?? events.find(e => e.isTomorrow && !e.allDay) ?? events[0]
+  const atRisk = clients.filter(c => ['at_risk', 'churning'].includes(c.health_status)).length
+
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <section style={{ ...GLASS, position: 'relative', overflow: 'hidden', padding: '19px 20px', background: 'linear-gradient(135deg, rgba(75,37,136,0.78), rgba(18,10,47,0.92))' }}>
+        <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', right: -42, top: -74, background: 'radial-gradient(circle, rgba(190,139,255,0.34), transparent 68%)' }} />
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <div>
-            <p style={{ fontSize: 20, fontWeight: 800, color: 'white', lineHeight: 1.1, margin: 0 }}>Work</p>
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-              {loading ? 'Syncing…' : error ? `DRYP unreachable — ${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''} from LUNA` : `${activeTasks.length} open task${activeTasks.length !== 1 ? 's' : ''}`}
+            <div style={LABEL}><Briefcase style={{ width: 11, height: 11 }} />Work today</div>
+            <h1 style={{ margin: '7px 0 3px', fontSize: 24, lineHeight: 1.1, color: 'white', fontWeight: 850 }}>One clear lane.</h1>
+            <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.5, color: 'rgba(255,255,255,0.55)' }}>
+              {loading ? 'Pulling your priorities together…' : `${priorities.length} priority${priorities.length === 1 ? '' : 'ies'} ready for focus.`}
             </p>
           </div>
+          <button onClick={onSync} disabled={loading} aria-label="Refresh work data" style={{ width: 42, height: 42, borderRadius: 15, display: 'grid', placeItems: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: 'white', flexShrink: 0 }}>
+            {loading ? <Loader2 className="animate-spin" style={{ width: 18, height: 18 }} /> : <RefreshCw style={{ width: 18, height: 18 }} />}
+          </button>
         </div>
-        <button onClick={onSync} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 13px', borderRadius: 13, border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.46)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
-          {loading ? <Loader2 style={{ width: 12, height: 12 }} className="animate-spin" /> : <RefreshCw style={{ width: 12, height: 12 }} />}
-          Sync
-        </button>
-      </div>
+      </section>
 
-      {/* Stats strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, flexShrink: 0 }}>
-        {[
-          { label: 'Open',    value: loading ? '—' : String(stats?.openTasks ?? activeTasks.length), color: 'white' },
-          { label: 'Today',   value: loading ? '—' : String(stats?.dueToday ?? 0),    color: (stats?.dueToday ?? 0) > 0 ? '#E08B4A' : 'white' },
-          { label: 'Week',    value: loading ? '—' : String(stats?.dueThisWeek ?? 0), color: 'white' },
-          { label: 'At-risk', value: loading ? '—' : String(stats?.atRiskCount ?? 0), color: (stats?.atRiskCount ?? 0) > 0 ? '#E05E5E' : 'white' },
-        ].map(s => (
-          <div key={s.label} style={{ ...G, borderRadius: 14, padding: '10px 6px', textAlign: 'center' }}>
-            <p style={{ fontSize: 20, fontWeight: 800, color: s.color, lineHeight: 1, margin: 0 }}>{s.value}</p>
-            <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', marginTop: 3 }}>{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Prep for tomorrow — surfaced a day ahead so nothing sneaks up */}
-      {!eventsLoading && events.some(e => e.isTomorrow && !e.allDay) && (
-        <div style={{ ...G, borderRadius: 18, padding: '11px 14px', flexShrink: 0, background: 'rgba(224,140,74,0.10)', border: '1px solid rgba(224,140,74,0.28)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 6 }}>
-            <Zap style={{ width: 12, height: 12, color: '#E08C4A' }} />
-            <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#E08C4A' }}>
-              Prep for tomorrow
-            </span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {events.filter(e => e.isTomorrow && !e.allDay).map(e => (
-              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: '#E08C4A', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
-              </div>
-            ))}
-          </div>
+      <section style={{ ...GLASS, overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '13px 15px 11px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={LABEL}><Target style={{ width: 10, height: 10 }} />Today&apos;s top 3</div>
+          <Link href="/tasks" style={{ fontSize: 10.5, fontWeight: 700, color: '#b98bff', textDecoration: 'none' }}>All tasks →</Link>
         </div>
-      )}
-
-      {/* Today + tomorrow's schedule — actual calendar events */}
-      <div style={{ ...G, borderRadius: 22, flexShrink: 0, maxHeight: 220, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <div style={LBL}><Calendar style={{ width: 9, height: 9 }} />Schedule</div>
-          <Link href="/calendar" style={{ fontSize: 10.5, color: '#9b5cff', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
-        </div>
-        {eventsLoading ? (
-          <div style={{ padding: '16px 14px', display: 'flex', justifyContent: 'center' }}>
-            <Loader2 style={{ width: 18, height: 18, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
-          </div>
-        ) : events.length > 0 ? (
+        {error && priorities.length === 0 ? (
+          <EmptyState icon={AlertCircle} title="Some work data could not load" text="Your LUNA tasks are still safe. Refresh to retry the DRYP connection." />
+        ) : priorities.length ? (
           <div style={{ overflowY: 'auto', minHeight: 0 }}>
-            {events.some(e => e.isToday) && (
-              <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: 0, padding: '8px 14px 4px' }}>Today</p>
-            )}
-            {events.filter(e => e.isToday).map(e => (
-              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <span style={{ fontSize: 10.5, fontWeight: 700, color: '#8AAEC8', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
-              </div>
-            ))}
-            {events.some(e => e.isTomorrow) && (
-              <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: 0, padding: '8px 14px 4px' }}>Tomorrow</p>
-            )}
-            {events.filter(e => e.isTomorrow).map(e => (
-              <div key={e.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                <span style={{ fontSize: 10.5, fontWeight: 700, color: '#8AAEC8', flexShrink: 0, minWidth: 58 }}>{e.startTime}</span>
-                <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
-              </div>
-            ))}
+            {priorities.map(task => <TaskItem key={task.id} task={task} done={done.has(task.id)} onToggle={() => onToggle(task.id)} />)}
           </div>
         ) : (
-          <div style={{ padding: '16px 14px', textAlign: 'center' }}>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.28)', margin: 0 }}>Nothing on your calendar today or tomorrow</p>
-          </div>
+          <EmptyState icon={Sparkles} title="Your priority lane is clear" text="Add one focused task instead of filling the space with busywork." />
         )}
-      </div>
+      </section>
 
-      {/* Needs attention — flex:1, inner scroll */}
-      <div style={{ ...G, borderRadius: 22, flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px 10px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <div style={LBL}><Zap style={{ width: 9, height: 9 }} />Needs attention</div>
-          <Link href="/tasks" style={{ fontSize: 10.5, color: '#9b5cff', textDecoration: 'none', fontWeight: 600 }}>View all →</Link>
+      <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.35fr) minmax(0,1fr)', gap: 10 }}>
+        <div style={{ ...GLASS, borderRadius: 20, padding: '14px 15px', minHeight: 92 }}>
+          <div style={LABEL}><Calendar style={{ width: 10, height: 10 }} />Next up</div>
+          {eventsLoading ? (
+            <div style={{ paddingTop: 13 }}><Loader2 className="animate-spin" style={{ width: 18, height: 18, color: '#b98bff' }} /></div>
+          ) : nextEvent ? (
+            <div style={{ marginTop: 8 }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 780, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{nextEvent.title}</p>
+              <p style={{ margin: '4px 0 0', fontSize: 11.5, color: 'rgba(255,255,255,0.44)' }}>{nextEvent.isTomorrow ? 'Tomorrow' : 'Today'} · {nextEvent.allDay ? 'All day' : nextEvent.startTime}</p>
+            </div>
+          ) : (
+            <p style={{ margin: '10px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.36)' }}>No event is crowding your next move.</p>
+          )}
         </div>
-        {error && !loading && urgentTasks.length === 0 && emails.length === 0 && bills.length === 0 ? (
-          <div style={{ padding: '16px 14px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-            <AlertCircle style={{ width: 16, height: 16, color: '#E05E5E', flexShrink: 0, marginTop: 1 }} />
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>DRYP CRM unavailable — tap Sync to retry.</p>
-          </div>
-        ) : loading || emailsLoading ? (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Loader2 style={{ width: 22, height: 22, color: 'rgba(155,92,255,0.45)' }} className="animate-spin" />
-          </div>
-        ) : urgentTasks.length > 0 || emails.length > 0 || bills.length > 0 ? (
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-            {urgentTasks.map(t => (
-              <TaskRow key={t.id} task={t} done={done.has(t.id)} onToggle={() => onToggle(t.id)} />
-            ))}
-            {bills.map(b => <BillRow key={b.id} bill={b} />)}
-            {emails.map(e => <EmailRow key={e.id} email={e} />)}
-          </div>
-        ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.28)', textAlign: 'center' }}>No urgent tasks, bills, or emails right now</p>
-          </div>
-        )}
-      </div>
-
-      {/* Quick: Email + Calendar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, flexShrink: 0 }}>
-        <Link href="/email" style={{ textDecoration: 'none' }}>
-          <div style={{ ...G, borderRadius: 22, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Mail style={{ width: 18, height: 18, color: '#A8C4DA', flexShrink: 0 }} strokeWidth={1.5} />
-            <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Email</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Gmail inbox</p></div>
+        <Link href="/tasks" style={{ textDecoration: 'none' }}>
+          <div style={{ ...GLASS, borderRadius: 20, padding: '14px 15px', minHeight: 92, background: 'linear-gradient(145deg, rgba(55,27,90,0.9), rgba(18,10,42,0.9))' }}>
+            <div style={LABEL}><Zap style={{ width: 10, height: 10 }} />Attention</div>
+            <p style={{ margin: '9px 0 0', fontSize: 20, fontWeight: 850, color: 'white' }}>{emails.length + bills.length + atRisk}</p>
+            <p style={{ margin: '2px 0 0', fontSize: 10.5, color: 'rgba(255,255,255,0.42)' }}>{emails.length} email · {bills.length} bill · {atRisk} client</p>
           </div>
         </Link>
-        <Link href="/calendar" style={{ textDecoration: 'none' }}>
-          <div style={{ ...G, borderRadius: 22, padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Calendar style={{ width: 18, height: 18, color: '#8AAEC8', flexShrink: 0 }} strokeWidth={1.5} />
-            <div><p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>Calendar</p><p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>Today&apos;s events</p></div>
-          </div>
-        </Link>
-      </div>
-
+      </section>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 2 — Full task list
-// ─────────────────────────────────────────────────────────────────────────────
-type Filter = 'all' | 'critical' | 'high' | 'today'
+type TaskFilter = 'all' | 'today' | 'high'
 
-function Slide2({
-  tasks, done, onToggle,
-}: {
-  tasks: UnifiedTask[]; done: Set<string>; onToggle: (id: string) => void
-}) {
-  const [filter, setFilter] = useState<Filter>('all')
-
-  const todayBoundary = new Date(); todayBoundary.setHours(0,0,0,0)
-
-  const filtered = tasks
+function TasksSlide({ tasks, done, onToggle }: { tasks: UnifiedTask[]; done: Set<string>; onToggle: (id: string) => void }) {
+  const [filter, setFilter] = useState<TaskFilter>('all')
+  const visible = tasks
     .filter(t => t.status !== 'done' && !done.has(t.id))
-    .filter(t => {
-      if (filter === 'critical') return t.priority === 'critical'
-      if (filter === 'high')     return t.priority === 'high' || t.priority === 'critical'
-      if (filter === 'today') {
-        if (!t.due_date) return false
-        const d = new Date(t.due_date); d.setHours(0,0,0,0)
-        return d <= todayBoundary
-      }
-      return true
-    })
-    .sort(sortPriority)
-
-  const FILTERS: { id: Filter; label: string }[] = [
-    { id: 'all',      label: 'All' },
-    { id: 'critical', label: '🔴 Critical' },
-    { id: 'high',     label: '🟠 High' },
-    { id: 'today',    label: '📅 Due today' },
-  ]
+    .filter(t => filter === 'all' || (filter === 'today' ? isDueTodayOrEarlier(t) : ['critical', 'high'].includes(t.priority ?? '')))
+    .sort(sortTasks)
 
   return (
-    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-
-      {/* Filter pills + new task */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        <div style={{ flex: 1, display: 'flex', gap: 5, overflowX: 'auto', scrollbarWidth: 'none' }}>
-          {FILTERS.map(f => (
-            <button key={f.id} onClick={() => setFilter(f.id)} style={{ padding: '6px 12px', borderRadius: 20, border: `1px solid ${filter === f.id ? 'rgba(155,92,255,0.45)' : 'rgba(255,255,255,0.08)'}`, background: filter === f.id ? 'rgba(155,92,255,0.18)' : 'rgba(255,255,255,0.03)', color: filter === f.id ? '#b98bff' : 'rgba(255,255,255,0.45)', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-              {f.label}
-            </button>
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <section style={{ ...GLASS, padding: '16px 17px', background: 'linear-gradient(135deg, rgba(39,23,79,0.88), rgba(15,9,40,0.92))' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div>
+            <div style={LABEL}><CheckSquare style={{ width: 10, height: 10 }} />Tasks</div>
+            <p style={{ margin: '7px 0 0', fontSize: 20, fontWeight: 820, color: 'white' }}>{visible.length} open</p>
+          </div>
+          <Link href="/tasks?new=1" style={{ textDecoration: 'none' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 15, display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, #7743ff, #a563ff)', boxShadow: '0 10px 24px rgba(123,70,255,0.35)' }}>
+              <Plus style={{ width: 20, height: 20, color: 'white' }} />
+            </div>
+          </Link>
+        </div>
+        <div style={{ display: 'flex', gap: 7, marginTop: 14 }}>
+          {(['all', 'today', 'high'] as TaskFilter[]).map(item => (
+            <button key={item} onClick={() => setFilter(item)} style={{ flex: 1, height: 36, borderRadius: 12, cursor: 'pointer', border: `1px solid ${filter === item ? 'rgba(185,139,255,0.42)' : 'rgba(255,255,255,0.07)'}`, background: filter === item ? 'rgba(155,92,255,0.18)' : 'rgba(255,255,255,0.035)', color: filter === item ? '#d0b0ff' : 'rgba(255,255,255,0.42)', fontSize: 11.5, fontWeight: 750, textTransform: 'capitalize' }}>{item === 'high' ? 'High priority' : item}</button>
           ))}
         </div>
-        <Link href="/tasks?new=1" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <div style={{ width: 34, height: 34, borderRadius: 12, background: 'rgba(155,92,255,0.18)', border: '1px solid rgba(155,92,255,0.32)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Plus style={{ width: 16, height: 16, color: '#b98bff' }} strokeWidth={2} />
-          </div>
-        </Link>
-      </div>
+      </section>
 
-      {/* Task list */}
-      <div style={{ ...G, flex: 1, minHeight: 0, borderRadius: 22, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
-          <div style={LBL}><CheckSquare style={{ width: 9, height: 9 }} />{filtered.length} task{filtered.length !== 1 ? 's' : ''} {filter !== 'all' ? `· ${FILTERS.find(f => f.id === filter)?.label}` : ''}</div>
+      <section style={{ ...GLASS, flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        {visible.length ? (
+          <div style={{ overflowY: 'auto', minHeight: 0, flex: 1 }}>
+            {visible.map(task => <TaskItem key={task.id} task={task} done={done.has(task.id)} onToggle={() => onToggle(task.id)} />)}
+          </div>
+        ) : (
+          <EmptyState icon={Check} title="Nothing in this lane" text="Switch the filter or add one task that deserves your attention." />
+        )}
+      </section>
+
+      <Link href="/tasks" style={{ textDecoration: 'none' }}>
+        <div style={{ borderRadius: 18, minHeight: 48, padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, #6b3dff, #9258ff)', boxShadow: '0 12px 28px rgba(107,61,255,0.30)' }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Open full task manager</span>
+          <ArrowRight style={{ width: 16, height: 16, color: 'white' }} />
         </div>
-        {filtered.length > 0 ? (
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-            {filtered.map(t => (
-              <TaskRow key={t.id} task={t} done={done.has(t.id)} onToggle={() => onToggle(t.id)} />
+      </Link>
+    </div>
+  )
+}
+
+function ClientsSlide({ clients, emails, loading }: { clients: ClientAccount[]; emails: NeedsAttentionEmail[]; loading: boolean }) {
+  const sortedClients = [...clients].sort((a, b) => {
+    const rank: Record<string, number> = { churning: 0, at_risk: 1, new: 2, active: 3, good: 4, excellent: 5 }
+    return (rank[a.health_status] ?? 4) - (rank[b.health_status] ?? 4)
+  })
+  const focusClients = sortedClients.slice(0, 3)
+
+  const statusColor = (status: string) => {
+    if (status === 'churning') return '#ff6b75'
+    if (status === 'at_risk') return '#f1a35b'
+    if (status === 'new') return '#7ab8db'
+    return '#7ed195'
+  }
+
+  return (
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <section style={{ ...GLASS, padding: '17px 18px', background: 'linear-gradient(135deg, rgba(57,27,105,0.88), rgba(14,9,39,0.94))' }}>
+        <div style={LABEL}><Users style={{ width: 10, height: 10 }} />Clients & outreach</div>
+        <h2 style={{ margin: '8px 0 4px', fontSize: 22, lineHeight: 1.1, fontWeight: 850, color: 'white' }}>Relationships before reports.</h2>
+        <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: 'rgba(255,255,255,0.46)' }}>See who needs attention, then choose one useful action.</p>
+      </section>
+
+      <section style={{ ...GLASS, overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '13px 15px 11px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={LABEL}><Building2 style={{ width: 10, height: 10 }} />Client focus</div>
+          <Link href="/dryp-hub" style={{ fontSize: 10.5, fontWeight: 700, color: '#b98bff', textDecoration: 'none' }}>See all →</Link>
+        </div>
+        {loading ? (
+          <div style={{ flex: 1, display: 'grid', placeItems: 'center' }}><Loader2 className="animate-spin" style={{ width: 22, height: 22, color: '#b98bff' }} /></div>
+        ) : focusClients.length ? (
+          <div style={{ overflowY: 'auto', minHeight: 0 }}>
+            {focusClients.map(client => (
+              <div key={client.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px', borderBottom: '1px solid rgba(255,255,255,0.055)' }}>
+                <div style={{ width: 38, height: 38, borderRadius: 13, display: 'grid', placeItems: 'center', background: `${statusColor(client.health_status)}16`, border: `1px solid ${statusColor(client.health_status)}2b`, color: statusColor(client.health_status), fontWeight: 850, flexShrink: 0 }}>{client.business_name.slice(0, 1).toUpperCase()}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 13.5, fontWeight: 750, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{client.business_name}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 10.5, color: 'rgba(255,255,255,0.38)', textTransform: 'capitalize' }}>{client.client_pipeline_stage?.replaceAll('_', ' ') || client.health_status.replaceAll('_', ' ')}</p>
+                </div>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: statusColor(client.health_status), flexShrink: 0 }} />
+              </div>
             ))}
           </div>
         ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', textAlign: 'center' }}>
-              {filter === 'all' ? 'No open tasks — you\'re clear' : 'Nothing in this filter right now'}
-            </p>
-          </div>
+          <EmptyState icon={Building2} title="Client data is not connected yet" text="Open DRYP Hub to check the CRM connection without cluttering this page." />
         )}
-      </div>
+      </section>
 
-      {/* View in DRYP Hub — primary CTA */}
-      <a href="https://dryphub.com" target="_blank" rel="noreferrer" style={{ textDecoration: 'none', flexShrink: 0 }}>
-        <div style={{
-          borderRadius: 16, padding: '11px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #6B3DFF 0%, #8D5CFF 100%)',
-          boxShadow: '0 0 18px rgba(109,60,255,0.35)',
-        }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>Open DRYP Hub →</span>
-          <ExternalLink style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.7)' }} />
-        </div>
-      </a>
-
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <MiniAction href="/email" icon={Inbox} label="Needs reply" value={`${emails.length} thread${emails.length === 1 ? '' : 's'}`} color="#8fc7e8" />
+        <a href="https://dryphub.com/outreach" target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+          <div style={{ ...GLASS, borderRadius: 20, padding: '13px 14px', minHeight: 66, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 13, display: 'grid', placeItems: 'center', background: 'rgba(185,139,255,0.14)', border: '1px solid rgba(185,139,255,0.28)' }}><Zap style={{ width: 18, height: 18, color: '#b98bff' }} /></div>
+            <div style={{ flex: 1 }}><p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.42)' }}>Pipeline</p><p style={{ margin: '2px 0 0', fontSize: 13.5, fontWeight: 750, color: 'white' }}>Open outreach</p></div>
+            <ExternalLink style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.28)' }} />
+          </div>
+        </a>
+      </section>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 3 — DRYP / Clients
-// ─────────────────────────────────────────────────────────────────────────────
-function Slide3() {
+function MoneySlide({ money, bills, loading }: { money: MoneyDashboardData | null; bills: UpcomingBill[]; loading: boolean }) {
+  const safe = money?.safe_to_spend
+  const alerts = (money?.subscription_alerts_count ?? 0) + (money?.duplicate_charges_count ?? 0) + (money?.unknown_transactions_count ?? 0)
+
   return (
-    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-
-      {/* Header */}
-      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(40,22,80,0.78) 0%, rgba(16,8,44,0.88) 100%)', border: '1px solid rgba(155,92,255,0.20)' }}>
-        <div style={LBL}><Users style={{ width: 9, height: 9 }} />DRYP Digital · CRM</div>
-        <p style={{ fontSize: 16, fontWeight: 800, color: 'white', margin: '0 0 3px' }}>Clients & Outreach</p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.42)', margin: 0 }}>Your agency work, campaigns, and client relationships.</p>
-      </div>
-
-      {/* Primary CRM apps — 2×2 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, flexShrink: 0 }}>
-        <AppBtn icon={Building2}   label="DRYP Hub"   href="https://dryphub.com"             color="#b98bff" desc="CRM dashboard"    external />
-        <AppBtn icon={Users}       label="Clients"    href="/dryp-hub"                       color="#A890D0" desc="Account list"              />
-        <AppBtn icon={Zap}         label="Outreach"   href="https://dryphub.com/outreach"    color="#9070B0" desc="Contact pipeline" external />
-        <AppBtn icon={BarChart2}   label="Reports"    href="https://dryphub.com"             color="#7050A0" desc="Performance"      external />
-      </div>
-
-      {/* Secondary links — flex:1 spacer card */}
-      <div style={{ ...G, borderRadius: 22, padding: '12px 14px', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        <div style={LBL}><Briefcase style={{ width: 9, height: 9 }} />Quick Access</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flex: 1, overflowY: 'auto', minHeight: 0 }}>
-          {[
-            { icon: Mail,         label: 'Email',      desc: 'Gmail inbox',         href: '/email',      color: '#A8C4DA' },
-            { icon: Calendar,     label: 'Calendar',   desc: "Today's events",      href: '/calendar',   color: '#8AAEC8' },
-            { icon: CheckSquare,  label: 'Tasks',      desc: 'Open task list',      href: '/tasks',      color: '#b98bff' },
-            { icon: Target,       label: 'Work Overview', desc: 'Dashboard',         href: '/work',       color: '#9b5cff' },
-          ].map(({ icon: Icon, label, desc, href, color }) => (
-            <Link key={label} href={href} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 10, background: `${color}18`, border: `1px solid ${color}28`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Icon style={{ width: 15, height: 15, color }} strokeWidth={1.6} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.80)', margin: 0 }}>{label}</p>
-                  <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.30)', margin: 0 }}>{desc}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
+    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <section style={{ ...GLASS, position: 'relative', overflow: 'hidden', padding: '19px 20px', background: 'linear-gradient(135deg, rgba(24,77,54,0.82), rgba(12,29,29,0.94))', border: '1px solid rgba(126,209,149,0.18)' }}>
+        <div style={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', right: -55, top: -72, background: 'radial-gradient(circle, rgba(126,209,149,0.26), transparent 70%)' }} />
+        <div style={{ position: 'relative' }}>
+          <div style={{ ...LABEL, color: '#8fd6a3' }}><CircleDollarSign style={{ width: 11, height: 11 }} />Safe to spend</div>
+          {loading ? (
+            <Loader2 className="animate-spin" style={{ width: 25, height: 25, color: '#8fd6a3', marginTop: 17 }} />
+          ) : (
+            <>
+              <p style={{ margin: '8px 0 2px', fontSize: 39, lineHeight: 1, fontWeight: 900, color: 'white' }}>{formatMoney(safe?.safeToSpend)}</p>
+              <p style={{ margin: '8px 0 0', fontSize: 11.5, lineHeight: 1.5, color: 'rgba(255,255,255,0.46)' }}>
+                {safe?.dailySpendingAmount != null && safe?.daysUntilNextConfirmedIncome != null
+                  ? `${formatMoney(safe.dailySpendingAmount)} per day for ${safe.daysUntilNextConfirmedIncome} days`
+                  : 'Calculated from imported statements, bills, reserves, and confirmed income.'}
+              </p>
+            </>
+          )}
         </div>
-      </div>
+      </section>
 
+      <section style={{ ...GLASS, overflow: 'hidden', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '13px 15px 11px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ ...LABEL, color: '#d8ba78' }}><CreditCard style={{ width: 10, height: 10 }} />Upcoming bills</div>
+          <Link href="/money/bills" style={{ fontSize: 10.5, fontWeight: 700, color: '#d8ba78', textDecoration: 'none' }}>All bills →</Link>
+        </div>
+        {bills.length ? (
+          <div style={{ overflowY: 'auto', minHeight: 0 }}>
+            {bills.slice(0, 3).map(bill => {
+              const amount = bill.expected_amount ?? bill.minimum_amount
+              return (
+                <Link key={bill.id} href="/money/bills" style={{ textDecoration: 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 15px', borderBottom: '1px solid rgba(255,255,255,0.055)' }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 13, display: 'grid', placeItems: 'center', background: 'rgba(216,186,120,0.12)', border: '1px solid rgba(216,186,120,0.22)' }}><FileText style={{ width: 17, height: 17, color: '#d8ba78' }} /></div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: 13.5, fontWeight: 740, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{bill.name}</p>
+                      <p style={{ margin: '3px 0 0', fontSize: 10.5, color: bill.days_until != null && bill.days_until <= 1 ? '#f1a35b' : 'rgba(255,255,255,0.38)' }}>{bill.days_until === 0 ? 'Due today' : bill.days_until === 1 ? 'Due tomorrow' : bill.days_until != null ? `Due in ${bill.days_until} days` : 'Due date not set'}</p>
+                    </div>
+                    <span style={{ fontSize: 12.5, fontWeight: 780, color: '#d8ba78', flexShrink: 0 }}>{amount != null ? formatMoney(amount) : '—'}</span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        ) : (
+          <EmptyState icon={CreditCard} title="No upcoming bills are loaded" text="Upload the latest statements or add a bill manually so LUNA can warn you before it is due." />
+        )}
+      </section>
+
+      <section style={{ display: 'grid', gridTemplateColumns: '1fr 1.15fr', gap: 10 }}>
+        <MiniAction href="/money/subscriptions" icon={AlertCircle} label="Money alerts" value={`${alerts} to review`} color="#f1a35b" />
+        <Link href="/money/import" style={{ textDecoration: 'none' }}>
+          <div style={{ minHeight: 66, borderRadius: 20, padding: '13px 14px', display: 'flex', alignItems: 'center', gap: 10, background: 'linear-gradient(135deg, #5d37d6, #8e55ff)', boxShadow: '0 12px 28px rgba(94,55,214,0.30)' }}>
+            <div style={{ width: 38, height: 38, borderRadius: 13, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,0.13)', border: '1px solid rgba(255,255,255,0.18)' }}><Upload style={{ width: 18, height: 18, color: 'white' }} /></div>
+            <div style={{ flex: 1 }}><p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.68)' }}>Update LUNA</p><p style={{ margin: '2px 0 0', fontSize: 13.5, fontWeight: 800, color: 'white' }}>Import statement</p></div>
+            <ChevronRight style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.68)' }} />
+          </div>
+        </Link>
+      </section>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// SLIDE 4 — Money tools
-// ─────────────────────────────────────────────────────────────────────────────
-const MONEY_APPS = [
-  { icon: ArrowUpDown, label: 'Transactions',  href: '/money/transactions',  color: '#8AB88A', desc: 'All spending'    },
-  { icon: CreditCard,  label: 'Subscriptions', href: '/money/subscriptions', color: '#7AA87A', desc: 'Monthly bills'   },
-  { icon: FileText,    label: 'Bills',          href: '/money/bills',         color: '#C9A96E', desc: 'Upcoming due'   },
-  { icon: Lightbulb,   label: 'Insights',       href: '/money/insights',      color: '#C9A96E', desc: 'Spending intel' },
-  { icon: Target,      label: 'Planning',       href: '/money/planning',      color: '#C9923A', desc: 'Budget goals'   },
-  { icon: Building2,   label: 'Connect Bank',   href: '/money/connect',       color: '#6A8EA8', desc: 'Link accounts'  },
-]
-
-function Slide4() {
-  return (
-    <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', gap: 8 }}>
-
-      {/* Header card */}
-      <div style={{ ...G, borderRadius: 24, padding: '12px 14px', flexShrink: 0, background: 'linear-gradient(140deg, rgba(20,44,20,0.72) 0%, rgba(12,28,12,0.85) 100%)', border: '1px solid rgba(138,184,138,0.16)' }}>
-        <div style={LBL}><BarChart2 style={{ width: 9, height: 9 }} />Money</div>
-        <p style={{ fontSize: 16, fontWeight: 800, color: 'white', margin: '0 0 3px' }}>Financial Overview</p>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.40)', margin: 0 }}>Track spending, bills, subscriptions, and plan ahead.</p>
-      </div>
-
-      {/* Money apps grid — flex:1 so it fills remaining space */}
-      <div style={{ flex: 1, minHeight: 0, display: 'grid', gridTemplateColumns: '1fr 1fr', gridTemplateRows: 'repeat(3, 1fr)', gap: 8 }}>
-        {MONEY_APPS.map(app => (
-          <AppBtn key={app.href} {...app} />
-        ))}
-      </div>
-
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN PAGE
-// ─────────────────────────────────────────────────────────────────────────────
 export default function WorkPage() {
-  const [tasks,   setTasks]   = useState<UnifiedTask[]>([])
-  const [stats,   setStats]   = useState<{ openTasks: number; dueToday: number; dueThisWeek: number; atRiskCount: number } | null>(null)
+  const [tasks, setTasks] = useState<UnifiedTask[]>([])
+  const [done, setDone] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(false)
-  const [done,    setDone]    = useState<Set<string>>(new Set())
-  const [events,        setEvents]        = useState<CalendarEvent[]>([])
+  const [error, setError] = useState(false)
+  const [events, setEvents] = useState<CalendarEvent[]>([])
   const [eventsLoading, setEventsLoading] = useState(true)
-  const [emails,        setEmails]        = useState<NeedsAttentionEmail[]>([])
-  const [emailsLoading, setEmailsLoading] = useState(true)
-  const [bills,          setBills]        = useState<{ id: string; name: string; expected_amount: number | null; minimum_amount: number | null; days_until: number | null }[]>([])
+  const [emails, setEmails] = useState<NeedsAttentionEmail[]>([])
+  const [bills, setBills] = useState<UpcomingBill[]>([])
+  const [clients, setClients] = useState<ClientAccount[]>([])
+  const [clientsLoading, setClientsLoading] = useState(true)
+  const [money, setMoney] = useState<MoneyDashboardData | null>(null)
+  const [moneyLoading, setMoneyLoading] = useState(true)
 
   const load = useCallback(() => {
-    setLoading(true); setError(false)
+    setLoading(true)
+    setError(false)
+
     Promise.allSettled([
-      fetch('/api/dryp/tasks').then(r => r.json()),
-      fetch('/api/tasks/prioritized').then(r => r.json()),
-      fetch('/api/dryp/stats').then(r => r.json()),
-    ]).then(([drypRes, localRes, statsRes]) => {
-      const drypTasks: UnifiedTask[] = drypRes.status === 'fulfilled' ? (drypRes.value.tasks ?? []) : []
-      const connected = drypRes.status === 'fulfilled' ? (drypRes.value.connected ?? true) : false
-      if (!connected) setError(true)
-
-      const localTasks: UnifiedTask[] = localRes.status === 'fulfilled'
-        ? ((localRes.value.tasks ?? []) as LocalTask[]).map(localTaskToUnified)
+      fetch('/api/dryp/tasks', { cache: 'no-store' }).then(r => r.json()),
+      fetch('/api/tasks/prioritized', { cache: 'no-store' }).then(r => r.json()),
+    ]).then(([drypResult, localResult]) => {
+      const drypTasks: UnifiedTask[] = drypResult.status === 'fulfilled' ? (drypResult.value.tasks ?? []) : []
+      const localTasks: UnifiedTask[] = localResult.status === 'fulfilled'
+        ? ((localResult.value.tasks ?? []) as LocalTask[]).map(localTaskToUnified)
         : []
-
+      if (drypResult.status === 'rejected' || (drypResult.status === 'fulfilled' && drypResult.value.connected === false)) setError(true)
       setTasks([...drypTasks, ...localTasks])
-
-      const dryStats = statsRes.status === 'fulfilled' && statsRes.value.connected ? statsRes.value : null
-      const merged = [...drypTasks, ...localTasks].filter(t => t.status !== 'done')
-      const today = new Date(); today.setHours(0, 0, 0, 0)
-      const weekOut = new Date(today.getTime() + 7 * 86_400_000)
-      setStats({
-        openTasks: merged.length,
-        dueToday: merged.filter(t => t.due_date && new Date(t.due_date) <= today).length,
-        dueThisWeek: merged.filter(t => t.due_date && new Date(t.due_date) <= weekOut).length,
-        atRiskCount: dryStats?.atRiskCount ?? 0,
-      })
     }).finally(() => setLoading(false))
 
     setEventsLoading(true)
-    fetch('/api/calendar/upcoming?days=2')
+    fetch('/api/calendar/upcoming?days=2', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => setEvents((d.events ?? []).filter((e: CalendarEvent) => (e.isToday || e.isTomorrow) && !isMickEvent(e))))
+      .then(data => setEvents((data.events ?? []).filter((event: CalendarEvent) => (event.isToday || event.isTomorrow) && !isMickEvent(event))))
       .catch(() => setEvents([]))
       .finally(() => setEventsLoading(false))
 
-    setEmailsLoading(true)
-    fetch('/api/gmail/needs-attention')
+    fetch('/api/gmail/needs-attention', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => setEmails(d.top ?? []))
+      .then(data => setEmails(data.top ?? []))
       .catch(() => setEmails([]))
-      .finally(() => setEmailsLoading(false))
 
-    fetch('/api/money/bills')
+    fetch('/api/money/bills', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => setBills((d.bills ?? []).filter((b: { days_until: number | null; status: string }) => b.days_until != null && b.days_until <= 7 && b.status !== 'paid')))
+      .then(data => setBills((data.bills ?? []).filter((bill: UpcomingBill) => bill.days_until != null && bill.days_until <= 30 && bill.status !== 'paid')))
       .catch(() => setBills([]))
+
+    setClientsLoading(true)
+    fetch('/api/dryp/accounts', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => setClients(data.accounts ?? []))
+      .catch(() => setClients([]))
+      .finally(() => setClientsLoading(false))
+
+    setMoneyLoading(true)
+    fetch('/api/money/dashboard', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(data => setMoney(data.error ? null : data))
+      .catch(() => setMoney(null))
+      .finally(() => setMoneyLoading(false))
   }, [])
 
   useEffect(() => { load() }, [load])
 
-  function toggle(id: string) {
-    const task = tasks.find(t => t.id === id)
-    setDone(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n })
-    // Local (LUNA-side) tasks actually persist as done — DRYP CRM tasks stay
-    // a session-local hide since completing those belongs in DRYP itself.
-    if (task?._local && !done.has(id)) {
+  function toggleTask(id: string) {
+    const task = tasks.find(item => item.id === id)
+    const markingDone = !done.has(id)
+    setDone(previous => {
+      const next = new Set(previous)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+    if (task?._local && markingDone) {
       fetch('/api/tasks/update', {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: 'done' }),
       }).catch(() => {})
     }
   }
 
-  const activeTasks = tasks.filter(t => t.status !== 'done' && !done.has(t.id))
-  const todayBoundary = new Date(); todayBoundary.setHours(0,0,0,0)
-  const highPriority  = activeTasks.filter(t => t.priority === 'critical' || t.priority === 'high').sort(sortPriority)
-  const dueTodayTasks = activeTasks.filter(t => {
-    if (!t.due_date) return false
-    const d = new Date(t.due_date); d.setHours(0,0,0,0)
-    return d <= todayBoundary
-  }).sort(sortPriority)
-  const urgentTasks = [
-    ...highPriority.slice(0, 3),
-    ...dueTodayTasks.filter(t => !highPriority.find(h => h.id === t.id)).slice(0, 2),
-  ]
+  const activeTasks = useMemo(
+    () => tasks.filter(task => task.status !== 'done' && !done.has(task.id)),
+    [tasks, done],
+  )
 
   const pages = [
     {
-      id: 'today', label: 'Today',
-      content: (
-        <Slide1
-          stats={stats} loading={loading} error={error}
-          activeTasks={activeTasks} urgentTasks={urgentTasks}
-          done={done} onToggle={toggle} onSync={load}
-          events={events} eventsLoading={eventsLoading}
-          emails={emails} emailsLoading={emailsLoading}
-          bills={bills}
-        />
-      ),
+      id: 'today',
+      label: 'Today',
+      icon: Target,
+      content: <TodaySlide tasks={activeTasks} done={done} onToggle={toggleTask} loading={loading} error={error} onSync={load} events={events} eventsLoading={eventsLoading} emails={emails} bills={bills} clients={clients} />,
     },
     {
-      id: 'tasks', label: 'Tasks',
-      content: <Slide2 tasks={tasks} done={done} onToggle={toggle} />,
+      id: 'tasks',
+      label: 'Tasks',
+      icon: CheckSquare,
+      content: <TasksSlide tasks={activeTasks} done={done} onToggle={toggleTask} />,
     },
     {
-      id: 'clients', label: 'Clients',
-      content: <Slide3 />,
+      id: 'clients',
+      label: 'Clients',
+      icon: Users,
+      content: <ClientsSlide clients={clients} emails={emails} loading={clientsLoading} />,
     },
     {
-      id: 'money', label: 'Money',
-      content: <Slide4 />,
+      id: 'money',
+      label: 'Money',
+      icon: BarChart3,
+      content: <MoneySlide money={money} bills={bills} loading={moneyLoading} />,
     },
   ]
 
   return (
     <AppLayout noScroll>
-      <CategoryPager pages={pages} accentColor="#9b5cff" hidePills />
+      <CategoryPager pages={pages} accentColor="#9b5cff" hidePills pageNoScroll />
     </AppLayout>
   )
 }

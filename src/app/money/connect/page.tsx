@@ -1,160 +1,99 @@
 'use client'
-import { useState, useCallback, useEffect } from 'react'
+
+import Link from 'next/link'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CreditCard,
+  FileText,
+  ShieldCheck,
+  Upload,
+  WalletCards,
+} from 'lucide-react'
+
 import { AppLayout } from '@/components/layout/AppLayout'
-import { useRouter } from 'next/navigation'
-import { usePlaidLink, type PlaidLinkOnSuccessMetadata } from 'react-plaid-link'
-import { Building2, CheckCircle, Loader2, AlertTriangle } from 'lucide-react'
 
-const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
-const GOLDEN = '#C9A96E'
-const GREEN  = '#5A8A6A'
-
+const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 38%, #08061D 100%)'
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
-  borderRadius: 18,
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  padding: 20,
+  background: 'linear-gradient(145deg, rgba(29,19,65,0.82), rgba(12,8,35,0.88))',
+  border: '1px solid rgba(255,255,255,0.09)',
+  borderRadius: 24,
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  boxShadow: '0 18px 42px rgba(0,0,0,0.22)',
+}
+
+function ActionCard({ href, icon: Icon, title, text, color }: {
+  href: string
+  icon: React.ElementType
+  title: string
+  text: string
+  color: string
+}) {
+  return (
+    <Link href={href} style={{ textDecoration: 'none' }}>
+      <div style={{ ...CARD, padding: 18, display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ width: 50, height: 50, borderRadius: 17, display: 'grid', placeItems: 'center', background: `${color}18`, border: `1px solid ${color}32`, flexShrink: 0 }}>
+          <Icon style={{ width: 23, height: 23, color }} strokeWidth={1.6} />
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white' }}>{title}</p>
+          <p style={{ margin: '4px 0 0', fontSize: 12, lineHeight: 1.5, color: 'rgba(255,255,255,0.44)' }}>{text}</p>
+        </div>
+        <ArrowRight style={{ width: 17, height: 17, color: 'rgba(255,255,255,0.32)', flexShrink: 0 }} />
+      </div>
+    </Link>
+  )
 }
 
 export default function ConnectBankPage() {
-  const router = useRouter()
-  const [linkToken, setLinkToken] = useState<string | null>(null)
-  const [status, setStatus]   = useState<'idle' | 'loading-token' | 'importing' | 'done' | 'error'>('idle')
-  const [message, setMessage] = useState('')
-  const [imported, setImported] = useState(0)
-
-  const fetchLinkToken = useCallback(async () => {
-    setStatus('loading-token')
-    setMessage('Preparing bank connection…')
-    try {
-      const res = await fetch('/api/plaid/create-link-token', { method: 'POST' })
-      const data = await res.json() as { link_token?: string; error?: string }
-      if (!res.ok || !data.link_token) throw new Error(data.error ?? 'Could not start the connection')
-      setLinkToken(data.link_token)
-      setStatus('idle')
-      setMessage('')
-    } catch (err) {
-      setStatus('error')
-      setMessage(err instanceof Error ? err.message : 'Something went wrong')
-    }
-  }, [])
-
-  useEffect(() => { fetchLinkToken() }, [fetchLinkToken])
-
-  const onSuccess = useCallback(async (public_token: string, metadata: PlaidLinkOnSuccessMetadata) => {
-    setStatus('importing')
-    setMessage(`Importing ${metadata.institution?.name ?? 'your account'}…`)
-    try {
-      const res = await fetch('/api/plaid/exchange-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          public_token,
-          institution_id: metadata.institution?.institution_id ?? null,
-          institution_name: metadata.institution?.name ?? null,
-        }),
-      })
-      const data = await res.json() as { imported?: number; institution_name?: string; error?: string }
-      if (!res.ok) throw new Error(data.error ?? 'Import failed')
-      setImported(data.imported ?? 0)
-      setStatus('done')
-      setMessage(`${data.imported ?? 0} transactions imported successfully`)
-    } catch (err) {
-      setStatus('error')
-      setMessage(err instanceof Error ? err.message : 'Something went wrong')
-    }
-  }, [])
-
-  const { open, ready } = usePlaidLink({
-    token: linkToken,
-    onSuccess,
-    onExit: (err) => {
-      if (err) { setStatus('error'); setMessage(err.error_message || 'Connection was cancelled.') }
-    },
-  })
-
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad>
-        <div style={{ padding: '80px 20px 140px', maxWidth: 440, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div style={{ padding: '82px 20px 140px', maxWidth: 520, margin: '0 auto' }}>
+          <Link href="/money" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.48)', textDecoration: 'none', fontSize: 12.5, marginBottom: 18 }}>
+            <ArrowLeft style={{ width: 15, height: 15 }} /> Back to Money
+          </Link>
 
-          {/* Header */}
-          <div style={{ textAlign: 'center' }}>
-            <div style={{
-              width: 72, height: 72, borderRadius: '50%', margin: '0 auto 16px',
-              background: 'radial-gradient(circle, rgba(201,169,110,0.2) 0%, transparent 70%)',
-              border: '1.5px solid rgba(201,169,110,0.3)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <Building2 style={{ width: 32, height: 32, color: GOLDEN }} />
+          <section style={{ ...CARD, position: 'relative', overflow: 'hidden', padding: '24px 22px', marginBottom: 14, background: 'linear-gradient(135deg, rgba(73,40,139,0.84), rgba(15,9,43,0.94))' }}>
+            <div style={{ position: 'absolute', width: 190, height: 190, borderRadius: '50%', right: -65, top: -85, background: 'radial-gradient(circle, rgba(190,139,255,0.33), transparent 70%)' }} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ width: 58, height: 58, borderRadius: 19, display: 'grid', placeItems: 'center', background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.14)', marginBottom: 16 }}>
+                <WalletCards style={{ width: 28, height: 28, color: '#d1b1ff' }} strokeWidth={1.5} />
+              </div>
+              <h1 style={{ margin: 0, fontSize: 25, lineHeight: 1.1, fontWeight: 850, color: 'white' }}>Update LUNA without linking your bank</h1>
+              <p style={{ margin: '10px 0 0', fontSize: 13, lineHeight: 1.65, color: 'rgba(255,255,255,0.55)' }}>
+                LUNA now uses statement imports and manual account updates. This keeps the Money section focused and avoids a bank connection that was creating errors.
+              </p>
             </div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, color: 'white', marginBottom: 6 }}>Connect Your Bank</h1>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
-              Securely link your bank account through Plaid. Your credentials are never stored — only read-only access.
-            </p>
+          </section>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <ActionCard href="/money/import" icon={Upload} title="Import a bank statement" text="Upload a PDF, CSV, or screenshot. LUNA checks subscriptions, bills, duplicates, and spending patterns." color="#b98bff" />
+            <ActionCard href="/money/accounts" icon={CreditCard} title="Update account balances" text="Keep only the institution, nickname, last four digits, and current balance." color="#8fd6a3" />
           </div>
 
-          {/* Status */}
-          {status === 'done' ? (
-            <div style={{ ...CARD, background: 'rgba(90,138,90,0.1)', border: '1px solid rgba(90,138,90,0.3)', textAlign: 'center', padding: 28 }}>
-              <CheckCircle style={{ width: 36, height: 36, color: GREEN, margin: '0 auto 12px' }} />
-              <p style={{ fontSize: 16, fontWeight: 700, color: 'white', marginBottom: 6 }}>Connected!</p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{imported} transactions imported</p>
-              <button
-                onClick={() => router.push('/money')}
-                style={{ marginTop: 16, width: '100%', height: 44, borderRadius: 12, border: 'none', background: GOLDEN, color: '#1A1240', fontSize: 14, fontWeight: 800, cursor: 'pointer' }}>
-                View Money Dashboard →
-              </button>
+          <section style={{ ...CARD, padding: 18, marginTop: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 14, display: 'grid', placeItems: 'center', background: 'rgba(143,214,163,0.12)', border: '1px solid rgba(143,214,163,0.24)', flexShrink: 0 }}>
+                <ShieldCheck style={{ width: 20, height: 20, color: '#8fd6a3' }} strokeWidth={1.6} />
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 13.5, fontWeight: 800, color: 'white' }}>Private by design</p>
+                <p style={{ margin: '5px 0 0', fontSize: 12, lineHeight: 1.6, color: 'rgba(255,255,255,0.43)' }}>
+                  Do not add bank passwords or complete account numbers. Statements should be stored in private app storage and tied only to your signed-in account.
+                </p>
+              </div>
             </div>
-          ) : status === 'error' ? (
-            <div style={{ ...CARD, background: 'rgba(201,107,90,0.08)', border: '1px solid rgba(201,107,90,0.25)', textAlign: 'center', padding: 24 }}>
-              <AlertTriangle style={{ width: 28, height: 28, color: '#C96B5A', margin: '0 auto 10px' }} />
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', marginBottom: 14 }}>{message}</p>
-              <button onClick={() => { setStatus('idle'); fetchLinkToken() }} style={{ fontSize: 13, color: GOLDEN, background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
-                Try again
-              </button>
+          </section>
+
+          <Link href="/money" style={{ textDecoration: 'none' }}>
+            <div style={{ marginTop: 14, minHeight: 50, borderRadius: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg, #6b3dff, #9258ff)', boxShadow: '0 12px 28px rgba(107,61,255,0.3)', color: 'white', fontSize: 13.5, fontWeight: 800 }}>
+              <FileText style={{ width: 17, height: 17 }} /> Open Money dashboard
             </div>
-          ) : (
-            <>
-              {/* Info cards */}
-              {[
-                { icon: '🔒', title: 'Bank-level security', desc: 'Powered by Plaid — used by Venmo, Betterment, and thousands of banking apps' },
-                { icon: '👁️', title: 'Read-only access', desc: 'LUNA can only read your transactions. It cannot move money or make changes' },
-                { icon: '⚡', title: 'Instant import', desc: 'Recent transactions imported automatically after you connect' },
-              ].map(item => (
-                <div key={item.title} style={{ ...CARD, display: 'flex', gap: 14, padding: 16 }}>
-                  <span style={{ fontSize: 22, flexShrink: 0, marginTop: 2 }}>{item.icon}</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: 'white', marginBottom: 3 }}>{item.title}</p>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-
-              {message && (
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>{message}</p>
-              )}
-
-              <button
-                onClick={() => open()}
-                disabled={!ready || status === 'loading-token' || status === 'importing'}
-                style={{
-                  width: '100%', height: 52, borderRadius: 16, border: 'none',
-                  background: (!ready || status !== 'idle') ? 'rgba(201,169,110,0.4)' : 'linear-gradient(135deg, #C9A96E 0%, #B8903A 100%)',
-                  color: '#1A1240', fontSize: 16, fontWeight: 800, cursor: (!ready || status !== 'idle') ? 'wait' : 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}>
-                {status === 'loading-token' || status === 'importing'
-                  ? <><Loader2 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }} /> {message || 'Loading…'}</>
-                  : 'Connect Bank Account'}
-              </button>
-            </>
-          )}
+          </Link>
         </div>
       </AppLayout>
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
     </div>
   )
 }
