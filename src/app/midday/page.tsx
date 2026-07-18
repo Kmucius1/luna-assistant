@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Sun, Sparkles, Droplets, Apple, RefreshCw } from 'lucide-react'
+import { Sun, Sparkles, Droplets, Apple, RefreshCw, Home } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { MIDDAY_REMINDERS } from '@/lib/luna/reminders'
 
@@ -105,7 +106,7 @@ export default function MiddayPage() {
               {/* Today's reminders */}
               <div className="glass-card p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--golden)' }}>
-                  Today's Reminders
+                  Today&apos;s Reminders
                 </p>
                 <div className="space-y-2">
                   {MIDDAY_REMINDERS.map(r => (
@@ -244,6 +245,14 @@ export default function MiddayPage() {
                 <Sparkles className="inline h-4 w-4 mr-2" />
                 Reset again
               </button>
+
+              <Link href="/" className="block mt-3">
+                <button className="w-full py-3.5 rounded-2xl font-semibold text-white flex items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  <Home className="h-4 w-4" />
+                  Return to Home
+                </button>
+              </Link>
             </div>
           )}
 

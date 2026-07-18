@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Zap, Check } from 'lucide-react'
+import { Zap, Check, Home } from 'lucide-react'
 
 const STEPS = [
   { id: 1, emoji: '🦷', text: 'Teeth'               },
@@ -18,6 +19,30 @@ const STEPS = [
 export default function RushModeScreen() {
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [priority, setPriority] = useState('')
+  const [saving, setSaving] = useState(false)
+  const savedTaskId = useRef<string | null>(null)
+
+  async function savePriority() {
+    const title = priority.trim()
+    if (!title) return
+    setSaving(true)
+    try {
+      if (savedTaskId.current) {
+        await fetch('/api/tasks/update', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: savedTaskId.current, title }),
+        })
+      } else {
+        const res = await fetch('/api/tasks/create', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, status: 'todo', source: 'manual', urgency_level: 'high', priority_score: 90 }),
+        })
+        const { task } = await res.json()
+        if (task?.id) savedTaskId.current = task.id
+      }
+    } catch { /* non-fatal */ }
+    finally { setSaving(false) }
+  }
 
   function toggle(id: number) {
     setChecked(prev => {
@@ -96,15 +121,20 @@ export default function RushModeScreen() {
             })}
           </div>
 
-          {/* Priority input */}
+          {/* Priority input — saved as a real task on blur, editable after */}
           <div className="glass-card mb-6" style={{ padding: '16px' }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>
-              ⭐ One priority today
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>
+                ⭐ One priority today
+              </p>
+              {saving && <span className="text-[10px]" style={{ color: 'var(--text-3)' }}>saving…</span>}
+              {!saving && savedTaskId.current && <span className="text-[10px]" style={{ color: 'var(--text-3)' }}>saved · editable</span>}
+            </div>
             <input
               type="text"
               value={priority}
               onChange={e => setPriority(e.target.value)}
+              onBlur={savePriority}
               placeholder="What is the one thing that matters most?"
               className="w-full bg-transparent outline-none text-sm"
               style={{ color: 'var(--text-1)' }}
@@ -120,6 +150,14 @@ export default function RushModeScreen() {
               Go. You are ready enough.
             </p>
           </div>
+
+          <Link href="/" className="block">
+            <button className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+              style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+              <Home className="h-4 w-4" />
+              Return to Home
+            </button>
+          </Link>
 
         </div>
       </AppLayout>

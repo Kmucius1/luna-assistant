@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Sun, ArrowRight, Sparkles, ChevronLeft, Moon } from 'lucide-react'
+import { Sun, ArrowRight, Sparkles, ChevronLeft, Moon, Home, Pencil } from 'lucide-react'
 import { format } from 'date-fns'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { addPattern } from '@/lib/patterns'
@@ -83,6 +84,12 @@ export default function MorningCheckIn() {
     human_design_message: string; chart_reflection: string;
     self_care_action: string; ai_message: string;
   } | null>(null)
+  // The check-in's "top 3" turned into real, editable tasks — not just
+  // read-only text — so they persist, show up on Home/Work, and can be
+  // corrected if the AI got one slightly wrong.
+  const [priorityTasks, setPriorityTasks] = useState<{ id: string; title: string }[]>([])
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+  const [savingTaskId, setSavingTaskId] = useState<string | null>(null)
 
   useEffect(() => { setCheckInType(getCheckInType()) }, [])
 
@@ -124,6 +131,27 @@ export default function MorningCheckIn() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, type: checkInType, aiResponse: aiResult }),
       }).catch(() => {})
+
+      // Turn the top 3 into real tasks so they're saved, editable, and show
+      // up on Home/Work — not just text she reads once and loses.
+      const top3: string[] = aiResult?.top_3 ?? []
+      if (top3.length) {
+        Promise.all(top3.map((title, i) =>
+          fetch('/api/tasks/create', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title, status: 'todo', source: 'manual',
+              urgency_level: i === 0 ? 'high' : 'medium',
+              priority_score: 80 - i * 10,
+            }),
+          }).then(r => r.json()).catch(() => null)
+        )).then(results => {
+          const created = results
+            .map(r => r?.task)
+            .filter((t): t is { id: string; title: string } => !!t?.id)
+          setPriorityTasks(created)
+        })
+      }
       setLoading(false)
     }
   }
@@ -189,7 +217,7 @@ export default function MorningCheckIn() {
               {/* Today's reminders — surfaced immediately, no need to finish the form */}
               <div className="glass-card p-5 mb-6">
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>
-                  Today's Reminders
+                  Today&apos;s Reminders
                 </p>
                 <div className="space-y-2.5">
                   {MORNING_REMINDERS.map(r => (
@@ -453,16 +481,58 @@ export default function MorningCheckIn() {
                     {result.greeting}
                   </h2>
 
-                  {/* Top 3 */}
+                  {/* Top 3 — saved as real tasks the moment they're created
+                      (see finish()), editable here, and visible on Home/Work
+                      since they're the same tasks table those pages read. */}
                   <div className="glass-card p-5">
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Your top 3 today</p>
-                    {result.top_3?.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 py-2" style={{ borderBottom: i < result.top_3.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none' }}>
-                        <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
-                          style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>{i + 1}</span>
-                        <p className="text-sm" style={{ color: 'var(--depth)' }}>{item}</p>
-                      </div>
-                    ))}
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your top 3 today</p>
+                      {priorityTasks.length > 0 && (
+                        <span className="text-[10px]" style={{ color: 'var(--mist)' }}>saved · editable</span>
+                      )}
+                    </div>
+                    {result.top_3?.map((item, i) => {
+                      const task = priorityTasks[i]
+                      const isEditing = task && editingTaskId === task.id
+                      return (
+                        <div key={task?.id ?? i} className="flex items-start gap-3 py-2" style={{ borderBottom: i < result.top_3.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none' }}>
+                          <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+                            style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>{i + 1}</span>
+                          {isEditing ? (
+                            <input
+                              autoFocus
+                              value={task.title}
+                              onChange={e => setPriorityTasks(prev => prev.map(t => t.id === task.id ? { ...t, title: e.target.value } : t))}
+                              onBlur={async () => {
+                                setEditingTaskId(null)
+                                setSavingTaskId(task.id)
+                                await fetch('/api/tasks/update', {
+                                  method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: task.id, title: task.title }),
+                                }).catch(() => {})
+                                setSavingTaskId(null)
+                              }}
+                              onKeyDown={e => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+                              className="flex-1 text-sm bg-transparent outline-none border-b"
+                              style={{ color: 'var(--depth)', borderColor: 'var(--violet)' }}
+                            />
+                          ) : (
+                            <button
+                              onClick={() => task && setEditingTaskId(task.id)}
+                              disabled={!task}
+                              className="flex-1 flex items-center justify-between gap-2 text-left"
+                            >
+                              <p className="text-sm" style={{ color: 'var(--depth)' }}>{task?.title ?? item}</p>
+                              {task && (
+                                savingTaskId === task.id
+                                  ? <span className="text-[10px] flex-shrink-0" style={{ color: 'var(--mist)' }}>saving…</span>
+                                  : <Pencil className="h-3 w-3 flex-shrink-0" style={{ color: 'var(--mist)' }} />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
 
                   {/* First step */}
@@ -500,6 +570,14 @@ export default function MorningCheckIn() {
                   </div>
 
                   <p className="text-sm text-center py-2 italic" style={{ color: 'var(--mist)' }}>{result.ai_message}</p>
+
+                  <Link href="/" className="block">
+                    <button className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                      style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                      <Home className="h-4 w-4" />
+                      Return to Home
+                    </button>
+                  </Link>
                 </div>
               ) : null}
             </div>
