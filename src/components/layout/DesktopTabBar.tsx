@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation'
 import { Home, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid } from 'lucide-react'
 
 const TABS = [
-  { href: '/',          label: 'Home',      icon: Home          },
-  { href: '/work',      label: 'Work',      icon: Briefcase     },
-  { href: '/luna',      label: 'LUNA',      icon: MessageCircle },
-  { href: '/astrology', label: 'Astrology', icon: Moon          },
-  { href: '/creative',  label: 'Atelier',   icon: Scissors      },
-  { href: '/explore',   label: 'Explore',   icon: LayoutGrid    },
+  { href: '/',               label: 'Home',      icon: Home          },
+  { href: '/work-home',      label: 'Work',      icon: Briefcase     },
+  { href: '/luna',           label: 'LUNA',      icon: MessageCircle },
+  { href: '/astrology-home', label: 'Astrology', icon: Moon          },
+  { href: '/creative-home',  label: 'Creative',  icon: Scissors      },
+  { href: '/explore',        label: 'Explore',   icon: LayoutGrid    },
 ]
 
 export function DesktopTabBar() {
@@ -18,6 +18,9 @@ export function DesktopTabBar() {
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/'
+    if (href === '/work-home') return pathname.startsWith('/work') || pathname.startsWith('/tasks') || pathname.startsWith('/calendar') || pathname.startsWith('/email') || pathname.startsWith('/money')
+    if (href === '/astrology-home') return pathname.startsWith('/astrology') || pathname.startsWith('/manifest') || pathname.startsWith('/journal')
+    if (href === '/creative-home') return pathname.startsWith('/creative')
     return pathname.startsWith(href)
   }
 
