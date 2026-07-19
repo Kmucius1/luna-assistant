@@ -11,7 +11,7 @@ interface AppLayoutProps {
   noScroll?: boolean
   noPad?: boolean
   className?: string
-  /** Hub/list pages: 1440px cap instead of the default 1120px narrow-page cap */
+  /** Hub/list pages: a roomy desktop cap without stretching cards edge-to-edge */
   wide?: boolean
 }
 
@@ -42,12 +42,12 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
       )}
 
       <main
-        className={['mx-auto w-full', wide ? 'max-w-[1440px]' : 'max-w-[1120px]', 'lg:pt-16', className ?? ''].join(' ')}
+        className={['mx-auto w-full', wide ? 'max-w-[1180px]' : 'max-w-[1120px]', 'lg:pt-16', className ?? ''].join(' ')}
         style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       >
         {noScroll ? (
           <div
-            className={noPad ? '' : 'px-4 md:px-8 lg:px-12'}
+            className={noPad ? '' : 'px-4 md:px-8 lg:px-10'}
             style={{
               flex: 1, minHeight: 0, overflow: 'hidden',
               display: 'flex', flexDirection: 'column',
@@ -58,7 +58,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
           </div>
         ) : (
           <div
-            className={noPad ? '' : 'px-4 md:px-8 lg:px-12'}
+            className={noPad ? '' : 'px-4 md:px-8 lg:px-10'}
             style={{
               flex: 1, overflowY: 'auto', overflowX: 'hidden',
               paddingBottom: DOCK_CLEAR,
