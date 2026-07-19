@@ -656,6 +656,7 @@ function LunaHomeInner() {
   const initialTab = searchParams.get('tab') ?? ''
   const [activeSlide, setActiveSlide] = useState(TAB_TO_SLIDE[initialTab] ?? 0)
   const [hour, setHour] = useState(12)
+  const [tagline, setTagline] = useState(() => HERO_TAGLINES[getBucket(12)][0])
   const [guidance, setGuidance] = useState<GuidanceData | null>(null)
   const [lunaMessage, setLunaMessage] = useState<{ message: string; affirmation: string } | null>(null)
   const [topTasks, setTopTasks] = useState<HomeTask[]>([])
@@ -667,7 +668,11 @@ function LunaHomeInner() {
   const location = useLocation()
 
   useEffect(() => {
-    const update = () => setHour(new Date().getHours())
+    const update = () => {
+      const nextHour = new Date().getHours()
+      setHour(nextHour)
+      setTagline(getTagline(nextHour))
+    }
     update()
     const timer = window.setInterval(update, 60_000)
     return () => window.clearInterval(timer)
@@ -751,7 +756,7 @@ function LunaHomeInner() {
 
   const bucket = getBucket(hour)
   const pages = useMemo(() => [
-    { id: 'today', label: 'Today', noScroll: true, content: <HomeSlideOne greeting={HERO_GREETINGS[bucket]} tagline={getTagline(hour)} moon={moonData} checkIn={checkIn} topTasks={topTasks} dayPlan={dayPlan} /> },
+    { id: 'today', label: 'Today', noScroll: true, content: <HomeSlideOne greeting={HERO_GREETINGS[bucket]} tagline={tagline} moon={moonData} checkIn={checkIn} topTasks={topTasks} dayPlan={dayPlan} /> },
     { id: 'focus', label: 'Focus', noScroll: true, content: <HomeSlideTwo guidance={guidance} lunaMessage={lunaMessage} /> },
     { id: 'previews', label: 'Previews', noScroll: true, content: <HomeSlideThree outfit={dailyOutfit} moon={moonData} money={moneyData} guidance={guidance} /> },
     { id: 'wellness', label: 'Wellness', noScroll: true, content: <HomeSlideFour checkIn={checkIn} /> },
@@ -760,7 +765,7 @@ function LunaHomeInner() {
     { id: 'reset', label: 'Reset', noScroll: true, content: <HomeSlideSeven /> },
     { id: 'weekly', label: 'Weekly', noScroll: true, content: <HomeSlideEight guidance={guidance} /> },
     { id: 'parked', label: 'Parked', noScroll: true, content: <HomeSlideNine guidance={guidance} /> },
-  ], [bucket, hour, moonData, checkIn, topTasks, dayPlan, guidance, lunaMessage, dailyOutfit, moneyData])
+  ], [bucket, hour, tagline, moonData, checkIn, topTasks, dayPlan, guidance, lunaMessage, dailyOutfit, moneyData])
 
   return (
     <LunaShell noScroll wide>
