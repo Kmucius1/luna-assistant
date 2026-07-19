@@ -159,6 +159,34 @@
     margin-top: 4px !important;
     font-size: 10px !important;
   }
+
+  /* Preserve the complete artwork instead of crop-to-fill on narrow screens. */
+  [class*="homeExperience"] [class*="journalArt"],
+  [class*="homeExperience"] [class*="dailyGlanceArt"],
+  [class*="homeExperience"] [class*="lunaMessageArt"],
+  [class*="homeExperience"] [class*="homeEnergyArt"],
+  [class*="homeExperience"] [class*="lessonBackground"],
+  [class*="homeExperience"] [class*="upcomingBackground"] {
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-color: #0d0927 !important;
+  }
+
+  [class*="homeExperience"] [class*="journalArt"] {
+    background-position: right center !important;
+  }
+
+  [class*="homeExperience"] [class*="dailyGlanceArt"],
+  [class*="homeExperience"] [class*="lunaMessageArt"],
+  [class*="homeExperience"] [class*="homeEnergyArt"] {
+    background-position: center !important;
+  }
+
+  [class*="homeExperience"] [class*="outfitImageWrap"] img {
+    object-fit: contain !important;
+    object-position: center !important;
+    background: #0d0927 !important;
+  }
 }
 
 @media (max-width: 390px) {
