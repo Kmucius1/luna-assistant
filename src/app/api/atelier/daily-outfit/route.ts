@@ -6,14 +6,29 @@ import { getCurrentPlanets } from '@/lib/astrology'
 import { callAI, parseAIJson } from '@/lib/ai'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const OUTFIT_FALLBACK_IMAGE = 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg'
 
 interface DayPlanAnchors { at_work?: string; gym?: string }
 interface DayPlan { key_anchors?: DayPlanAnchors }
-
 interface WeatherNow { tempF: number; forecast: string }
 
-// US National Weather Service — free, no API key. Silently returns null if
-// coordinates aren't available (location permission denied) or the call fails.
+async function isUsableImage(url: string | null | undefined): Promise<boolean> {
+  if (!url || !/^https:\/\//i.test(url)) return false
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(5000),
+      headers: { 'User-Agent': 'Mozilla/5.0 LunaAssistant/1.0' },
+    })
+    const type = response.headers.get('content-type') ?? ''
+    return response.ok && (type.startsWith('image/') || type === '')
+  } catch {
+    return false
+  }
+}
+
 async function getWeather(lat: number, lon: number): Promise<WeatherNow | null> {
   try {
     const ua = { 'User-Agent': 'luna-assistant (info@drypdigital.com)' }
@@ -53,11 +68,10 @@ Return ONLY valid JSON:
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const tz  = searchParams.get('tz') || 'America/New_York'
+    const tz = searchParams.get('tz') || 'America/New_York'
     const lat = searchParams.get('lat')
     const lon = searchParams.get('lon')
     const dateKey = localDateKey(new Date(), tz)
-
     const db = createAdminClient()
 
     const dayName = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(new Date())
@@ -74,7 +88,6 @@ export async function GET(req: NextRequest) {
     const checkIn = checkInR.data as { mood_rating?: number; feeling?: string } | null
     const dayPlan = dayPlanR.data?.payload as DayPlan | undefined
     const isWorkDay = dayPlan?.key_anchors?.at_work ? true : !isWeekend
-
     const planets = getCurrentPlanets(new Date())
     const sun = planets.find(p => p.name === 'Sun')
     const moon = planets.find(p => p.name === 'Moon')
@@ -102,28 +115,44 @@ export async function GET(req: NextRequest) {
 
           let image_url: string | null = null
           try {
-            image_url = await generateFashionImage(parsed.image_prompt)
+            const generated = await generateFashionImage(parsed.image_prompt)
+            image_url = await isUsableImage(generated) ? generated : OUTFIT_FALLBACK_IMAGE
           } catch (imgErr) {
             console.error('[daily-outfit] image generation failed:', imgErr instanceof Error ? imgErr.message : imgErr)
+            image_url = OUTFIT_FALLBACK_IMAGE
           }
 
           return {
             payload: { occasion: parsed.occasion, why: parsed.why, outfit_caption: parsed.outfit_caption, image_url },
-            source: image_url ? 'ai' as const : 'fallback' as const,
+            source: image_url === OUTFIT_FALLBACK_IMAGE ? 'fallback' as const : 'ai' as const,
           }
         } catch (err) {
           console.error('[daily-outfit] generation error:', err)
           return {
-            payload: { occasion: isWorkDay ? 'Work day' : 'Day off', why: 'Dress true to your style today.', outfit_caption: '', image_url: null },
+            payload: {
+              occasion: isWorkDay ? 'Work day' : 'Day off',
+              why: 'Dress true to your style today.',
+              outfit_caption: 'A confident, easy street-style look',
+              image_url: OUTFIT_FALLBACK_IMAGE,
+            },
             source: 'fallback' as const,
           }
         }
       },
     })
 
-    return NextResponse.json(result.payload, { headers: { 'Cache-Control': 'no-store, must-revalidate' } })
+    const image_url = await isUsableImage(result.payload.image_url)
+      ? result.payload.image_url
+      : OUTFIT_FALLBACK_IMAGE
+
+    return NextResponse.json({ ...result.payload, image_url }, { headers: { 'Cache-Control': 'no-store, must-revalidate' } })
   } catch (err) {
     console.error('[atelier/daily-outfit] error:', err)
-    return NextResponse.json({ occasion: '', why: '', outfit_caption: '', image_url: null })
+    return NextResponse.json({
+      occasion: '',
+      why: '',
+      outfit_caption: '',
+      image_url: OUTFIT_FALLBACK_IMAGE,
+    })
   }
 }
