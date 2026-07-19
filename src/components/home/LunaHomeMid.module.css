@@ -53,17 +53,22 @@
 .wellnessRow .iconOrb{ width:34px; height:34px; }
 .wellnessRow > div strong{ font-size:11px; }
 .wellnessRow > div span,.wellnessRow > b{ font-size:9px; }
-.flowSlide{ grid-template-rows:.9fr 1.1fr; gap:8px; }
-.flowCard{ padding:13px; }
-.flowChart{ height:calc(100% - 45px); }
-.flowChart svg{ min-height:60px; }
-.peakLabel{ font-size:8px; padding:5px 8px; }
-.flowTimes,.flowLabels{ font-size:7px; }
+.flowSlide{ grid-template-rows:minmax(0,.92fr) minmax(0,1.08fr); gap:8px; height:100%; min-height:0; }
+.flowCard{ padding:12px 13px 10px; min-height:0; }
+.flowHeader p{ margin-top:6px; font-size:10px; }
+.flowHeader a{ font-size:10px; }
+.flowChart{ height:calc(100% - 39px); min-height:0; padding-top:3px; overflow:hidden; }
+.flowChart svg{ height:calc(100% - 29px); min-height:0; overflow:visible; }
+.peakLabel{ top:6%; left:58%; font-size:8px; padding:5px 8px; }
+.flowTimes{ font-size:7px; }
+.flowLabels{ margin-top:3px; font-size:8px; }
+.flowLabels span{ gap:3px; }
+.flowLabels svg{ width:12px; height:12px; flex:0 0 auto; }
 .journalCard::after{ background:linear-gradient(90deg,rgba(12,7,31,.96) 0%,rgba(12,7,31,.88) 48%,rgba(12,7,31,.34) 74%,rgba(12,7,31,.12) 100%); }
-.journalCopy{ width:72%; padding:18px 16px; }
-.journalCopy > span{ font-size:9px; margin-top:8px; }
-.journalCopy blockquote{ font-size:17px; margin:8px 0 12px; max-width:none; }
-.journalArt{ inset:0; opacity:1; background-position:64% center; background-size:cover; }
+.journalCopy{ width:70%; padding:15px 15px; }
+.journalCopy > span{ font-size:9px; margin-top:7px; }
+.journalCopy blockquote{ font-size:16px; margin:7px 0 10px; max-width:none; line-height:1.23; }
+.journalArt{ inset:0; opacity:1; background-position:66% center; background-size:cover; }
 .primaryButton{ padding:8px 12px; font-size:10px; gap:5px; border-radius:11px; }
 .energySlide{ grid-template-rows:minmax(0,.95fr) minmax(0,1.05fr); gap:8px; }
 .energyReadOverlay{ padding:12px 14px; justify-content:flex-start; }
