@@ -21,11 +21,12 @@
 .flowTimes,.flowLabels{ display: flex; justify-content: space-between; color: rgba(255,255,255,.76); font-size: 12px; }
 .flowLabels{ margin-top: 4px; }
 .flowLabels span{ display: flex; align-items: center; gap: 5px; }
-.journalCard{ display: grid; grid-template-columns: 49% 51%; min-height: 0; background: linear-gradient(90deg,rgba(45,15,97,.92),rgba(15,9,40,.96)); border-color: rgba(160,93,255,.45); }
-.journalCopy{ padding: 18px 24px; display: flex; flex-direction: column; justify-content: center; z-index: 2; overflow: hidden; min-height: 0; }
-.journalCopy > span{ margin-top: 6px; color: var(--text-muted); font-size: 12px; }
-.journalCopy blockquote{ margin: 8px 0 12px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(16px,1.8vw,22px); font-style: italic; line-height: 1.3; }
-.journalArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
+.journalCard{ position:relative; display:block; min-height:0; isolation:isolate; background:#10092b; border-color:rgba(160,93,255,.45); }
+.journalCard::after{ content:""; position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(90deg,rgba(13,7,34,.96) 0%,rgba(13,7,34,.90) 34%,rgba(13,7,34,.48) 58%,rgba(13,7,34,.12) 100%); }
+.journalCopy{ position:relative; width:min(58%,680px); height:100%; padding:24px 30px; display:flex; flex-direction:column; justify-content:center; z-index:2; overflow:hidden; min-height:0; }
+.journalCopy > span{ margin-top:6px; color:var(--text-muted); font-size:12px; }
+.journalCopy blockquote{ margin:8px 0 12px; color:white; font-family:var(--font-display),Georgia,serif; font-size:clamp(16px,1.8vw,22px); font-style:italic; line-height:1.3; }
+.journalArt{ position:absolute; inset:0; z-index:0; background-position:68% center; background-size:cover; background-repeat:no-repeat; }
 .primaryButton{ display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: fit-content; padding: 13px 22px; border: 0; border-radius: 15px; color: white !important; text-decoration: none; font-size: 15px; font-weight: 800; background: linear-gradient(135deg,#6334e8,#8b4eff); box-shadow: 0 12px 30px rgba(92,40,205,.36); cursor: pointer; }
 .energySlide{ display: grid; grid-template-rows: minmax(220px,1fr) minmax(180px,.78fr); gap: 16px; }
 .energyReadCard{ background-image: linear-gradient(90deg,rgba(11,8,38,.92) 0%,rgba(12,8,38,.66) 46%,rgba(13,8,38,.12) 100%); background-size: cover; background-position: center; border-color: rgba(155,92,255,.52); }
@@ -58,12 +59,12 @@
 .flowChart svg{ min-height:60px; }
 .peakLabel{ font-size:8px; padding:5px 8px; }
 .flowTimes,.flowLabels{ font-size:7px; }
-.journalCard{ grid-template-columns: 1fr; }
-.journalCopy{ padding:15px; z-index:2; }
+.journalCard::after{ background:linear-gradient(90deg,rgba(12,7,31,.96) 0%,rgba(12,7,31,.88) 48%,rgba(12,7,31,.34) 74%,rgba(12,7,31,.12) 100%); }
+.journalCopy{ width:72%; padding:18px 16px; }
 .journalCopy > span{ font-size:9px; margin-top:8px; }
-.journalCopy blockquote{ font-size:17px; margin:8px 0 12px; max-width:75%; }
-.journalArt{ position:absolute; inset:0 0 0 35%; opacity:.75; }
-.primaryButton{ padding:6px 10px; font-size:9px; gap:5px; border-radius:11px; }
+.journalCopy blockquote{ font-size:17px; margin:8px 0 12px; max-width:none; }
+.journalArt{ inset:0; opacity:1; background-position:64% center; background-size:cover; }
+.primaryButton{ padding:8px 12px; font-size:10px; gap:5px; border-radius:11px; }
 .energySlide{ grid-template-rows: 1fr 1fr; gap:8px; }
 .energyReadOverlay{ padding:17px; }
 .energyReadOverlay h2{ font-size:23px; margin:12px 0 7px; }
