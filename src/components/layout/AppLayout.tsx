@@ -1,5 +1,6 @@
 'use client'
 import { usePathname } from 'next/navigation'
+import { EnergyReadUpdater } from '@/components/home/EnergyReadUpdater'
 import { BottomNav } from './BottomNav'
 import { DesktopHeader } from './DesktopHeader'
 import { DesktopTabBar } from './DesktopTabBar'
@@ -31,6 +32,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
       style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       className="bg-app"
     >
+      <EnergyReadUpdater />
       {/* Desktop fixed header */}
       <DesktopHeader />
 
