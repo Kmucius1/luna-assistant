@@ -98,7 +98,6 @@
 }
 .heroCard {
   composes: heroCard from './LunaHomeBase.module.css';
-  composes: hero from './assets/Hero.module.css';
 }
 .heroCopy {
   composes: heroCopy from './LunaHomeBase.module.css';
