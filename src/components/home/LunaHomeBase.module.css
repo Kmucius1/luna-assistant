@@ -45,7 +45,6 @@ grid-template-rows: minmax(148px, 0.92fr) minmax(150px, 0.88fr) minmax(140px, 0.
 gap: 12px;
 }
 .heroCard{
-background-image: linear-gradient(90deg, rgba(10,8,32,0.36), rgba(10,8,32,0.06));
 background-size: cover;
 background-position: center;
 border-color: rgba(159, 94, 255, 0.55);
