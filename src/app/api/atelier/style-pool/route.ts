@@ -8,8 +8,6 @@ const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const DAILY_COUNT = 12
 const DAILY_GENERATE_COUNT = 4
 
-// Real Pinterest pin images, verified loading — starter pool for a
-// brand-new account before any real taste signal exists.
 const SEED_PINS = [
   { image_url: 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg', label: 'Chic Workwear' },
   { image_url: 'https://i.pinimg.com/736x/0b/f7/2f/0bf72f36fe8ef8c3e2260069ebc7c9b8.jpg', label: 'Business Casual' },
@@ -20,11 +18,29 @@ const SEED_PINS = [
   { image_url: 'https://i.pinimg.com/736x/0f/ab/ab/0fabab24cecd50492cc8a572b5665ae0.jpg', label: 'Office Chic' },
 ]
 
-// Default direction when there's no like signal yet — her actual confirmed
-// aesthetic (from reviewing her real liked pins directly, 2026-07-15):
-// downtown streetwear/Y2K baddie, not polished editorial. The earlier
-// "Old Money"/"Chic Workwear" defaults were wrong and got denied repeatedly.
 const DEFAULT_LANES = ['Downtown Streetwear', 'Y2K Baddie', 'Street Style', 'Cool-Girl Casual']
+
+async function isUsableImage(url: string): Promise<boolean> {
+  if (!/^https:\/\//i.test(url)) return false
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      redirect: 'follow',
+      cache: 'no-store',
+      signal: AbortSignal.timeout(4500),
+      headers: { 'User-Agent': 'Mozilla/5.0 LunaAssistant/1.0' },
+    })
+    const type = response.headers.get('content-type') ?? ''
+    return response.ok && (type.startsWith('image/') || type === '')
+  } catch {
+    return false
+  }
+}
+
+async function keepReachableImages<T extends { image_url: string }>(images: T[]): Promise<T[]> {
+  const checks = await Promise.all(images.map(async image => ({ image, ok: await isUsableImage(image.image_url) })))
+  return checks.filter(check => check.ok).map(check => check.image)
+}
 
 function buildPrompt(lane: string, avoid: string[]): string {
   const avoidNote = avoid.length ? ` Avoid: ${avoid.join(', ')} styling.` : ''
@@ -34,8 +50,6 @@ function buildPrompt(lane: string, avoid: string[]): string {
     `quality, not overly posed or editorial.${avoidNote}`
 }
 
-// Simple string hash -> seeded PRNG (mulberry32), so "random" is stable for
-// a given day (reloading today shows the same set) but different tomorrow.
 function seededShuffle<T>(items: T[], seed: string): T[] {
   let h = 1779033703 ^ seed.length
   for (let i = 0; i < seed.length; i++) {
@@ -44,7 +58,8 @@ function seededShuffle<T>(items: T[], seed: string): T[] {
   }
   let state = h >>> 0
   function rand() {
-    state |= 0; state = (state + 0x6D2B79F5) | 0
+    state |= 0
+    state = (state + 0x6D2B79F5) | 0
     let t = Math.imul(state ^ (state >>> 15), 1 | state)
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
@@ -79,6 +94,17 @@ export async function GET(req: NextRequest) {
       pool = seeded ?? []
     }
 
+    pool = await keepReachableImages(pool)
+
+    if (pool.length === 0) {
+      const reachableSeeds = await keepReachableImages(SEED_PINS)
+      const { data: reseeded } = await db
+        .from('style_pool_images')
+        .insert(reachableSeeds.map(p => ({ ...p, user_id: ZOE_USER_ID, added_by: 'seed' as const })))
+        .select('id, image_url, label')
+      pool = reseeded ?? []
+    }
+
     const { data: votesData } = await db
       .from('style_pool_votes')
       .select('image_id, vote')
@@ -86,9 +112,6 @@ export async function GET(req: NextRequest) {
 
     const votes: { image_id: string; vote: string }[] = votesData ?? []
     const votedIds = new Set(votes.map(v => v.image_id))
-
-    // Style profile from her actual heart/deny history — what to lean into,
-    // what to steer away from.
     const poolById = new Map(pool.map(p => [p.id, p]))
     const likedLabels = [...new Set(votes.filter(v => v.vote === 'liked')
       .map(v => poolById.get(v.image_id)?.label).filter((l): l is string => Boolean(l)))]
@@ -96,13 +119,6 @@ export async function GET(req: NextRequest) {
       .map(v => poolById.get(v.image_id)?.label).filter((l): l is string => Boolean(l)))]
     const lanes = (likedLabels.length ? likedLabels : DEFAULT_LANES).slice(0, DAILY_GENERATE_COUNT)
 
-    // Once per local day, pull in a few new images matching her taste so far
-    // — a real, growing "similar to what I like" pool, not just what she
-    // manually pastes in. Pinterest live search is the primary source (real
-    // photos, no API key needed — see src/lib/pinterestSearch.ts for the
-    // tradeoffs); AI generation is the fallback whenever Pinterest returns
-    // nothing for a lane, so the pool still grows even if Pinterest's
-    // internal endpoint changes or HIGGSFIELD_API_KEY isn't set.
     const existingUrls = new Set(pool.map(p => p.image_url))
     await getOrCreateDailyContent<{ generated: number; fromPinterest: number; fromAi: number }>({
       userId: ZOE_USER_ID,
@@ -115,18 +131,23 @@ export async function GET(req: NextRequest) {
           for (const lane of lanes) {
             try {
               const pinResults = await searchPinterestImages(`${lane} outfit`, 6)
-              const fresh = pinResults.find(r => !existingUrls.has(r.image_url))
+              const freshCandidates = pinResults.filter(r => !existingUrls.has(r.image_url))
+              const reachable = await keepReachableImages(freshCandidates)
+              const fresh = reachable[0]
               if (fresh) {
                 inserted.push({ image_url: fresh.image_url, label: lane, added_by: 'pinterest' })
                 existingUrls.add(fresh.image_url)
                 continue
               }
             } catch (e) {
-              console.error('[style-pool] Pinterest search failed for lane, falling back to AI:', lane, e instanceof Error ? e.message : e)
+              console.error('[style-pool] Pinterest search failed for lane:', lane, e instanceof Error ? e.message : e)
             }
             try {
               const url = await generateFashionImage(buildPrompt(lane, deniedLabels))
-              inserted.push({ image_url: url, label: lane, added_by: 'ai_generated' })
+              if (await isUsableImage(url)) {
+                inserted.push({ image_url: url, label: lane, added_by: 'ai_generated' })
+                existingUrls.add(url)
+              }
             } catch (e) {
               console.error('[style-pool] generateFashionImage failed:', e instanceof Error ? e.message : e)
             }
@@ -151,6 +172,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
+    pool = await keepReachableImages(pool)
     const unvoted = pool.filter(p => !votedIds.has(p.id))
     const todaysSet = seededShuffle(unvoted, dateKey).slice(0, DAILY_COUNT)
 
@@ -171,15 +193,12 @@ export async function POST(req: NextRequest) {
   try {
     const db = createAdminClient()
     const { image_id, vote } = await req.json() as { image_id: string; vote: 'liked' | 'denied' }
-
     if (!image_id || (vote !== 'liked' && vote !== 'denied')) {
       return NextResponse.json({ error: 'image_id and vote (liked|denied) required' }, { status: 400 })
     }
-
     const { error } = await db
       .from('style_pool_votes')
       .upsert({ user_id: ZOE_USER_ID, image_id, vote }, { onConflict: 'user_id,image_id' })
-
     if (error) {
       console.error('[atelier/style-pool] vote error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
