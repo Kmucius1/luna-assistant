@@ -8,6 +8,27 @@
   margin-inline: auto;
 }
 
+[class*="homeExperience"] [class*="heroCard"] {
+  background-image: url('/images/home/greeting-celestial.svg') !important;
+  background-size: 100% 100% !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-color: #090717 !important;
+}
+
+[class*="homeExperience"] [class*="heroCard"]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(5,5,15,.28), rgba(5,5,15,.08) 62%, rgba(5,5,15,0));
+}
+
+[class*="homeExperience"] [class*="heroCopy"] {
+  position: relative;
+  z-index: 1;
+}
+
 @media (max-width: 900px) {
   [class*="homeExperience"] {
     max-width: 680px;
