@@ -1,4 +1,4 @@
-.resetSlide{ display: grid; grid-template-rows: 1.12fr .88fr; gap: 16px; }
+.resetSlide{ display: grid; grid-template-rows: minmax(240px,1.12fr) minmax(200px,.88fr); gap: 16px; }
 .resetModeCard{ padding: 29px 34px; }
 .resetModeGrid{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px 22px; margin-top: 24px; }
 .resetModeGrid button{ min-height: 124px; display: grid; grid-template-columns: 82px 1fr 30px; gap: 20px; align-items: center; padding: 16px 24px; border-radius: 26px; color: white; border: 1px solid rgba(198,168,255,.22); background: linear-gradient(145deg,rgba(42,36,82,.82),rgba(14,13,42,.82)); cursor: pointer; text-align: left; font-size: 20px; font-weight: 700; }
@@ -28,7 +28,7 @@
 .weekDays .currentDay i{ background:#d3aeff; box-shadow:0 0 17px rgba(211,174,255,.95); }
 .weekThemes{ display:flex; flex-wrap:wrap; justify-content:center; gap:16px; margin-top:27px; }
 .weekThemes span{ padding:12px 23px; border-radius:999px; color:white; border:1px solid rgba(198,168,255,.28); background:rgba(87,42,151,.34); }
-.weekPlanSlide{ display:grid; grid-template-rows:.6fr 1fr .56fr; gap:10px; min-height:0; }
+.weekPlanSlide{ display:grid; grid-template-rows:minmax(130px,.6fr) minmax(200px,1fr) minmax(90px,.56fr); gap:10px; min-height:0; }
 .lessonGrid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; min-height:0; }
 .lessonCard{ display:grid; grid-template-columns:56px 1fr; gap:14px; align-items:center; padding:14px 18px; background-size:cover; background-position:center; overflow:hidden; }
 .lessonBackground{ background-size:cover; background-position:center; }
@@ -47,7 +47,7 @@
 .planWeekOrb{ width:38px;height:38px;display:grid;place-items:center;border-radius:50%;font-size:16px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08); }
 .planWeekButton strong{ display:flex;align-items:center;gap:4px;font-size:16px; }
 @media (max-width: 900px){
-.resetSlide{ grid-template-rows:1.08fr .92fr; gap:8px; }
+.resetSlide{ grid-template-rows:minmax(220px,1.08fr) minmax(180px,.92fr); gap:8px; }
 .resetModeCard{ padding:14px; }
 .resetModeGrid{ gap:7px; margin-top:11px; }
 .resetModeGrid button{ min-height:65px; grid-template-columns:42px 1fr 14px; gap:8px; padding:7px 10px; border-radius:15px; font-size:11px; }

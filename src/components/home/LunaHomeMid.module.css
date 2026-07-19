@@ -10,7 +10,7 @@
 .wellnessRow > b{ color: #a9ff61; font-size: 16px; font-weight: 600; }
 .statusLow{ color: #ff9a89 !important; }
 .checkInLink{ color: #b879ff !important; text-decoration: none; font-weight: 700; }
-.flowSlide{ display: grid; grid-template-rows: .86fr 1.14fr; gap: 14px; }
+.flowSlide{ display: grid; grid-template-rows: minmax(180px,.86fr) minmax(220px,1.14fr); gap: 14px; }
 .flowCard{ padding: 24px 28px 16px; }
 .flowHeader{ display: flex; justify-content: space-between; align-items: flex-start; }
 .flowHeader p{ margin: 9px 0 0; color: var(--text-muted); font-size: 14px; }
@@ -27,7 +27,7 @@
 .journalCopy blockquote{ margin: 8px 0 12px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(16px,1.8vw,22px); font-style: italic; line-height: 1.3; }
 .journalArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
 .primaryButton{ display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: fit-content; padding: 13px 22px; border: 0; border-radius: 15px; color: white !important; text-decoration: none; font-size: 15px; font-weight: 800; background: linear-gradient(135deg,#6334e8,#8b4eff); box-shadow: 0 12px 30px rgba(92,40,205,.36); cursor: pointer; }
-.energySlide{ display: grid; grid-template-rows: 1fr .78fr; gap: 16px; }
+.energySlide{ display: grid; grid-template-rows: minmax(220px,1fr) minmax(180px,.78fr); gap: 16px; }
 .energyReadCard{ background-image: linear-gradient(90deg,rgba(11,8,38,.92) 0%,rgba(12,8,38,.66) 46%,rgba(13,8,38,.12) 100%); background-size: cover; background-position: center; border-color: rgba(155,92,255,.52); }
 .energyReadOverlay{ height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 34px 44px; }
 .energyReadOverlay h2{ color: white; font-size: clamp(30px,3vw,48px); line-height: 1; margin: 24px 0 16px; }
