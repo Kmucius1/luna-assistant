@@ -63,7 +63,7 @@
 .journalCopy > span{ font-size:9px; margin-top:8px; }
 .journalCopy blockquote{ font-size:17px; margin:8px 0 12px; max-width:75%; }
 .journalArt{ position:absolute; inset:0 0 0 35%; opacity:.75; }
-.primaryButton{ padding:8px 12px; font-size:10px; }
+.primaryButton{ padding:6px 10px; font-size:9px; gap:5px; border-radius:11px; }
 .energySlide{ grid-template-rows: 1fr 1fr; gap:8px; }
 .energyReadOverlay{ padding:17px; }
 .energyReadOverlay h2{ font-size:23px; margin:12px 0 7px; }
