@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from '@/lib/theme'
 import './globals.css'
+import './luna-home-polish.css'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
