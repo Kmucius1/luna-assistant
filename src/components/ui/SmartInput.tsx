@@ -53,14 +53,21 @@ declare global {
   }
 }
 
+// Shared with parent pages that need to clear a field's autosaved draft
+// from the outside once a multi-step flow finishes (see useAutosave.ts's
+// clearAutosaveDraft) — must stay in sync with the slug logic below.
+export function getAutosaveKey(context: string, autosaveKey?: string) {
+  return autosaveKey ?? context.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40)
+}
+
 export function SmartInput({
   context, placeholder, value, onChange, onSubmit,
   patternType = 'general', multiline = true, rows = 3,
   history = [], autoSuggest = true, autosave = true,
   autosaveKey, className, style,
 }: SmartInputProps) {
-  const storageKey = autosaveKey ?? context.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40)
-  const { status: saveStatus } = useAutosave(
+  const storageKey = getAutosaveKey(context, autosaveKey)
+  const { status: saveStatus, clearDraft } = useAutosave(
     autosave
       ? { key: storageKey, value, onRestore: (v) => { if (!value) onChange(v) } }
       : { key: storageKey, value: '' }
@@ -168,6 +175,7 @@ export function SmartInput({
     if (value.trim() && onSubmit) {
       addPattern({ type: patternType, context, value: value.trim(), source: 'typed' })
       onSubmit(value.trim())
+      clearDraft()
     }
   }
 
