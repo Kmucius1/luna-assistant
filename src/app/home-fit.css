@@ -10,8 +10,8 @@
 
 [class*="homeExperience"] [class*="heroCard"] {
   background-image: url('/images/home/greeting-celestial.svg') !important;
-  background-size: 100% 100% !important;
-  background-position: center !important;
+  background-size: cover !important;
+  background-position: right center !important;
   background-repeat: no-repeat !important;
   background-color: #090717 !important;
 }
