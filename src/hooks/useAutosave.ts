@@ -56,3 +56,9 @@ export function useAutosave({ key, value, debounceMs = 800, onRestore }: UseAuto
 
   return { status, clearDraft }
 }
+
+export function clearAutosaveDraft(key: string) {
+  try {
+    localStorage.removeItem(`luna_draft_${key}`)
+  } catch {}
+}
