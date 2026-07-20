@@ -1,12 +1,23 @@
 import { createClient } from '@/lib/supabase/server'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+export class UnauthorizedError extends Error {
+  constructor(message = 'Authentication required') {
+    super(message)
+    this.name = 'UnauthorizedError'
+  }
+}
+
+export function isUnauthorizedError(error: unknown): error is UnauthorizedError {
+  return error instanceof UnauthorizedError || (error instanceof Error && error.name === 'UnauthorizedError')
+}
 
 export async function resolveMoneyUserId(): Promise<string> {
-  try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user?.id) return user.id
-  } catch { /* fall through */ }
-  return ZOE_USER_ID
+  const supabase = await createClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  if (error || !user?.id) {
+    throw new UnauthorizedError()
+  }
+
+  return user.id
 }
