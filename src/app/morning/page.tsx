@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Sun, ArrowRight, Sparkles, ChevronLeft, Moon, Home, Pencil } from 'lucide-react'
 import { format } from 'date-fns'
-import { SmartInput } from '@/components/ui/SmartInput'
+import { SmartInput, getAutosaveKey } from '@/components/ui/SmartInput'
 import { addPattern } from '@/lib/patterns'
 import { useLocation } from '@/hooks/useLocation'
 import { MORNING_REMINDERS } from '@/lib/luna/reminders'
+import { clearAutosaveDraft } from '@/hooks/useAutosave'
 
 type CheckInType = 'morning' | 'midday' | 'night'
 
@@ -67,6 +68,15 @@ interface CheckInData {
 }
 
 type Step = 'wake' | 'sleep' | 'energy' | 'mood' | 'dream' | 'feeling' | 'support' | 'goal' | 'result'
+
+// Context strings passed to each SmartInput in this flow — kept here so
+// their saved drafts can be cleared once a check-in finishes (see finish()).
+const CHECK_IN_FIELD_CONTEXTS = [
+  "dream — people, feelings, places, symbols from last night's dream",
+  'how are you feeling right now — emotions, physical sensations, overall state',
+  'what is on your mind — work, people, thoughts, worries, excitement',
+  'what would make tonight-you proud — one thing that would feel like a win by bedtime',
+]
 
 export default function MorningCheckIn() {
   const location = useLocation()
@@ -131,6 +141,11 @@ export default function MorningCheckIn() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, type: checkInType, aiResponse: aiResult }),
       }).catch(() => {})
+
+      // This check-in's answers are now saved server-side above — clear
+      // their local drafts so the next check-in (morning, midday, or
+      // night) opens blank instead of restoring today's leftover text.
+      CHECK_IN_FIELD_CONTEXTS.forEach(ctx => clearAutosaveDraft(getAutosaveKey(ctx)))
 
       // Turn the top 3 into real tasks so they're saved, editable, and show
       // up on Home/Work — not just text she reads once and loses.
