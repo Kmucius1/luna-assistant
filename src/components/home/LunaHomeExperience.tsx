@@ -243,6 +243,7 @@ function HomeSlideOne({
   dayPlan: DayPlan | null
 }) {
   const now = new Date()
+  const bucket = getBucket(now.getHours())
   const nowMinutes = now.getHours() * 60 + now.getMinutes()
   const nextItems = (dayPlan?.schedule ?? [])
     .map(item => ({ ...item, minutes: timeToMinutes(item.time) }))
@@ -258,7 +259,7 @@ function HomeSlideOne({
 
   return (
     <div className={styles.slideOne}>
-      <GlassCard className={styles.heroCard}>
+      <GlassCard className={`${styles.heroCard} hero-${bucket}`}>
         <div className={styles.heroCopy}>
           <h1>{greeting}, Zoe <span>✦</span></h1>
           <p>{tagline}</p>
