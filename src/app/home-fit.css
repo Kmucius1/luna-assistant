@@ -204,7 +204,7 @@
   }
 
   [class*="homeExperience"] [class*="outfitImageWrap"] img {
-    object-fit: contain !important;
+    object-fit: cover !important;
     object-position: center !important;
     background: #0d0927 !important;
   }
