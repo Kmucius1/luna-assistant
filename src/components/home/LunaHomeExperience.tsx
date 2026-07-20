@@ -234,6 +234,7 @@ function HomeSlideOne({
   checkIn,
   topTasks,
   dayPlan,
+  bucket,
 }: {
   greeting: string
   tagline: string
@@ -241,9 +242,9 @@ function HomeSlideOne({
   checkIn: TodayCheckIn | null
   topTasks: HomeTask[]
   dayPlan: DayPlan | null
+  bucket: HeroTimeBucket
 }) {
   const now = new Date()
-  const bucket = getBucket(now.getHours())
   const nowMinutes = now.getHours() * 60 + now.getMinutes()
   const nextItems = (dayPlan?.schedule ?? [])
     .map(item => ({ ...item, minutes: timeToMinutes(item.time) }))
@@ -757,7 +758,7 @@ function LunaHomeInner() {
 
   const bucket = getBucket(hour)
   const pages = useMemo(() => [
-    { id: 'today', label: 'Today', noScroll: true, content: <HomeSlideOne greeting={HERO_GREETINGS[bucket]} tagline={tagline} moon={moonData} checkIn={checkIn} topTasks={topTasks} dayPlan={dayPlan} /> },
+    { id: 'today', label: 'Today', noScroll: true, content: <HomeSlideOne greeting={HERO_GREETINGS[bucket]} tagline={tagline} moon={moonData} checkIn={checkIn} topTasks={topTasks} dayPlan={dayPlan} bucket={bucket} /> },
     { id: 'focus', label: 'Focus', noScroll: true, content: <HomeSlideTwo guidance={guidance} lunaMessage={lunaMessage} /> },
     { id: 'previews', label: 'Previews', noScroll: true, content: <HomeSlideThree outfit={dailyOutfit} moon={moonData} money={moneyData} guidance={guidance} /> },
     { id: 'wellness', label: 'Wellness', noScroll: true, content: <HomeSlideFour checkIn={checkIn} /> },
