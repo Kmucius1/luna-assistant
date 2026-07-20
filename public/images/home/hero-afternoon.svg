@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+<title id="title">Luna daylight horizon</title>
+<desc id="desc">A bright, clear afternoon sky over layered mountains, in azure and soft gold.</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#1d4fb0"/>
+<stop offset="0.5" stop-color="#4f8fe0"/>
+<stop offset="1" stop-color="#cfe8ff"/>
+</linearGradient>
+<radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+<stop offset="0" stop-color="#ffffff"/>
+<stop offset="0.4" stop-color="#fff3c4"/>
+<stop offset="1" stop-color="#fff3c4" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="back" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#5b7bb8"/>
+<stop offset="1" stop-color="#3f5f9c"/>
+</linearGradient>
+<linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#324a80"/>
+<stop offset="1" stop-color="#213460"/>
+</linearGradient>
+</defs>
+<rect x="0" y="0" width="1600" height="520" fill="url(#sky)"/>
+<ellipse cx="260" cy="90" rx="90" ry="22" fill="#ffffff" opacity="0.55"/>
+<ellipse cx="360" cy="110" rx="70" ry="18" fill="#ffffff" opacity="0.4"/>
+<ellipse cx="980" cy="60" rx="80" ry="20" fill="#ffffff" opacity="0.45"/>
+<circle cx="1310" cy="110" r="160" fill="url(#sun)"/>
+<circle cx="1310" cy="110" r="58" fill="#fffdf3"/>
+<path d="M0,520 L0,340 L160,300 L320,360 L480,290 L640,330 L800,270 L960,340 L1120,300 L1280,350 L1440,310 L1600,340 L1600,520 Z" fill="url(#back)"/>
+<path d="M0,520 L0,420 L140,390 L300,440 L460,380 L620,430 L780,400 L940,450 L1100,410 L1260,440 L1440,420 L1600,440 L1600,520 Z" fill="url(#front)"/>
+</svg>
