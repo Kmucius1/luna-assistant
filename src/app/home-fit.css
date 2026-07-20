@@ -9,11 +9,27 @@
 }
 
 [class*="homeExperience"] [class*="heroCard"] {
-  background-image: url('/images/home/greeting-celestial.svg') !important;
   background-size: cover !important;
   background-position: right center !important;
   background-repeat: no-repeat !important;
   background-color: #090717 !important;
+  transition: background-image 0.8s ease;
+}
+
+[class*="homeExperience"] [class*="heroCard"].hero-morning {
+  background-image: url('/images/home/hero-morning.svg') !important;
+}
+
+[class*="homeExperience"] [class*="heroCard"].hero-afternoon {
+  background-image: url('/images/home/hero-afternoon.svg') !important;
+}
+
+[class*="homeExperience"] [class*="heroCard"].hero-evening {
+  background-image: url('/images/home/hero-evening.svg') !important;
+}
+
+[class*="homeExperience"] [class*="heroCard"].hero-night {
+  background-image: url('/images/home/greeting-celestial.svg') !important;
 }
 
 [class*="homeExperience"] [class*="heroCard"]::after {
