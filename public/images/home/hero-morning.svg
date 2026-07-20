@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 520" role="img" aria-labelledby="title desc">
+<title id="title">Luna sunrise horizon</title>
+<desc id="desc">A warm sunrise sky over layered mountains, in gold, coral and indigo.</desc>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#150f33"/>
+<stop offset="0.42" stop-color="#5a3a68"/>
+<stop offset="0.7" stop-color="#e2724f"/>
+<stop offset="1" stop-color="#ffcf7a"/>
+</linearGradient>
+<radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">
+<stop offset="0" stop-color="#fff6dd"/>
+<stop offset="0.4" stop-color="#ffd27a"/>
+<stop offset="1" stop-color="#ffb066" stop-opacity="0"/>
+</radialGradient>
+<linearGradient id="back" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#3c2f66"/>
+<stop offset="1" stop-color="#2a2050"/>
+</linearGradient>
+<linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#211a3f"/>
+<stop offset="1" stop-color="#150f2c"/>
+</linearGradient>
+</defs>
+<rect x="0" y="0" width="1600" height="520" fill="url(#sky)"/>
+<circle cx="1250" cy="400" r="150" fill="url(#sun)"/>
+<circle cx="1250" cy="400" r="62" fill="#ffe6ad"/>
+<path d="M0,520 L0,330 L160,290 L320,350 L480,270 L640,320 L800,260 L960,330 L1120,280 L1280,340 L1440,300 L1600,330 L1600,520 Z" fill="url(#back)"/>
+<path d="M0,520 L0,420 L140,380 L300,440 L460,370 L620,430 L780,390 L940,450 L1100,400 L1260,440 L1440,410 L1600,440 L1600,520 Z" fill="url(#front)"/>
+</svg>
