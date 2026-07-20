@@ -45,6 +45,19 @@
   z-index: 1;
 }
 
+/* Generated 9:16 visual for the narrow artwork beside Today's Glance. */
+[class*="homeExperience"] [class*="dailyGlanceArt"] {
+  background-image:
+    linear-gradient(90deg, rgba(8, 5, 23, 0.08), rgba(8, 5, 23, 0.42)),
+    url('/api/home/daily-glance-art') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  aspect-ratio: 9 / 16;
+  min-height: 100%;
+  transition: background-image 0.65s ease, opacity 0.35s ease;
+}
+
 @media (max-width: 900px) {
   [class*="homeExperience"] {
     max-width: 680px;
@@ -199,7 +212,6 @@
 
   /* Preserve the complete artwork instead of crop-to-fill on narrow screens. */
   [class*="homeExperience"] [class*="journalArt"],
-  [class*="homeExperience"] [class*="dailyGlanceArt"],
   [class*="homeExperience"] [class*="lunaMessageArt"],
   [class*="homeExperience"] [class*="homeEnergyArt"],
   [class*="homeExperience"] [class*="lessonBackground"],
@@ -209,11 +221,16 @@
     background-color: #0d0927 !important;
   }
 
+  [class*="homeExperience"] [class*="dailyGlanceArt"] {
+    background-size: cover !important;
+    background-position: center !important;
+    background-color: #0d0927 !important;
+  }
+
   [class*="homeExperience"] [class*="journalArt"] {
     background-position: right center !important;
   }
 
-  [class*="homeExperience"] [class*="dailyGlanceArt"],
   [class*="homeExperience"] [class*="lunaMessageArt"],
   [class*="homeExperience"] [class*="homeEnergyArt"] {
     background-position: center !important;
