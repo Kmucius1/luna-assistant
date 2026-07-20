@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI, DAILY_BRIEF_PROMPT, parseAIJson } from '@/lib/ai'
 
 const FALLBACK = {
-  mantra: 'You are not behind. You are returning.',
-  theme: 'Presence',
-  focus_areas: ['Show up for what matters most today', 'Protect your energy', 'One clear next step'],
-  tone_mode: 'Soft Start',
-  reflection: 'Some days the most powerful thing is to begin quietly, without pressure.',
+  greeting: 'You showed up. That is enough.',
+  mood_summary: 'Some days the most powerful thing is to begin quietly, without pressure.',
+  top_3: ['Show up for what matters most today', 'Protect your energy', 'One clear next step'],
+  can_wait: [],
+  first_step: 'Choose one task that moves the needle and give it your full attention first.',
+  spiritual_message: 'Move with intention before speed.',
+  human_design_message: 'As a Projector, wait for recognition. Do not force.',
+  chart_reflection: 'Your Scorpio Sun wants to go deep. Your Cancer Moon needs to feel safe first.',
   affirmation: 'Your consistency builds legacy. Today counts.',
-  one_move: 'Choose one task that moves the needle and give it your full attention first.',
+  self_care_action: 'Drink water first.',
+  thing_to_avoid: 'Forcing progress before you feel grounded.',
+  ai_message: 'You are becoming the woman you see in your future.',
 }
 
 export async function POST(request: NextRequest) {
@@ -38,7 +43,8 @@ ${checkIn.dreamText ? `- Dream: ${checkIn.dreamText}` : ''}
       const result = await callAI(DAILY_BRIEF_PROMPT, context, 2000)
       const parsed = parseAIJson(result)
       return NextResponse.json(parsed)
-    } catch {
+    } catch (aiErr) {
+      console.error('Daily brief AI call failed, using fallback:', aiErr)
       return NextResponse.json(FALLBACK)
     }
   } catch (err) {
