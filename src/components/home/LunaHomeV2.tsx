@@ -4,34 +4,35 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
+  ArrowRight,
+  Bell,
+  Brain,
   Briefcase,
   Cloud,
   CloudRain,
-  Coins,
-  Compass,
-  DoorOpen,
+  DollarSign,
   Dumbbell,
+  Flower2,
+  Heart,
   MapPin,
-  Moon,
+  MoonStar,
   PenLine,
   Plane,
-  Quote,
-  Scissors,
   ShirtIcon,
-  Sparkle,
   Sparkles,
   Sun,
-  Sunrise,
-  Utensils,
+  UtensilsCrossed,
   Wind,
 } from 'lucide-react'
 
 import { useLocation } from '@/hooks/useLocation'
+import { ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import styles from './LunaHomeV2.module.css'
 
 interface Room {
   slug: string
   label: string
+  tagline: [string, string]
   image: string
   href: string
   icon: typeof Sun
@@ -39,36 +40,42 @@ interface Room {
 }
 
 const ROOMS: Room[] = [
-  { slug: 'today', label: 'Today', image: '/images/rooms/today.png', href: '/today', icon: Sunrise },
-  { slug: 'food', label: 'Food', image: '/images/rooms/food.png', href: '/food', icon: Utensils, comingSoon: true },
-  { slug: 'style', label: 'Style', image: '/images/rooms/style.png', href: '/creative', icon: ShirtIcon },
-  { slug: 'fitness', label: 'Fitness', image: '/images/rooms/fitness.png', href: '/fitness', icon: Dumbbell, comingSoon: true },
-  { slug: 'work', label: 'Work', image: '/images/rooms/work.png', href: '/work', icon: Briefcase },
-  { slug: 'atelier', label: 'Atelier', image: '/images/rooms/atelier.png', href: '/creative', icon: Scissors },
-  { slug: 'wellness', label: 'Wellness', image: '/images/rooms/wellness.png', href: '/wellness', icon: Sparkle, comingSoon: true },
-  { slug: 'astrology', label: 'Astrology', image: '/images/rooms/astrology.png', href: '/astrology', icon: Moon },
-  { slug: 'money', label: 'Money', image: '/images/rooms/money.png', href: '/money', icon: Coins },
-  { slug: 'brain', label: 'Brain Dump', image: '/images/rooms/brain.png', href: '/brain-dump', icon: PenLine },
-  { slug: 'travel', label: 'Travel', image: '/images/rooms/travel.png', href: '/travel', icon: Plane, comingSoon: true },
-  { slug: 'next', label: 'Next Move', image: '/images/rooms/next-move.png', href: '/next', icon: DoorOpen, comingSoon: true },
+  { slug: 'today', label: 'Today', tagline: ['Plan your day.', 'Live on purpose.'], image: '/images/rooms/today.png', href: '/today', icon: Sun },
+  { slug: 'food', label: 'Food', tagline: ['Fuel your body.', 'Eat beautifully.'], image: '/images/rooms/food.png', href: '/food', icon: UtensilsCrossed, comingSoon: true },
+  { slug: 'style', label: 'Style', tagline: ['Dress the life', "you're building."], image: '/images/rooms/style.png', href: '/creative', icon: ShirtIcon },
+  { slug: 'fitness', label: 'Fitness', tagline: ['Train your body.', 'Build strength.'], image: '/images/rooms/fitness.png', href: '/fitness', icon: Dumbbell, comingSoon: true },
+  { slug: 'work', label: 'Work', tagline: ['Build your brand.', 'Create impact.'], image: '/images/rooms/work.png', href: '/work', icon: Briefcase },
+  { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.png', href: '/creative', icon: PenLine },
+  { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.png', href: '/wellness', icon: Flower2, comingSoon: true },
+  { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.png', href: '/astrology', icon: MoonStar },
+  { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.png', href: '/money', icon: DollarSign },
+  { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.png', href: '/brain-dump', icon: Brain },
+  { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.png', href: '/travel', icon: Plane, comingSoon: true },
+  { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.png', href: '/next', icon: ArrowRight, comingSoon: true },
 ]
 
-const QUOTES: { text: string; author: string }[] = [
-  { text: 'Discipline is choosing between what you want now and what you want most.', author: 'Abraham Lincoln' },
-  { text: 'What you do today can improve all your tomorrows.', author: 'Ralph Marston' },
-  { text: 'Small steps, taken daily, become a life you’re proud of.', author: 'Luna' },
-  { text: 'You do not have to see the whole staircase, just take the first step.', author: 'Martin Luther King Jr.' },
-  { text: 'Slow is smooth, and smooth is fast.', author: 'Navy SEAL Proverb' },
-  { text: 'Clarity comes from action, not thought.', author: 'Marie Forleo' },
-  { text: 'The way you do anything is the way you do everything.', author: 'T. Harv Eker' },
+const QUOTES = [
+  'Discipline creates freedom.',
+  'What you do today can improve all your tomorrows.',
+  'Small steps, taken daily, become a life you’re proud of.',
+  'You do not have to see the whole staircase, just take the first step.',
+  'Slow is smooth, and smooth is fast.',
+  'Clarity comes from action, not thought.',
+  'The way you do anything is the way you do everything.',
 ]
 
-const FOCUS_MESSAGES = [
-  { title: 'Be Present', body: 'Focus on what truly matters and trust the process.' },
-  { title: 'Move With Intention', body: 'One clear priority beats ten scattered ones.' },
-  { title: 'Protect Your Energy', body: 'Say no to what drains you so you can say yes to what matters.' },
-  { title: 'Steady Wins', body: 'Consistency compounds quietly. Keep going.' },
-]
+// Punchy display copy for the Hero card, grounded in the real weekly gym
+// split from zoeLifestyleProfile.ts (ZOE_GYM_BY_DAY) — keep these in sync
+// if that split ever changes.
+const HERO_FOCUS: Record<string, { emoji: string; title: string; subtitle: string }> = {
+  Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.' },
+  Tuesday: { emoji: '💪', title: 'Sexy Back Tuesday', subtitle: 'Pull, row, and build the back you love.' },
+  Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.' },
+  Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.' },
+  Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.' },
+  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.' },
+  Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.' },
+}
 
 function dayIndex(): number {
   const start = new Date(new Date().getFullYear(), 0, 0).getTime()
@@ -76,10 +83,10 @@ function dayIndex(): number {
 }
 
 function getGreeting(hour: number): string {
-  if (hour < 12) return 'Good morning'
-  if (hour < 17) return 'Good afternoon'
-  if (hour < 21) return 'Good evening'
-  return 'Good night'
+  if (hour < 12) return 'Good Morning'
+  if (hour < 17) return 'Good Afternoon'
+  if (hour < 21) return 'Good Evening'
+  return 'Good Night'
 }
 
 function cityFromTimezone(tz: string): string {
@@ -98,12 +105,17 @@ function weatherIconFor(forecast: string) {
 
 export function LunaHomeV2() {
   const location = useLocation()
-  const [hour, setHour] = useState<number | null>(null)
+  const [now, setNow] = useState<{ hour: number; weekday: string; dateLabel: string } | null>(null)
   const [weather, setWeather] = useState<{ tempF: number; forecast: string } | null>(null)
   const [weatherError, setWeatherError] = useState(false)
 
   useEffect(() => {
-    setHour(new Date().getHours())
+    const d = new Date()
+    setNow({
+      hour: d.getHours(),
+      weekday: new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d),
+      dateLabel: new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(d),
+    })
   }, [])
 
   useEffect(() => {
@@ -119,67 +131,55 @@ export function LunaHomeV2() {
 
   const idx = dayIndex()
   const quote = QUOTES[idx % QUOTES.length]
-  const focus = FOCUS_MESSAGES[idx % FOCUS_MESSAGES.length]
-  const greeting = hour != null ? getGreeting(hour) : 'Hello'
+  const greeting = now ? getGreeting(now.hour) : 'Hello'
+  const focus = (now && HERO_FOCUS[now.weekday]) ?? HERO_FOCUS.Monday
+  const gymDetail = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ''
   const WeatherIcon = weather ? weatherIconFor(weather.forecast) : Sun
 
   return (
     <div className={styles.page}>
-      <div className={styles.greetingRow}>
+      <div className={styles.headerTop}>
         <div className={styles.greetingText}>
-          <h1>{greeting}, Zoë <Sparkles size={15} strokeWidth={1.6} /></h1>
-          <p>Let&apos;s make today exceptional.</p>
+          <h1>{greeting}, Zoe <Heart size={16} strokeWidth={1.6} /></h1>
+          {now && <p className={styles.dateLine}>{now.dateLabel}</p>}
         </div>
-        <div className={styles.avatar}>Z</div>
-      </div>
-
-      <div className={styles.topRow}>
-        <div className={styles.tile}>
-          <WeatherIcon size={18} strokeWidth={1.5} className={styles.weatherIcon} />
-          <div className={styles.weatherTemp}>
+        <div className={styles.headerRight}>
+          <span className={styles.bellButton}><Bell size={18} strokeWidth={1.6} /><i /></span>
+          <div className={styles.weatherCard}>
+            <WeatherIcon size={16} strokeWidth={1.5} className={styles.weatherIcon} />
             <strong>{weather ? `${weather.tempF}°` : weatherError ? '—' : '…'}</strong>
+            <p>{weather ? weather.forecast : weatherError ? 'Unavailable' : 'Loading…'}</p>
+            {location.tz && <p className={styles.place}>{cityFromTimezone(location.tz)}</p>}
           </div>
-          <p>{weather ? weather.forecast : weatherError ? 'Weather unavailable' : 'Loading forecast…'}</p>
-          {location.tz && (
-            <p className={styles.place}><MapPin size={12} /> {cityFromTimezone(location.tz)}</p>
-          )}
-        </div>
-
-        <div className={styles.tile}>
-          <Quote size={14} className={styles.quoteMark} />
-          <p className={styles.quoteText}>{quote.text}</p>
-          <p className={styles.quoteAuthor}>— {quote.author}</p>
         </div>
       </div>
 
-      <Link href="/home-classic" className={styles.hero}>
-        <Image src="/images/rooms/hero-today-focus.png" alt="Today's focus" fill sizes="(max-width: 640px) 100vw, 640px" priority />
-        <div className={styles.heroOverlay} />
-        <div className={styles.heroContent}>
+      <p className={styles.quoteLine}><Sparkles size={13} /> &ldquo;{quote}&rdquo;</p>
+
+      <Link href="/plan-my-day" className={styles.hero}>
+        <div className={styles.heroText}>
           <div className={styles.heroLabel}>Today&apos;s Focus</div>
-          <h2>{focus.title}</h2>
-          <p>{focus.body}</p>
-          <span className={styles.heroButton}>
-            View Today <span><Compass size={12} /></span>
-          </span>
+          <h2>{focus.title} <span>{focus.emoji}</span></h2>
+          <p>{focus.subtitle}</p>
+          <span className={styles.heroButton}>View Plan <ArrowRight size={13} /></span>
+        </div>
+        <div className={styles.heroPhoto}>
+          <Image src="/images/rooms/hero-today-focus.png" alt={gymDetail || 'Today\'s workout focus'} fill sizes="(max-width: 640px) 45vw, 300px" priority />
         </div>
       </Link>
-
-      <div className={styles.roomsHeader}>
-        <h3>My Rooms</h3>
-        <span>Edit</span>
-      </div>
 
       <div className={styles.roomGrid}>
         {ROOMS.map(room => {
           const Icon = room.icon
           return (
             <Link key={room.slug} href={room.href} className={styles.roomCard}>
-              <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 160px" />
-              <div className={styles.roomOverlay} />
-              <Icon size={12} strokeWidth={1.7} className={styles.roomIcon} />
-              {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
+              <Icon size={16} strokeWidth={1.5} className={styles.roomIcon} />
               <span className={styles.roomLabel}>{room.label}</span>
+              <p className={styles.roomTagline}>{room.tagline[0]}<br />{room.tagline[1]}</p>
+              <div className={styles.roomPhoto}>
+                <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 160px" />
+              </div>
+              {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
             </Link>
           )
         })}
