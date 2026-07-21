@@ -43,10 +43,16 @@ const EQUIPMENT = ['Barbells', 'Dumbbells', 'Cable machine', 'Smith machine', 'L
 
 const DAYS = ['2', '3', '4', '5', '6+']
 
-const COMING_SOON = [
-  'Progress Photos', 'Workout History', 'Personal Records', 'Strength Graphs',
-  'Recovery Insights', 'Weekly Trends', 'AI Coaching Based on Performance',
-]
+const ONBOARDING_TABS = [
+  { id: 'goals', label: 'Goals', icon: Target },
+  { id: 'gym', label: 'Gym', icon: Building2 },
+  { id: 'equipment', label: 'Equipment', icon: Dumbbell },
+  { id: 'schedule', label: 'Schedule', icon: Footprints },
+] as const
+
+type OnboardingTab = typeof ONBOARDING_TABS[number]['id']
+
+const COMING_SOON_COUNT = 7
 
 interface Onboarding {
   goals: string[]
@@ -64,6 +70,7 @@ function toggle(list: string[], value: string): string[] {
 export function LunaFitnessPage() {
   const [weekday, setWeekday] = useState<string | null>(null)
   const [onboarding, setOnboarding] = useState<Onboarding>(DEFAULT_ONBOARDING)
+  const [activeTab, setActiveTab] = useState<OnboardingTab>('goals')
 
   useEffect(() => {
     setWeekday(new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()))
@@ -83,7 +90,7 @@ export function LunaFitnessPage() {
   const estimatedMinutes = exercises.length * 8
 
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.header}>
           <Image src="/images/rooms/hero-gym-focus.png" alt="Fitness" fill sizes="(max-width: 640px) 100vw, 640px" priority />
@@ -94,108 +101,85 @@ export function LunaFitnessPage() {
           </div>
         </div>
 
-        <div>
-          <p className={styles.sectionHeader}><Dumbbell size={15} /> Today&apos;s Workout</p>
+        <div className={styles.workoutSection}>
+          <p className={styles.sectionHeader}><Dumbbell size={12} /> Today&apos;s Workout</p>
           <div className={styles.card}>
             <p className={styles.workoutName}>{gymFocus}</p>
             <div className={styles.workoutStats}>
-              <div className={styles.workoutStat}><Clock size={14} /><strong>~{estimatedMinutes} min</strong></div>
-              <div className={styles.workoutStat}><Flame size={14} /><strong>{exercises.length} exercises</strong></div>
-              <div className={styles.workoutStat}><Building2 size={14} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
+              <div className={styles.workoutStat}><Clock size={11} /><strong>~{estimatedMinutes} min</strong></div>
+              <div className={styles.workoutStat}><Flame size={11} /><strong>{exercises.length} exercises</strong></div>
+              <div className={styles.workoutStat}><Building2 size={11} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
             </div>
-            {!onboarding.gym && (
-              <div className={styles.gymChips}>
-                {GYMS.map(gym => (
-                  <button key={gym} type="button" className={styles.chip} onClick={() => update({ ...onboarding, gym })}>{gym}</button>
-                ))}
-              </div>
-            )}
             <Link href="/plan-my-day" className={styles.startButton}>Start Workout</Link>
           </div>
         </div>
 
-        <div>
-          <p className={styles.sectionHeader}><Target size={15} /> Your Goals</p>
-          <div className={styles.card}>
-            <div className={styles.chipGrid}>
-              {GOALS.map(goal => (
+        <div className={styles.onboardingSection}>
+          <div className={styles.tabRow}>
+            {ONBOARDING_TABS.map(tab => {
+              const Icon = tab.icon
+              return (
                 <button
-                  key={goal.id}
+                  key={tab.id}
                   type="button"
-                  className={`${styles.chip} ${onboarding.goals.includes(goal.id) ? styles.chipActive : ''}`}
-                  onClick={() => update({ ...onboarding, goals: toggle(onboarding.goals, goal.id) })}
+                  className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                  onClick={() => setActiveTab(tab.id)}
                 >
-                  {goal.emoji} {goal.label}
+                  <Icon size={12} strokeWidth={1.7} /> {tab.label}
                 </button>
-              ))}
-            </div>
+              )
+            })}
           </div>
-        </div>
-
-        <div>
-          <p className={styles.sectionHeader}><Building2 size={15} /> Your Equipment</p>
-          <div className={styles.card}>
-            <div className={styles.chipGrid}>
-              {EQUIPMENT.map(item => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`${styles.chip} ${onboarding.equipment.includes(item) ? styles.chipActive : ''}`}
-                  onClick={() => update({ ...onboarding, equipment: toggle(onboarding.equipment, item) })}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <p className={styles.sectionHeader}><Footprints size={15} /> Your Schedule</p>
-          <div className={styles.card}>
-            <p style={{ fontSize: 12.5, color: 'var(--ink-3)', margin: '0 0 8px' }}>How many days can you realistically train?</p>
-            <div className={styles.chipGrid}>
-              {DAYS.map(d => (
-                <button
-                  key={d}
-                  type="button"
-                  className={`${styles.chip} ${onboarding.days === d ? styles.chipActive : ''}`}
-                  onClick={() => update({ ...onboarding, days: d })}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
+          <div className={styles.card + ' ' + styles.onboardingCard}>
+            {activeTab === 'goals' && (
+              <div className={styles.chipGrid}>
+                {GOALS.map(goal => (
+                  <button key={goal.id} type="button" className={`${styles.chip} ${onboarding.goals.includes(goal.id) ? styles.chipActive : ''}`} onClick={() => update({ ...onboarding, goals: toggle(onboarding.goals, goal.id) })}>
+                    {goal.emoji} {goal.label}
+                  </button>
+                ))}
+              </div>
+            )}
+            {activeTab === 'gym' && (
+              <div className={styles.chipGrid}>
+                {GYMS.map(gym => (
+                  <button key={gym} type="button" className={`${styles.chip} ${onboarding.gym === gym ? styles.chipActive : ''}`} onClick={() => update({ ...onboarding, gym })}>{gym}</button>
+                ))}
+              </div>
+            )}
+            {activeTab === 'equipment' && (
+              <div className={styles.chipGrid}>
+                {EQUIPMENT.map(item => (
+                  <button key={item} type="button" className={`${styles.chip} ${onboarding.equipment.includes(item) ? styles.chipActive : ''}`} onClick={() => update({ ...onboarding, equipment: toggle(onboarding.equipment, item) })}>{item}</button>
+                ))}
+              </div>
+            )}
+            {activeTab === 'schedule' && (
+              <div className={styles.chipGrid}>
+                {DAYS.map(d => (
+                  <button key={d} type="button" className={`${styles.chip} ${onboarding.days === d ? styles.chipActive : ''}`} onClick={() => update({ ...onboarding, days: d })}>{d} days/wk</button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
         <div className={`${styles.card} ${styles.motivationCard}`}>
-          <Sparkles size={20} style={{ color: 'var(--gold)', marginBottom: 6 }} />
-          <h2>You don&apos;t need to be perfect.</h2>
-          <p>You just need to show up today.</p>
+          <Sparkles size={13} style={{ color: 'var(--gold)' }} />
+          <span>You don&apos;t need to be perfect — just show up today.</span>
         </div>
 
-        <div>
-          <p className={styles.sectionHeader}><Zap size={15} /> Quick Actions</p>
+        <div className={styles.quickSection}>
           <div className={styles.quickGrid}>
-            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Camera size={18} /> Progress photo</div>
-            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Scale size={18} /> Log weight</div>
-            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Heart size={18} /> Log water</div>
-            <Link href="/food" className={styles.quickAction}><Utensils size={18} /> Go to Food</Link>
-            <Link href="/style" className={styles.quickAction}><ShirtIcon size={18} /> Pick gym outfit</Link>
+            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Camera size={13} /> Photo</div>
+            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Scale size={13} /> Weight</div>
+            <div className={`${styles.quickAction} ${styles.quickActionDisabled}`}><span className={styles.soonBadge}>Soon</span><Heart size={13} /> Water</div>
+            <Link href="/food" className={styles.quickAction}><Utensils size={13} /> Food</Link>
+            <Link href="/style" className={styles.quickAction}><ShirtIcon size={13} /> Outfit</Link>
           </div>
         </div>
 
-        <div>
-          <p className={styles.sectionHeader}><Lock size={15} /> Unlocks As You Use Luna</p>
-          <div className={styles.card}>
-            <div className={styles.lockedList}>
-              {COMING_SOON.map(item => (
-                <div key={item} className={styles.lockedRow}><Lock size={13} /> {item}</div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <div className={styles.lockedRow}><Lock size={11} /> {COMING_SOON_COUNT} more features unlock as you train — Progress Photos, PRs, Strength Graphs &amp; more</div>
       </div>
     </AppLayout>
   )

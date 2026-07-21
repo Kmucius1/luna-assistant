@@ -66,7 +66,7 @@ export function LunaFoodPage() {
   const totals = todayNutritionTotals()
 
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerPhoto}>

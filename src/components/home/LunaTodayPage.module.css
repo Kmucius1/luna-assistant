@@ -7,11 +7,18 @@
   --gold: var(--golden, #C9A96E);
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
-  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
-  padding: 14px 14px 8px;
+  /* Fills the AppLayout noScroll container exactly — this page never
+     scrolls on any device (including short desktop windows), so every
+     section below sizes itself off flex-grow ratios against whatever
+     height is actually available, not fixed px. */
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 8px 10px 4px;
+  gap: 6px;
 }
 
 /* This page is locked to the light/cream palette regardless of the
@@ -21,81 +28,87 @@
 /* ── Header (shared visual language with the room-grid Home) ────── */
 
 .headerTop {
+  flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .greetingText h1 {
   font-family: var(--font-display-var, serif);
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 500;
   color: var(--ink-1);
-  margin: 0 0 4px;
+  margin: 0 0 1px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
-.greetingText h1 svg { color: var(--gold); }
+.greetingText h1 svg { color: var(--gold); width: 14px; height: 14px; }
 
-.dateLine { margin: 0; font-size: 14px; color: var(--ink-2); }
+.dateLine { margin: 0; font-size: 10.5px; color: var(--ink-2); }
 
 .headerRight {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 6px;
+  gap: 3px;
 }
 
 .bellButton { position: relative; color: var(--gold); display: flex; }
 .bellButton i {
   position: absolute; top: -1px; right: -1px;
-  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold);
 }
 
 .weatherCard {
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: var(--soft-shadow);
-  padding: 8px 14px;
+  padding: 4px 9px;
   text-align: right;
-  min-width: 100px;
+  min-width: 78px;
 }
 
 .weatherCard strong {
   display: block;
   font-family: var(--font-display-var, serif);
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--ink-1);
 }
 
-.weatherIcon { color: var(--gold); float: left; }
+.weatherIcon { color: var(--gold); float: left; width: 13px; height: 13px; }
 
-.weatherCard p { margin: 0; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.weatherCard p { margin: 0; font-size: 8.5px; color: var(--ink-3); white-space: nowrap; }
 
 .quoteLine {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   margin: 0;
-  font-size: 14px;
+  font-size: 10.5px;
   font-style: italic;
   color: var(--ink-2);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.quoteLine svg { color: var(--gold); flex-shrink: 0; }
+.quoteLine svg { color: var(--gold); flex-shrink: 0; width: 11px; height: 11px; }
 
 /* ── Hero ─────────────────────────────────────────────── */
 
 .hero {
   position: relative;
-  min-height: 165px;
-  border-radius: 22px;
+  flex: 0.85 1 0;
+  min-height: 0;
+  border-radius: 16px;
   overflow: hidden;
   box-shadow: var(--soft-shadow);
   display: flex;
@@ -113,156 +126,165 @@
 .heroContent {
   position: relative;
   z-index: 1;
-  padding: 18px 20px;
+  padding: 8px 12px;
   color: #fff;
   max-width: 68%;
 }
 
 .heroLabel {
-  font-size: 10.5px;
+  font-size: 7.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 5px;
+  margin-bottom: 2px;
 }
 
 .heroContent h2 {
   font-family: var(--font-display-var, serif);
-  font-size: 21px;
+  font-size: 13.5px;
   font-weight: 500;
-  margin: 0 0 6px;
+  margin: 0 0 2px;
 }
 
 .heroContent p {
-  font-size: 12.5px;
-  line-height: 1.35;
+  font-size: 9px;
+  line-height: 1.25;
   color: rgba(255,255,255,0.82);
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ── Card grid ────────────────────────────────────────── */
 
 .cardGrid {
+  flex: 3.4 1 0;
+  min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-@media (max-width: 380px) {
-  .cardGrid { grid-template-columns: 1fr; }
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: 18px;
+  border-radius: 12px;
   box-shadow: var(--soft-shadow);
-  padding: 14px;
+  padding: 7px 8px;
 }
 
 .cardHeader {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin-bottom: 10px;
+  gap: 4px;
+  margin-bottom: 3px;
 }
 
-.cardHeader svg:first-child { color: var(--gold); flex-shrink: 0; }
+.cardHeader svg:first-child { color: var(--gold); flex-shrink: 0; width: 11px; height: 11px; }
 
 .cardHeader span {
   flex: 1;
-  font-size: 11px;
+  font-size: 8px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-1);
 }
 
-.cardHeader svg:last-child { color: var(--ink-3); flex-shrink: 0; }
+.cardHeader svg:last-child { display: none; }
 
 .cardLink {
+  flex-shrink: 0;
   margin-top: auto;
-  padding-top: 8px;
-  font-size: 12px;
+  padding-top: 3px;
+  font-size: 8.5px;
   font-weight: 600;
   color: var(--gold);
 }
 
 /* Morning timeline */
 
-.timeline { display: flex; flex-direction: column; gap: 8px; }
-.timelineRow { display: flex; gap: 10px; align-items: flex-start; }
-.timelineTime { flex-shrink: 0; width: 58px; font-size: 11px; color: var(--ink-3); font-weight: 600; }
-.timelineDot { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin-top: 5px; }
-.timelineLabel { font-size: 12.5px; color: var(--ink-2); line-height: 1.3; }
+.timeline { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 2px; overflow: hidden; }
+.timelineRow { display: flex; gap: 5px; align-items: flex-start; }
+.timelineTime { flex-shrink: 0; width: 38px; font-size: 7.5px; color: var(--ink-3); font-weight: 600; }
+.timelineDot { flex-shrink: 0; width: 4px; height: 4px; border-radius: 50%; background: var(--gold); margin-top: 3px; }
+.timelineLabel { font-size: 8.5px; color: var(--ink-2); line-height: 1.2; overflow: hidden; }
 
 /* Gym card */
 
-.gymRow { display: flex; align-items: flex-start; gap: 10px; }
-.gymList { flex: 1; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 3px; }
-.gymFocusName { font-weight: 600; font-size: 13.5px; color: var(--ink-1); margin: 0 0 6px; }
-.gymList li { font-size: 11.5px; color: var(--ink-2); }
+.gymRow { flex: 1; min-height: 0; display: flex; align-items: flex-start; gap: 6px; overflow: hidden; }
+.gymList { flex: 1; min-height: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
+.gymFocusName { font-weight: 600; font-size: 9.5px; color: var(--ink-1); margin: 0 0 3px; }
+.gymList li { font-size: 7.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gymAvatar {
   flex-shrink: 0;
-  width: 46px; height: 46px;
+  width: 26px; height: 26px;
   border-radius: 50%;
   background: rgba(201,169,110,0.18);
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
+  font-size: 13px;
 }
 
 /* Meals card */
 
-.mealsList { display: flex; flex-direction: column; gap: 8px; }
-.mealsRow { display: flex; align-items: center; gap: 9px; }
-.mealThumb { position: relative; width: 34px; height: 34px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.mealsList { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-evenly; gap: 1px; overflow: hidden; }
+.mealsRow { display: flex; align-items: center; gap: 5px; }
+.mealThumb { position: relative; width: 18px; height: 18px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
 .mealThumb :global(img) { object-fit: cover; }
-.mealsRow div p:first-child { margin: 0; font-size: 10px; color: var(--gold); font-weight: 600; }
-.mealsRow div p:last-child { margin: 0; font-size: 12.5px; color: var(--ink-1); }
+.mealsRow div { min-width: 0; overflow: hidden; }
+.mealsRow div p:first-child { margin: 0; font-size: 6.5px; color: var(--gold); font-weight: 600; }
+.mealsRow div p:last-child { margin: 0; font-size: 8.5px; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* Outfit card */
 
-.outfitRow { display: flex; gap: 10px; align-items: center; }
-.outfitPhoto { position: relative; width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.outfitRow { flex: 1; min-height: 0; display: flex; gap: 6px; align-items: center; overflow: hidden; }
+.outfitPhoto { position: relative; width: 40px; height: 40px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 .outfitPhoto :global(img) { object-fit: cover; }
-.outfitTags { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--ink-2); }
-.swatches { display: flex; gap: 4px; margin-top: 6px; }
-.swatch { width: 12px; height: 12px; border-radius: 50%; }
+.outfitTags { display: flex; flex-direction: column; gap: 1px; font-size: 8px; color: var(--ink-2); min-width: 0; }
+.swatches { display: flex; gap: 3px; margin-top: 3px; }
+.swatch { width: 8px; height: 8px; border-radius: 50%; }
 
 /* Work card */
 
-.workTime { font-size: 13px; font-weight: 600; color: var(--ink-1); margin: 0 0 3px; }
-.workNote { font-size: 12px; color: var(--ink-2); margin: 0 0 8px; }
-.progressTrack { height: 5px; border-radius: 4px; background: rgba(180,150,100,0.18); overflow: hidden; margin-bottom: 6px; }
-.progressFill { height: 100%; background: var(--gold); border-radius: 4px; }
-.workCount { font-size: 11px; color: var(--ink-3); margin: 0; }
+.workTime { font-size: 9px; font-weight: 600; color: var(--ink-1); margin: 0 0 1px; }
+.workNote { font-size: 7.5px; color: var(--ink-2); margin: 0 0 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.progressTrack { height: 3px; border-radius: 3px; background: rgba(180,150,100,0.18); overflow: hidden; margin-bottom: 3px; }
+.progressFill { height: 100%; background: var(--gold); border-radius: 3px; }
+.workCount { font-size: 7.5px; color: var(--ink-3); margin: 0; }
 
 /* For You Today card */
 
-.forYouRow { display: flex; gap: 10px; align-items: center; }
-.forYouPhoto { position: relative; width: 72px; height: 72px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.forYouRow { flex: 1; min-height: 0; display: flex; gap: 6px; align-items: center; overflow: hidden; }
+.forYouPhoto { position: relative; width: 40px; height: 40px; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
 .forYouPhoto :global(img) { object-fit: cover; }
-.forYouTags { font-size: 12px; color: var(--ink-2); display: flex; flex-direction: column; gap: 1px; }
-.forYouTags strong { display: block; font-size: 14px; color: var(--ink-1); margin-bottom: 3px; font-weight: 600; }
+.forYouTags { font-size: 7.5px; color: var(--ink-2); display: flex; flex-direction: column; gap: 0; min-width: 0; overflow: hidden; }
+.forYouTags strong { display: block; font-size: 9.5px; color: var(--ink-1); margin-bottom: 1px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* Astrology card (full width) */
+/* Astrology card (full width, slim) */
 
 .astrologyCard {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 10px;
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: 18px;
+  border-radius: 12px;
   box-shadow: var(--soft-shadow);
-  padding: 16px;
+  padding: 6px 10px;
 }
 
-.astrologyText { flex: 1; }
-.astrologyText .cardHeader { margin-bottom: 6px; }
-.astrologyText p { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
-.astrologyGlyph { color: var(--gold); flex-shrink: 0; opacity: 0.7; }
+.astrologyText { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+.astrologyText .cardHeader { margin-bottom: 0; flex-shrink: 0; }
+.astrologyText p { margin: 0; font-size: 8.5px; line-height: 1.2; color: var(--ink-2); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.astrologyGlyph { display: none; }

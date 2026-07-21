@@ -138,7 +138,7 @@ export function LunaTodayPage() {
   const WeatherIcon = weather ? weatherIconFor(weather.forecast) : Sun
 
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.headerTop}>
           <div className={styles.greetingText}>
