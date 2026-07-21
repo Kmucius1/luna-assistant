@@ -1,8 +1,12 @@
-import './home-fit.css'
-import { LunaHomeExperience } from '@/components/home/LunaHomeExperience'
+import { AppLayout } from '@/components/layout/AppLayout'
+import { LunaHomeV2 } from '@/components/home/LunaHomeV2'
 
 export const dynamic = 'force-dynamic'
 
 export default function HomePage() {
-  return <LunaHomeExperience />
+  return (
+    <AppLayout noPad>
+      <LunaHomeV2 />
+    </AppLayout>
+  )
 }
