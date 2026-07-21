@@ -90,6 +90,19 @@ export const ZOE_GYM_BY_DAY: Record<string, string> = {
   Sunday: 'Recovery, outdoor walk, stretching, beach, pool, or mobility',
 }
 
+// Structured version of the exercise lists embedded in ZOE_GYM_BY_DAY's prose
+// above — kept in sync manually since the AI prompt needs prose and the UI
+// (the /today Gym card) needs a real list to render, not string-parsing.
+export const ZOE_EXERCISES_BY_DAY: Record<string, string[]> = {
+  Monday: ['Hip Thrusts', 'Romanian Deadlifts', 'Bulgarian Split Squats', 'Cable Kickbacks', 'Hip Abductor', 'Glute-Focused Back Extensions'],
+  Tuesday: ['Pull-Ups (or Assisted)', 'Lat Pulldown', 'Cable Row', 'Face Pulls', 'Curls', 'Triceps', 'Hanging Knee Raises', 'Cable Crunches', 'Planks'],
+  Wednesday: ['Lighter Hip Thrusts', 'Smith Squats', 'Walking Lunges', 'Cable Abductions', 'Frog Pumps', 'Glute Bridges', 'Core Work'],
+  Thursday: ['Shoulder Press', 'Lateral Raises', 'Rear Delts', 'Triceps', 'Biceps', 'Reverse Crunches', 'Dead Bugs', 'Side Planks'],
+  Friday: ['Hip Thrusts', 'Sumo Deadlifts', 'Step-Ups', 'Cable Kickbacks', 'Hip Abductor Burnout'],
+  Saturday: ['Kettlebell Swings', 'Push-Ups', 'Lunges', 'TRX Rows', 'Conditioning', 'Cable Crunches', 'Hanging Leg Raises'],
+  Sunday: ['Outdoor Walk', 'Stretching', 'Beach or Pool', 'Mobility', 'Sauna'],
+}
+
 export const ZOE_NEVER_FOODS = [
   'eggs',
   'turkey sausage',

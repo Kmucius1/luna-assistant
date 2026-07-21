@@ -1,10 +1,13 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid } from 'lucide-react'
+import { Home, Utensils, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid } from 'lucide-react'
 
+// Home now lands on /today (the real landing experience — see
+// LUNA_V2_MIGRATION_PLAN.md); "/" itself just redirects there.
 const TABS = [
-  { href: '/',                 label: 'Home',      icon: Home          },
+  { href: '/today',            label: 'Home',      icon: Home          },
+  { href: '/food',              label: 'Food',      icon: Utensils      },
   { href: '/work-home',        label: 'Work',      icon: Briefcase     },
   { href: '/luna',             label: 'LUNA',      icon: MessageCircle },
   { href: '/astrology-home',   label: 'Astrology', icon: Moon          },
@@ -13,7 +16,8 @@ const TABS = [
 ]
 
 function isActive(pathname: string, href: string) {
-  if (href === '/') return pathname === '/'
+  if (href === '/today') return pathname === '/' || pathname === '/today'
+  if (href === '/food') return pathname.startsWith('/food')
   if (href === '/work-home') return pathname.startsWith('/work') || pathname.startsWith('/tasks') || pathname.startsWith('/calendar') || pathname.startsWith('/email') || pathname.startsWith('/money')
   if (href === '/astrology-home') return pathname.startsWith('/astrology') || pathname.startsWith('/manifest') || pathname.startsWith('/journal')
   if (href === '/creative-home') return pathname.startsWith('/creative')
