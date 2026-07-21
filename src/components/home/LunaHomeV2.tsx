@@ -127,7 +127,7 @@ export function LunaHomeV2() {
     <div className={styles.page}>
       <div className={styles.greetingRow}>
         <div className={styles.greetingText}>
-          <h1>{greeting}, Zoë <Sparkles size={20} strokeWidth={1.6} /></h1>
+          <h1>{greeting}, Zoë <Sparkles size={15} strokeWidth={1.6} /></h1>
           <p>Let&apos;s make today exceptional.</p>
         </div>
         <div className={styles.avatar}>Z</div>
@@ -135,7 +135,7 @@ export function LunaHomeV2() {
 
       <div className={styles.topRow}>
         <div className={styles.tile}>
-          <WeatherIcon size={26} strokeWidth={1.5} className={styles.weatherIcon} />
+          <WeatherIcon size={18} strokeWidth={1.5} className={styles.weatherIcon} />
           <div className={styles.weatherTemp}>
             <strong>{weather ? `${weather.tempF}°` : weatherError ? '—' : '…'}</strong>
           </div>
@@ -146,7 +146,7 @@ export function LunaHomeV2() {
         </div>
 
         <div className={styles.tile}>
-          <Quote size={20} className={styles.quoteMark} />
+          <Quote size={14} className={styles.quoteMark} />
           <p className={styles.quoteText}>{quote.text}</p>
           <p className={styles.quoteAuthor}>— {quote.author}</p>
         </div>
@@ -160,7 +160,7 @@ export function LunaHomeV2() {
           <h2>{focus.title}</h2>
           <p>{focus.body}</p>
           <span className={styles.heroButton}>
-            View Today <span><Compass size={14} /></span>
+            View Today <span><Compass size={12} /></span>
           </span>
         </div>
       </Link>
@@ -177,7 +177,7 @@ export function LunaHomeV2() {
             <Link key={room.slug} href={room.href} className={styles.roomCard}>
               <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 160px" />
               <div className={styles.roomOverlay} />
-              <Icon size={16} strokeWidth={1.6} className={styles.roomIcon} />
+              <Icon size={12} strokeWidth={1.7} className={styles.roomIcon} />
               {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
               <span className={styles.roomLabel}>{room.label}</span>
             </Link>

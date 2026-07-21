@@ -9,9 +9,17 @@
   --card-radius: 24px;
   --soft-shadow: 0 6px 28px rgba(60, 46, 24, 0.08);
 
-  min-height: 100%;
+  /* Fills the AppLayout noScroll container exactly — this page never
+     scrolls, so every section below sizes itself off flex-grow ratios
+     (not fixed px) against whatever height is actually available. */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 55%, var(--ivory-3) 100%);
-  padding: 18px 4px 32px;
+  padding: 10px 4px 6px;
+  overflow: hidden;
 }
 
 [data-theme='dark'] .page {
@@ -25,37 +33,40 @@
 }
 
 .greetingRow {
+  flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 4px 18px;
+  padding: 0 4px;
 }
 
 .greetingText h1 {
   font-family: var(--font-display-var, serif);
-  font-size: 28px;
+  font-size: 21px;
   font-weight: 500;
   color: var(--ink-1);
-  margin: 0 0 4px;
+  margin: 0 0 2px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .greetingText h1 svg {
   color: var(--gold);
+  width: 16px;
+  height: 16px;
 }
 
 .greetingText p {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
   color: var(--ink-3);
 }
 
 .avatar {
-  width: 46px;
-  height: 46px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   flex-shrink: 0;
   background: linear-gradient(155deg, #d9c9a8, #a98f5f);
@@ -64,27 +75,25 @@
   justify-content: center;
   color: #fff;
   font-family: var(--font-display-var, serif);
-  font-size: 17px;
+  font-size: 14px;
   box-shadow: var(--soft-shadow);
 }
 
 .topRow {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 4px 14px;
-}
-
-@media (max-width: 420px) {
-  .topRow { grid-template-columns: 1fr; }
+  gap: 8px;
+  padding: 0 4px;
 }
 
 .tile {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: var(--card-radius);
+  border-radius: 18px;
   box-shadow: var(--soft-shadow);
-  padding: 16px 16px 14px;
+  padding: 10px 12px;
+  min-width: 0;
 }
 
 [data-theme='dark'] .tile {
@@ -95,38 +104,51 @@
 .weatherTemp {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  margin: 6px 0 8px;
+  gap: 6px;
+  margin: 3px 0 2px;
 }
 
 .weatherTemp strong {
   font-family: var(--font-display-var, serif);
-  font-size: 34px;
+  font-size: 22px;
   color: var(--ink-1);
   font-weight: 500;
 }
 
-.weatherIcon { color: var(--gold); flex-shrink: 0; }
+.weatherIcon { color: var(--gold); flex-shrink: 0; width: 18px; height: 18px; }
 
-.tile p { margin: 0; font-size: 13px; color: var(--ink-3); }
-.tile .place { display: flex; align-items: center; gap: 5px; margin-top: 6px; }
-
-.quoteMark { color: var(--gold); opacity: 0.55; margin-bottom: 2px; }
-.quoteText {
-  font-size: 14.5px;
-  line-height: 1.45;
-  color: var(--ink-2);
-  margin: 0 0 10px;
+.tile p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ink-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.quoteAuthor { font-size: 12.5px; color: var(--ink-3); }
+.tile .place { display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.tile .place svg { flex-shrink: 0; width: 10px; height: 10px; }
+
+.quoteMark { color: var(--gold); opacity: 0.55; width: 14px; height: 14px; }
+.quoteText {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--ink-2);
+  margin: 3px 0 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.quoteAuthor { font-size: 10.5px; color: var(--ink-3); }
 
 .hero {
   position: relative;
-  margin: 4px 4px 22px;
-  border-radius: 28px;
+  flex: 1.05 1 0;
+  min-height: 0;
+  margin: 0 4px;
+  border-radius: 24px;
   overflow: hidden;
   box-shadow: var(--soft-shadow);
-  min-height: 220px;
   display: flex;
   align-items: flex-end;
 }
@@ -144,52 +166,56 @@
 .heroContent {
   position: relative;
   z-index: 1;
-  padding: 20px 22px 22px;
+  padding: 12px 16px 14px;
   color: #fff;
-  max-width: 78%;
+  max-width: 80%;
 }
 
 .heroLabel {
-  font-size: 11.5px;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
 .heroContent h2 {
   font-family: var(--font-display-var, serif);
-  font-size: 26px;
+  font-size: 18px;
   font-weight: 500;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
 }
 
 .heroContent p {
-  font-size: 13.5px;
-  line-height: 1.4;
+  font-size: 11.5px;
+  line-height: 1.3;
   color: rgba(255,255,255,0.82);
-  margin: 0 0 14px;
+  margin: 0 0 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .heroButton {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255,255,255,0.14);
   border: 1px solid rgba(255,255,255,0.28);
   backdrop-filter: blur(8px);
   color: #fff;
-  font-size: 13.5px;
+  font-size: 11.5px;
   font-weight: 600;
-  padding: 8px 8px 8px 16px;
+  padding: 5px 5px 5px 12px;
   border-radius: 999px;
   text-decoration: none;
 }
 
 .heroButton span {
-  width: 26px;
-  height: 26px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: rgba(255,255,255,0.18);
   display: flex;
@@ -198,41 +224,41 @@
 }
 
 .roomsHeader {
+  flex: 0 0 auto;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0 8px 12px;
+  padding: 0 8px;
 }
 
 .roomsHeader h3 {
   font-family: var(--font-display-var, serif);
-  font-size: 19px;
+  font-size: 15px;
   font-weight: 500;
   color: var(--ink-1);
   margin: 0;
 }
 
 .roomsHeader span {
-  font-size: 13px;
+  font-size: 11.5px;
   color: var(--gold);
   font-weight: 600;
 }
 
 .roomGrid {
+  flex: 1.7 1 0;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
   padding: 0 4px;
-}
-
-@media (max-width: 480px) {
-  .roomGrid { gap: 6px; }
 }
 
 .roomCard {
   position: relative;
-  aspect-ratio: 3 / 4;
-  border-radius: 16px;
+  min-height: 0;
+  border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 3px 14px rgba(60,46,24,0.14);
   display: block;
@@ -255,34 +281,38 @@
 
 .roomIcon {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 6px;
+  left: 6px;
   color: rgba(255,255,255,0.92);
   opacity: 0.9;
 }
 
 .roomLabel {
   position: absolute;
-  bottom: 8px;
+  bottom: 5px;
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 12px;
+  font-size: 9.5px;
   font-weight: 600;
   color: #fff;
   letter-spacing: 0.01em;
+  padding: 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .comingSoonBadge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 8.5px;
+  top: 5px;
+  right: 5px;
+  font-size: 6.5px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #14110b;
   background: var(--gold);
-  padding: 2px 6px;
+  padding: 1.5px 4px;
   border-radius: 999px;
 }

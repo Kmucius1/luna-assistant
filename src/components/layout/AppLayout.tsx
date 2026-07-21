@@ -18,10 +18,12 @@ interface AppLayoutProps {
 
 const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 
-// The moon/LUNA/bell header only earns its space on the two pages it's
+// The moon/LUNA/bell header only earns its space on the pages it's
 // actually useful on — everywhere else it just ate screen height and
-// pushed content below the fold.
-const TOP_BAR_ROUTES = ['/', '/explore']
+// pushed content below the fold. Home (`/`) has its own greeting header
+// as part of the LUNA V2 design and must fit one screen with no scroll,
+// so it doesn't get this bar on top of that.
+const TOP_BAR_ROUTES = ['/explore']
 
 export function AppLayout({ children, noScroll, noPad, className, wide }: AppLayoutProps) {
   const pathname = usePathname()

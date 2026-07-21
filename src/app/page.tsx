@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 export default function HomePage() {
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <LunaHomeV2 />
     </AppLayout>
   )
