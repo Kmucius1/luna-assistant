@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localHour, localDateKey } from '@/lib/luna/dailyCache'
 import { buildLunaContext } from '@/lib/luna/context'
+import { ZOE_GYM_BY_DAY, ZOE_LIFESTYLE_PROFILE } from '@/lib/luna/zoeLifestyleProfile'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_IDS = [
@@ -17,46 +18,49 @@ function dryhubAdmin() {
   return createClient(url, key, { auth: { persistSession: false } })
 }
 
-const SYSTEM = `You are LUNA — Zoe's personal life scheduler and day planner. You know everything about her:
-- Birth chart: Scorpio Sun/Mercury, Cancer Moon/Rising/North Node, Gemini Rising, Virgo Midheaven, Venus Sagittarius, Mars Libra, Saturn Taurus
-- Human Design: Self-Projected Projector 4/6 — max 6 hours real focused work, needs rest before she burns out, energy is precious
-- Hair: she has a perm — on wash days add 20 extra mins to hair block; on refresh days just 5 extra mins
-- Breakfasts she eats: waffles, bagels, pancakes, oatmeal, french toast — never eggs
-- She does NOT have a dog. Never mention walking a dog.
-- She works from home or from the DRYP office (Tampa area)
-- Bed prep should start ~9 PM, lights out ~10:30-11 PM
-- She functions best with structured but flexible blocks, not back-to-back task marathons
-- As a Projector: schedule 20-30 min buffers between intense blocks. No more than 90 min focused work without a break.
+const SYSTEM = `You are LUNA, Zoe's personal life scheduler and day planner.
 
-Her stated morning routine and personal goals are given to you below as REAL, CURRENT context —
-use THAT for her morning block, not any generic assumption. If she has a gym time, it is a real
-anchor in the schedule, not optional filler.
+${ZOE_LIFESTYLE_PROFILE}
 
-Generate a COMPLETE timed daily schedule from wake to sleep. Include every anchor: wake up, gym (if
-she has one today), out the door (if office), at work/desk, lunch, leave work, dinner, evening
-wind-down, bed prep, lights out.
+OTHER CONTEXT
+- Hair: Zoe has a perm. On wash days add 20 extra minutes to hair time; on refresh days add about 5 minutes.
+- She does not have a dog. Never mention walking a dog.
+- She works from home or from the DRYP office in the Tampa area.
+- Bed preparation should begin around 9:00 PM, with lights out around 10:30 PM to support her 5:00 AM wake-up.
+- She does best with structured but flexible blocks, not back-to-back task marathons.
+- Build 20 to 30 minute buffers between intense blocks. Avoid more than 90 minutes of focused work without a break.
 
-Weave her actual open tasks into the work blocks — give each task a realistic time slot based on estimated effort.
+PLANNING RULES
+- Generate a complete timed schedule from wake-up through sleep.
+- Her standard morning sequence is wake at 5:00 AM, shower, gym clothes, oatmeal, hot tea, leave by 5:35 AM, gym by 5:45 AM.
+- Include the correct named gym focus for the weekday and list the workout under the gym block.
+- Protect work from 10:30 AM to 5:30 PM every day unless a real fixed event says otherwise.
+- Breakfast, lunch, and dinner are mandatory anchors. Never omit them or schedule over them.
+- Include one personal, creative, outdoor, beauty, social, or restorative action when realistic.
+- Do not punish a changed or low-energy day. Scale optional tasks and keep anchors.
+- Weave real open tasks into the work blocks with realistic estimates.
 
 Return ONLY valid JSON:
 {
-  "day_energy": "1-2 sentence energy read — what kind of day is this based on her tasks and schedule context",
-  "ai_message": "personal warm note from LUNA to open the plan — 2-3 sentences, grounded in what's actually on her plate today",
+  "day_energy": "1-2 sentence read of the day",
+  "ai_message": "warm practical note from Luna",
+  "gym_focus": "the correct weekday workout focus",
   "key_anchors": {
-    "wake": "6:00 AM",
-    "gym": "6:30 AM or null if no gym today",
-    "out_door": "9:45 AM or null if WFH",
-    "at_work": "10:00 AM",
+    "wake": "5:00 AM",
+    "breakfast": "5:20 AM",
+    "gym": "5:45 AM",
+    "at_work": "10:30 AM",
     "lunch": "12:30 PM",
-    "leave_work": "6:00 PM",
+    "leave_work": "5:30 PM",
+    "dinner": "6:00 PM",
     "wind_down": "9:00 PM",
     "lights_out": "10:30 PM"
   },
   "schedule": [
     {
-      "time": "6:00 AM",
+      "time": "5:00 AM",
       "label": "Wake up",
-      "detail": "Water. No phone yet. Open the blinds.",
+      "detail": "Water, shower, and get dressed in gym clothes.",
       "type": "morning",
       "anchor": true,
       "emoji": "☀️"
@@ -68,27 +72,23 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}))
     const {
-      wakeTime      = '6:00 AM',
-      gymTime       = '',
-      location      = 'home',
-      morningPlans  = '',
-      workPlans     = '',
-      workEndTime   = '6:00 PM',
-      hairWashDay   = false,
-      eveningPlans  = '',
-      tz            = 'America/New_York',
+      wakeTime = '5:00 AM',
+      gymTime = '5:45 AM',
+      location = 'home',
+      morningPlans = '',
+      workPlans = '',
+      workEndTime = '5:30 PM',
+      hairWashDay = false,
+      eveningPlans = '',
+      tz = 'America/New_York',
     } = body
 
-    // Her real, current routine/goals — set in Settings, kept up to date —
-    // is the source of truth for her morning block, not a hardcoded guess.
     const lunaContext = await buildLunaContext(ZOE_USER_ID)
     const routineContext = [
-      lunaContext.assistantProfile?.dailyRoutine && `Her stated daily routine: ${lunaContext.assistantProfile.dailyRoutine}`,
-      lunaContext.assistantProfile?.personalGoals && `Her personal goals: ${lunaContext.assistantProfile.personalGoals}`,
-    ].filter(Boolean).join('\n') || 'No stored routine yet — build a reasonable default morning.'
+      lunaContext.assistantProfile?.dailyRoutine && `Her saved daily routine: ${lunaContext.assistantProfile.dailyRoutine}`,
+      lunaContext.assistantProfile?.personalGoals && `Her saved personal goals: ${lunaContext.assistantProfile.personalGoals}`,
+    ].filter(Boolean).join('\n') || 'Use the current lifestyle profile as the source of truth.'
 
-    // Pull her own open tasks (chat-extracted, brain-dump-saved, manually
-    // added) alongside DRYP CRM tasks — both are real work she owns.
     let taskList = ''
     try {
       const db = createAdminClient()
@@ -101,12 +101,12 @@ export async function POST(req: NextRequest) {
         .limit(20)
 
       interface OwnTaskRow { title: string; category?: string; due_date?: string; urgency_level?: string }
-      const ownList = (ownTasks ?? []).map((t: OwnTaskRow) =>
-        `• ${t.title}${t.category ? ` (${t.category})` : ''}${t.urgency_level ? ` [${t.urgency_level}]` : ''}${t.due_date ? ` — due ${t.due_date}` : ''}`
+      const ownList = (ownTasks ?? []).map((task: OwnTaskRow) =>
+        `• ${task.title}${task.category ? ` (${task.category})` : ''}${task.urgency_level ? ` [${task.urgency_level}]` : ''}${task.due_date ? ` — due ${task.due_date}` : ''}`
       ).join('\n')
       if (ownList) taskList += `Her own tasks:\n${ownList}\n\n`
-    } catch (dbErr) {
-      console.warn('[plan-my-day] own tasks unavailable:', dbErr instanceof Error ? dbErr.message : String(dbErr))
+    } catch (dbError) {
+      console.warn('[plan-my-day] own tasks unavailable:', dbError instanceof Error ? dbError.message : String(dbError))
     }
 
     if (process.env.DRYP_SUPABASE_SERVICE_KEY ?? process.env.DRYPHUB_SERVICE_ROLE_KEY) {
@@ -120,70 +120,72 @@ export async function POST(req: NextRequest) {
           .order('due_date', { ascending: true, nullsFirst: false })
           .limit(20)
 
-        const list = (tasks ?? []).map(t =>
-          `• ${t.title}${t.account_name ? ` (${t.account_name})` : ''}${t.priority ? ` [${t.priority}]` : ''}${t.due_date ? ` — due ${t.due_date.slice(0, 10)}` : ''}`
+        const list = (tasks ?? []).map(task =>
+          `• ${task.title}${task.account_name ? ` (${task.account_name})` : ''}${task.priority ? ` [${task.priority}]` : ''}${task.due_date ? ` — due ${task.due_date.slice(0, 10)}` : ''}`
         ).join('\n')
         if (list) taskList += `DRYP CRM open tasks:\n${list}`
-      } catch (dbErr) {
-        console.warn('[plan-my-day] DRYP CRM unavailable:', dbErr instanceof Error ? dbErr.message : String(dbErr))
+      } catch (dbError) {
+        console.warn('[plan-my-day] DRYP CRM unavailable:', dbError instanceof Error ? dbError.message : String(dbError))
       }
     }
 
     if (!taskList.trim()) {
-      taskList = 'No open tasks pulled — build a focused general day plan based on her typical work.'
+      taskList = 'No open tasks were pulled. Build a calm, focused workday using her normal anchors.'
     }
 
+    const todayDate = new Date()
+    const weekday = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long' }).format(todayDate)
     const today = new Intl.DateTimeFormat('en-US', {
-      timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
-    }).format(new Date())
-    const hour  = localHour(new Date(), tz)
+      timeZone: tz,
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(todayDate)
+    const hour = localHour(todayDate, tz)
     const timeContext = hour < 10 ? 'morning' : hour < 14 ? 'midday' : hour < 18 ? 'afternoon' : 'evening'
+    const gymFocus = ZOE_GYM_BY_DAY[weekday] ?? 'Use the weekly split from Zoe’s lifestyle profile'
 
     const userPrompt = `Today: ${today} (${timeContext})
+Weekday gym focus: ${gymFocus}
 
 ${routineContext}
 
 Wake time: ${wakeTime}
-Gym: ${gymTime ? `${gymTime} — this is a real anchor, schedule it right after wake` : 'Not going to the gym today'}
+Gym arrival: ${gymTime || '5:45 AM'}
 Location: ${location === 'home' ? 'Working from home' : 'Going into the DRYP office'}
-${morningPlans ? `Morning plans (real, fixed commitments — schedule around these): ${morningPlans}` : ''}
-Work end target: ${workEndTime}
-${workPlans ? `Work plans (real, fixed commitments — schedule around these): ${workPlans}` : ''}
-Hair today: ${hairWashDay ? 'WASH DAY — add 20 extra mins to shower/hair block for perm care' : 'Refresh day — 5 extra mins for curl refresh'}
-${eveningPlans ? `Evening plans: ${eveningPlans}` : 'No specific evening plans — free evening'}
+${morningPlans ? `Morning plans: ${morningPlans}` : ''}
+Protected work window: 10:30 AM to ${workEndTime || '5:30 PM'}
+${workPlans ? `Work plans: ${workPlans}` : ''}
+Hair today: ${hairWashDay ? 'Wash day, add 20 minutes for perm care' : 'Refresh day, add about 5 minutes'}
+${eveningPlans ? `Evening plans: ${eveningPlans}` : 'No fixed evening plans'}
 
 ${taskList}
 
-Build her complete day from wake to sleep. Time-block her morning routine first (honoring her real
-stated routine, gym time, and any morning plans above), then slot her real tasks and any stated work
-plans into the work window before ${workEndTime}, then build her evening down to lights out. Be
-realistic — Projector energy, max 6 focused work hours, 20-30 min buffers built in.`
+Build the full day. Include the exact weekday gym focus and exercises under the gym block. Protect breakfast, lunch, and dinner. Protect the 10:30 AM to 5:30 PM workday. Keep the plan flexible, include buffers, and add one happiness or restoration block when realistic.`
 
-    const raw    = await callAI(SYSTEM, userPrompt, 3000)
+    const raw = await callAI(SYSTEM, userPrompt, 3200)
     const parsed = parseAIJson(raw)
 
-    // Persist so the Home page can reflect "what's next" from her actual
-    // planned day, not just generic task priority — she built this plan
-    // on purpose, it should show up somewhere after she leaves this page.
     try {
       const db = createAdminClient()
       await db.from('daily_generation_cache').upsert({
         user_id: ZOE_USER_ID,
-        date_key: localDateKey(new Date(), tz),
+        date_key: localDateKey(todayDate, tz),
         timezone: tz,
         generation_type: 'day_plan',
         payload: parsed,
         source: 'ai',
-        updated_at: new Date().toISOString(),
+        updated_at: todayDate.toISOString(),
       }, { onConflict: 'user_id,date_key,generation_type' })
-    } catch (saveErr) {
-      console.error('[plan-my-day] failed to persist plan:', saveErr instanceof Error ? saveErr.message : saveErr)
+    } catch (saveError) {
+      console.error('[plan-my-day] failed to persist plan:', saveError instanceof Error ? saveError.message : saveError)
     }
 
     return NextResponse.json(parsed)
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[plan-my-day]', msg)
-    return NextResponse.json({ error: 'Could not generate your plan.', detail: msg }, { status: 500 })
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[plan-my-day]', message)
+    return NextResponse.json({ error: 'Could not generate your plan.', detail: message }, { status: 500 })
   }
 }
