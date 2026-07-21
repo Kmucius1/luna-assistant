@@ -220,7 +220,7 @@ export function LunaTodayPage() {
             <span className={styles.cardLink}>View all meals</span>
           </Link>
 
-          <Link href="/outfit-today" className={styles.card}>
+          <Link href="/style" className={styles.card}>
             <div className={styles.cardHeader}><ShirtIcon size={15} /><span>Today&apos;s Outfit</span></div>
             <div className={styles.outfitRow}>
               <div className={styles.outfitPhoto}>

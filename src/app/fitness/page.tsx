@@ -1,18 +1,7 @@
-import { ComingSoonRoom } from '@/components/shared/ComingSoonRoom'
+import { LunaFitnessPage } from '@/components/home/LunaFitnessPage'
+
+export const dynamic = 'force-dynamic'
 
 export default function FitnessPage() {
-  return (
-    <ComingSoonRoom
-      label="Fitness"
-      image="/images/rooms/fitness.png"
-      tagline="Your workout split, progress, and recovery — tracked for real, not just planned."
-      planned={[
-        "Today's workout + weekly gym split",
-        'Exercise library',
-        'Progress charts and body measurements',
-        'Gym history',
-        'Stretching and recovery',
-      ]}
-    />
-  )
+  return <LunaFitnessPage />
 }

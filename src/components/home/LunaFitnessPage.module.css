@@ -1,0 +1,125 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: var(--text-1, #100C1E);
+  --ink-2: var(--text-2, #32284A);
+  --ink-3: var(--text-3, #5E5474);
+  --gold: var(--golden, #C9A96E);
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 14px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  min-height: 170px;
+  display: flex;
+  align-items: flex-end;
+  box-shadow: var(--soft-shadow);
+}
+
+.header :global(img) { object-fit: cover; }
+
+.headerOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20,15,8,0.05) 35%, rgba(15,11,6,0.82) 100%);
+}
+
+.headerContent { position: relative; z-index: 1; padding: 18px 20px; color: #fff; }
+.headerContent h1 { font-family: var(--font-display-var, serif); font-size: 24px; font-weight: 500; margin: 0 0 4px; }
+.headerContent p { margin: 0; font-size: 13px; color: rgba(255,255,255,0.85); }
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-1);
+  margin: 0 0 8px;
+}
+
+.sectionHeader svg { color: var(--gold); }
+
+.card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.14);
+  border-radius: 18px;
+  box-shadow: var(--soft-shadow);
+  padding: 16px;
+}
+
+/* Today's Workout */
+
+.workoutName { font-family: var(--font-display-var, serif); font-size: 20px; color: var(--ink-1); margin: 0 0 8px; }
+.workoutStats { display: flex; gap: 16px; margin-bottom: 12px; }
+.workoutStat { font-size: 12px; color: var(--ink-3); display: flex; flex-direction: column; gap: 2px; }
+.workoutStat strong { font-size: 15px; color: var(--ink-1); font-weight: 600; }
+.gymChips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.startButton {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+  background: var(--gold); color: #14110b;
+  font-size: 14px; font-weight: 700;
+  padding: 12px; border-radius: 14px; border: none;
+  text-decoration: none;
+}
+
+/* Chip selectors */
+
+.chip {
+  font-size: 12px; color: var(--ink-2);
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(180,150,100,0.2);
+  border-radius: 999px; padding: 7px 13px;
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.chipActive {
+  background: var(--gold); color: #14110b; font-weight: 700;
+  border-color: var(--gold);
+}
+.chipGrid { display: flex; flex-wrap: wrap; gap: 7px; }
+
+/* Motivation */
+
+.motivationCard { text-align: center; }
+.motivationCard h2 { font-family: var(--font-display-var, serif); font-size: 17px; color: var(--ink-1); margin: 0 0 4px; }
+.motivationCard p { font-size: 12.5px; color: var(--ink-3); margin: 0; }
+
+/* Quick actions */
+
+.quickGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.quickAction {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(180,150,100,0.14);
+  border-radius: 14px; padding: 12px 6px;
+  font-size: 10.5px; font-weight: 600; color: var(--ink-2);
+  box-shadow: var(--soft-shadow);
+  position: relative;
+}
+.quickAction svg { color: var(--gold); }
+.quickActionDisabled { opacity: 0.5; }
+.soonBadge {
+  position: absolute; top: 4px; right: 4px;
+  font-size: 6.5px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #14110b; background: var(--gold); padding: 1.5px 4px; border-radius: 999px;
+}
+
+/* Coming soon */
+
+.lockedList { display: flex; flex-direction: column; gap: 8px; }
+.lockedRow {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--ink-3);
+}
+.lockedRow svg { color: var(--ink-3); flex-shrink: 0; opacity: 0.6; }
