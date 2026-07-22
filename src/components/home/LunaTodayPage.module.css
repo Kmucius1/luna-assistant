@@ -1,10 +1,15 @@
 .page {
   --ivory-1: #FBF8F2;
   --ivory-2: #F6F1E7;
-  --ink-1: var(--text-1, #100C1E);
-  --ink-2: var(--text-2, #32284A);
-  --ink-3: var(--text-3, #5E5474);
-  --gold: var(--golden, #C9A96E);
+  /* Hardcoded, not var(--text-1)/var(--golden) — those are theme-dependent
+     and resolve to near-white under [data-theme="dark"], which made this
+     text invisible against these always-light cards. This page is locked
+     to the light palette regardless of the site-wide theme toggle, so it
+     must not inherit theme tokens at all. */
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
   /* Fills the AppLayout noScroll container exactly — this page never
