@@ -4,7 +4,7 @@ export default function TravelPage() {
   return (
     <ComingSoonRoom
       label="Travel"
-      image="/images/rooms/travel.png"
+      image="/images/rooms/travel.jpg"
       tagline="Upcoming trips, dream trips, packing lists, and itineraries — all in one place."
       planned={[
         'Upcoming and dream trips',

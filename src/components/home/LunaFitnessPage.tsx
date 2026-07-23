@@ -93,7 +93,7 @@ export function LunaFitnessPage() {
     <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.header}>
-          <Image src="/images/rooms/hero-gym-focus.png" alt="Fitness" fill sizes="(max-width: 640px) 100vw, 640px" priority />
+          <Image src="/images/rooms/hero-gym-focus.jpg" alt="Fitness" fill sizes="(max-width: 640px) 100vw, 640px" priority />
           <div className={styles.headerOverlay} />
           <div className={styles.headerContent}>
             <h1>Good morning, Zoe. Ready to move?</h1>

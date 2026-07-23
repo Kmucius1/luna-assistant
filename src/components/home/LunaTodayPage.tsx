@@ -47,9 +47,9 @@ const HERO_FOCUS: Record<string, { emoji: string; title: string; subtitle: strin
 }
 
 const FOR_YOU_TODAY = [
-  { title: 'Sunset Walk', tags: ['Movement', 'Fresh air', 'Reset your mind'], cta: 'Protect your peace', image: '/images/rooms/travel.png' },
-  { title: 'Ten Minutes of Quiet', tags: ['Stillness', 'Breath work', 'No screens'], cta: 'Protect your peace', image: '/images/rooms/wellness.png' },
-  { title: 'Call Someone You Love', tags: ['Connection', 'Presence', 'Warmth'], cta: 'Protect your peace', image: '/images/rooms/travel.png' },
+  { title: 'Sunset Walk', tags: ['Movement', 'Fresh air', 'Reset your mind'], cta: 'Protect your peace', image: '/images/rooms/travel.jpg' },
+  { title: 'Ten Minutes of Quiet', tags: ['Stillness', 'Breath work', 'No screens'], cta: 'Protect your peace', image: '/images/rooms/wellness.jpg' },
+  { title: 'Call Someone You Love', tags: ['Connection', 'Presence', 'Warmth'], cta: 'Protect your peace', image: '/images/rooms/travel.jpg' },
 ]
 
 const SWATCH_COLORS = ['#4a3d33', '#7a746c', '#c9b393']
@@ -158,7 +158,7 @@ export function LunaTodayPage() {
         <p className={styles.quoteLine}><Sparkles size={14} /> &ldquo;{quote}&rdquo;</p>
 
         <Link href="/plan-my-day" className={styles.hero}>
-          <Image src="/images/rooms/hero-gym-focus.png" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />
+          <Image src="/images/rooms/hero-gym-focus.jpg" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />
           <div className={styles.heroOverlay} />
           <div className={styles.heroContent}>
             <div className={styles.heroLabel}>Today&apos;s Focus</div>
@@ -224,7 +224,7 @@ export function LunaTodayPage() {
             <div className={styles.cardHeader}><ShirtIcon size={15} /><span>Today&apos;s Outfit</span></div>
             <div className={styles.outfitRow}>
               <div className={styles.outfitPhoto}>
-                <Image src={outfit?.image_url || '/images/rooms/outfit-sporty.png'} alt={outfit?.outfit_caption ?? 'Today\'s outfit'} fill sizes="72px" />
+                <Image src={outfit?.image_url || '/images/rooms/outfit-sporty.jpg'} alt={outfit?.outfit_caption ?? 'Today\'s outfit'} fill sizes="72px" />
               </div>
               <div className={styles.outfitTags}>
                 <span>{outfit?.occasion ?? 'Sporty'}</span>

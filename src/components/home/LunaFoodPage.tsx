@@ -70,7 +70,7 @@ export function LunaFoodPage() {
       <div className={styles.page}>
         <div className={styles.header}>
           <div className={styles.headerPhoto}>
-            <Image src="/images/rooms/food.png" alt="Food" fill sizes="(max-width: 640px) 100vw, 640px" priority />
+            <Image src="/images/rooms/food.jpg" alt="Food" fill sizes="(max-width: 640px) 100vw, 640px" priority />
           </div>
           <Link href="/today" className={styles.headerBack}><ChevronLeft size={16} /> Back</Link>
           <div className={styles.headerContent}>

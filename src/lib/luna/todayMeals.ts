@@ -25,7 +25,7 @@ export const TODAY_MEALS: TodayMeal[] = [
     description: 'Oats, protein powder, frozen blueberries, peanut butter',
     calories: 420,
     proteinG: 32,
-    image: '/images/rooms/meal-oatmeal.png',
+    image: '/images/rooms/meal-oatmeal.jpg',
   },
   {
     id: 'post_gym',
@@ -35,7 +35,7 @@ export const TODAY_MEALS: TodayMeal[] = [
     description: 'Whey protein, almond milk, banana, peanut butter',
     calories: 350,
     proteinG: 30,
-    image: '/images/rooms/meal-smoothie.png',
+    image: '/images/rooms/meal-smoothie.jpg',
   },
   {
     id: 'lunch',
@@ -45,7 +45,7 @@ export const TODAY_MEALS: TodayMeal[] = [
     description: 'Chicken, rice, buffalo sauce, lettuce, tomatoes, avocado',
     calories: 550,
     proteinG: 45,
-    image: '/images/rooms/meal-buffalo-bowl.png',
+    image: '/images/rooms/meal-buffalo-bowl.jpg',
   },
   {
     id: 'dinner',
@@ -55,7 +55,7 @@ export const TODAY_MEALS: TodayMeal[] = [
     description: 'Chicken, marinara sauce, mozzarella, side salad',
     calories: 650,
     proteinG: 50,
-    image: '/images/rooms/meal-chicken-parm.png',
+    image: '/images/rooms/meal-chicken-parm.jpg',
   },
 ]
 

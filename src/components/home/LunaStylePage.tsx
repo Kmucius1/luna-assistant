@@ -169,7 +169,7 @@ export function LunaStylePage() {
     <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.header}>
-          <Image src="/images/rooms/style.png" alt="Style" fill sizes="(max-width: 640px) 100vw, 640px" priority />
+          <Image src="/images/rooms/style.jpg" alt="Style" fill sizes="(max-width: 640px) 100vw, 640px" priority />
           <div className={styles.headerOverlay} />
           <div className={styles.headerContent}>
             <h1>Style</h1>
@@ -192,7 +192,7 @@ export function LunaStylePage() {
           {activeTab === 'outfit' && (
             <div className={`${styles.card} ${styles.outfitCard}`}>
               <div className={styles.outfitPhoto}>
-                <Image src={outfit?.image_url || '/images/rooms/outfit-sporty.png'} alt={outfit?.outfit_caption ?? 'Today\'s outfit'} fill sizes="(max-width: 640px) 100vw, 480px" />
+                <Image src={outfit?.image_url || '/images/rooms/outfit-sporty.jpg'} alt={outfit?.outfit_caption ?? 'Today\'s outfit'} fill sizes="(max-width: 640px) 100vw, 480px" />
               </div>
               <p className={styles.outfitOccasion}>{outfit?.occasion ?? 'Loading your look…'}</p>
               {outfit?.outfit_caption && <p className={styles.outfitCaption}>{outfit.outfit_caption}</p>}
