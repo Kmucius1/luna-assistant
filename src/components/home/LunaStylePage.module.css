@@ -40,7 +40,7 @@
 .headerActions { display: flex; gap: 6px; flex-shrink: 0; }
 
 .iconButton {
-  width: 32px; height: 32px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.6);
@@ -273,7 +273,7 @@
 }
 
 .swipeButton {
-  width: 34px; height: 34px;
+  width: 44px; height: 44px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   background: rgba(255,255,255,0.9);
@@ -282,7 +282,7 @@
   color: var(--ink-2);
 }
 
-.swipeButton svg { width: 15px; height: 15px; }
+.swipeButton svg { width: 18px; height: 18px; }
 
 .swipeButtonLove { background: var(--gold); color: #14110b; }
 
@@ -290,6 +290,8 @@
   flex-shrink: 0;
   margin-top: 4px;
   align-self: center;
+  min-height: 44px;
+  padding: 0 10px;
   font-size: 9px;
   font-weight: 600;
   color: var(--ink-3);

@@ -165,7 +165,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
+  min-height: 44px;
   background: rgba(255, 255, 255, 0.5);
   border: 1px solid rgba(180, 150, 100, 0.12);
   border-radius: 10px;
@@ -175,7 +177,7 @@
   color: var(--ink-3);
 }
 
-.tab svg { width: 12px; height: 12px; }
+.tab svg { width: 14px; height: 14px; }
 
 .tabActive {
   background: rgba(255, 255, 255, 0.85);

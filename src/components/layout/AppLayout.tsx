@@ -38,11 +38,16 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
       {/* Desktop fixed header */}
       <DesktopHeader />
 
-      {/* Mobile top bar — Home and Explore only, part of flex flow, hidden on desktop */}
-      {showTopBar && (
+      {/* Mobile top bar — Explore only, part of flex flow, hidden on desktop.
+          MobileTopBar itself pads for the top safe area (notch/Dynamic
+          Island); pages that don't render it still need that clearance,
+          since viewportFit=cover lets content draw under the status bar. */}
+      {showTopBar ? (
         <div className="lg:hidden" style={{ flexShrink: 0 }}>
           <MobileTopBar />
         </div>
+      ) : (
+        <div className="lg:hidden" style={{ flexShrink: 0, paddingTop: 'env(safe-area-inset-top, 0px)' }} />
       )}
 
       <main
