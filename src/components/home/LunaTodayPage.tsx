@@ -4,37 +4,21 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  Bell,
   Briefcase,
-  Cloud,
-  CloudRain,
   Coffee,
   Dumbbell,
   Heart,
   MoonStar,
   ShirtIcon,
-  Sparkles,
-  Sun,
   Sunrise,
   Utensils,
-  Wind,
 } from 'lucide-react'
 
-import { AppLayout } from '@/components/layout/AppLayout'
-import { useLocation } from '@/hooks/useLocation'
+import { GreetingHeader, dayIndex, useTodayContext } from '@/components/home/GreetingHeader'
 import { ZOE_EXERCISES_BY_DAY, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { AppLayout } from '@/components/layout/AppLayout'
 import { TODAY_MEALS } from '@/lib/luna/todayMeals'
 import styles from './LunaTodayPage.module.css'
-
-const QUOTES = [
-  'Discipline creates freedom.',
-  'What you do today can improve all your tomorrows.',
-  'Small steps, taken daily, become a life you’re proud of.',
-  'You do not have to see the whole staircase, just take the first step.',
-  'Slow is smooth, and smooth is fast.',
-  'Clarity comes from action, not thought.',
-  'The way you do anything is the way you do everything.',
-]
 
 const HERO_FOCUS: Record<string, { emoji: string; title: string; subtitle: string }> = {
   Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.' },
@@ -54,67 +38,21 @@ const FOR_YOU_TODAY = [
 
 const SWATCH_COLORS = ['#4a3d33', '#7a746c', '#c9b393']
 
-function dayIndex(): number {
-  const start = new Date(new Date().getFullYear(), 0, 0).getTime()
-  return Math.floor((Date.now() - start) / 86_400_000)
-}
-
-function getGreeting(hour: number): string {
-  if (hour < 12) return 'Good Morning'
-  if (hour < 17) return 'Good Afternoon'
-  if (hour < 21) return 'Good Evening'
-  return 'Good Night'
-}
-
-function weatherIconFor(forecast: string) {
-  const f = forecast.toLowerCase()
-  if (f.includes('rain') || f.includes('shower')) return CloudRain
-  if (f.includes('cloud')) return Cloud
-  if (f.includes('wind')) return Wind
-  return Sun
-}
-
 interface DailyOutfit { occasion?: string; outfit_caption?: string; image_url?: string | null }
 interface AstrologyGuidance { horoscope?: string; energy?: string }
 
 export function LunaTodayPage() {
-  const location = useLocation()
-  const [now, setNow] = useState<{ hour: number; weekday: string; dateLabel: string } | null>(null)
-  const [weather, setWeather] = useState<{ tempF: number; forecast: string } | null>(null)
-  const [weatherError, setWeatherError] = useState(false)
+  const { now, weather, weatherError } = useTodayContext()
   const [outfit, setOutfit] = useState<DailyOutfit | null>(null)
   const [openTaskCount, setOpenTaskCount] = useState<number | null>(null)
   const [guidance, setGuidance] = useState<AstrologyGuidance | null>(null)
 
   useEffect(() => {
-    const d = new Date()
-    setNow({
-      hour: d.getHours(),
-      weekday: new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d),
-      dateLabel: new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(d),
-    })
-  }, [])
-
-  useEffect(() => {
-    if (location.lat == null || location.lon == null) return
-    fetch(`/api/weather?lat=${location.lat}&lon=${location.lon}`, { cache: 'no-store' })
-      .then(res => { if (!res.ok) throw new Error('unavailable'); return res.json() })
-      .then(setWeather)
-      .catch(() => setWeatherError(true))
-  }, [location.lat, location.lon])
-
-  useEffect(() => {
-    if (location.permitted === null) return
-    const params = new URLSearchParams({ tz: Intl.DateTimeFormat().resolvedOptions().timeZone })
-    if (location.lat != null && location.lon != null) {
-      params.set('lat', String(location.lat))
-      params.set('lon', String(location.lon))
-    }
-    fetch(`/api/atelier/daily-outfit?${params.toString()}`, { cache: 'no-store' })
+    fetch('/api/atelier/daily-outfit', { cache: 'no-store' })
       .then(res => res.json())
       .then(setOutfit)
       .catch(() => setOutfit(null))
-  }, [location.permitted, location.lat, location.lon])
+  }, [])
 
   useEffect(() => {
     fetch('/api/home/summary', { cache: 'no-store' })
@@ -129,33 +67,15 @@ export function LunaTodayPage() {
   }, [])
 
   const idx = dayIndex()
-  const quote = QUOTES[idx % QUOTES.length]
-  const greeting = now ? getGreeting(now.hour) : 'Hello'
   const focus = (now && HERO_FOCUS[now.weekday]) ?? HERO_FOCUS.Monday
   const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
   const exercises = (now && ZOE_EXERCISES_BY_DAY[now.weekday]) ?? ZOE_EXERCISES_BY_DAY.Monday
   const forYou = FOR_YOU_TODAY[idx % FOR_YOU_TODAY.length]
-  const WeatherIcon = weather ? weatherIconFor(weather.forecast) : Sun
 
   return (
     <AppLayout noPad noScroll>
       <div className={styles.page}>
-        <div className={styles.headerTop}>
-          <div className={styles.greetingText}>
-            <h1>{greeting}, Zoe <Heart size={18} strokeWidth={1.6} /></h1>
-            {now && <p className={styles.dateLine}>{now.dateLabel}</p>}
-          </div>
-          <div className={styles.headerRight}>
-            <span className={styles.bellButton}><Bell size={19} strokeWidth={1.6} /><i /></span>
-            <div className={styles.weatherCard}>
-              <WeatherIcon size={17} strokeWidth={1.5} className={styles.weatherIcon} />
-              <strong>{weather ? `${weather.tempF}°` : weatherError ? '—' : '…'}</strong>
-              <p>{weather ? weather.forecast : weatherError ? 'Unavailable' : 'Loading…'}</p>
-            </div>
-          </div>
-        </div>
-
-        <p className={styles.quoteLine}><Sparkles size={14} /> &ldquo;{quote}&rdquo;</p>
+        <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
 
         <Link href="/plan-my-day" className={styles.hero}>
           <Image src="/images/rooms/hero-gym-focus.jpg" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />
@@ -265,7 +185,6 @@ export function LunaTodayPage() {
             <div className={styles.cardHeader}><MoonStar size={15} /><span>Daily Astrology</span></div>
             <p>{guidance?.horoscope ?? guidance?.energy ?? 'Your daily reading is syncing…'}</p>
           </div>
-          <Sparkles size={38} strokeWidth={1} className={styles.astrologyGlyph} />
         </Link>
       </div>
     </AppLayout>

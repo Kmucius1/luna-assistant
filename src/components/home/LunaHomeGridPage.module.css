@@ -1,0 +1,159 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 8px 10px 4px;
+  gap: 6px;
+}
+
+/* ── Hero (with View Plan button, unlike /today's) ────── */
+
+.hero {
+  position: relative;
+  flex: 1.05 1 0;
+  min-height: 0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--soft-shadow);
+  display: flex;
+  align-items: center;
+}
+
+.hero :global(img) { object-fit: cover; }
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(30,20,10,0.88) 40%, rgba(30,20,10,0.35) 75%, rgba(30,20,10,0.1) 100%);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  padding: 10px 14px;
+  color: #fff;
+  max-width: 68%;
+}
+
+.heroLabel {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+
+.heroContent h2 {
+  font-family: var(--font-display-var, serif);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 2px;
+}
+
+.heroContent p {
+  font-size: 9px;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.82);
+  margin: 0 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.heroButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,0.16);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 8.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* ── Room grid ──────────────────────────────────────────── */
+
+.roomGrid {
+  flex: 3.2 1 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.roomCard {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(180, 150, 100, 0.14);
+  box-shadow: 0 3px 12px rgba(60, 46, 24, 0.08);
+  padding: 5px 5px 3px;
+}
+
+.roomIcon { color: var(--gold); flex-shrink: 0; width: 12px; height: 12px; }
+
+.roomLabel {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-1);
+  margin: 2px 0 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roomTagline {
+  flex-shrink: 0;
+  margin: 0 0 3px;
+  font-size: 5.8px;
+  line-height: 1.15;
+  color: var(--ink-3);
+  overflow: hidden;
+}
+
+.roomPhoto {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.roomPhoto :global(img) { object-fit: cover; }
+
+.comingSoonBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #14110b;
+  background: var(--gold);
+  padding: 1px 4px;
+  border-radius: 999px;
+}

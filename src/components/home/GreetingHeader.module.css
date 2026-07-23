@@ -1,0 +1,74 @@
+.headerTop {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.greetingText h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 18px;
+  font-weight: 500;
+  color: #100C1E;
+  margin: 0 0 1px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.greetingText h1 svg { color: #C9A96E; width: 14px; height: 14px; }
+
+.dateLine { margin: 0; font-size: 10.5px; color: #32284A; }
+
+.headerRight {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.bellButton { position: relative; color: #C9A96E; display: flex; }
+.bellButton i {
+  position: absolute; top: -1px; right: -1px;
+  width: 5px; height: 5px; border-radius: 50%; background: #C9A96E;
+}
+
+.weatherCard {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+  padding: 4px 9px;
+  text-align: right;
+  min-width: 78px;
+}
+
+.weatherCard strong {
+  display: block;
+  font-family: var(--font-display-var, serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: #100C1E;
+}
+
+.weatherIcon { color: #C9A96E; float: left; width: 13px; height: 13px; }
+
+.weatherCard p { margin: 0; font-size: 8.5px; color: #5E5474; white-space: nowrap; }
+
+.quoteLine {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 10.5px;
+  font-style: italic;
+  color: #32284A;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.quoteLine svg { color: #C9A96E; flex-shrink: 0; width: 11px; height: 11px; }
