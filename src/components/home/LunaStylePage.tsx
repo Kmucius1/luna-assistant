@@ -62,7 +62,7 @@ export function LunaStylePage() {
   const [lastSwiped, setLastSwiped] = useState<{ card: StylePoolImage; vote: 'liked' | 'denied' } | null>(null)
   const [saved, setSaved] = useState<string[]>([])
   const [modalImage, setModalImage] = useState<string | null>(null)
-  const [expandCloset, setExpandCloset] = useState(false)
+  const [closetModalOpen, setClosetModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadWardrobe = useCallback(() => {
@@ -167,7 +167,7 @@ export function LunaStylePage() {
   const closetEmpty = wardrobe !== null && wardrobe.length === 0
 
   return (
-    <AppLayout noPad>
+    <AppLayout noPad noScroll>
       <div className={styles.page}>
         <div className={styles.header}>
           <div>
@@ -194,41 +194,30 @@ export function LunaStylePage() {
           </div>
         </div>
 
-        <div>
+        <div className={styles.closetSection}>
           <div className={styles.sectionHeader}>
             <h2>AI Closet</h2>
-            <button type="button" onClick={() => setExpandCloset(v => !v)}>{expandCloset ? 'Collapse' : 'View all'} ›</button>
+            {!closetEmpty && <button type="button" onClick={() => setClosetModalOpen(true)}>View all ›</button>}
           </div>
           {closetEmpty ? (
             <div className={styles.emptyState}>
-              <p>Your closet is waiting.<br />Upload an outfit and Luna will organize the pieces for you.</p>
+              <p>Your closet is waiting. Upload an outfit and Luna will organize the pieces for you.</p>
               <button type="button" className={styles.emptyButton} onClick={() => fileInputRef.current?.click()}>Upload First Outfit <Upload size={13} /></button>
             </div>
           ) : (
-            <>
-              <div className={styles.closetRow}>
-                {bucketData.map(bucket => (
-                  <div key={bucket.id} className={styles.closetCard}>
-                    <div className={styles.closetPhoto}><Image src={bucket.image} alt={bucket.label} fill sizes="128px" unoptimized={bucket.image.startsWith('data:')} /></div>
-                    <h3>{bucket.label}</h3>
-                    <p>{bucket.count} {bucket.count === 1 ? 'item' : 'items'}</p>
-                  </div>
-                ))}
-              </div>
-              {expandCloset && (
-                <div className={styles.closetFullGrid}>
-                  {(wardrobe ?? []).map(item => (
-                    <div key={item.id} className={styles.closetFullItem}>
-                      {item.photo_url && <Image src={item.photo_url} alt={item.name ?? item.category ?? 'Item'} fill sizes="90px" unoptimized={item.photo_url.startsWith('data:')} />}
-                    </div>
-                  ))}
+            <div className={styles.closetRow}>
+              {bucketData.map(bucket => (
+                <div key={bucket.id} className={styles.closetCard}>
+                  <div className={styles.closetPhoto}><Image src={bucket.image} alt={bucket.label} fill sizes="80px" unoptimized={bucket.image.startsWith('data:')} /></div>
+                  <h3>{bucket.label}</h3>
+                  <p>{bucket.count} {bucket.count === 1 ? 'item' : 'items'}</p>
                 </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
         </div>
 
-        <div>
+        <div className={styles.inspirationSection}>
           <div className={styles.sectionHeader}>
             <h2>Outfit Inspiration</h2>
             <button type="button">See all ›</button>
@@ -272,14 +261,14 @@ export function LunaStylePage() {
           )}
         </div>
 
-        <div>
+        <div className={styles.savedSection}>
           <div className={styles.sectionHeader}>
             <h2>Saved Looks</h2>
-            <button type="button">View all ›</button>
+            {saved.length > 0 && <button type="button">View all ›</button>}
           </div>
           {saved.length === 0 ? (
             <div className={styles.emptyState}>
-              <p>Your saved looks will live here.<br />Swipe right on an outfit you love.</p>
+              <p>Your saved looks will live here. Swipe right on an outfit you love.</p>
             </div>
           ) : (
             <div className={styles.savedRow}>
@@ -320,6 +309,24 @@ export function LunaStylePage() {
             <div className={styles.modalBody}>
               <p>Full styling breakdown (items owned, missing pieces, occasion notes) is coming soon — for now this saves the look so you can find it again.</p>
               <button type="button" className={styles.modalClose} onClick={() => setModalImage(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {closetModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setClosetModalOpen(false)}>
+          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalBody}>
+              <h3>Full Closet</h3>
+              <div className={styles.closetFullGrid}>
+                {(wardrobe ?? []).map(item => (
+                  <div key={item.id} className={styles.closetFullItem}>
+                    {item.photo_url && <Image src={item.photo_url} alt={item.name ?? item.category ?? 'Item'} fill sizes="90px" unoptimized={item.photo_url.startsWith('data:')} />}
+                  </div>
+                ))}
+              </div>
+              <button type="button" className={styles.modalClose} style={{ marginTop: 14 }} onClick={() => setClosetModalOpen(false)}>Close</button>
             </div>
           </div>
         </div>
