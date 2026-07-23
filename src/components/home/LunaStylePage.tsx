@@ -1,80 +1,69 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import {
+  Bell,
+  Calendar,
   Heart,
-  Quote,
-  Shirt,
-  ShoppingBag,
-  Sparkles,
-  Star,
-  Trash2,
+  Search,
+  ShirtIcon,
+  Undo2,
   Upload,
+  User,
   X,
 } from 'lucide-react'
 
 import { AppLayout } from '@/components/layout/AppLayout'
-import { useLocation } from '@/hooks/useLocation'
 import styles from './LunaStylePage.module.css'
 
-interface DailyOutfit { occasion?: string; why?: string; outfit_caption?: string; image_url?: string }
-interface StylePoolImage { id: string; image_url: string; label?: string }
 interface WardrobeItem { id: string; name?: string; category?: string; photo_url?: string }
-interface WishlistItem { id: string; list?: string; text: string }
+interface StylePoolImage { id: string; image_url: string; label?: string }
 
 const SAVED_KEY = 'luna_style_saved_v1'
 
-const TABS = [
-  { id: 'outfit', label: 'Today', icon: Shirt },
-  { id: 'discover', label: 'Discover', icon: Sparkles },
-  { id: 'closet', label: 'Closet', icon: Star },
-  { id: 'wishlist', label: 'Wishlist', icon: ShoppingBag },
-] as const
+// Real backend has no distinct fashion "title/description/tags" per pool
+// image yet — only a lane `label` used to steer future generation. These
+// are display-only groupings derived from that label; not fabricated
+// per-image copy.
+const LANE_DISPLAY: Record<string, { title: string; description: string; tags: string[] }> = {
+  default: { title: 'Fashion Killa Edit', description: 'Bold silhouettes, low-rise denim, and statement everything.', tags: ['Swag', 'Night Out', 'Creative', 'Off-Duty'] },
+  streetwear: { title: 'Street Luxe Edit', description: 'Oversized layers and leather with a feminine edge.', tags: ['Swag', 'Street', 'Bold'] },
+  edgy: { title: 'Edgy Off-Duty', description: 'Deconstructed pieces with statement gold.', tags: ['Edgy', 'Off-Duty', 'Bold'] },
+}
 
-type TabId = typeof TABS[number]['id']
+interface ClosetBucket {
+  id: string
+  label: string
+  fallbackImage: string
+  match: (category: string) => boolean
+}
+
+const CLOSET_BUCKETS: ClosetBucket[] = [
+  { id: 'tops', label: 'Statement Tops', fallbackImage: '/images/style/closet-tops.jpg', match: c => /top|shirt|dress|hoodie|jacket|corset|bodysuit/.test(c) },
+  { id: 'denim', label: 'Baggy Denim', fallbackImage: '/images/style/closet-denim.jpg', match: c => /denim|jean|pant|cargo|trouser|short|skirt/.test(c) },
+  { id: 'boots', label: 'Boots + Heels', fallbackImage: '/images/style/closet-boots.jpg', match: c => /boot|heel|shoe|sneaker/.test(c) },
+  { id: 'bags', label: 'Bags + Jewelry', fallbackImage: '/images/style/closet-bags.jpg', match: c => /bag|jewelry|belt|sunglasses|hat|accessor/.test(c) },
+]
+
+const FALLBACK_DECK: { image: string; label: string }[] = [
+  { image: '/images/style/inspo-1.jpg', label: 'default' },
+  { image: '/images/style/inspo-2.jpg', label: 'edgy' },
+  { image: '/images/style/inspo-3.jpg', label: 'streetwear' },
+]
 
 export function LunaStylePage() {
-  const location = useLocation()
-  const [activeTab, setActiveTab] = useState<TabId>('outfit')
-
-  const [outfit, setOutfit] = useState<DailyOutfit | null>(null)
-  const [pool, setPool] = useState<StylePoolImage[]>([])
-  const [poolIndex, setPoolIndex] = useState(0)
-  const [likedCount, setLikedCount] = useState(0)
-  const [deniedCount, setDeniedCount] = useState(0)
   const [wardrobe, setWardrobe] = useState<WardrobeItem[] | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([])
-  const [wishlistText, setWishlistText] = useState('')
+  const [pool, setPool] = useState<StylePoolImage[]>([])
+  const [poolLoaded, setPoolLoaded] = useState(false)
+  const [poolIndex, setPoolIndex] = useState(0)
+  const [lastSwiped, setLastSwiped] = useState<{ card: StylePoolImage; vote: 'liked' | 'denied' } | null>(null)
+  const [saved, setSaved] = useState<string[]>([])
+  const [modalImage, setModalImage] = useState<string | null>(null)
+  const [expandCloset, setExpandCloset] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  useEffect(() => {
-    if (location.permitted === null) return
-    const params = new URLSearchParams({ tz: Intl.DateTimeFormat().resolvedOptions().timeZone })
-    if (location.lat != null && location.lon != null) {
-      params.set('lat', String(location.lat))
-      params.set('lon', String(location.lon))
-    }
-    fetch(`/api/atelier/daily-outfit?${params.toString()}`, { cache: 'no-store' })
-      .then(res => res.json())
-      .then(setOutfit)
-      .catch(() => setOutfit(null))
-  }, [location.permitted, location.lat, location.lon])
-
-  const loadPool = useCallback(() => {
-    fetch(`/api/atelier/style-pool?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => {
-        setPool(data.images ?? [])
-        setPoolIndex(0)
-        setLikedCount(data.likedCount ?? 0)
-        setDeniedCount(data.deniedCount ?? 0)
-      })
-      .catch(() => setPool([]))
-  }, [])
-
-  useEffect(() => { loadPool() }, [loadPool])
 
   const loadWardrobe = useCallback(() => {
     fetch('/api/atelier/wardrobe', { cache: 'no-store' })
@@ -86,202 +75,255 @@ export function LunaStylePage() {
   useEffect(() => { loadWardrobe() }, [loadWardrobe])
 
   useEffect(() => {
-    fetch('/api/atelier/shopping', { cache: 'no-store' })
+    fetch(`/api/atelier/style-pool?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`, { cache: 'no-store' })
       .then(res => res.json())
-      .then(data => setWishlist(data.items ?? []))
-      .catch(() => setWishlist([]))
+      .then(data => setPool(data.images ?? []))
+      .catch(() => setPool([]))
+      .finally(() => setPoolLoaded(true))
   }, [])
 
-  const currentCard = pool[poolIndex]
-
-  function vote(imageId: string, value: 'liked' | 'denied') {
-    fetch('/api/atelier/style-pool', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image_id: imageId, vote: value }),
-    }).catch(() => {})
-    if (value === 'liked') setLikedCount(c => c + 1)
-    else setDeniedCount(c => c + 1)
-    setPoolIndex(i => i + 1)
-  }
-
-  function saveForLater(image: StylePoolImage) {
-    vote(image.id, 'liked')
+  useEffect(() => {
     try {
-      const saved = JSON.parse(localStorage.getItem(SAVED_KEY) ?? '[]')
-      localStorage.setItem(SAVED_KEY, JSON.stringify([...saved, image.image_url]))
+      const stored = JSON.parse(localStorage.getItem(SAVED_KEY) ?? '[]')
+      if (Array.isArray(stored)) setSaved(stored)
     } catch { /* ignore */ }
-  }
+  }, [])
+
+  const deck = pool.length > 0 ? pool : FALLBACK_DECK.map((d, i) => ({ id: `fallback-${i}`, image_url: d.image, label: d.label }))
+  const usingFallbackDeck = pool.length === 0
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files ?? [])
+    if (files.length === 0) return
     setUploading(true)
     try {
-      const dataUrl: string = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = reject
-        reader.readAsDataURL(file)
-      })
-      await fetch('/api/atelier/wardrobe/detect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: dataUrl, sourceLabel: 'style-page-upload' }),
-      })
+      for (const file of files) {
+        const dataUrl: string = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
+        await fetch('/api/atelier/wardrobe/detect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: dataUrl, sourceLabel: 'style-page-upload' }),
+        })
+      }
       loadWardrobe()
     } catch {
-      /* silently ignore — detect route never hard-errors to the client anyway */
+      /* wardrobe/detect never hard-errors to the client anyway */
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
-  async function addWishlistItem() {
-    if (!wishlistText.trim()) return
-    const res = await fetch('/api/atelier/shopping', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: wishlistText.trim() }),
+  function persistSaved(next: string[]) {
+    setSaved(next)
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(next)) } catch { /* ignore */ }
+  }
+
+  function swipe(vote: 'liked' | 'denied') {
+    const card = deck[poolIndex]
+    if (!card) return
+    if (!usingFallbackDeck) {
+      fetch('/api/atelier/style-pool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image_id: card.id, vote }),
+      }).catch(() => {})
+    }
+    if (vote === 'liked' && !saved.includes(card.image_url)) {
+      persistSaved([...saved, card.image_url])
+    }
+    setLastSwiped({ card, vote })
+    setPoolIndex(i => i + 1)
+  }
+
+  function undoSwipe() {
+    if (!lastSwiped) return
+    if (lastSwiped.vote === 'liked') {
+      persistSaved(saved.filter(url => url !== lastSwiped.card.image_url))
+    }
+    setPoolIndex(i => Math.max(0, i - 1))
+    setLastSwiped(null)
+  }
+
+  const bucketData = useMemo(() => {
+    return CLOSET_BUCKETS.map(bucket => {
+      const items = (wardrobe ?? []).filter(item => bucket.match((item.category ?? '').toLowerCase()))
+      return {
+        ...bucket,
+        count: items.length,
+        image: items[0]?.photo_url || bucket.fallbackImage,
+      }
     })
-    const data = await res.json()
-    if (data.item) setWishlist(w => [...w, data.item])
-    setWishlistText('')
-  }
+  }, [wardrobe])
 
-  async function removeWishlistItem(id: string) {
-    setWishlist(w => w.filter(i => i.id !== id))
-    fetch('/api/atelier/shopping', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    }).catch(() => {})
-  }
-
-  const categoryCounts = (wardrobe ?? []).reduce<Record<string, number>>((acc, item) => {
-    const cat = item.category || 'Uncategorized'
-    acc[cat] = (acc[cat] ?? 0) + 1
-    return acc
-  }, {})
+  const currentCard = deck[poolIndex]
+  const nextCard = deck[poolIndex + 1]
+  const afterCard = deck[poolIndex + 2]
+  const closetEmpty = wardrobe !== null && wardrobe.length === 0
 
   return (
-    <AppLayout noPad noScroll>
+    <AppLayout noPad>
       <div className={styles.page}>
         <div className={styles.header}>
-          <Image src="/images/rooms/style.jpg" alt="Style" fill sizes="(max-width: 640px) 100vw, 640px" priority />
-          <div className={styles.headerOverlay} />
-          <div className={styles.headerContent}>
+          <div>
             <h1>Style</h1>
-            <p>Wear your confidence.</p>
+            <p>Curate your closet. Dress with intention.</p>
+          </div>
+          <div className={styles.headerActions}>
+            <button type="button" className={styles.iconButton} aria-label="Notifications"><Bell size={18} strokeWidth={1.6} /></button>
+            <Link href="/settings" className={styles.iconButton} aria-label="Profile"><User size={18} strokeWidth={1.6} /></Link>
           </div>
         </div>
 
-        <div className={styles.tabRow}>
-          {TABS.map(tab => {
-            const Icon = tab.icon
-            return (
-              <button key={tab.id} type="button" className={`${styles.tab} ${activeTab === tab.id ? styles.tabActive : ''}`} onClick={() => setActiveTab(tab.id)}>
-                <Icon size={13} strokeWidth={1.7} /> {tab.label}
-              </button>
-            )
-          })}
+        <div className={styles.uploadHero}>
+          <div className={styles.uploadText}>
+            <div className={styles.uploadLabel}>Today&apos;s Outfit</div>
+            <h2>Upload today&apos;s look and let AI organize it for you.</h2>
+            <button type="button" className={styles.uploadButton} onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+              {uploading ? 'Organizing…' : 'Upload Outfit'} <Upload size={15} />
+            </button>
+            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" multiple hidden onChange={handleUpload} />
+          </div>
+          <div className={styles.uploadPhoto}>
+            <Image src="/images/style/closet-hero.jpg" alt="Zoe's closet" fill sizes="(max-width: 640px) 45vw, 300px" />
+          </div>
         </div>
 
-        <div className={styles.content}>
-          {activeTab === 'outfit' && (
-            <div className={`${styles.card} ${styles.outfitCard}`}>
-              <div className={styles.outfitPhoto}>
-                <Image src={outfit?.image_url || '/images/rooms/outfit-sporty.jpg'} alt={outfit?.outfit_caption ?? 'Today\'s outfit'} fill sizes="(max-width: 640px) 100vw, 480px" />
-              </div>
-              <p className={styles.outfitOccasion}>{outfit?.occasion ?? 'Loading your look…'}</p>
-              {outfit?.outfit_caption && <p className={styles.outfitCaption}>{outfit.outfit_caption}</p>}
-              {outfit?.why && (
-                <div className={styles.outfitWhy}>
-                  <Quote size={11} />
-                  <span>{outfit.why}</span>
-                </div>
-              )}
+        <div>
+          <div className={styles.sectionHeader}>
+            <h2>AI Closet</h2>
+            <button type="button" onClick={() => setExpandCloset(v => !v)}>{expandCloset ? 'Collapse' : 'View all'} ›</button>
+          </div>
+          {closetEmpty ? (
+            <div className={styles.emptyState}>
+              <p>Your closet is waiting.<br />Upload an outfit and Luna will organize the pieces for you.</p>
+              <button type="button" className={styles.emptyButton} onClick={() => fileInputRef.current?.click()}>Upload First Outfit <Upload size={13} /></button>
             </div>
-          )}
-
-          {activeTab === 'discover' && (
-            <div className={`${styles.card} ${styles.swipeCard}`}>
-              <div className={styles.swipePhoto}>
-                {currentCard ? (
-                  <Image src={currentCard.image_url} alt={currentCard.label ?? 'Style inspiration'} fill sizes="(max-width: 640px) 100vw, 480px" />
-                ) : (
-                  <div className={styles.swipeEmpty}>You&apos;re all caught up — check back tomorrow.</div>
-                )}
-              </div>
-              {currentCard && (
-                <div className={styles.swipeActions}>
-                  <button type="button" className={`${styles.swipeButton} ${styles.swipeButtonDeny}`} onClick={() => vote(currentCard.id, 'denied')} aria-label="Not my style"><X size={16} /></button>
-                  <button type="button" className={`${styles.swipeButton} ${styles.swipeButtonSave}`} onClick={() => saveForLater(currentCard)} aria-label="Save"><Star size={13} /></button>
-                  <button type="button" className={`${styles.swipeButton} ${styles.swipeButtonLove}`} onClick={() => vote(currentCard.id, 'liked')} aria-label="Love it"><Heart size={17} /></button>
-                </div>
-              )}
-              <p className={styles.swipeStats}>{likedCount} loved &middot; {deniedCount} passed</p>
-            </div>
-          )}
-
-          {activeTab === 'closet' && (
-            <div className={`${styles.card} ${styles.closetCard}`}>
-              <div className={styles.closetHeader}>
-                {wardrobe && wardrobe.length > 0 && (
-                  <div className={styles.closetInsights}>
-                    <span className={styles.insightPill}>{wardrobe.length} items</span>
-                    {Object.entries(categoryCounts).slice(0, 2).map(([cat, count]) => (
-                      <span key={cat} className={styles.insightPill}>{count} {cat}</span>
-                    ))}
+          ) : (
+            <>
+              <div className={styles.closetRow}>
+                {bucketData.map(bucket => (
+                  <div key={bucket.id} className={styles.closetCard}>
+                    <div className={styles.closetPhoto}><Image src={bucket.image} alt={bucket.label} fill sizes="128px" unoptimized={bucket.image.startsWith('data:')} /></div>
+                    <h3>{bucket.label}</h3>
+                    <p>{bucket.count} {bucket.count === 1 ? 'item' : 'items'}</p>
                   </div>
-                )}
-                <button type="button" className={styles.uploadButton} onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                  <Upload size={11} /> {uploading ? 'Detecting…' : 'Upload'}
-                </button>
-                <input ref={fileInputRef} type="file" accept="image/*" capture="environment" hidden onChange={handleUpload} />
+                ))}
               </div>
-              <div className={styles.closetGrid}>
-                {wardrobe === null && <div className={styles.closetEmpty}>Loading your closet…</div>}
-                {wardrobe?.length === 0 && <div className={styles.closetEmpty}>Your closet is empty — upload a photo to get started.</div>}
-                {wardrobe?.slice(0, 8).map(item => (
-                  <div key={item.id} className={styles.closetItem}>
-                    <div className={styles.closetPhoto}>
-                      {item.photo_url && <Image src={item.photo_url} alt={item.name ?? item.category ?? 'Closet item'} fill sizes="120px" unoptimized={item.photo_url.startsWith('data:')} />}
+              {expandCloset && (
+                <div className={styles.closetFullGrid}>
+                  {(wardrobe ?? []).map(item => (
+                    <div key={item.id} className={styles.closetFullItem}>
+                      {item.photo_url && <Image src={item.photo_url} alt={item.name ?? item.category ?? 'Item'} fill sizes="90px" unoptimized={item.photo_url.startsWith('data:')} />}
                     </div>
-                    <span>{item.name || item.category || 'Item'}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
+        </div>
 
-          {activeTab === 'wishlist' && (
-            <div className={`${styles.card} ${styles.wishlistCard}`}>
-              <div className={styles.wishlistForm}>
-                <input
-                  value={wishlistText}
-                  onChange={e => setWishlistText(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && addWishlistItem()}
-                  placeholder="Add something you want…"
-                />
-                <button type="button" onClick={addWishlistItem}>Add</button>
-              </div>
-              <div className={styles.wishlistList}>
-                {wishlist.map(item => (
-                  <div key={item.id} className={styles.wishlistRow}>
-                    <span>{item.text}</span>
-                    <button type="button" onClick={() => removeWishlistItem(item.id)}><Trash2 size={12} /></button>
+        <div>
+          <div className={styles.sectionHeader}>
+            <h2>Outfit Inspiration</h2>
+            <button type="button">See all ›</button>
+          </div>
+          {!poolLoaded ? (
+            <div className={styles.swipeEmpty}>Loading inspiration…</div>
+          ) : currentCard ? (
+            <>
+              <div className={styles.swipeStage}>
+                {afterCard && <div className={`${styles.swipeCard} ${styles.swipeCardBehind2}`} />}
+                {nextCard && <div className={`${styles.swipeCard} ${styles.swipeCardBehind1}`} />}
+                <div className={`${styles.swipeCard} ${styles.swipeCardActive}`}>
+                  <div className={styles.swipePhotoHalf}>
+                    <Image src={currentCard.image_url} alt={currentCard.label ?? 'Outfit inspiration'} fill sizes="(max-width: 640px) 55vw, 300px" />
                   </div>
-                ))}
-                {wishlist.length === 0 && <div className={styles.closetEmpty}>Nothing on your wishlist yet.</div>}
+                  <div className={styles.swipeInfoHalf}>
+                    {(() => {
+                      const meta = LANE_DISPLAY[currentCard.label ?? 'default'] ?? LANE_DISPLAY.default
+                      return (
+                        <>
+                          <div className={styles.swipeLabel}>{(currentCard.label ?? 'Street Luxe').replace(/_/g, ' ')}</div>
+                          <h3>{meta.title}</h3>
+                          <p>{meta.description}</p>
+                          <div className={styles.swipeTags}>{meta.tags.map(t => <span key={t}>{t}</span>)}</div>
+                        </>
+                      )
+                    })()}
+                  </div>
+                </div>
+                <div className={styles.swipeActions}>
+                  <button type="button" className={styles.swipeButton} onClick={() => swipe('denied')} aria-label="Not my style"><X size={19} /></button>
+                  <button type="button" className={`${styles.swipeButton} ${styles.swipeButtonLove}`} onClick={() => swipe('liked')} aria-label="Love it"><Heart size={19} /></button>
+                </div>
               </div>
+              {lastSwiped && (
+                <button type="button" className={styles.undoButton} onClick={undoSwipe}><Undo2 size={13} /> Undo last swipe</button>
+              )}
+            </>
+          ) : (
+            <div className={styles.swipeEmpty}>You&apos;re all caught up — check back tomorrow for new inspiration.</div>
+          )}
+        </div>
+
+        <div>
+          <div className={styles.sectionHeader}>
+            <h2>Saved Looks</h2>
+            <button type="button">View all ›</button>
+          </div>
+          {saved.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p>Your saved looks will live here.<br />Swipe right on an outfit you love.</p>
+            </div>
+          ) : (
+            <div className={styles.savedRow}>
+              {saved.slice().reverse().map(url => (
+                <button key={url} type="button" className={styles.savedThumb} onClick={() => setModalImage(url)}>
+                  <Image src={url} alt="Saved look" fill sizes="96px" />
+                </button>
+              ))}
             </div>
           )}
         </div>
 
-        <p className={styles.deferredNote}>Outfit Builder, Packing &amp; Style DNA — coming soon.</p>
+        <div className={styles.quickGrid}>
+          <Link href="/plan-my-day" className={styles.quickCard}>
+            <Calendar size={18} strokeWidth={1.6} />
+            <strong>Plan a Look</strong>
+            <span>Build outfits for your week</span>
+          </Link>
+          <div className={styles.quickCard}>
+            <span className={styles.quickBadge}>Soon</span>
+            <ShirtIcon size={18} strokeWidth={1.6} />
+            <strong>Build from Closet</strong>
+            <span>Create with what you own</span>
+          </div>
+          <div className={styles.quickCard}>
+            <span className={styles.quickBadge}>Soon</span>
+            <Search size={18} strokeWidth={1.6} />
+            <strong>Find Similar</strong>
+            <span>Discover new pieces</span>
+          </div>
+        </div>
       </div>
+
+      {modalImage && (
+        <div className={styles.modalOverlay} onClick={() => setModalImage(null)}>
+          <div className={styles.modalCard} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalPhoto}><Image src={modalImage} alt="Saved look detail" fill sizes="360px" /></div>
+            <div className={styles.modalBody}>
+              <p>Full styling breakdown (items owned, missing pieces, occasion notes) is coming soon — for now this saves the look so you can find it again.</p>
+              <button type="button" className={styles.modalClose} onClick={() => setModalImage(null)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   )
 }

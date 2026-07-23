@@ -109,6 +109,19 @@
   transition: background 0.3s ease;
 }
 
+/* Dark mode: a moon-goddess backdrop instead of a flat solid color,
+   showing through in the margins around any page's cards. Dark
+   gradient layered on top keeps the same depth/contrast dark-theme
+   UI already assumes. */
+[data-theme="dark"] .bg-app {
+  background-image:
+    linear-gradient(180deg, rgba(5,5,18,0.55) 0%, rgba(3,4,13,0.72) 55%, rgba(3,4,13,0.92) 100%),
+    url('/images/backgrounds/moon-goddess.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
 /* ─── Design tokens ─────────────────────────────────────────── */
 :root {
   --cream:       #FDF8F3;
