@@ -1,6 +1,8 @@
 # LUNA V2 Migration Plan
 
 > Companion to `LUNA_V2_ARCHITECTURE.md`. This phases the move from the current 5-dock nav to the 12-room structure, grounded in an actual read of every existing route (not just names) as of 2026-07-21. Nothing in this plan has been executed — it's a proposal awaiting Zoe's sign-off, phase by phase.
+>
+> **Update 2026-07-23:** `/home` (12-room grid), `/today` (daily dashboard), `/food`, `/style`, and `/fitness` are now built for real on the `luna-v2-home` branch — the table below describing them as "net-new"/not-yet-built is stale for those five. See `LunaHomeGridPage`, `LunaTodayPage`, `LunaFoodPage`, `LunaStylePage`, `LunaFitnessPage` in `src/components/home/` for current state. Astrology/Money/Work/Brain-Dump/Atelier are unchanged from the findings below. Wellness/Travel/Next Move are still genuinely not built (honest "coming soon" stub pages only).
 
 ## Current State Per Room
 

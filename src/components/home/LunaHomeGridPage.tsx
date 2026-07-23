@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
-import { ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { ZOE_GYM_BY_DAY, ZOE_HERO_FOCUS_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaHomeGridPage.module.css'
 
@@ -47,19 +47,9 @@ const ROOMS: Room[] = [
   { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.jpg', href: '/next', icon: ArrowRight, comingSoon: true },
 ]
 
-const HERO_FOCUS: Record<string, { emoji: string; title: string; subtitle: string }> = {
-  Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.' },
-  Tuesday: { emoji: '💪', title: 'Sexy Back Tuesday', subtitle: 'Pull, row, and build the back you love.' },
-  Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.' },
-  Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.' },
-  Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.' },
-  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.' },
-  Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.' },
-}
-
 export function LunaHomeGridPage() {
   const { now, weather, weatherError } = useTodayContext()
-  const focus = (now && HERO_FOCUS[now.weekday]) ?? HERO_FOCUS.Monday
+  const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? ZOE_HERO_FOCUS_BY_DAY.Monday
   const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
 
   return (

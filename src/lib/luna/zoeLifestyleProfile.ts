@@ -90,6 +90,20 @@ export const ZOE_GYM_BY_DAY: Record<string, string> = {
   Sunday: 'Recovery, outdoor walk, stretching, beach, pool, or mobility',
 }
 
+// Punchy display copy for the Home/Today/Fitness hero cards — was
+// previously duplicated identically in LunaHomeGridPage.tsx and
+// LunaTodayPage.tsx, which risked the two silently drifting apart.
+// Single source of truth here, alongside the gym data it's built from.
+export const ZOE_HERO_FOCUS_BY_DAY: Record<string, { emoji: string; title: string; subtitle: string }> = {
+  Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.' },
+  Tuesday: { emoji: '💪', title: 'Sexy Back Tuesday', subtitle: 'Pull, row, and build the back you love.' },
+  Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.' },
+  Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.' },
+  Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.' },
+  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.' },
+  Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.' },
+}
+
 // Structured version of the exercise lists embedded in ZOE_GYM_BY_DAY's prose
 // above — kept in sync manually since the AI prompt needs prose and the UI
 // (the /today Gym card) needs a real list to render, not string-parsing.
