@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Bell, Cloud, CloudRain, Heart, Sparkles, Sun, Wind } from 'lucide-react'
+import Link from 'next/link'
+import { Bell, ChevronLeft, Cloud, CloudRain, Heart, Sparkles, Sun, Wind } from 'lucide-react'
 
 import { useLocation } from '@/hooks/useLocation'
 import styles from './GreetingHeader.module.css'
@@ -62,10 +63,14 @@ export function useTodayContext() {
   return { now, weather, weatherError }
 }
 
-export function GreetingHeader({ now, weather, weatherError }: {
+export function GreetingHeader({ now, weather, weatherError, backHref }: {
   now: { hour: number; weekday: string; dateLabel: string } | null
   weather: { tempF: number; forecast: string } | null
   weatherError: boolean
+  /** Only /today needs this — it's not in the bottom nav, so without this
+      there's no way back to /home besides the browser's own back button.
+      /home itself never passes this (no "back to home" from home). */
+  backHref?: string
 }) {
   const greeting = now ? getGreeting(now.hour) : 'Hello'
   const quote = QUOTES[dayIndex() % QUOTES.length]
@@ -74,9 +79,16 @@ export function GreetingHeader({ now, weather, weatherError }: {
   return (
     <>
       <div className={styles.headerTop}>
-        <div className={styles.greetingText}>
-          <h1>{greeting}, Zoe <Heart size={16} strokeWidth={1.6} /></h1>
-          {now && <p className={styles.dateLine}>{now.dateLabel}</p>}
+        <div className={styles.headerLeft}>
+          {backHref && (
+            <Link href={backHref} className={styles.backButton} aria-label="Back to Home">
+              <ChevronLeft size={18} strokeWidth={2} />
+            </Link>
+          )}
+          <div className={styles.greetingText}>
+            <h1>{greeting}, Zoe <Heart size={16} strokeWidth={1.6} /></h1>
+            {now && <p className={styles.dateLine}>{now.dateLabel}</p>}
+          </div>
         </div>
         <div className={styles.headerRight}>
           <span className={styles.bellButton}><Bell size={19} strokeWidth={1.6} /><i /></span>

@@ -65,7 +65,7 @@ export function LunaTodayPage() {
   return (
     <AppLayout noPad noScroll>
       <div className={styles.page}>
-        <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
+        <GreetingHeader now={now} weather={weather} weatherError={weatherError} backHref="/home" />
 
         <Link href="/plan-my-day" className={styles.hero}>
           <Image src="/images/rooms/hero-gym-focus.jpg" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />

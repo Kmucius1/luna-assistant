@@ -6,6 +6,27 @@
   gap: 8px;
 }
 
+.headerLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.backButton {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.2);
+  color: #32284A;
+  margin-top: 1px;
+}
+
 .greetingText h1 {
   font-family: var(--font-display-var, serif);
   font-size: 18px;
