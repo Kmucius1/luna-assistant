@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   ArrowRight,
+  ArrowUpRight,
   Briefcase,
   Brain,
   DollarSign,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react'
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
+import { DailyCreativeSpark } from '@/components/home/DailyCreativeSpark'
 import { ZOE_GYM_BY_DAY, ZOE_HERO_FOCUS_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaHomeGridPage.module.css'
@@ -30,22 +32,23 @@ interface Room {
   image: string
   href: string
   icon: typeof Sun
+  accent: string
   comingSoon?: boolean
 }
 
 const ROOMS: Room[] = [
-  { slug: 'today', label: 'Today', tagline: ['Plan your day.', 'Live on purpose.'], image: '/images/rooms/today.jpg', href: '/today', icon: Sun },
-  { slug: 'food', label: 'Food', tagline: ['Fuel your body.', 'Eat beautifully.'], image: '/images/rooms/food.jpg', href: '/food', icon: UtensilsCrossed },
-  { slug: 'style', label: 'Style', tagline: ['Dress the life', "you're building."], image: '/images/rooms/style.jpg', href: '/style', icon: ShirtIcon },
-  { slug: 'fitness', label: 'Fitness', tagline: ['Train your body.', 'Build strength.'], image: '/images/rooms/fitness.jpg', href: '/fitness', icon: Dumbbell },
-  { slug: 'work', label: 'Work', tagline: ['Build your brand.', 'Create impact.'], image: '/images/rooms/work.jpg', href: '/work', icon: Briefcase },
-  { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.jpg', href: '/create', icon: PenLine },
-  { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.jpg', href: '/wellness', icon: Flower2, comingSoon: true },
-  { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.jpg', href: '/astrology', icon: MoonStar },
-  { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign },
-  { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.jpg', href: '/brain-dump', icon: Brain },
-  { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.jpg', href: '/travel', icon: Plane, comingSoon: true },
-  { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.jpg', href: '/next', icon: ArrowRight, comingSoon: true },
+  { slug: 'today', label: 'Today', tagline: ['Plan your day.', 'Live on purpose.'], image: '/images/rooms/today.jpg', href: '/today', icon: Sun, accent: 'rgba(230,210,170,0.45)' },
+  { slug: 'food', label: 'Food', tagline: ['Fuel your body.', 'Eat beautifully.'], image: '/images/rooms/food.jpg', href: '/food', icon: UtensilsCrossed, accent: 'rgba(160,190,150,0.35)' },
+  { slug: 'style', label: 'Style', tagline: ['Dress the life', "you're building."], image: '/images/rooms/style.jpg', href: '/style', icon: ShirtIcon, accent: 'rgba(201,169,110,0.3)' },
+  { slug: 'fitness', label: 'Fitness', tagline: ['Train your body.', 'Build strength.'], image: '/images/rooms/fitness.jpg', href: '/fitness', icon: Dumbbell, accent: 'rgba(210,150,150,0.32)' },
+  { slug: 'work', label: 'Work', tagline: ['Build your brand.', 'Create impact.'], image: '/images/rooms/work.jpg', href: '/work', icon: Briefcase, accent: 'rgba(180,165,140,0.35)' },
+  { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.jpg', href: '/create', icon: PenLine, accent: 'rgba(201,169,110,0.32)' },
+  { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.jpg', href: '/wellness', icon: Flower2, accent: 'rgba(150,175,160,0.32)', comingSoon: true },
+  { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.jpg', href: '/astrology', icon: MoonStar, accent: 'rgba(150,160,200,0.32)' },
+  { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign, accent: 'rgba(190,175,140,0.35)' },
+  { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.jpg', href: '/brain-dump', icon: Brain, accent: 'rgba(180,170,190,0.32)' },
+  { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.jpg', href: '/travel', icon: Plane, accent: 'rgba(150,185,195,0.32)', comingSoon: true },
+  { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.jpg', href: '/next', icon: ArrowRight, accent: 'rgba(200,180,150,0.35)', comingSoon: true },
 ]
 
 const PAGE_SIZE = 4
@@ -102,11 +105,14 @@ export function LunaHomeGridPage() {
                   const Icon = room.icon
                   return (
                     <Link key={room.slug} href={room.href} className={styles.roomCard}>
-                      <Icon size={20} strokeWidth={1.6} className={styles.roomIcon} />
+                      <span className={styles.roomIconBadge} style={{ background: room.accent }}>
+                        <Icon size={16} strokeWidth={1.7} className={styles.roomIcon} />
+                      </span>
                       <span className={styles.roomLabel}>{room.label}</span>
                       <p className={styles.roomTagline}>{room.tagline[0]}<br />{room.tagline[1]}</p>
                       <div className={styles.roomPhoto}>
                         <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 220px" />
+                        <span className={styles.roomGoButton}><ArrowUpRight size={13} /></span>
                       </div>
                       {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
                     </Link>
@@ -128,6 +134,8 @@ export function LunaHomeGridPage() {
             ))}
           </div>
         </div>
+
+        <div className={styles.sparkSection}><DailyCreativeSpark /></div>
       </div>
     </AppLayout>
   )

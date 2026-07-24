@@ -5,10 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   Aperture,
-  ArrowRight,
   Bookmark,
   Camera,
-  Check,
   Clock,
   Compass,
   Dice5,
@@ -24,6 +22,7 @@ import {
 } from 'lucide-react'
 
 import { AppLayout } from '@/components/layout/AppLayout'
+import { DailyCreativeSpark } from '@/components/home/DailyCreativeSpark'
 import styles from './LunaCreatePage.module.css'
 
 interface CreativePath {
@@ -50,15 +49,6 @@ const QUESTIONS = [
   { id: 'capture', label: 'Capture It?', question: 'Do you want this to become content?', image: '/images/rooms/travel.jpg', options: ['Just for me', 'Maybe', 'Yes'] },
 ] as const
 
-const SPARKS = [
-  { text: 'Photograph something ordinary like it belongs in a magazine.', tip: 'Look for light, texture, and tiny details.' },
-  { text: 'Design an outfit around one emotion.', tip: 'Pick the feeling first, then the pieces.' },
-  { text: 'Create a lock screen for the chapter of life you’re in right now.', tip: 'One photo, one word, one color.' },
-  { text: 'Write four lines that begin with "Lately, I’ve been learning…"', tip: 'Don’t edit — just let them land.' },
-  { text: 'Find one object in your home and redesign it.', tip: 'Sketch it, style it, or just imagine it differently.' },
-  { text: 'Go outside and collect five images that feel like freedom.', tip: 'No rules — just what freedom looks like today.' },
-]
-
 const CATEGORIES = [
   { label: 'Make Something', desc: 'Art, fashion, writing, design, music.', icon: Palette, href: '/creative' },
   { label: 'Experience Something', desc: 'Nature, exploring, new places.', icon: Compass, soon: true },
@@ -68,22 +58,12 @@ const CATEGORIES = [
   { label: 'Continue Something', desc: 'Projects and ideas already started.', icon: History, soon: true },
 ]
 
-function dayIndex(): number {
-  const start = new Date(new Date().getFullYear(), 0, 0).getTime()
-  return Math.floor((Date.now() - start) / 86_400_000)
-}
-
 export function LunaCreatePage() {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [paths, setPaths] = useState<CreativePath[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   const [saved, setSaved] = useState<Set<string>>(new Set())
-  const [sparkIndex, setSparkIndex] = useState(dayIndex() % SPARKS.length)
-  const [sparkSaved, setSparkSaved] = useState(false)
-  const [sparkDone, setSparkDone] = useState(false)
-
-  const spark = SPARKS[sparkIndex]
 
   function selectAnswer(qid: string, option: string) {
     setAnswers(a => ({ ...a, [qid]: option }))
@@ -209,24 +189,7 @@ export function LunaCreatePage() {
           </div>
         )}
 
-        <div>
-          <div className={styles.sectionHeader}>
-            <h2>Daily Creative Spark</h2>
-            <span>New spark tomorrow <Sparkles size={12} /></span>
-          </div>
-          <div className={styles.sparkCard}>
-            <div className={styles.sparkPhoto}><Image src="/images/create/spark-daisy.jpg" alt="" fill sizes="84px" /></div>
-            <div className={styles.sparkBody}>
-              <p className={styles.sparkText}>{spark.text}</p>
-              <p className={styles.sparkTip}>{spark.tip}</p>
-              <div className={styles.sparkActions}>
-                <button type="button" onClick={() => setSparkSaved(s => !s)} className={sparkSaved ? styles.sparkActionDone : ''}><Bookmark size={16} /> Save</button>
-                <button type="button" onClick={() => setSparkDone(d => !d)} className={sparkDone ? styles.sparkActionDone : ''}><Check size={16} /> Did It</button>
-                <button type="button" onClick={() => { setSparkIndex(i => (i + 1) % SPARKS.length); setSparkSaved(false); setSparkDone(false) }}><ArrowRight size={16} /> More</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <DailyCreativeSpark />
 
         <div className={styles.categoryGrid}>
           {CATEGORIES.map(cat => {
