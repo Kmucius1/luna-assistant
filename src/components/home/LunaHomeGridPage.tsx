@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -47,10 +48,35 @@ const ROOMS: Room[] = [
   { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.jpg', href: '/next', icon: ArrowRight, comingSoon: true },
 ]
 
+const PAGE_SIZE = 4
+
+const HERO_FOCUS_FALLBACK = ZOE_HERO_FOCUS_BY_DAY.Monday
+
 export function LunaHomeGridPage() {
   const { now, weather, weatherError } = useTodayContext()
-  const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? ZOE_HERO_FOCUS_BY_DAY.Monday
+  const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? HERO_FOCUS_FALLBACK
   const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
+
+  const pages = useMemo(() => {
+    const chunks: Room[][] = []
+    for (let i = 0; i < ROOMS.length; i += PAGE_SIZE) chunks.push(ROOMS.slice(i, i + PAGE_SIZE))
+    return chunks
+  }, [])
+
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const [pageIndex, setPageIndex] = useState(0)
+
+  function handleScroll() {
+    const el = scrollerRef.current
+    if (!el || el.clientWidth === 0) return
+    setPageIndex(Math.round(el.scrollLeft / el.clientWidth))
+  }
+
+  function goToPage(i: number) {
+    const el = scrollerRef.current
+    if (!el) return
+    el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+  }
 
   return (
     <AppLayout noPad noScroll>
@@ -68,21 +94,39 @@ export function LunaHomeGridPage() {
           </div>
         </Link>
 
-        <div className={styles.roomGrid}>
-          {ROOMS.map(room => {
-            const Icon = room.icon
-            return (
-              <Link key={room.slug} href={room.href} className={styles.roomCard}>
-                <Icon size={12} strokeWidth={1.6} className={styles.roomIcon} />
-                <span className={styles.roomLabel}>{room.label}</span>
-                <p className={styles.roomTagline}>{room.tagline[0]}<br />{room.tagline[1]}</p>
-                <div className={styles.roomPhoto}>
-                  <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 160px" />
-                </div>
-                {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
-              </Link>
-            )
-          })}
+        <div className={styles.roomsSection}>
+          <div className={styles.roomPager} ref={scrollerRef} onScroll={handleScroll}>
+            {pages.map((page, i) => (
+              <div key={i} className={styles.roomPage}>
+                {page.map(room => {
+                  const Icon = room.icon
+                  return (
+                    <Link key={room.slug} href={room.href} className={styles.roomCard}>
+                      <Icon size={20} strokeWidth={1.6} className={styles.roomIcon} />
+                      <span className={styles.roomLabel}>{room.label}</span>
+                      <p className={styles.roomTagline}>{room.tagline[0]}<br />{room.tagline[1]}</p>
+                      <div className={styles.roomPhoto}>
+                        <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 220px" />
+                      </div>
+                      {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}
+                    </Link>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.dots}>
+            {pages.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                className={`${styles.dot} ${i === pageIndex ? styles.dotActive : ''}`}
+                onClick={() => goToPage(i)}
+                aria-label={`Page ${i + 1} of ${pages.length}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </AppLayout>
