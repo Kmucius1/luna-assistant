@@ -66,8 +66,8 @@ export function DesktopHeader() {
       <div className="flex items-center gap-2 pl-7 w-56 flex-shrink-0">
         <span className="text-lg leading-none">{moon.emoji}</span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold leading-tight" style={{ color: '#32284A' }}>{moon.name} · 82%</p>
-          <p className="text-[11px] leading-tight" style={{ color: '#8A8098' }}>Illuminating your next step</p>
+          <p className="text-xs font-bold leading-tight" style={{ color: '#100C1E' }}>{moon.name} · 82%</p>
+          <p className="text-[11px] font-semibold leading-tight" style={{ color: '#5E5474' }}>Illuminating your next step</p>
         </div>
       </div>
 
