@@ -10,6 +10,21 @@ import { useLocation } from '@/hooks/useLocation'
 import { MORNING_REMINDERS } from '@/lib/luna/reminders'
 import { clearAutosaveDraft } from '@/hooks/useAutosave'
 
+// ─── Locked light-palette card styles (bypass the global .glass-card /
+// .soul-card classes, which force white text + dark surfaces under
+// [data-theme="dark"] regardless of local CSS var overrides) ──────────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+const SOUL_CARD: React.CSSProperties = {
+  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
+  border: '1px solid rgba(201,169,110,0.22)',
+  borderRadius: 20,
+}
+
 type CheckInType = 'morning' | 'midday' | 'night'
 
 function getCheckInType(): CheckInType {
@@ -41,7 +56,7 @@ const CHECK_IN_CONFIG: Record<CheckInType, {
     emoji: '🌙',
     headline: 'Let the day settle.',
     subtitle: 'Release what happened. Honor what you felt.',
-    color: 'var(--violet-mid)',
+    color: '#4A5578',
   },
 }
 
@@ -199,14 +214,30 @@ export default function MorningCheckIn() {
   }
 
   return (
-    <AppLayout noPad className="pt-16">
+    <div
+      style={{
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--violet-pale': '#F5EBD3',
+        '--depth': '#100C1E',
+        '--mid': '#32284A',
+        '--mist': '#5E5474',
+        '--text-1': '#100C1E',
+        '--text-2': '#32284A',
+        '--text-3': '#5E5474',
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
+      <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
           {/* Header */}
           {step !== 'result' && (
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(155,92,255,0.15)' }}>
+                style={{ background: 'rgba(201,169,110,0.15)' }}>
                 <span className="text-xl">{CHECK_IN_CONFIG[checkInType].emoji}</span>
               </div>
               <div>
@@ -230,7 +261,7 @@ export default function MorningCheckIn() {
               </p>
 
               {/* Today's reminders — surfaced immediately, no need to finish the form */}
-              <div className="glass-card p-5 mb-6">
+              <div className="p-5 mb-6" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>
                   Today&apos;s Reminders
                 </p>
@@ -246,7 +277,7 @@ export default function MorningCheckIn() {
                 </div>
               </div>
 
-              <div className="glass-card p-5 mb-6">
+              <div className="p-5 mb-6" style={CARD}>
                 <p className="text-sm font-semibold mb-3" style={{ color: 'var(--depth)' }}>What time did you wake up?</p>
                 <input
                   type="time"
@@ -273,12 +304,12 @@ export default function MorningCheckIn() {
               <p className="text-sm mb-8" style={{ color: 'var(--mid)' }}>
                 Sleep is the foundation of everything. Be honest.
               </p>
-              <div className="glass-card p-5 mb-6 space-y-6">
+              <div className="p-5 mb-6 space-y-6" style={CARD}>
                 <SliderInput label="Sleep quality" value={data.sleepRating} onChange={n => update('sleepRating', n)} />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('wake')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('energy')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -295,13 +326,13 @@ export default function MorningCheckIn() {
               <h2 className="font-display text-2xl font-semibold mb-8" style={{ color: 'var(--depth)' }}>
                 How is your body and spirit?
               </h2>
-              <div className="glass-card p-5 mb-6 space-y-6">
+              <div className="p-5 mb-6 space-y-6" style={CARD}>
                 <SliderInput label="Energy level" value={data.energyRating} onChange={n => update('energyRating', n)} />
                 <SliderInput label="Mood" value={data.moodRating} onChange={n => update('moodRating', n)} />
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('sleep')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('mood')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -326,7 +357,7 @@ export default function MorningCheckIn() {
                   <button key={String(v)} onClick={() => update('hadDream', v)}
                     className="flex-1 py-4 rounded-2xl font-semibold transition-all"
                     style={{
-                      background: data.hadDream === v ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
+                      background: data.hadDream === v ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
                       color: data.hadDream === v ? 'white' : 'var(--mid)',
                     }}>
                     {v ? 'Yes ✨' : 'Not that I remember'}
@@ -334,7 +365,7 @@ export default function MorningCheckIn() {
                 ))}
               </div>
               {data.hadDream && (
-                <div className="glass-card p-5 mb-5">
+                <div className="p-5 mb-5" style={CARD}>
                   <p className="text-xs font-semibold mb-3" style={{ color: 'var(--violet)' }}>Tell me what you remember</p>
                   <SmartInput
                     context="dream — people, feelings, places, symbols from last night's dream"
@@ -348,7 +379,7 @@ export default function MorningCheckIn() {
               )}
               <div className="flex gap-3">
                 <button onClick={() => setStep('energy')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('dream')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -368,7 +399,7 @@ export default function MorningCheckIn() {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>
                 Say it out loud if you can. Speak it into the room first.
               </p>
-              <div className="glass-card p-5 mb-4">
+              <div className="p-5 mb-4" style={CARD}>
                 <p className="text-xs font-semibold mb-3" style={{ color: 'var(--violet)' }}>What are you feeling?</p>
                 <SmartInput
                   context="how are you feeling right now — emotions, physical sensations, overall state"
@@ -379,7 +410,7 @@ export default function MorningCheckIn() {
                   rows={3}
                 />
               </div>
-              <div className="glass-card p-5 mb-5">
+              <div className="p-5 mb-5" style={CARD}>
                 <p className="text-xs font-semibold mb-3" style={{ color: 'var(--violet)' }}>What is sitting on your mind?</p>
                 <SmartInput
                   context="what is on your mind — work, people, thoughts, worries, excitement"
@@ -393,7 +424,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('mood')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('feeling')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -424,7 +455,7 @@ export default function MorningCheckIn() {
                     className="p-4 rounded-2xl text-left transition-all"
                     style={{
                       background: data.supportNeed === s.value ? 'var(--violet-pale)' : 'var(--glass-bg)',
-                      border: `1.5px solid ${data.supportNeed === s.value ? 'var(--violet)' : 'rgba(255,255,255,0.6)'}`,
+                      border: `1.5px solid ${data.supportNeed === s.value ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`,
                       backdropFilter: 'blur(16px)',
                     }}
                   >
@@ -435,7 +466,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('dream')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('support')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -455,7 +486,7 @@ export default function MorningCheckIn() {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>
                 One thing. Not a list. What would feel like a win by bedtime?
               </p>
-              <div className="glass-card p-5 mb-8">
+              <div className="p-5 mb-8" style={CARD}>
                 <SmartInput
                   context="what would make tonight-you proud — one thing that would feel like a win by bedtime"
                   placeholder="Tonight I will feel good because I..."
@@ -468,7 +499,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('feeling')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={finish} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95"
@@ -486,7 +517,7 @@ export default function MorningCheckIn() {
               {loading ? (
                 <div className="text-center py-20">
                   <div className="w-16 h-16 rounded-full mx-auto mb-6 animate-breathe"
-                    style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.4), rgba(155,92,255,0.1))' }} />
+                    style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.4), rgba(201,169,110,0.1))' }} />
                   <p className="font-display text-lg" style={{ color: 'var(--violet)' }}>Reading your energy...</p>
                   <p className="text-sm mt-2" style={{ color: 'var(--mist)' }}>Generating your morning brief</p>
                 </div>
@@ -499,7 +530,7 @@ export default function MorningCheckIn() {
                   {/* Top 3 — saved as real tasks the moment they're created
                       (see finish()), editable here, and visible on Home/Work
                       since they're the same tasks table those pages read. */}
-                  <div className="glass-card p-5">
+                  <div className="p-5" style={CARD}>
                     <div className="flex items-center justify-between mb-3">
                       <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your top 3 today</p>
                       {priorityTasks.length > 0 && (
@@ -510,7 +541,7 @@ export default function MorningCheckIn() {
                       const task = priorityTasks[i]
                       const isEditing = task && editingTaskId === task.id
                       return (
-                        <div key={task?.id ?? i} className="flex items-start gap-3 py-2" style={{ borderBottom: i < result.top_3.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none' }}>
+                        <div key={task?.id ?? i} className="flex items-start gap-3 py-2" style={{ borderBottom: i < result.top_3.length - 1 ? '1px solid rgba(201,169,110,0.08)' : 'none' }}>
                           <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
                             style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>{i + 1}</span>
                           {isEditing ? (
@@ -551,19 +582,19 @@ export default function MorningCheckIn() {
                   </div>
 
                   {/* First step */}
-                  <div className="soul-card p-5">
+                  <div className="p-5" style={SOUL_CARD}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Start here</p>
                     <p className="font-medium" style={{ color: 'var(--depth)' }}>{result.first_step}</p>
                   </div>
 
                   {/* Spiritual */}
-                  <div className="glass-card p-5">
+                  <div className="p-5" style={CARD}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Spirit today</p>
                     <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.spiritual_message}</p>
                   </div>
 
                   {/* HD */}
-                  <div className="glass-card p-5">
+                  <div className="p-5" style={CARD}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Human Design</p>
                     <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.human_design_message}</p>
                     {result.chart_reflection && (
@@ -572,14 +603,14 @@ export default function MorningCheckIn() {
                   </div>
 
                   {/* Affirmation */}
-                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
+                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
                     <p className="font-display text-lg italic" style={{ color: 'var(--depth)' }}>
                       &ldquo;{result.affirmation}&rdquo;
                     </p>
                   </div>
 
                   {/* Self care */}
-                  <div className="glass-card p-5">
+                  <div className="p-5" style={CARD}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--herb)' }}>Self-care today</p>
                     <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.self_care_action}</p>
                   </div>
@@ -600,5 +631,6 @@ export default function MorningCheckIn() {
 
         </div>
       </AppLayout>
+    </div>
   )
 }

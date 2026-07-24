@@ -127,7 +127,6 @@ export function LunaFoodPage() {
                         <h3>{meal.title}</h3>
                         <ChevronRight size={16} />
                       </div>
-                      <p className={styles.mealDesc}>{meal.description}</p>
                       <div className={styles.mealStats}>
                         <span><Droplet size={13} /> {meal.calories} cal</span>
                         <span><Beef size={13} /> {meal.proteinG}g protein</span>

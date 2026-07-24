@@ -1,9 +1,24 @@
 'use client'
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { GlassCard } from '@/components/ui/GlassCard'
 import { Mic, Square, ChevronDown, Check, Sparkles, Archive } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
+
+// ─── Locked light-palette card styles (bypass the shared GlassCard
+// component's .glass-card / .soul-card classes, which force white text +
+// dark surfaces under [data-theme="dark"] regardless of local CSS var
+// overrides — GlassCard itself is out of scope for this retheme) ──────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+const SOUL_CARD: React.CSSProperties = {
+  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
+  border: '1px solid rgba(201,169,110,0.22)',
+  borderRadius: 20,
+}
 
 type DictationType = 'journal' | 'dream' | 'task' | 'work_note' | 'message_draft' | 'spiritual' | 'career' | 'money_note'
 
@@ -124,14 +139,24 @@ export default function DictationScreen() {
   const URGENCY_COLORS: Record<string, string> = { critical: '#E05E5E', high: '#E08B4A', medium: 'var(--violet)', low: 'var(--mist)' }
 
   return (
-    <div className="bg-sanctuary min-h-screen">
+    <div
+      className="bg-sanctuary min-h-screen"
+      style={{
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--depth': '#100C1E',
+        '--mid': '#32284A',
+        '--mist': '#5E5474',
+        '--faint': '#8A8098',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
           {/* Header */}
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(155,92,255,0.12)' }}>
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(201,169,110,0.12)' }}>
                 <Mic className="h-5 w-5" style={{ color: 'var(--violet)' }} />
               </div>
               <div>
@@ -161,7 +186,7 @@ export default function DictationScreen() {
                   <button key={t.value} onClick={() => setType(t.value)}
                     className="flex-none px-3 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
                     style={{
-                      background: type === t.value ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
+                      background: type === t.value ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
                       color: type === t.value ? 'white' : 'var(--mid)',
                     }}>
                     {t.emoji} {t.label}
@@ -172,7 +197,7 @@ export default function DictationScreen() {
               {/* Mic / recording area */}
               <div className="mb-4">
                 {recording ? (
-                  <div className="glass-card p-6 text-center">
+                  <div className="p-6 text-center" style={CARD}>
                     <div className="flex justify-center gap-1 mb-4 h-5 items-end">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <div key={i} className="mic-bar" />
@@ -189,7 +214,7 @@ export default function DictationScreen() {
                   <div className="text-center mb-4">
                     <button onClick={startRecording}
                       className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-3 transition-all active:scale-95 animate-pulse-glow"
-                      style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))', boxShadow: 'var(--float-shadow)' }}>
+                      style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))', boxShadow: '0 8px 32px rgba(201,169,110,0.35)' }}>
                       <Mic className="h-8 w-8 text-white" />
                     </button>
                     <p className="text-sm" style={{ color: 'var(--mist)' }}>Tap to speak</p>
@@ -199,9 +224,9 @@ export default function DictationScreen() {
 
               {/* OR type */}
               <div className="relative flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px" style={{ background: 'rgba(155,92,255,0.1)' }} />
+                <div className="flex-1 h-px" style={{ background: 'rgba(201,169,110,0.1)' }} />
                 <p className="text-xs" style={{ color: 'var(--faint)' }}>or type</p>
-                <div className="flex-1 h-px" style={{ background: 'rgba(155,92,255,0.1)' }} />
+                <div className="flex-1 h-px" style={{ background: 'rgba(201,169,110,0.1)' }} />
               </div>
 
               <div className="mb-5">
@@ -226,19 +251,19 @@ export default function DictationScreen() {
             /* Results */
             <div className="space-y-4 animate-fade-up">
               {/* Emotional read */}
-              <GlassCard soul>
+              <div className="p-5" style={SOUL_CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>What I heard</p>
                 <p className="text-base leading-relaxed font-display italic" style={{ color: 'var(--depth)' }}>
                   &ldquo;{result.emotional_read}&rdquo;
                 </p>
-              </GlassCard>
+              </div>
 
               {/* Key feelings */}
               {result.key_feelings?.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {result.key_feelings.map((f, i) => (
                     <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium"
-                      style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
+                      style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--violet)' }}>
                       {f}
                     </span>
                   ))}
@@ -246,14 +271,14 @@ export default function DictationScreen() {
               )}
 
               {/* Summary */}
-              <GlassCard>
+              <div className="p-5" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--mist)' }}>Summary</p>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--depth)' }}>{result.summary}</p>
-              </GlassCard>
+              </div>
 
               {/* Tasks */}
               {result.extracted_tasks?.length > 0 && (
-                <GlassCard>
+                <div className="p-5" style={CARD}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>
                     Mentioned tasks ({result.extracted_tasks.length})
                   </p>
@@ -266,25 +291,25 @@ export default function DictationScreen() {
                       </div>
                     ))}
                   </div>
-                </GlassCard>
+                </div>
               )}
 
               {/* Next step */}
-              <GlassCard>
+              <div className="p-5" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Next step</p>
                 <p className="text-base font-medium" style={{ color: 'var(--depth)' }}>{result.next_step}</p>
-              </GlassCard>
+              </div>
 
               {/* HD note */}
               {result.human_design_note && (
-                <GlassCard>
+                <div className="p-5" style={CARD}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Design note</p>
                   <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.human_design_note}</p>
-                </GlassCard>
+                </div>
               )}
 
               {/* Affirmation */}
-              <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
+              <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
                 <p className="font-display text-base italic" style={{ color: 'var(--depth)' }}>
                   &ldquo;{result.affirmation}&rdquo;
                 </p>
@@ -294,7 +319,7 @@ export default function DictationScreen() {
               <div className="flex gap-3">
                 <button onClick={reset}
                   className="flex-1 py-3.5 rounded-2xl font-semibold text-center transition-all"
-                  style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
                   Speak again
                 </button>
                 <button

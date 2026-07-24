@@ -62,7 +62,7 @@ const SECTIONS = [
 function AccordionSection({ title, body }: { title: string; body: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+    <div style={{ borderBottom: '1px solid rgba(180,150,100,0.16)' }}>
       <button
         onClick={() => setOpen(v => !v)}
         style={{
@@ -73,12 +73,12 @@ function AccordionSection({ title, body }: { title: string; body: string }) {
       >
         <span style={{ fontSize: 13, fontWeight: 700, color: '#C9A96E', lineHeight: 1.3 }}>{title}</span>
         {open
-          ? <ChevronUp style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
-          : <ChevronDown style={{ width: 14, height: 14, color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+          ? <ChevronUp style={{ width: 14, height: 14, color: '#5E5474', flexShrink: 0 }} />
+          : <ChevronDown style={{ width: 14, height: 14, color: '#5E5474', flexShrink: 0 }} />
         }
       </button>
       {open && (
-        <p style={{ fontSize: 12, lineHeight: 1.7, color: 'rgba(255,255,255,0.65)', paddingBottom: 12, margin: 0 }}>
+        <p style={{ fontSize: 12, lineHeight: 1.7, color: '#32284A', paddingBottom: 12, margin: 0 }}>
           {body}
         </p>
       )}
@@ -99,51 +99,51 @@ export default function TermsPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)',
-      color: 'rgba(255,255,255,0.88)',
+      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+      color: '#32284A',
       fontFamily: 'system-ui, -apple-system, sans-serif',
       paddingBottom: 120,
     }}>
       {/* Sticky header */}
       <div style={{
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: '1px solid rgba(180,150,100,0.16)',
         padding: '14px 20px',
         display: 'flex', alignItems: 'center', gap: 10,
-        background: 'rgba(10,8,28,0.96)',
+        background: 'rgba(255,252,248,0.94)',
         backdropFilter: 'blur(20px)',
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 7 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 12 }}>☽</span>
           </div>
-          <span style={{ fontWeight: 800, fontSize: 14, letterSpacing: '0.16em', color: 'white' }}>LUNA</span>
+          <span style={{ fontWeight: 800, fontSize: 14, letterSpacing: '0.16em', color: '#100C1E' }}>LUNA</span>
         </Link>
-        <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>/</span>
-        <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>Terms of Service</span>
+        <span style={{ color: '#5E5474', fontSize: 13 }}>/</span>
+        <span style={{ color: '#32284A', fontSize: 13 }}>Terms of Service</span>
       </div>
 
       {/* Content */}
       <div style={{ maxWidth: 600, margin: '0 auto', padding: '24px 20px 0' }}>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'white', marginBottom: 4, letterSpacing: '-0.01em' }}>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#100C1E', marginBottom: 4, letterSpacing: '-0.01em' }}>
           Terms of Service
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, marginBottom: 20 }}>
+        <p style={{ color: '#5E5474', fontSize: 11, marginBottom: 20 }}>
           Effective: June 23, 2026 · Last updated: June 23, 2026
         </p>
 
         {/* Summary card */}
         <div style={{
-          background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.25)',
+          background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.28)',
           borderRadius: 14, padding: '12px 14px', marginBottom: 20,
         }}>
-          <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.85)', lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 12, color: '#8A6D3B', lineHeight: 1.6, margin: 0 }}>
             By using LUNA, you agree to these terms. Tap each section below to read the details, then accept at the bottom.
           </p>
         </div>
 
         {/* Accordion sections */}
-        <div style={{ background: 'rgba(20,12,50,0.60)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '0 14px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', borderRadius: 16, padding: '0 14px' }}>
           {SECTIONS.map(s => (
             <AccordionSection key={s.title} title={s.title} body={s.body} />
           ))}
@@ -151,15 +151,15 @@ export default function TermsPage() {
 
         <div style={{ marginTop: 20, display: 'flex', gap: 14 }}>
           <Link href="/privacy" style={{ color: '#8B9FD4', fontSize: 12, textDecoration: 'none' }}>Privacy Policy →</Link>
-          <Link href="/" style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, textDecoration: 'none' }}>← Back to LUNA</Link>
+          <Link href="/" style={{ color: '#5E5474', fontSize: 12, textDecoration: 'none' }}>← Back to LUNA</Link>
         </div>
       </div>
 
       {/* Sticky accept bar */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        background: 'rgba(10,8,28,0.97)', backdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255,255,255,0.09)',
+        background: 'rgba(255,252,248,0.95)', backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(180,150,100,0.18)',
         padding: '14px 20px',
         paddingBottom: 'max(14px, env(safe-area-inset-bottom))',
       }}>
@@ -170,10 +170,10 @@ export default function TermsPage() {
             width: '100%', padding: '14px', borderRadius: 16, border: 'none',
             background: accepted
               ? 'rgba(90,180,90,0.25)'
-              : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
-            color: 'white', fontSize: 15, fontWeight: 700, cursor: accepted ? 'default' : 'pointer',
+              : 'linear-gradient(135deg, #C9A96E, #B08D52)',
+            color: accepted ? '#2F6B2F' : 'white', fontSize: 15, fontWeight: 700, cursor: accepted ? 'default' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            boxShadow: accepted ? 'none' : '0 4px 24px rgba(155,92,255,0.40)',
+            boxShadow: accepted ? 'none' : '0 4px 24px rgba(201,169,110,0.40)',
             transition: 'all 0.3s',
           }}
         >
@@ -182,7 +182,7 @@ export default function TermsPage() {
             : 'I Accept the Terms of Service'
           }
         </button>
-        <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.22)', marginTop: 8 }}>
+        <p style={{ textAlign: 'center', fontSize: 10, color: '#5E5474', marginTop: 8 }}>
           By accepting, you confirm you are an authorized user of LUNA.
         </p>
       </div>

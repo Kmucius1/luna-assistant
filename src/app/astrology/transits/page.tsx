@@ -35,12 +35,23 @@ type TransitData = {
 }
 
 const ASPECT_COLORS: Record<string, string> = {
-  conjunction: '#9b5cff',
+  conjunction: '#DC82AA',
   square:      '#C96B5A',
   opposition:  '#C9A96E',
   trine:       '#5A8A7A',
   sextile:     '#5A7A9A',
 }
+
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
 
 const ORDINALS: Record<number, string> = {
   1:'1st', 2:'2nd', 3:'3rd', 4:'4th', 5:'5th', 6:'6th',
@@ -230,7 +241,7 @@ export default function TransitsPage() {
   const displayed = !data ? [] : filter === 'all' ? data.aspects : filter === 'major' ? data.major_aspects : data.supportive_aspects
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">
@@ -245,7 +256,7 @@ export default function TransitsPage() {
           </div>
           <Link href="/memory">
             <div className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)', border: '1px solid rgba(155,92,255,0.25)' }}>
+              style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.25)' }}>
               📖 Memory
             </div>
           </Link>
@@ -257,19 +268,19 @@ export default function TransitsPage() {
           <>
             {/* Daily theme */}
             <div className="relative rounded-[22px] p-5 mb-4 overflow-hidden"
-              style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
+              style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
               <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none"
-                style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
+                style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.18) 0%, transparent 60%)', filter: 'blur(16px)' }} />
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-4 w-4" style={{ color: 'rgba(185,139,255,0.7)' }} />
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(185,139,255,0.6)' }}>Today's Theme</p>
+                  <Sparkles className="h-4 w-4" style={{ color: 'rgba(201,169,110,0.9)' }} />
+                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(201,169,110,0.85)' }}>Today's Theme</p>
                 </div>
-                <p className="text-sm leading-relaxed text-white">{data.daily_theme}</p>
+                <p className="text-sm leading-relaxed" style={{ color: '#100C1E' }}>{data.daily_theme}</p>
                 {data.moon_house && data.moon_house_meaning && (
-                  <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-                    <p className="text-sm" style={{ color: 'rgba(185,139,255,0.8)' }}>
-                      🌙 Moon in your <strong className="text-white">{ORDINALS[data.moon_house]} house</strong>
+                  <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(180,150,100,0.15)' }}>
+                    <p className="text-sm" style={{ color: '#C9A96E' }}>
+                      🌙 Moon in your <strong style={{ color: '#100C1E' }}>{ORDINALS[data.moon_house]} house</strong>
                       {' '}— {data.moon_house_meaning}
                     </p>
                   </div>
@@ -283,7 +294,7 @@ export default function TransitsPage() {
                 <p className="text-xs font-bold uppercase tracking-wider self-center mr-1" style={{ color: 'var(--text-4)' }}>Activated today:</p>
                 {data.active_natal_points.map(pt => (
                   <span key={pt} className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)', border: '1px solid rgba(155,92,255,0.25)' }}>
+                    style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.25)' }}>
                     {pt}
                   </span>
                 ))}
@@ -297,7 +308,7 @@ export default function TransitsPage() {
                   className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
                     background: filter === f ? 'var(--violet)' : 'var(--surface)',
-                    color:      filter === f ? 'white' : 'var(--text-3)',
+                    color:      filter === f ? '#100C1E' : 'var(--text-3)',
                     border:     `1px solid ${filter === f ? 'var(--violet)' : 'var(--surface-border)'}`,
                   }}>
                   {f === 'all' ? `All (${data.aspects.length})` : f === 'major' ? `Tension (${data.major_aspects.length})` : `Flow (${data.supportive_aspects.length})`}
@@ -321,7 +332,7 @@ export default function TransitsPage() {
 
             {/* Prompt to go to memory */}
             <div className="mt-5 rounded-[18px] p-4 flex items-center gap-3"
-              style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.15)' }}>
+              style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
               <Zap className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--violet)' }} />
               <div className="flex-1">
                 <p className="text-xs font-bold" style={{ color: 'var(--violet)' }}>Your reflections go to Memory</p>

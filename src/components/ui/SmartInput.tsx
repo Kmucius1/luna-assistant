@@ -206,9 +206,9 @@ export function SmartInput({
               <button key={s} onClick={() => selectSuggestion(s)}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
                 style={{
-                  background: selected ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.07)',
-                  color: selected ? 'white' : 'rgba(255,255,255,0.75)',
-                  border: `1px solid ${selected ? 'rgba(155,92,255,0.8)' : 'rgba(255,255,255,0.12)'}`,
+                  background: selected ? 'rgba(201,169,110,0.85)' : 'rgba(180,150,100,0.1)',
+                  color: selected ? '#100C1E' : 'var(--text-2)',
+                  border: `1px solid ${selected ? 'rgba(201,169,110,0.8)' : 'rgba(180,150,100,0.18)'}`,
                   transform: selected ? 'scale(1.02)' : undefined,
                 }}>
                 {selected && <Check className="h-3 w-3" />}
@@ -230,14 +230,14 @@ export function SmartInput({
             rows={rows}
             className="w-full rounded-[16px] px-4 py-3 text-sm resize-none focus:outline-none transition-all luna-input"
             style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: `1px solid ${listening ? 'rgba(155,92,255,0.55)' : 'rgba(255,255,255,0.12)'}`,
-              color: '#ffffff',
+              background: 'rgba(255,255,255,0.5)',
+              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.2)'}`,
+              color: '#100C1E',
               paddingRight: 48,
               fontFamily: 'inherit',
               lineHeight: 1.6,
-              colorScheme: 'dark',
-              boxShadow: listening ? '0 0 0 3px rgba(155,92,255,0.15)' : undefined,
+              colorScheme: 'light',
+              boxShadow: listening ? '0 0 0 3px rgba(201,169,110,0.15)' : undefined,
             }}
           />
         ) : (
@@ -249,12 +249,12 @@ export function SmartInput({
             placeholder={listening ? '🎙 Listening...' : (placeholder ?? `Or speak / type...`)}
             className="w-full rounded-[16px] px-4 py-3 text-sm focus:outline-none transition-all luna-input"
             style={{
-              background: 'rgba(255,255,255,0.07)',
-              border: `1px solid ${listening ? 'rgba(155,92,255,0.55)' : 'rgba(255,255,255,0.12)'}`,
-              color: '#ffffff',
+              background: 'rgba(255,255,255,0.5)',
+              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.2)'}`,
+              color: '#100C1E',
               paddingRight: 48,
               fontFamily: 'inherit',
-              colorScheme: 'dark',
+              colorScheme: 'light',
             }}
           />
         )}
@@ -264,13 +264,13 @@ export function SmartInput({
           onClick={listening ? stopListening : startListening}
           className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           style={{
-            background: listening ? 'var(--violet)' : 'rgba(155,92,255,0.12)',
-            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(155,92,255,0.25)'}`,
-            boxShadow: listening ? '0 0 0 4px rgba(155,92,255,0.2)' : undefined,
+            background: listening ? 'var(--violet)' : 'rgba(201,169,110,0.12)',
+            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(201,169,110,0.25)'}`,
+            boxShadow: listening ? '0 0 0 4px rgba(201,169,110,0.2)' : undefined,
           }}
           title={listening ? 'Stop recording' : 'Tap to dictate'}>
           {listening
-            ? <MicOff className="h-3.5 w-3.5 text-white" />
+            ? <MicOff className="h-3.5 w-3.5" style={{ color: '#100C1E' }} />
             : <Mic className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />}
         </button>
       </div>
@@ -311,7 +311,7 @@ export function SmartInput({
       {onSubmit && value.trim() && (
         <button onClick={handleSubmit}
           className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-[14px] text-sm font-semibold transition-all"
-          style={{ background: 'var(--violet)', color: 'white' }}>
+          style={{ background: 'var(--violet)', color: '#100C1E' }}>
           Continue <ArrowRight className="h-4 w-4" />
         </button>
       )}

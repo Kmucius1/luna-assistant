@@ -49,12 +49,13 @@ interface SyncData {
 
 // ─── Design tokens (matches the app's locked glass-card system) ──────────────
 const G: React.CSSProperties = {
-  background: 'rgba(20,12,50,0.68)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'rgba(255,255,255,0.62)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 20,
   backdropFilter: 'blur(18px)',
   WebkitBackdropFilter: 'blur(18px)',
   overflow: 'hidden',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
 // ─── Mail tabs — Priority/Urgent/Meetings/Needs Review are cross-cutting flags;
@@ -68,19 +69,19 @@ const TABS: { key: TabKey; label: string; emoji: string; color: string }[] = [
   { key: 'dryp_client',   label: 'DRYP Clients',    emoji: '💼', color: '#A890D0' },
   { key: 'personal',      label: 'Zoe Personal',    emoji: '🌸', color: '#D4A8C4' },
   { key: 'meetings',      label: 'Meetings',        emoji: '📅', color: '#8AAEC8' },
-  { key: 'recap',         label: 'Recap',           emoji: '📋', color: 'rgba(185,139,255,0.9)' },
+  { key: 'recap',         label: 'Recap',           emoji: '📋', color: '#C9A96E' },
   { key: 'tracking',      label: 'Tracking',        emoji: '📦', color: '#C9A96E' },
   { key: 'bills_medical', label: 'Bills / Medical', emoji: '🏥', color: '#E08B4A' },
-  { key: 'admin_tools',   label: 'Admin / Tools',   emoji: '⚙️', color: 'rgba(255,255,255,0.5)' },
+  { key: 'admin_tools',   label: 'Admin / Tools',   emoji: '⚙️', color: '#5E5474' },
   { key: 'needs_review',  label: 'Needs Review',    emoji: '❓', color: '#E6B84A' },
-  { key: 'promo',         label: 'Promos / Ignore', emoji: '🏷️', color: 'rgba(255,255,255,0.35)' },
-  { key: 'all',           label: 'All Mail',        emoji: '📬', color: 'rgba(255,255,255,0.5)' },
+  { key: 'promo',         label: 'Promos / Ignore', emoji: '🏷️', color: '#8A8098' },
+  { key: 'all',           label: 'All Mail',        emoji: '📬', color: '#5E5474' },
 ]
 
 function tabColorFor(email: GmailEmail): { color: string; label: string } {
   if (email.isPriority) return { color: '#C9A96E', label: 'Priority' }
   const meta = TABS.find(t => t.key === email.category)
-  return meta ? { color: meta.color, label: meta.label } : { color: 'rgba(255,255,255,0.4)', label: 'Mail' }
+  return meta ? { color: meta.color, label: meta.label } : { color: '#5E5474', label: 'Mail' }
 }
 
 function filterForTab(emails: GmailEmail[], tab: TabKey): GmailEmail[] {
@@ -124,10 +125,10 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
   return (
     <button onClick={onClick} style={{
       width: '100%', textAlign: 'left', padding: '12px 14px',
-      borderBottom: '1px solid rgba(255,255,255,0.05)',
+      borderBottom: '1px solid rgba(180,150,100,0.14)',
       background: isPri
-        ? 'rgba(201,169,110,0.06)'
-        : email.isRead ? 'transparent' : 'rgba(155,92,255,0.04)',
+        ? 'rgba(201,169,110,0.1)'
+        : email.isRead ? 'transparent' : 'rgba(201,169,110,0.06)',
       display: 'flex', gap: 10, alignItems: 'flex-start',
       borderLeft: isPri ? '3px solid rgba(201,169,110,0.7)' : `3px solid ${tag.color}55`,
     }}>
@@ -138,7 +139,7 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
         background: isPri ? 'linear-gradient(135deg, rgba(201,169,110,0.5), rgba(201,169,110,0.25))' : `linear-gradient(135deg, ${tag.color}44, ${tag.color}22)`,
         border: `1.5px solid ${isPri ? 'rgba(201,169,110,0.5)' : tag.color + '44'}`,
         fontSize: 12, fontWeight: 700,
-        color: isPri ? '#C9A96E' : tag.color,
+        color: isPri ? '#8A6F2A' : tag.color,
         boxShadow: isPri ? '0 0 12px rgba(201,169,110,0.25)' : 'none',
       }}>
         {initials(email.from)}
@@ -146,16 +147,16 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-          <span style={{ fontSize: 13, fontWeight: isPri || !email.isRead ? 700 : 500, color: isPri ? '#E8D5A3' : 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
+          <span style={{ fontSize: 13, fontWeight: isPri || !email.isRead ? 700 : 500, color: isPri ? '#8A6F2A' : '#100C1E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '65%' }}>
             {email.from}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
             {email.isStarred && <Star className="h-3 w-3" style={{ color: '#C9A96E', fill: '#C9A96E' }} />}
-            {email.hasAttachment && <Paperclip className="h-3 w-3" style={{ color: 'rgba(255,255,255,0.3)' }} />}
-            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>{timeAgo(email.timestamp)}</span>
+            {email.hasAttachment && <Paperclip className="h-3 w-3" style={{ color: '#8A8098' }} />}
+            <span style={{ fontSize: 10, color: '#8A8098' }}>{timeAgo(email.timestamp)}</span>
           </div>
         </div>
-        <p style={{ fontSize: 12, fontWeight: !email.isRead ? 600 : 400, color: 'rgba(255,255,255,0.75)', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 12, fontWeight: !email.isRead ? 600 : 400, color: '#32284A', marginBottom: 3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {email.subject}
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -166,7 +167,7 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
           {email.isMeeting && (
             <span style={{ fontSize: 10, padding: '1px 6px', borderRadius: 5, background: 'rgba(138,174,200,0.18)', color: '#8AAEC8', fontWeight: 600, flexShrink: 0 }}>📅 Meeting</span>
           )}
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+          <span style={{ fontSize: 11, color: '#8A8098', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
             {email.snippet}
           </span>
         </div>
@@ -226,34 +227,34 @@ function ReplyDrafter({ email, onClose }: { email: GmailEmail; onClose: () => vo
   ] : []
 
   return (
-    <div style={{ ...G, margin: '10px 0', padding: 16, border: '1px solid rgba(155,92,255,0.25)' }}>
+    <div style={{ ...G, margin: '10px 0', padding: 16, border: '1px solid rgba(201,169,110,0.3)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(185,139,255,0.85)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#8A6F2A', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
           <Sparkles className="inline h-3 w-3 mr-1" />AI Reply Drafts
         </p>
-        <button onClick={onClose} style={{ color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}><X className="h-4 w-4" /></button>
+        <button onClick={onClose} style={{ color: '#5E5474', background: 'none', border: 'none', cursor: 'pointer' }}><X className="h-4 w-4" /></button>
       </div>
-      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.42)', marginBottom: 12 }}>
-        Replying to <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{email.from}</strong>
+      <p style={{ fontSize: 11, color: '#5E5474', marginBottom: 12 }}>
+        Replying to <strong style={{ color: '#32284A' }}>{email.from}</strong>
       </p>
       {loading
-        ? <p style={{ padding: '20px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 12 }}>Drafting your reply…</p>
+        ? <p style={{ padding: '20px 0', textAlign: 'center', color: '#5E5474', fontSize: 12 }}>Drafting your reply…</p>
         : <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {options.map(opt => (
-            <div key={opt.key} style={{ ...G, padding: 14, border: '1px solid rgba(255,255,255,0.08)' }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.45)', marginBottom: 6, textTransform: 'uppercase' }}>{opt.label}</p>
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.65, marginBottom: 10, whiteSpace: 'pre-line' }}>{opt.text}</p>
+            <div key={opt.key} style={{ ...G, padding: 14, border: '1px solid rgba(180,150,100,0.16)' }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#5E5474', marginBottom: 6, textTransform: 'uppercase' }}>{opt.label}</p>
+              <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.65, marginBottom: 10, whiteSpace: 'pre-line' }}>{opt.text}</p>
               <div style={{ display: 'flex', gap: 6 }}>
                 <button onClick={() => send(opt.text, opt.key)} disabled={!!sending || !!sent}
                   style={{ flex: 1, padding: '8px 12px', borderRadius: 12, fontSize: 12, fontWeight: 600, border: 'none', cursor: 'pointer',
-                    background: sent === opt.key ? 'rgba(90,138,90,0.3)' : 'rgba(155,92,255,0.25)',
-                    color: sent === opt.key ? '#8AB88A' : 'rgba(255,255,255,0.85)' }}>
+                    background: sent === opt.key ? 'rgba(90,138,90,0.25)' : 'rgba(201,169,110,0.3)',
+                    color: sent === opt.key ? '#3D7A3D' : '#8A6F2A' }}>
                   {sending === opt.key ? 'Sending…' : sent === opt.key ? '✓ Sent'
                     : <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}><Send className="h-3 w-3" />Send</span>}
                 </button>
                 <button onClick={() => copy(opt.text, opt.key)}
-                  style={{ padding: '8px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', cursor: 'pointer', color: 'rgba(255,255,255,0.6)' }}>
-                  {copied === opt.key ? <Check className="h-3.5 w-3.5" style={{ color: '#8AB88A' }} /> : <Copy className="h-3.5 w-3.5" />}
+                  style={{ padding: '8px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.18)', background: 'transparent', cursor: 'pointer', color: '#5E5474' }}>
+                  {copied === opt.key ? <Check className="h-3.5 w-3.5" style={{ color: '#3D7A3D' }} /> : <Copy className="h-3.5 w-3.5" />}
                 </button>
               </div>
             </div>
@@ -292,18 +293,18 @@ function PriorityContactsManager({ contacts, onUpdate }: { contacts: PriorityCon
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
         <UserCheck className="h-4 w-4" style={{ color: '#C9A96E' }} />
         <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Priority Contacts</p>
-        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginLeft: 'auto' }}>Always surfaced first</span>
+        <span style={{ fontSize: 10, color: '#8A8098', marginLeft: 'auto' }}>Always surfaced first</span>
       </div>
 
       {/* Contact list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
         {contacts.map(c => (
-          <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 12, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
+          <div key={c.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)' }}>
             <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#E8D5A3' }}>⭐ {c.name}</p>
-              {c.email && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>{c.email}</p>}
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#8A6F2A' }}>⭐ {c.name}</p>
+              {c.email && <p style={{ fontSize: 10, color: '#8A8098' }}>{c.email}</p>}
             </div>
-            <button onClick={() => remove(c.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 4 }}>
+            <button onClick={() => remove(c.name)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A8098', padding: 4 }}>
               <Trash2 className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -316,10 +317,10 @@ function PriorityContactsManager({ contacts, onUpdate }: { contacts: PriorityCon
           value={newName} onChange={e => setNewName(e.target.value)}
           placeholder="Add contact name…"
           onKeyDown={e => e.key === 'Enter' && add()}
-          style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 10, padding: '8px 12px', fontSize: 12, color: 'white', outline: 'none' }}
+          style={{ flex: 1, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', borderRadius: 10, padding: '8px 12px', fontSize: 12, color: '#100C1E', outline: 'none' }}
         />
         <button onClick={add} disabled={adding || !newName.trim()}
-          style={{ padding: '8px 14px', borderRadius: 10, background: 'rgba(201,169,110,0.25)', border: '1px solid rgba(201,169,110,0.35)', color: '#C9A96E', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, opacity: !newName.trim() ? 0.4 : 1 }}>
+          style={{ padding: '8px 14px', borderRadius: 10, background: 'rgba(201,169,110,0.25)', border: '1px solid rgba(201,169,110,0.35)', color: '#8A6F2A', fontSize: 12, fontWeight: 600, cursor: 'pointer', flexShrink: 0, opacity: !newName.trim() ? 0.4 : 1 }}>
           <Plus className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -334,36 +335,36 @@ function ConnectGmail({ accounts, error }: { accounts: ConnectedAccount[]; error
     <div style={{ padding: '32px 24px', textAlign: 'center' }}>
       {hasAccounts && (
         <div style={{ ...G, padding: 16, marginBottom: 20, textAlign: 'left' }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.45)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Connected Accounts</p>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Connected Accounts</p>
           {accounts.filter(a => a.connected).map(a => (
             <div key={a.email} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
               <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#5A8A5A' }} />
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{a.email}</span>
+              <span style={{ fontSize: 13, color: '#32284A' }}>{a.email}</span>
             </div>
           ))}
         </div>
       )}
-      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #8D5CFF, #6B3DFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 32px rgba(109,60,255,0.3)' }}>
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 32px rgba(201,169,110,0.3)' }}>
         <Mail className="h-7 w-7 text-white" />
       </div>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: 'white', marginBottom: 6, fontFamily: 'var(--font-display)' }}>
+      <h2 style={{ fontSize: 20, fontWeight: 700, color: '#100C1E', marginBottom: 6, fontFamily: 'var(--font-display)' }}>
         {hasAccounts ? 'Add Another Account' : 'Connect Your Mail'}
       </h2>
-      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: 24, maxWidth: 320, margin: '0 auto 24px' }}>
+      <p style={{ fontSize: 13, color: '#5E5474', lineHeight: 1.6, marginBottom: 24, maxWidth: 320, margin: '0 auto 24px' }}>
         Connect zoettaylor14@gmail.com (personal), zoe@drypdigital.com (business), and info@drypdigital.com (team) — LUNA reads all three together and sorts what's personal from what's DRYP client work.
       </p>
       {error && (
         <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 12, background: 'rgba(224,94,94,0.1)', border: '1px solid rgba(224,94,94,0.2)' }}>
-          <p style={{ fontSize: 12, color: '#E05E5E' }}><AlertCircle className="inline h-3.5 w-3.5 mr-1" />
+          <p style={{ fontSize: 12, color: '#B23B3B' }}><AlertCircle className="inline h-3.5 w-3.5 mr-1" />
             {error === 'gmail_denied' ? 'You cancelled the connection. Try again when ready.' : 'Something went wrong. Try again.'}
           </p>
         </div>
       )}
-      <a href="/api/gmail/auth" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 28px', borderRadius: 16, background: 'linear-gradient(135deg, #6B3DFF 0%, #8D5CFF 100%)', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 24px rgba(109,60,255,0.35)' }}>
+      <a href="/api/gmail/auth" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 28px', borderRadius: 16, background: 'linear-gradient(135deg, #C9A96E 0%, #B8934A 100%)', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 24px rgba(201,169,110,0.35)' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Sign in with Google
       </a>
-      <p style={{ marginTop: 14, fontSize: 11, color: 'rgba(255,255,255,0.3)' }}>Sign in once per account to connect all three</p>
+      <p style={{ marginTop: 14, fontSize: 11, color: '#8A8098' }}>Sign in once per account to connect all three</p>
     </div>
   )
 }
@@ -407,7 +408,14 @@ function EmailInner() {
   }
 
   if (!isConnected && accounts.length === 0) return (
-    <div className="bg-app min-h-screen">
+    <div
+      className="bg-app min-h-screen"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16"><ConnectGmail accounts={[]} error={errorParam ?? undefined} /></AppLayout>
     </div>
   )
@@ -421,14 +429,21 @@ function EmailInner() {
   const priorityCount   = sync?.priority_count ?? 0
 
   return (
-    <div className="bg-app min-h-screen">
+    <div
+      className="bg-app min-h-screen"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '0 16px 180px' }}>
 
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, #6B3DFF, #8D5CFF)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 <Inbox className="h-5 w-5 text-white" />
                 {priorityCount > 0 && (
                   <div style={{ position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: '#C9A96E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#000', boxShadow: '0 0 8px rgba(201,169,110,0.6)' }}>
@@ -437,23 +452,23 @@ function EmailInner() {
                 )}
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#9b5cff' }}>Mail</p>
-                <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C9A96E' }}>Mail</p>
+                <p style={{ fontSize: 10, color: '#5E5474' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               <button onClick={() => setShowContacts(v => !v)} title="Priority contacts"
-                style={{ width: 33, height: 33, borderRadius: 10, background: showContacts ? 'rgba(201,169,110,0.25)' : 'rgba(255,255,255,0.07)', border: `1px solid ${showContacts ? 'rgba(201,169,110,0.4)' : 'rgba(255,255,255,0.1)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <UserCheck className="h-3.5 w-3.5" style={{ color: showContacts ? '#C9A96E' : 'rgba(255,255,255,0.55)' }} />
+                style={{ width: 33, height: 33, borderRadius: 10, background: showContacts ? 'rgba(201,169,110,0.25)' : 'rgba(255,255,255,0.5)', border: `1px solid ${showContacts ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <UserCheck className="h-3.5 w-3.5" style={{ color: showContacts ? '#C9A96E' : '#5E5474' }} />
               </button>
-              <a href="/api/gmail/auth" style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} title="Add account">
-                <Plus className="h-3.5 w-3.5" style={{ color: 'rgba(255,255,255,0.55)' }} />
+              <a href="/api/gmail/auth" style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} title="Add account">
+                <Plus className="h-3.5 w-3.5" style={{ color: '#5E5474' }} />
               </a>
-              <button onClick={syncEmails} disabled={loading} style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} style={{ color: 'rgba(255,255,255,0.55)' }} />
+              <button onClick={syncEmails} disabled={loading} style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} style={{ color: '#5E5474' }} />
               </button>
-              <button onClick={disconnect} style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <LogOut className="h-3.5 w-3.5" style={{ color: 'rgba(255,255,255,0.4)' }} />
+              <button onClick={disconnect} style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <LogOut className="h-3.5 w-3.5" style={{ color: '#8A8098' }} />
               </button>
             </div>
           </div>
@@ -469,8 +484,8 @@ function EmailInner() {
               {['all', ...connectedEmails].map(acc => (
                 <button key={acc} onClick={() => setAccountFilter(acc)} style={{
                   flexShrink: 0, padding: '5px 12px', borderRadius: 20, border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 600,
-                  background: accountFilter === acc ? 'rgba(155,92,255,0.35)' : 'rgba(255,255,255,0.07)',
-                  color: accountFilter === acc ? 'rgba(185,139,255,0.95)' : 'rgba(255,255,255,0.5)',
+                  background: accountFilter === acc ? 'rgba(201,169,110,0.28)' : 'rgba(255,255,255,0.5)',
+                  color: accountFilter === acc ? '#8A6F2A' : '#5E5474',
                 }}>{acc === 'all' ? 'All inboxes' : acc}</button>
               ))}
             </div>
@@ -482,12 +497,12 @@ function EmailInner() {
               {[
                 { label: 'Priority',    count: priorityCount,                          color: '#C9A96E', glow: true  },
                 { label: 'Urgent',      count: allEmails.filter(e => e.isUrgent).length, color: '#E05E5E', glow: false },
-                { label: 'Unread',      count: sync.unread_count,                       color: '#9b5cff', glow: false },
+                { label: 'Unread',      count: sync.unread_count,                       color: '#8A6F2A', glow: false },
                 { label: 'Tasks found', count: sync.extracted_tasks.length,             color: '#8AAEC8', glow: false },
               ].map(s => (
                 <div key={s.label} style={{ ...G, padding: '10px 6px', textAlign: 'center', border: s.glow && s.count > 0 ? '1px solid rgba(201,169,110,0.35)' : G.border, boxShadow: s.glow && s.count > 0 ? '0 0 12px rgba(201,169,110,0.15)' : 'none' }}>
                   <p style={{ fontSize: 22, fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.count}</p>
-                  <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>{s.label}</p>
+                  <p style={{ fontSize: 11, color: '#5E5474', marginTop: 2 }}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -502,8 +517,8 @@ function EmailInner() {
                 <button key={t.key} onClick={() => { setTab(t.key); setSelected(null); setShowReply(false) }}
                   style={{
                     flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: active ? `1px solid ${t.color}55` : '1px solid transparent', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                    background: active ? `${t.color}28` : 'rgba(255,255,255,0.07)',
-                    color: active ? t.color : 'rgba(255,255,255,0.5)',
+                    background: active ? `${t.color}28` : 'rgba(255,255,255,0.5)',
+                    color: active ? t.color : '#5E5474',
                     boxShadow: active && (count ?? 0) > 0 ? `0 0 10px ${t.color}33` : 'none',
                   }}>
                   {t.emoji} {t.label}{count !== undefined ? ` (${count})` : ''}
@@ -517,19 +532,19 @@ function EmailInner() {
           {tab === 'priority' && !loading && list.length === 0 && sync && (
             <div style={{ ...G, padding: 24, textAlign: 'center', border: '1px solid rgba(201,169,110,0.2)' }}>
               <p style={{ fontSize: 22, marginBottom: 8 }}>⭐</p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>Nothing urgent or high-priority right now</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.38)' }}>Priority contacts and time-sensitive mail across all inboxes will surface here.</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#32284A', marginBottom: 4 }}>Nothing urgent or high-priority right now</p>
+              <p style={{ fontSize: 12, color: '#5E5474' }}>Priority contacts and time-sensitive mail across all inboxes will surface here.</p>
             </div>
           )}
 
           {loading && !sync && (
-            <div style={{ padding: '32px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+            <div style={{ padding: '32px 0', textAlign: 'center', color: '#5E5474', fontSize: 13 }}>
               <RefreshCw className="inline h-4 w-4 animate-spin mr-2" />Reading your inboxes…
             </div>
           )}
 
           {!loading && tab !== 'priority' && list.length === 0 && sync && (
-            <p style={{ padding: '32px 0', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Nothing in this tab.</p>
+            <p style={{ padding: '32px 0', textAlign: 'center', color: '#5E5474', fontSize: 13 }}>Nothing in this tab.</p>
           )}
 
           {list.length > 0 && (
@@ -539,29 +554,29 @@ function EmailInner() {
                   <EmailRow email={email} onClick={() => { setSelected(selected?.id === email.id ? null : email); setShowReply(false) }} />
                   {selected?.id === email.id && (
                     <div style={{ padding: '0 14px 14px' }}>
-                      <div style={{ ...G, padding: 14, marginTop: 8, border: email.isPriority ? '1px solid rgba(201,169,110,0.25)' : '1px solid rgba(255,255,255,0.08)' }}>
+                      <div style={{ ...G, padding: 14, marginTop: 8, border: email.isPriority ? '1px solid rgba(201,169,110,0.25)' : '1px solid rgba(180,150,100,0.16)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             {email.isPriority && <div style={{ marginBottom: 6 }}><PriorityBadge name={email.priorityContact!} /></div>}
-                            <p style={{ fontSize: 14, fontWeight: 700, color: 'white', marginBottom: 2 }}>{email.subject}</p>
-                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{email.from} · {email.date}</p>
+                            <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E', marginBottom: 2 }}>{email.subject}</p>
+                            <p style={{ fontSize: 11, color: '#5E5474' }}>{email.from} · {email.date}</p>
                           </div>
-                          <a href={`https://mail.google.com/mail/u/0/#inbox/${email.threadId}`} target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }}>
+                          <a href={`https://mail.google.com/mail/u/0/#inbox/${email.threadId}`} target="_blank" rel="noopener noreferrer" style={{ color: '#8A8098', flexShrink: 0 }}>
                             <ExternalLink className="h-4 w-4" />
                           </a>
                         </div>
                         {email.action && (
                           <div style={{ padding: '8px 12px', borderRadius: 10, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)', marginBottom: 10 }}>
-                            <p style={{ fontSize: 12, color: '#C9A96E', fontWeight: 600 }}>⚡ {email.action}</p>
+                            <p style={{ fontSize: 12, color: '#8A6F2A', fontWeight: 600 }}>⚡ {email.action}</p>
                           </div>
                         )}
-                        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, whiteSpace: 'pre-line', wordBreak: 'break-word', marginBottom: 12 }}>
+                        <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.7, whiteSpace: 'pre-line', wordBreak: 'break-word', marginBottom: 12 }}>
                           {email.body || email.snippet}
                         </p>
                         {!showReply && (
                           <button onClick={() => setShowReply(true)} style={{
                             display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                            background: 'rgba(155,92,255,0.25)', color: 'rgba(185,139,255,0.95)', fontSize: 12, fontWeight: 600,
+                            background: 'rgba(201,169,110,0.28)', color: '#8A6F2A', fontSize: 12, fontWeight: 600,
                           }}>
                             <Sparkles className="h-3.5 w-3.5" /> Draft AI Reply <ChevronRight className="h-3.5 w-3.5 ml-auto" />
                           </button>
@@ -582,7 +597,7 @@ function EmailInner() {
 
 export default function EmailPage() {
   return (
-    <Suspense fallback={<div className="bg-app min-h-screen" />}>
+    <Suspense fallback={<div className="bg-app min-h-screen" style={{ '--app-bg-from': '#FBF8F2', '--app-bg-mid': '#F6F1E7', '--app-bg-to': '#F0E9DA' } as React.CSSProperties} />}>
       <EmailInner />
     </Suspense>
   )

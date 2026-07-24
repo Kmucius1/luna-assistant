@@ -4,6 +4,16 @@ import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Zap, Check, Home } from 'lucide-react'
 
+// ─── Locked light-palette card style (bypasses the global .glass-card
+// class, which forces white text + dark surfaces under [data-theme="dark"]
+// regardless of local CSS var overrides) ──────────────────────────────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+
 const STEPS = [
   { id: 1, emoji: '🦷', text: 'Teeth'               },
   { id: 2, emoji: '💧', text: 'Wash face'           },
@@ -55,7 +65,20 @@ export default function RushModeScreen() {
   const pct = Math.round((checked.size / STEPS.length) * 100)
 
   return (
-    <div style={{ background: 'linear-gradient(160deg, #FDF8F3 0%, #F5EEE0 100%)', minHeight: '100vh' }}>
+    <div
+      style={{
+        background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+        minHeight: '100vh',
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--golden': '#C9A96E',
+        '--text-1': '#100C1E',
+        '--text-2': '#32284A',
+        '--text-3': '#5E5474',
+        '--surface': 'rgba(255,255,255,0.6)',
+        '--surface-border': 'rgba(180,150,100,0.18)',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -80,7 +103,7 @@ export default function RushModeScreen() {
               <span>Progress</span>
               <span>{pct}%</span>
             </div>
-            <div className="h-2 rounded-full w-full" style={{ background: 'rgba(155,92,255,0.1)' }}>
+            <div className="h-2 rounded-full w-full" style={{ background: 'rgba(201,169,110,0.15)' }}>
               <div
                 className="h-2 rounded-full transition-all duration-500"
                 style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet), var(--golden))' }}
@@ -122,7 +145,7 @@ export default function RushModeScreen() {
           </div>
 
           {/* Priority input — saved as a real task on blur, editable after */}
-          <div className="glass-card mb-6" style={{ padding: '16px' }}>
+          <div className="mb-6" style={{ ...CARD, padding: '16px' }}>
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>
                 ⭐ One priority today

@@ -5,21 +5,22 @@ import { Sparkles, RefreshCw, ArrowLeft, Clock, Home, Building2, Droplets, Dumbb
 import Link from 'next/link'
 
 const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.62)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 20,
   backdropFilter: 'blur(14px)',
   WebkitBackdropFilter: 'blur(14px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
 const TYPE_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
-  morning:  { bg: 'rgba(201,169,110,0.10)', color: '#C9A96E',  dot: '#C9A96E' },
-  work:     { bg: 'rgba(90,138,164,0.10)',  color: '#7BAEC8',  dot: '#7BAEC8' },
-  break:    { bg: 'rgba(90,138,90,0.10)',   color: '#8AB88A',  dot: '#8AB88A' },
-  personal: { bg: 'rgba(200,120,160,0.10)', color: '#DC82AA',  dot: '#DC82AA' },
-  evening:  { bg: 'rgba(155,92,255,0.10)', color: '#9b5cff',  dot: '#9b5cff' },
-  night:    { bg: 'rgba(80,60,120,0.12)',   color: '#A090D0',  dot: '#A090D0' },
-  commute:  { bg: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', dot: 'rgba(255,255,255,0.3)' },
+  morning:  { bg: 'rgba(201,169,110,0.12)', color: '#8A6F2A',  dot: '#C9A96E' },
+  work:     { bg: 'rgba(90,138,164,0.12)',  color: '#4A7A96',  dot: '#7BAEC8' },
+  break:    { bg: 'rgba(90,138,90,0.12)',   color: '#5A8A5A',  dot: '#8AB88A' },
+  personal: { bg: 'rgba(200,120,160,0.12)', color: '#A8496E',  dot: '#DC82AA' },
+  evening:  { bg: 'rgba(201,169,110,0.12)', color: '#8A6F2A',  dot: '#C9A96E' },
+  night:    { bg: 'rgba(120,100,160,0.14)', color: '#6B5A96',  dot: '#A090D0' },
+  commute:  { bg: 'rgba(94,84,116,0.1)',    color: '#5E5474',  dot: 'rgba(94,84,116,0.3)' },
 }
 
 interface ScheduleBlock {
@@ -107,25 +108,32 @@ export default function PlanMyDayPage() {
   const anchors = plan?.key_anchors
 
   return (
-    <div className="min-h-screen bg-app overflow-x-hidden">
+    <div
+      className="min-h-screen bg-app overflow-x-hidden"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '0 0 180px' }}>
 
           {/* Header */}
-          <div style={{ background: 'linear-gradient(160deg, rgba(155,92,255,0.18) 0%, rgba(90,63,136,0.1) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
+          <div style={{ background: 'linear-gradient(160deg, rgba(201,169,110,0.2) 0%, rgba(180,150,100,0.1) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#5E5474', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Clock className="h-5 w-5" style={{ color: '#9b5cff' }} />
+              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(201,169,110,0.18)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Clock className="h-5 w-5" style={{ color: '#8A6F2A' }} />
               </div>
               <div>
-                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white' }}>Plan My Day</h1>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{today}</p>
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Plan My Day</h1>
+                <p style={{ fontSize: 12, color: '#5E5474' }}>{today}</p>
               </div>
             </div>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.6 }}>
               Full schedule — wake to sleep, with your real DRYP tasks built in.
             </p>
           </div>
@@ -135,7 +143,7 @@ export default function PlanMyDayPage() {
             {/* Checking for an already-built plan */}
             {checkingSaved && (
               <div style={{ ...GLASS, padding: 32, textAlign: 'center', marginBottom: 16 }}>
-                <RefreshCw className="h-5 w-5 animate-spin" style={{ color: '#9b5cff', margin: '0 auto' }} />
+                <RefreshCw className="h-5 w-5 animate-spin" style={{ color: '#8A6F2A', margin: '0 auto' }} />
               </div>
             )}
 
@@ -145,14 +153,14 @@ export default function PlanMyDayPage() {
 
                 {/* Wake time */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Wake up time</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Wake up time</p>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {WAKE_TIMES.map(t => (
                       <button key={t} onClick={() => setWakeTime(t)} style={{
                         padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                        background: wakeTime === t ? 'rgba(201,169,110,0.18)' : 'rgba(255,255,255,0.05)',
-                        border: wakeTime === t ? '1.5px solid rgba(201,169,110,0.45)' : '1px solid rgba(255,255,255,0.08)',
-                        color: wakeTime === t ? '#C9A96E' : 'rgba(255,255,255,0.45)',
+                        background: wakeTime === t ? 'rgba(201,169,110,0.2)' : 'rgba(255,255,255,0.45)',
+                        border: wakeTime === t ? '1.5px solid rgba(201,169,110,0.45)' : '1px solid rgba(180,150,100,0.16)',
+                        color: wakeTime === t ? '#8A6F2A' : '#5E5474',
                       }}>{t}</button>
                     ))}
                   </div>
@@ -161,22 +169,22 @@ export default function PlanMyDayPage() {
                 {/* Gym time */}
                 <div style={{ ...GLASS, padding: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-                    <Dumbbell className="h-3.5 w-3.5" style={{ color: 'rgba(255,255,255,0.35)' }} />
-                    <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gym</p>
+                    <Dumbbell className="h-3.5 w-3.5" style={{ color: '#5E5474' }} />
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gym</p>
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     <button onClick={() => setGymTime(null)} style={{
                       padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                      background: gymTime === null ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.05)',
-                      border: gymTime === null ? '1.5px solid rgba(255,255,255,0.25)' : '1px solid rgba(255,255,255,0.08)',
-                      color: gymTime === null ? 'white' : 'rgba(255,255,255,0.45)',
+                      background: gymTime === null ? 'rgba(94,84,116,0.15)' : 'rgba(255,255,255,0.45)',
+                      border: gymTime === null ? '1.5px solid rgba(94,84,116,0.3)' : '1px solid rgba(180,150,100,0.16)',
+                      color: gymTime === null ? '#100C1E' : '#5E5474',
                     }}>Not today</button>
                     {GYM_TIMES.map(t => (
                       <button key={t} onClick={() => setGymTime(t)} style={{
                         padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                        background: gymTime === t ? 'rgba(224,140,74,0.18)' : 'rgba(255,255,255,0.05)',
-                        border: gymTime === t ? '1.5px solid rgba(224,140,74,0.45)' : '1px solid rgba(255,255,255,0.08)',
-                        color: gymTime === t ? '#E08C4A' : 'rgba(255,255,255,0.45)',
+                        background: gymTime === t ? 'rgba(224,140,74,0.2)' : 'rgba(255,255,255,0.45)',
+                        border: gymTime === t ? '1.5px solid rgba(224,140,74,0.45)' : '1px solid rgba(180,150,100,0.16)',
+                        color: gymTime === t ? '#B8632F' : '#5E5474',
                       }}>{t}</button>
                     ))}
                   </div>
@@ -184,7 +192,7 @@ export default function PlanMyDayPage() {
 
                 {/* Location */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Where are you working?</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Where are you working?</p>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {([
                       { v: 'home',   label: 'Work from home', icon: <Home className="h-3.5 w-3.5" /> },
@@ -193,9 +201,9 @@ export default function PlanMyDayPage() {
                       <button key={opt.v} onClick={() => setLocation(opt.v)} style={{
                         flex: 1, padding: '11px 8px', borderRadius: 16, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                        background: location === opt.v ? 'rgba(155,92,255,0.15)' : 'rgba(255,255,255,0.04)',
-                        border: location === opt.v ? '1.5px solid rgba(155,92,255,0.4)' : '1px solid rgba(255,255,255,0.08)',
-                        color: location === opt.v ? '#9b5cff' : 'rgba(255,255,255,0.4)',
+                        background: location === opt.v ? 'rgba(201,169,110,0.2)' : 'rgba(255,255,255,0.4)',
+                        border: location === opt.v ? '1.5px solid rgba(201,169,110,0.4)' : '1px solid rgba(180,150,100,0.16)',
+                        color: location === opt.v ? '#8A6F2A' : '#5E5474',
                       }}>{opt.icon}{opt.label}</button>
                     ))}
                   </div>
@@ -203,36 +211,36 @@ export default function PlanMyDayPage() {
 
                 {/* Morning plans */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Morning plans (optional)</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Morning plans (optional)</p>
                   <input
                     value={morningPlans}
                     onChange={e => setMorningPlans(e.target.value)}
                     placeholder="doctor's appointment, coffee with a friend, errands…"
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#100C1E', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 {/* Work plans */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Work plans (optional)</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Work plans (optional)</p>
                   <input
                     value={workPlans}
                     onChange={e => setWorkPlans(e.target.value)}
                     placeholder="client call at 2, big deadline, meeting with Mick…"
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#100C1E', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 {/* End time */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Done with work by</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Done with work by</p>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {END_TIMES.map(t => (
                       <button key={t} onClick={() => setWorkEndTime(t)} style={{
                         padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                        background: workEndTime === t ? 'rgba(90,138,164,0.18)' : 'rgba(255,255,255,0.05)',
-                        border: workEndTime === t ? '1.5px solid rgba(90,138,164,0.45)' : '1px solid rgba(255,255,255,0.08)',
-                        color: workEndTime === t ? '#7BAEC8' : 'rgba(255,255,255,0.45)',
+                        background: workEndTime === t ? 'rgba(90,138,164,0.2)' : 'rgba(255,255,255,0.45)',
+                        border: workEndTime === t ? '1.5px solid rgba(90,138,164,0.45)' : '1px solid rgba(180,150,100,0.16)',
+                        color: workEndTime === t ? '#4A7A96' : '#5E5474',
                       }}>{t}</button>
                     ))}
                   </div>
@@ -241,38 +249,38 @@ export default function PlanMyDayPage() {
                 {/* Hair wash day */}
                 <button onClick={() => setHairWashDay(v => !v)} style={{
                   ...GLASS, padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer',
-                  background: hairWashDay ? 'rgba(90,168,164,0.1)' : 'rgba(255,255,255,0.04)',
-                  border: hairWashDay ? '1.5px solid rgba(90,168,164,0.35)' : '1px solid rgba(255,255,255,0.09)',
+                  background: hairWashDay ? 'rgba(90,168,164,0.12)' : 'rgba(255,255,255,0.4)',
+                  border: hairWashDay ? '1.5px solid rgba(90,168,164,0.35)' : '1px solid rgba(180,150,100,0.16)',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <Droplets className="h-4 w-4" style={{ color: hairWashDay ? '#5AA8A4' : 'rgba(255,255,255,0.3)' }} />
+                    <Droplets className="h-4 w-4" style={{ color: hairWashDay ? '#3D7A76' : '#8A8098' }} />
                     <div style={{ textAlign: 'left' }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: hairWashDay ? 'white' : 'rgba(255,255,255,0.6)' }}>Hair wash day</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>Adds 20 mins to your morning for perm care</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: hairWashDay ? '#100C1E' : '#32284A' }}>Hair wash day</p>
+                      <p style={{ fontSize: 11, color: '#8A8098', marginTop: 1 }}>Adds 20 mins to your morning for perm care</p>
                     </div>
                   </div>
-                  <div style={{ width: 22, height: 22, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hairWashDay ? '#5AA8A4' : 'rgba(255,255,255,0.07)', border: hairWashDay ? 'none' : '1.5px solid rgba(255,255,255,0.15)', flexShrink: 0 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', background: hairWashDay ? '#3D7A76' : 'rgba(255,255,255,0.5)', border: hairWashDay ? 'none' : '1.5px solid rgba(180,150,100,0.25)', flexShrink: 0 }}>
                     {hairWashDay && <span style={{ color: 'white', fontSize: 12, fontWeight: 800 }}>✓</span>}
                   </div>
                 </button>
 
                 {/* Evening plans */}
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Evening plans (optional)</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Evening plans (optional)</p>
                   <input
                     value={eveningPlans}
                     onChange={e => setEveningPlans(e.target.value)}
                     placeholder="dinner out, gym, date night, errands…"
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: '#100C1E', fontSize: 13, lineHeight: 1.6, fontFamily: 'inherit', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 <button onClick={generate} style={{
                   width: '100%', padding: '16px 0', borderRadius: 20, border: 'none', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, #9b5cff, #5A3F88)',
+                  background: 'linear-gradient(135deg, #C9A96E, #B8934A)',
                   color: 'white', fontSize: 15, fontWeight: 700,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  boxShadow: '0 6px 24px rgba(155,92,255,0.35)',
+                  boxShadow: '0 6px 24px rgba(201,169,110,0.35)',
                 }}>
                   <Sparkles className="h-5 w-5" /> Build my full day
                 </button>
@@ -282,19 +290,19 @@ export default function PlanMyDayPage() {
             {/* Loading */}
             {loading && (
               <div style={{ ...GLASS, padding: 32, textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(155,92,255,0.12)', border: '1px solid rgba(155,92,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <RefreshCw className="h-6 w-6 animate-spin" style={{ color: '#9b5cff' }} />
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <RefreshCw className="h-6 w-6 animate-spin" style={{ color: '#8A6F2A' }} />
                 </div>
-                <p style={{ fontSize: 15, fontWeight: 600, color: 'white', marginBottom: 6 }}>Building your full day…</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Pulling your DRYP tasks and mapping your schedule</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#100C1E', marginBottom: 6 }}>Building your full day…</p>
+                <p style={{ fontSize: 13, color: '#5E5474' }}>Pulling your DRYP tasks and mapping your schedule</p>
               </div>
             )}
 
             {/* Error */}
             {error && (
-              <div style={{ ...GLASS, padding: 18, background: 'rgba(224,94,94,0.07)', border: '1px solid rgba(224,94,94,0.2)', marginBottom: 12 }}>
-                <p style={{ fontSize: 13, color: '#E05E5E' }}>{error}</p>
-                <button onClick={generate} style={{ marginTop: 10, fontSize: 12, color: '#E05E5E', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Try again →</button>
+              <div style={{ ...GLASS, padding: 18, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.22)', marginBottom: 12 }}>
+                <p style={{ fontSize: 13, color: '#B23B3B' }}>{error}</p>
+                <button onClick={generate} style={{ marginTop: 10, fontSize: 12, color: '#B23B3B', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Try again →</button>
               </div>
             )}
 
@@ -304,14 +312,14 @@ export default function PlanMyDayPage() {
 
                 {/* LUNA message */}
                 {plan.ai_message && (
-                  <div style={{ ...GLASS, padding: 18, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)' }}>
+                  <div style={{ ...GLASS, padding: 18, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)' }}>
                     <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                       <span style={{ fontSize: 18, flexShrink: 0 }}>🌙</span>
                       <div>
-                        <p style={{ fontSize: 11, fontWeight: 700, color: '#9b5cff', marginBottom: 4 }}>LUNA</p>
-                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', lineHeight: 1.65 }}>{plan.ai_message}</p>
+                        <p style={{ fontSize: 11, fontWeight: 700, color: '#8A6F2A', marginBottom: 4 }}>LUNA</p>
+                        <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.65 }}>{plan.ai_message}</p>
                         {plan.day_energy && (
-                          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 6, fontStyle: 'italic' }}>{plan.day_energy}</p>
+                          <p style={{ fontSize: 12, color: '#5E5474', marginTop: 6, fontStyle: 'italic' }}>{plan.day_energy}</p>
                         )}
                       </div>
                     </div>
@@ -321,23 +329,23 @@ export default function PlanMyDayPage() {
                 {/* Key anchor times */}
                 {anchors && (
                   <div style={{ ...GLASS, padding: 16 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Today&apos;s anchors</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#8A8098', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Today&apos;s anchors</p>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       {[
-                        { label: 'Wake up',     time: anchors.wake,       emoji: '☀️', color: '#C9A96E' },
-                        ...(anchors.gym ? [{ label: 'Gym', time: anchors.gym, emoji: '💪', color: '#E08C4A' }] : []),
-                        { label: 'Start work',  time: anchors.at_work,    emoji: '💻', color: '#7BAEC8' },
-                        { label: 'Lunch',       time: anchors.lunch,      emoji: '🍽️', color: '#8AB88A' },
-                        { label: 'Leave work',  time: anchors.leave_work, emoji: '🏁', color: '#9b5cff' },
-                        { label: 'Wind down',   time: anchors.wind_down,  emoji: '🌙', color: '#A090D0' },
-                        { label: 'Lights out',  time: anchors.lights_out, emoji: '💤', color: 'rgba(255,255,255,0.35)' },
-                        ...(anchors.out_door ? [{ label: 'Out the door', time: anchors.out_door, emoji: '🚗', color: '#DC82AA' }] : []),
+                        { label: 'Wake up',     time: anchors.wake,       emoji: '☀️', color: '#8A6F2A' },
+                        ...(anchors.gym ? [{ label: 'Gym', time: anchors.gym, emoji: '💪', color: '#B8632F' }] : []),
+                        { label: 'Start work',  time: anchors.at_work,    emoji: '💻', color: '#4A7A96' },
+                        { label: 'Lunch',       time: anchors.lunch,      emoji: '🍽️', color: '#5A8A5A' },
+                        { label: 'Leave work',  time: anchors.leave_work, emoji: '🏁', color: '#8A6F2A' },
+                        { label: 'Wind down',   time: anchors.wind_down,  emoji: '🌙', color: '#6B5A96' },
+                        { label: 'Lights out',  time: anchors.lights_out, emoji: '💤', color: '#8A8098' },
+                        ...(anchors.out_door ? [{ label: 'Out the door', time: anchors.out_door, emoji: '🚗', color: '#A8496E' }] : []),
                       ].filter(a => a.time && a.time !== 'null').map((a, i) => (
-                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14, background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(180,150,100,0.14)' }}>
                           <span style={{ fontSize: 18, flexShrink: 0 }}>{a.emoji}</span>
                           <div>
                             <p style={{ fontSize: 13, fontWeight: 700, color: a.color }}>{a.time}</p>
-                            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>{a.label}</p>
+                            <p style={{ fontSize: 11, color: '#5E5474', marginTop: 1 }}>{a.label}</p>
                           </div>
                         </div>
                       ))}
@@ -348,10 +356,10 @@ export default function PlanMyDayPage() {
                 {/* Full timeline */}
                 {plan.schedule?.length > 0 && (
                   <div style={{ ...GLASS, padding: 18 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Full schedule</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#8A8098', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>Full schedule</p>
                     <div style={{ position: 'relative' }}>
                       {/* Vertical line */}
-                      <div style={{ position: 'absolute', left: 16, top: 8, bottom: 8, width: 1, background: 'rgba(255,255,255,0.06)' }} />
+                      <div style={{ position: 'absolute', left: 16, top: 8, bottom: 8, width: 1, background: 'rgba(180,150,100,0.16)' }} />
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                         {plan.schedule.map((block, i) => {
                           const style = TYPE_STYLE[block.type] ?? TYPE_STYLE.work
@@ -360,17 +368,17 @@ export default function PlanMyDayPage() {
                             <div key={i} style={{ display: 'flex', gap: 14, paddingBottom: 14 }}>
                               {/* Dot on timeline */}
                               <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 3 }}>
-                                <div style={{ width: isAnchor ? 14 : 10, height: isAnchor ? 14 : 10, borderRadius: '50%', background: isAnchor ? style.dot : 'rgba(255,255,255,0.15)', border: isAnchor ? `2px solid ${style.dot}` : '1.5px solid rgba(255,255,255,0.15)', flexShrink: 0, zIndex: 1, marginLeft: isAnchor ? -2 : 0 }} />
+                                <div style={{ width: isAnchor ? 14 : 10, height: isAnchor ? 14 : 10, borderRadius: '50%', background: isAnchor ? style.dot : 'rgba(94,84,116,0.25)', border: isAnchor ? `2px solid ${style.dot}` : '1.5px solid rgba(94,84,116,0.25)', flexShrink: 0, zIndex: 1, marginLeft: isAnchor ? -2 : 0 }} />
                               </div>
                               {/* Content */}
                               <div style={{ flex: 1, paddingBottom: 2 }}>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: block.detail ? 3 : 0 }}>
                                   <span style={{ fontSize: isAnchor ? 12 : 11, fontWeight: 700, color: style.color, flexShrink: 0, minWidth: 54 }}>{block.time}</span>
                                   <span style={{ fontSize: 14, flexShrink: 0 }}>{block.emoji ?? ''}</span>
-                                  <p style={{ fontSize: isAnchor ? 14 : 13, fontWeight: isAnchor ? 700 : 500, color: isAnchor ? 'white' : 'rgba(255,255,255,0.8)', lineHeight: 1.4 }}>{block.label}</p>
+                                  <p style={{ fontSize: isAnchor ? 14 : 13, fontWeight: isAnchor ? 700 : 500, color: isAnchor ? '#100C1E' : '#32284A', lineHeight: 1.4 }}>{block.label}</p>
                                 </div>
                                 {block.detail && (
-                                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.55, marginLeft: 62 }}>{block.detail}</p>
+                                  <p style={{ fontSize: 12, color: '#5E5474', lineHeight: 1.55, marginLeft: 62 }}>{block.detail}</p>
                                 )}
                               </div>
                             </div>
@@ -383,10 +391,10 @@ export default function PlanMyDayPage() {
 
                 {/* Regenerate + reset */}
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={generate} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(155,92,255,0.25)', cursor: 'pointer', background: 'rgba(155,92,255,0.08)', color: '#9b5cff', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <button onClick={generate} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(201,169,110,0.3)', cursor: 'pointer', background: 'rgba(201,169,110,0.1)', color: '#8A6F2A', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                     <RefreshCw className="h-3.5 w-3.5" /> Regenerate
                   </button>
-                  <button onClick={() => { setPlan(null); setError('') }} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(255,255,255,0.09)', cursor: 'pointer', background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.4)', fontSize: 13, fontWeight: 600 }}>
+                  <button onClick={() => { setPlan(null); setError('') }} style={{ flex: 1, padding: '13px 0', borderRadius: 16, border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', background: 'rgba(255,255,255,0.45)', color: '#5E5474', fontSize: 13, fontWeight: 600 }}>
                     Change setup
                   </button>
                 </div>

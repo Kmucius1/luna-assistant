@@ -3,17 +3,18 @@ import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Loader2 } from 'lucide-react'
 
-const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
+const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const GOLDEN = '#C9A96E'
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', padding: 18,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const INPUT: React.CSSProperties = {
-  width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 10, padding: '10px 12px', fontSize: 14, color: 'white', outline: 'none', boxSizing: 'border-box', colorScheme: 'dark',
+  width: '100%', background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)',
+  borderRadius: 10, padding: '10px 12px', fontSize: 14, color: '#100C1E', outline: 'none', boxSizing: 'border-box', colorScheme: 'light',
 }
-const LABEL: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: 6, display: 'block' }
+const LABEL: React.CSSProperties = { fontSize: 11, fontWeight: 700, color: '#5E5474', marginBottom: 6, display: 'block' }
 
 interface Prefs {
   checking_safety_buffer: number; weekly_grocery_target: number | null; weekly_gas_target: number | null
@@ -58,11 +59,11 @@ export default function MoneySettingsPage() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px', maxWidth: 480 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 4 }}>Money Settings</h1>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginBottom: 18 }}>What Safe to Spend reserves before showing your real number.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Money Settings</h1>
+          <p style={{ fontSize: 13, color: '#32284A', marginBottom: 18 }}>What Safe to Spend reserves before showing your real number.</p>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 40 }}><Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'rgba(255,255,255,0.4)' }} /></div>
+            <div style={{ textAlign: 'center', padding: 40 }}><Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: '#5E5474' }} /></div>
           ) : (
             <div style={CARD}>
               {field('checking_safety_buffer', 'Safety buffer ($) — always stays untouched')}
@@ -77,7 +78,7 @@ export default function MoneySettingsPage() {
               </div>
               <button onClick={save} disabled={saving}
                 style={{ width: '100%', height: 44, borderRadius: 12, border: 'none', cursor: 'pointer', marginTop: 14,
-                  background: saved ? '#5A8A6A' : `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#1A1240', fontSize: 14, fontWeight: 800, opacity: saving ? 0.6 : 1 }}>
+                  background: saved ? '#5A8A6A' : `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#100C1E', fontSize: 14, fontWeight: 800, opacity: saving ? 0.6 : 1 }}>
                 {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save settings'}
               </button>
             </div>

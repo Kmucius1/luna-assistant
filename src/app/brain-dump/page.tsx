@@ -15,8 +15,24 @@ interface BrainDumpResult {
 }
 
 const URGENCY_COLORS: Record<string, string> = {
-  critical: '#C96B5A', high: '#C9A96E', medium: '#9b5cff', low: '#5A8A7A'
+  critical: '#C96B5A', high: '#C9A96E', medium: '#7B93B8', low: '#5A8A7A'
 }
+
+// Locked light palette — overrides the theme-dependent tokens this page
+// otherwise inherits, so it stays ivory/gold regardless of the site's
+// dark/light toggle (see LunaFoodPage.module.css for the same fix and why).
+const LIGHT_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.18)',
+  '--app-bg-from': '#FBF8F2',
+  '--app-bg-mid': '#F6F1E7',
+  '--app-bg-to': '#F0E9DA',
+} as React.CSSProperties
 
 export default function BrainDumpPage() {
   const [text, setText] = useState('')
@@ -55,7 +71,7 @@ export default function BrainDumpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen bg-app" style={LIGHT_VARS}>
       <AppLayout>
         {/* Header */}
         <div className="flex items-center gap-3 mb-5 pt-2">
@@ -95,7 +111,7 @@ export default function BrainDumpPage() {
               className="mt-4 w-full flex items-center justify-center gap-2 py-3.5 rounded-[16px] font-semibold transition-all"
               style={{
                 background: !text.trim() ? 'var(--surface-border)' : 'var(--violet)',
-                color: !text.trim() ? 'var(--text-4)' : 'white',
+                color: !text.trim() ? 'var(--text-4)' : '#100C1E',
               }}>
               <Sparkles className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               {loading ? 'Organizing...' : 'Sort it out'}
@@ -121,7 +137,7 @@ export default function BrainDumpPage() {
           <div className="space-y-4">
             {/* AI message */}
             <div className="rounded-[20px] p-4"
-              style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
+              style={{ background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)' }}>
               <div className="flex items-start gap-3">
                 <Sparkles className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: 'var(--violet)' }} />
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{result.ai_message}</p>
@@ -202,7 +218,7 @@ function TaskCard({ task, rank, onSave, saving, saved, muted = false }: {
       style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)', opacity: muted ? 0.65 : 1 }}>
       {rank && (
         <span className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold mt-0.5"
-          style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)' }}>{rank}</span>
+          style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)' }}>{rank}</span>
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium" style={{ color: 'var(--text-1)' }}>{task.title}</p>
@@ -228,9 +244,9 @@ function TaskCard({ task, rank, onSave, saving, saved, muted = false }: {
       <button onClick={() => onSave(task)} disabled={saving || saved}
         className="flex-shrink-0 text-xs px-2.5 py-1 rounded-full font-semibold transition-all"
         style={{
-          background: saved ? 'rgba(90,140,120,0.15)' : 'rgba(155,92,255,0.12)',
+          background: saved ? 'rgba(90,140,120,0.15)' : 'rgba(201,169,110,0.12)',
           color: saved ? '#5A8A7A' : 'var(--violet)',
-          border: `1px solid ${saved ? 'rgba(90,140,120,0.25)' : 'rgba(155,92,255,0.2)'}`,
+          border: `1px solid ${saved ? 'rgba(90,140,120,0.25)' : 'rgba(201,169,110,0.2)'}`,
         }}>
         {saving ? '...' : saved ? '✓' : '+ Save'}
       </button>

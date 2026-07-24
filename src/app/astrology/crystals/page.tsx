@@ -17,6 +17,17 @@ interface CrystalEntry {
 }
 const CRYSTAL_LIBRARY = crystalsData as CrystalEntry[]
 
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
+
 function CrystalCard({ c, expanded, onToggle }: {
   c: typeof CRYSTAL_LIBRARY[0]
   expanded: boolean
@@ -49,14 +60,14 @@ function CrystalCard({ c, expanded, onToggle }: {
               </span>
             ))}
             <span className="text-xs px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)', border: '1px solid rgba(155,92,255,0.2)' }}>
+              style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>
               {c.chakra}
             </span>
           </div>
 
           {/* LUNA note */}
           <div className="rounded-[14px] p-3 mb-3"
-            style={{ background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.2)' }}>
+            style={{ background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)' }}>
             <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>LUNA</p>
             <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-1)' }}>{c.lunaNote}</p>
           </div>
@@ -101,7 +112,7 @@ export default function CrystalsPage() {
   const displayed = filter === 'today' ? todaysCrystals : CRYSTAL_LIBRARY
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">
@@ -134,7 +145,7 @@ export default function CrystalsPage() {
               className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: filter === f ? 'var(--violet)' : 'var(--surface)',
-                color: filter === f ? 'white' : 'var(--text-3)',
+                color: filter === f ? '#100C1E' : 'var(--text-3)',
                 border: `1px solid ${filter === f ? 'var(--violet)' : 'var(--surface-border)'}`,
               }}>
               {f === 'today' ? `Today (${todaysCrystals.length})` : `Full Library (${CRYSTAL_LIBRARY.length})`}

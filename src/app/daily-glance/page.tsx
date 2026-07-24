@@ -17,11 +17,12 @@ const G: React.CSSProperties = {
   borderRadius: 22,
   backdropFilter: 'blur(18px)',
   WebkitBackdropFilter: 'blur(18px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
 const LBL: React.CSSProperties = {
   fontSize: 9, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: 'white',
+  textTransform: 'uppercase', color: '#100C1E',
   display: 'flex', alignItems: 'center', gap: 5,
   marginBottom: 8, flexShrink: 0,
 }
@@ -34,7 +35,7 @@ function Row({ label, icon, href, linkText, children }: {
       <div style={{ ...G, padding: '16px 18px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={LBL}>{icon}{label}</div>
         {children}
-        <span style={{ fontSize: 11, color: 'white', fontWeight: 600, marginTop: 8, flexShrink: 0 }}>{linkText} →</span>
+        <span style={{ fontSize: 11, color: '#100C1E', fontWeight: 600, marginTop: 8, flexShrink: 0 }}>{linkText} →</span>
       </div>
     </Link>
   )
@@ -58,11 +59,15 @@ export default function DailyGlancePage() {
 
   return (
     <LunaShell>
-      <div className="flex flex-col gap-3" style={{ maxWidth: 720, margin: '0 auto', padding: '4px 2px 24px' }}>
+      <div className="flex flex-col gap-3" style={{
+        maxWidth: 720, margin: '0 auto', padding: '4px 2px 24px',
+        '--luna-panel': 'rgba(255,255,255,0.6)',
+        '--luna-border-soft': 'rgba(180,150,100,0.18)',
+      } as React.CSSProperties}>
 
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: '0 0 3px' }}>Today&apos;s Glance</h1>
-          <p style={{ fontSize: 13, color: 'white', opacity: 0.7, margin: 0 }}>Astrology, money, and tonight — all at once.</p>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: '0 0 3px' }}>Today&apos;s Glance</h1>
+          <p style={{ fontSize: 13, color: '#32284A', margin: 0 }}>Astrology, money, and tonight — all at once.</p>
         </div>
 
         <Row label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">
@@ -70,8 +75,8 @@ export default function DailyGlancePage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/ui/crescent-preview.png" alt="" style={{ width: 56, height: 56, objectFit: 'contain', flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2 }}>{astroHeadline}</p>
-              <p style={{ fontSize: 12, color: 'white', opacity: 0.75, margin: '3px 0 0', lineHeight: 1.4 }}>
+              <p style={{ fontSize: 15, fontWeight: 800, color: '#100C1E', margin: 0, lineHeight: 1.2 }}>{astroHeadline}</p>
+              <p style={{ fontSize: 12, color: '#32284A', margin: '3px 0 0', lineHeight: 1.4 }}>
                 {guidance?.moon_note ?? 'Emotional clarity · intuition · home'}
               </p>
             </div>
@@ -85,16 +90,16 @@ export default function DailyGlancePage() {
         } href="/money/transactions" linkText="View">
           {moneyData?.has_transactions ? (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E', margin: 0 }}>
                 {moneyData.bills_due_soon?.length ?? 0} bill{moneyData.bills_due_soon?.length === 1 ? '' : 's'} due this week
               </p>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 9.5, color: 'white', opacity: 0.7, margin: 0 }}>Spent this week</p>
-                <p style={{ fontSize: 18, fontWeight: 900, color: 'white', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
+                <p style={{ fontSize: 9.5, color: '#32284A', margin: 0 }}>Spent this week</p>
+                <p style={{ fontSize: 18, fontWeight: 900, color: '#100C1E', margin: 0 }}>${(moneyData.spending_this_week ?? 0).toFixed(2)}</p>
               </div>
             </div>
           ) : (
-            <p style={{ fontSize: 13, color: 'white', opacity: 0.75, margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
+            <p style={{ fontSize: 13, color: '#32284A', margin: 0, lineHeight: 1.4 }}>Connect your bank so LUNA can track bills and spending here.</p>
           )}
         </Row>
 
@@ -103,8 +108,8 @@ export default function DailyGlancePage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/brand/ui/night-cloud.png" alt="" style={{ width: 84, height: 50, objectFit: 'contain', flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0, lineHeight: 1.2 }}>Wind down tonight.</p>
-              <p style={{ fontSize: 12, color: 'white', opacity: 0.75, margin: '3px 0 0' }}>Plan tomorrow, protect your rest.</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: '#100C1E', margin: 0, lineHeight: 1.2 }}>Wind down tonight.</p>
+              <p style={{ fontSize: 12, color: '#32284A', margin: '3px 0 0' }}>Plan tomorrow, protect your rest.</p>
             </div>
           </div>
         </Row>

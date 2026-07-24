@@ -10,7 +10,7 @@ import { getInsights, type PatternInsights } from '@/lib/patterns'
 const MOOD_COLORS: Record<string, string> = {
   'good': '#5A8A7A', 'great': '#5A8A7A', 'clear': '#5A8A7A', 'aligned': '#5A8A7A', 'peaceful': '#5A8A7A',
   'grateful': '#8A9E6B', 'motivated': '#C9A96E', 'focused': '#6A9FB8',
-  'tired': '#9b5cff', 'anxious': '#C96B5A', 'heavy': '#6B6080', 'scattered': '#A88A7A', 'off': '#7A6A6A',
+  'tired': '#7B93B8', 'anxious': '#C96B5A', 'heavy': '#6B6080', 'scattered': '#A88A7A', 'off': '#7A6A6A',
 }
 
 function getMoodColor(mood: string): string {
@@ -182,7 +182,7 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
           <div className="space-y-2">
             {insights.topThemes.map(t => (
               <div key={t} className="flex items-center gap-3 rounded-[14px] p-3"
-                style={{ background: 'rgba(155,92,255,0.07)', border: '1px solid rgba(155,92,255,0.12)' }}>
+                style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.12)' }}>
                 <span className="text-lg">{THEME_ICONS[t] ?? '·'}</span>
                 <div>
                   <p className="text-sm font-semibold capitalize" style={{ color: 'var(--text-1)' }}>{t}</p>
@@ -241,12 +241,12 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
       {/* Recurring needs */}
       {insights.recurringNeeds.length > 0 && (
         <div className="rounded-[20px] p-4"
-          style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.15)' }}>
+          style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
           <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>You Often Need</p>
           <div className="flex flex-wrap gap-2">
             {insights.recurringNeeds.map(n => (
               <span key={n} className="text-sm px-3 py-1 rounded-full"
-                style={{ background: 'rgba(155,92,255,0.12)', color: 'var(--text-1)', border: '1px solid rgba(155,92,255,0.2)' }}>
+                style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--text-1)', border: '1px solid rgba(201,169,110,0.2)' }}>
                 {n}
               </span>
             ))}

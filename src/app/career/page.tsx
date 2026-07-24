@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { GlassCard } from '@/components/ui/GlassCard'
 import { Compass, Sparkles, Mic, ExternalLink, RefreshCw, Loader2, AlertCircle, TrendingUp, Users, Clock, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import type { DryphubAccount, DryphubTask } from '@/lib/dryp-crm'
@@ -30,17 +29,25 @@ interface WeekResult {
 
 // ─── Design ───────────────────────────────────────────────────────────────────
 const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.1)',
+  background: 'rgba(255,255,255,0.62)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 18,
   backdropFilter: 'blur(14px)',
   WebkitBackdropFilter: 'blur(14px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
+
+// Same visual language as GLASS but matches the padding of the shared
+// GlassCard component (p-5 = 20px). Used in place of <GlassCard> on this
+// page because .glass-card is forced to white text under [data-theme="dark"]
+// with !important — this page is locked light regardless of the site
+// theme toggle, so it can't rely on that theme-dependent global class.
+const CARD: React.CSSProperties = { ...GLASS, borderRadius: 20, padding: 20 }
 
 const HEALTH_STYLES: Record<string, { color: string; label: string }> = {
   excellent: { color: '#5A8A5A', label: 'Excellent' },
   good:      { color: '#8BAD78', label: 'Good'      },
-  new:       { color: '#9b5cff', label: 'New'       },
+  new:       { color: '#A8C4DA', label: 'New'       },
   at_risk:   { color: '#E08B4A', label: 'At risk'   },
   churning:  { color: '#E05E5E', label: 'Churning'  },
 }
@@ -69,7 +76,7 @@ function dueDaysLabel(dateStr?: string) {
   if (diff < 0)   return { text: 'Overdue', color: '#E05E5E' }
   if (diff === 0) return { text: 'Due today', color: '#E08B4A' }
   if (diff === 1) return { text: 'Tomorrow',  color: '#C9A96E' }
-  if (diff <= 7)  return { text: `${diff}d`,  color: 'rgba(255,255,255,0.4)' }
+  if (diff <= 7)  return { text: `${diff}d`,  color: '#5E5474' }
   return null
 }
 
@@ -86,17 +93,17 @@ function ClientCard({ account, tasks }: { account: DryphubAccount; tasks: Dryphu
     <div style={{ ...GLASS, padding: '14px 16px', borderLeft: `3px solid ${h.color}22` }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
         <div>
-          <p style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{account.business_name.trim()}</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E' }}>{account.business_name.trim()}</p>
           <div style={{ display: 'flex', gap: 8, marginTop: 3, alignItems: 'center', flexWrap: 'wrap' }}>
             <span style={{ fontSize: 10, fontWeight: 700, color: h.color, background: `${h.color}18`, padding: '2px 8px', borderRadius: 8 }}>{h.label}</span>
-            {stage && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 600 }}>{stage}</span>}
+            {stage && <span style={{ fontSize: 10, color: '#5E5474', fontWeight: 600 }}>{stage}</span>}
             {account.monthly_retainer && account.monthly_retainer > 0 && (
               <span style={{ fontSize: 10, color: '#C9A96E', fontWeight: 700 }}>${account.monthly_retainer.toLocaleString()}/mo</span>
             )}
           </div>
         </div>
         {tasks.length > 0 && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: 'rgba(155,92,255,0.8)', background: 'rgba(155,92,255,0.1)', padding: '4px 8px', borderRadius: 8 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#8A6F2A', background: 'rgba(201,169,110,0.15)', padding: '4px 8px', borderRadius: 8 }}>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -108,14 +115,14 @@ function ClientCard({ account, tasks }: { account: DryphubAccount; tasks: Dryphu
             const due = dueDaysLabel(t.due_date)
             return (
               <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: t.priority === 'high' || t.priority === 'critical' ? '#E08B4A' : 'rgba(255,255,255,0.2)' }} />
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</p>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0, background: t.priority === 'high' || t.priority === 'critical' ? '#E08B4A' : 'rgba(94,84,116,0.25)' }} />
+                <p style={{ fontSize: 12, color: '#32284A', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.title}</p>
                 {due && <span style={{ fontSize: 10, color: due.color, fontWeight: 700, flexShrink: 0 }}>{due.text}</span>}
               </div>
             )
           })}
           {tasks.length > 3 && (
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>+{tasks.length - 3} more</p>
+            <p style={{ fontSize: 11, color: '#8A8098', marginTop: 2 }}>+{tasks.length - 3} more</p>
           )}
         </div>
       )}
@@ -207,7 +214,15 @@ export default function CareerCompassScreen() {
   ]
 
   return (
-    <div className="min-h-screen bg-app overflow-x-hidden">
+    <div
+      className="min-h-screen bg-app overflow-x-hidden"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+        '--text-1': '#100C1E',
+      } as React.CSSProperties}
+    >
       <div className="fixed top-0 right-0 pointer-events-none z-0" style={{ width: 300, height: 300, background: 'radial-gradient(circle at 75% 12%, rgba(168,196,218,0.08) 0%, transparent 65%)', filter: 'blur(60px)' }} />
       <AppLayout>
 
@@ -219,12 +234,12 @@ export default function CareerCompassScreen() {
             </div>
             <div>
               <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Career Compass</h1>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
+              <p style={{ fontSize: 11, color: '#5E5474' }}>
                 {crmLoading ? 'Syncing CRM…' : crmError ? 'CRM unavailable' : `${accounts.length} clients · ${tasks.length} open tasks`}
               </p>
             </div>
           </div>
-          <button onClick={loadCrm} disabled={crmLoading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={loadCrm} disabled={crmLoading} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.16)', background: 'rgba(255,255,255,0.5)', color: '#5E5474', fontSize: 11, fontWeight: 600, cursor: 'pointer' }}>
             {crmLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
           </button>
         </div>
@@ -232,9 +247,9 @@ export default function CareerCompassScreen() {
         {/* CRM stat pills */}
         {!crmLoading && !crmError && accounts.length > 0 && (
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(155,92,255,0.1)', border: '1px solid rgba(155,92,255,0.18)' }}>
-              <Users className="h-3 w-3" style={{ color: '#9b5cff' }} />
-              <span style={{ fontSize: 12, fontWeight: 700, color: '#9b5cff' }}>{accounts.length} clients</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)' }}>
+              <Users className="h-3 w-3" style={{ color: '#8A6F2A' }} />
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#8A6F2A' }}>{accounts.length} clients</span>
             </div>
             {totalMRR > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.18)' }}>
@@ -267,9 +282,9 @@ export default function CareerCompassScreen() {
           ] as { key: Tab; label: string }[]).map(({ key, label }) => (
             <button key={key} onClick={() => setTab(key)} style={{
               padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-              background: tab === key ? 'rgba(168,196,218,0.14)' : 'transparent',
-              border: tab === key ? '1px solid rgba(168,196,218,0.28)' : '1px solid rgba(255,255,255,0.07)',
-              color: tab === key ? 'var(--lunar)' : 'rgba(255,255,255,0.4)',
+              background: tab === key ? 'rgba(168,196,218,0.18)' : 'transparent',
+              border: tab === key ? '1px solid rgba(168,196,218,0.32)' : '1px solid rgba(180,150,100,0.14)',
+              color: tab === key ? '#4A7A96' : '#5E5474',
             }}>
               {label}
             </button>
@@ -283,65 +298,65 @@ export default function CareerCompassScreen() {
               <>
                 {/* Context preview */}
                 {!crmLoading && tasks.length > 0 && (
-                  <div style={{ ...GLASS, padding: '12px 16px', background: 'rgba(255,255,255,0.03)' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>Live context for your compass</p>
+                  <div style={{ ...GLASS, padding: '12px 16px', background: 'rgba(255,255,255,0.45)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8A8098', marginBottom: 8 }}>Live context for your compass</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                       {tasks.filter(t => t.priority === 'high' || t.priority === 'critical').slice(0, 4).map(t => (
                         <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#E08B4A', flexShrink: 0 }} />
-                          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{t.title}{t.account_name ? ` — ${t.account_name}` : ''}</span>
+                          <span style={{ fontSize: 12, color: '#5E5474' }}>{t.title}{t.account_name ? ` — ${t.account_name}` : ''}</span>
                         </div>
                       ))}
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', marginTop: 2 }}>{accounts.length} clients · ${totalMRR.toLocaleString()}/mo MRR</p>
+                      <p style={{ fontSize: 11, color: '#8A8098', marginTop: 2 }}>{accounts.length} clients · ${totalMRR.toLocaleString()}/mo MRR</p>
                     </div>
                   </div>
                 )}
                 <button onClick={generateCompass} disabled={compassLoading} style={{
                   width: '100%', padding: '16px', borderRadius: 18, fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
-                  background: 'linear-gradient(135deg, rgba(168,196,218,0.3), rgba(155,92,255,0.3))',
-                  border: '1px solid rgba(168,196,218,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  background: 'linear-gradient(135deg, rgba(168,196,218,0.6), rgba(201,169,110,0.6))',
+                  border: '1px solid rgba(168,196,218,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}>
                   {compassLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Reading your career energy…</> : <><Sparkles className="h-4 w-4" /> Generate Career Compass</>}
                 </button>
               </>
             ) : (
               <>
-                <GlassCard>
+                <div style={CARD}>
                   <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--lunar)', marginBottom: 8 }}>Career energy today</p>
-                  <p style={{ fontSize: 14, color: 'white', lineHeight: 1.6 }}>{compassResult.career_energy}</p>
-                  {compassResult.chart_theme && <p style={{ fontSize: 11, fontStyle: 'italic', color: 'rgba(255,255,255,0.35)', marginTop: 8 }}>{compassResult.chart_theme}</p>}
-                </GlassCard>
+                  <p style={{ fontSize: 14, color: '#100C1E', lineHeight: 1.6 }}>{compassResult.career_energy}</p>
+                  {compassResult.chart_theme && <p style={{ fontSize: 11, fontStyle: 'italic', color: '#8A8098', marginTop: 8 }}>{compassResult.chart_theme}</p>}
+                </div>
 
                 {compassResult.highest_use_work && compassResult.highest_use_work.length > 0 && (
-                  <GlassCard soul>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 10 }}>Highest-use work today</p>
+                  <div style={{ ...CARD, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 10 }}>Highest-use work today</p>
                     {compassResult.highest_use_work.map((w, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 10, paddingTop: 8, paddingBottom: 8, borderBottom: i < compassResult.highest_use_work!.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none' }}>
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#9b5cff', minWidth: 20 }}>0{i+1}</span>
-                        <p style={{ fontSize: 14, color: 'white' }}>{w}</p>
+                      <div key={i} style={{ display: 'flex', gap: 10, paddingTop: 8, paddingBottom: 8, borderBottom: i < compassResult.highest_use_work!.length - 1 ? '1px solid rgba(201,169,110,0.15)' : 'none' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: '#8A6F2A', minWidth: 20 }}>0{i+1}</span>
+                        <p style={{ fontSize: 14, color: '#100C1E' }}>{w}</p>
                       </div>
                     ))}
-                  </GlassCard>
+                  </div>
                 )}
 
                 {compassResult.recognition_check && (
-                  <GlassCard>
+                  <div style={CARD}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 8 }}>Recognition check</p>
-                    <p style={{ fontSize: 14, fontStyle: 'italic', color: 'white' }}>{compassResult.recognition_check}</p>
+                    <p style={{ fontSize: 14, fontStyle: 'italic', color: '#100C1E' }}>{compassResult.recognition_check}</p>
                     <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 5 }}>
                       {RECOGNITION_QUESTIONS.map((q, i) => (
-                        <p key={i} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>· {q}</p>
+                        <p key={i} style={{ fontSize: 12, color: '#5E5474' }}>· {q}</p>
                       ))}
                     </div>
-                  </GlassCard>
+                  </div>
                 )}
 
                 {compassResult.voice_clarity_prompt && (
-                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(155,92,255,0.06)' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 8 }}>Voice clarity</p>
-                    <p style={{ fontSize: 14, fontStyle: 'italic', color: 'white', lineHeight: 1.6 }}>{compassResult.voice_clarity_prompt}</p>
+                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(201,169,110,0.08)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 8 }}>Voice clarity</p>
+                    <p style={{ fontSize: 14, fontStyle: 'italic', color: '#100C1E', lineHeight: 1.6 }}>{compassResult.voice_clarity_prompt}</p>
                     <Link href="/dictation">
-                      <button style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#9b5cff', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <button style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 700, color: '#8A6F2A', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <Mic className="h-3.5 w-3.5" /> Speak it out →
                       </button>
                     </Link>
@@ -349,30 +364,30 @@ export default function CareerCompassScreen() {
                 )}
 
                 {compassResult.current_pattern && (
-                  <GlassCard>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 10 }}>Pattern → Highest Self</p>
+                  <div style={CARD}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A8098', marginBottom: 10 }}>Pattern → Highest Self</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(224,94,94,0.06)', border: '1px solid rgba(224,94,94,0.12)' }}>
                         <p style={{ fontSize: 10, fontWeight: 700, color: '#E05E5E', marginBottom: 4 }}>Pattern</p>
-                        <p style={{ fontSize: 13, color: 'white' }}>{compassResult.current_pattern}</p>
+                        <p style={{ fontSize: 13, color: '#100C1E' }}>{compassResult.current_pattern}</p>
                       </div>
                       <div style={{ padding: '10px 14px', borderRadius: 12, background: 'rgba(90,138,90,0.06)', border: '1px solid rgba(90,138,90,0.12)' }}>
                         <p style={{ fontSize: 10, fontWeight: 700, color: '#5A8A5A', marginBottom: 4 }}>Highest self</p>
-                        <p style={{ fontSize: 13, color: 'white' }}>{compassResult.highest_self_action}</p>
+                        <p style={{ fontSize: 13, color: '#100C1E' }}>{compassResult.highest_self_action}</p>
                       </div>
                     </div>
-                  </GlassCard>
+                  </div>
                 )}
 
                 {compassResult.career_message && (
                   <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontStyle: 'italic', color: 'rgba(255,255,255,0.5)' }}>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontStyle: 'italic', color: '#5E5474' }}>
                       &ldquo;{compassResult.career_message}&rdquo;
                     </p>
                   </div>
                 )}
 
-                <button onClick={() => setCompassResult(null)} style={{ width: '100%', padding: '12px', borderRadius: 14, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}>
+                <button onClick={() => setCompassResult(null)} style={{ width: '100%', padding: '12px', borderRadius: 14, fontSize: 13, fontWeight: 600, color: '#5E5474', background: 'rgba(255,255,255,0.45)', border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer' }}>
                   Regenerate
                 </button>
               </>
@@ -383,12 +398,12 @@ export default function CareerCompassScreen() {
         {/* ── CLIENTS TAB ──────────────────────────────────── */}
         {tab === 'clients' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {crmLoading && [1,2,3].map(i => <div key={i} style={{ ...GLASS, height: 80, background: 'rgba(255,255,255,0.03)' }} />)}
+            {crmLoading && [1,2,3].map(i => <div key={i} style={{ ...GLASS, height: 80, background: 'rgba(255,255,255,0.4)' }} />)}
 
             {!crmLoading && crmError && (
-              <div style={{ ...GLASS, padding: '20px', textAlign: 'center', background: 'rgba(224,94,94,0.06)' }}>
+              <div style={{ ...GLASS, padding: '20px', textAlign: 'center', background: 'rgba(224,94,94,0.08)' }}>
                 <AlertCircle className="h-8 w-8 mx-auto mb-2" style={{ color: '#E05E5E' }} />
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Can't reach DRYP CRM right now.</p>
+                <p style={{ fontSize: 13, color: '#5E5474' }}>Can't reach DRYP CRM right now.</p>
               </div>
             )}
 
@@ -403,7 +418,7 @@ export default function CareerCompassScreen() {
                     {retainerAccounts.map(a => (
                       <ClientCard key={a.id} account={a} tasks={tasksByClient[a.id] ?? []} />
                     ))}
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.25)', marginBottom: 4, marginTop: 8 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A8098', marginBottom: 4, marginTop: 8 }}>
                       All clients
                     </p>
                   </>
@@ -416,8 +431,8 @@ export default function CareerCompassScreen() {
 
             {/* Open in CRM */}
             <a href="https://dryphub.com/accounts" target="_blank" rel="noreferrer" style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, textDecoration: 'none' }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>Open in DRYP CRM</p>
-              <ExternalLink className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.2)' }} />
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#5E5474' }}>Open in DRYP CRM</p>
+              <ExternalLink className="h-4 w-4" style={{ color: '#8A8098' }} />
             </a>
           </div>
         )}
@@ -425,7 +440,7 @@ export default function CareerCompassScreen() {
         {/* ── LANES TAB ────────────────────────────────────── */}
         {tab === 'lanes' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#5E5474', lineHeight: 1.6 }}>
               Your career is multi-lane. Ideas are safe here — one priority at a time.
             </p>
 
@@ -438,21 +453,21 @@ export default function CareerCompassScreen() {
                   : ['EHM Strategies', 'Flanagan\'s Irish Pub', 'Villa Residential', 'Babe Coffee Lounge'],
                 live: accounts.length > 0,
               },
-              { label: 'DRYP Growth',       color: '#9b5cff',           items: ['DRYP Digital', 'DRYPHub CRM', 'Newsletter Studio', 'DRYP Studio', 'Social content'],   live: false },
+              { label: 'DRYP Growth',       color: '#B79A5C',           items: ['DRYP Digital', 'DRYPHub CRM', 'Newsletter Studio', 'DRYP Studio', 'Social content'],   live: false },
               { label: 'Money Moves',        color: '#C9A96E',           items: ['TikTok Shop', 'Dropshipping', 'Trading', 'Passive income streams'],                    live: false },
               { label: 'Creative Identity',  color: 'var(--blush)',      items: ['Content creation', 'Sewing + clothing brand', 'Painting', 'Dance', 'Tattoo art'],      live: false },
               { label: 'Future Projects',    color: 'var(--herb)',       items: ['Nurturly', 'LINK\'d UP', 'Bikini brand', 'Books', '144-client prep'],                  live: false },
-              { label: 'Parked',             color: 'rgba(255,255,255,0.25)', items: ['Ideas waiting for the right moment — safe here'],                               live: false },
+              { label: 'Parked',             color: '#8A8098', items: ['Ideas waiting for the right moment — safe here'],                               live: false },
             ].map(lane => (
               <div key={lane.label} style={{ ...GLASS, padding: '14px 16px', borderLeft: `3px solid ${lane.color}40` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: lane.color }} />
-                  <p style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>{lane.label}</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E' }}>{lane.label}</p>
                   {lane.live && <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: lane.color, background: `${lane.color}18`, padding: '2px 6px', borderRadius: 6 }}>live</span>}
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {lane.items.map((item, j) => (
-                    <span key={j} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 20, background: `${lane.color}12`, border: `1px solid ${lane.color}20`, color: lane.color === 'rgba(255,255,255,0.25)' ? 'rgba(255,255,255,0.3)' : lane.color }}>
+                    <span key={j} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 20, background: `${lane.color}18`, border: `1px solid ${lane.color}30`, color: lane.color === '#8A8098' ? '#5E5474' : lane.color }}>
                       {item}
                     </span>
                   ))}
@@ -460,7 +475,7 @@ export default function CareerCompassScreen() {
               </div>
             ))}
 
-            <p style={{ fontSize: 11, fontStyle: 'italic', textAlign: 'center', color: 'rgba(255,255,255,0.2)', paddingBottom: 8 }}>
+            <p style={{ fontSize: 11, fontStyle: 'italic', textAlign: 'center', color: '#8A8098', paddingBottom: 8 }}>
               One main priority. Everything else stays safe.
             </p>
           </div>
@@ -471,12 +486,12 @@ export default function CareerCompassScreen() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {!weekResult ? (
               <>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6, marginBottom: 4 }}>
+                <p style={{ fontSize: 13, color: '#5E5474', lineHeight: 1.6, marginBottom: 4 }}>
                   Reflect on your week. Answer what feels true — LUNA will read the pattern.
                 </p>
                 {WEEK_QUESTIONS.map(({ key, q }) => (
                   <div key={key}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>{q}</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', marginBottom: 6 }}>{q}</p>
                     <textarea
                       value={weekAnswers[key] ?? ''}
                       onChange={e => setWeekAnswers(prev => ({ ...prev, [key]: e.target.value }))}
@@ -484,8 +499,8 @@ export default function CareerCompassScreen() {
                       placeholder="Speak your truth…"
                       style={{
                         width: '100%', padding: '10px 14px', borderRadius: 12, fontSize: 13,
-                        background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                        color: 'white', resize: 'none', outline: 'none', boxSizing: 'border-box',
+                        background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.18)',
+                        color: '#100C1E', resize: 'none', outline: 'none', boxSizing: 'border-box',
                         lineHeight: 1.5,
                       }}
                     />
@@ -493,8 +508,8 @@ export default function CareerCompassScreen() {
                 ))}
                 <button onClick={submitWeek} disabled={weekLoading || Object.keys(weekAnswers).length === 0} style={{
                   width: '100%', padding: '14px', borderRadius: 16, fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer', marginTop: 4,
-                  background: 'linear-gradient(135deg, rgba(168,196,218,0.25), rgba(155,92,255,0.25))',
-                  border: '1px solid rgba(168,196,218,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  background: 'linear-gradient(135deg, rgba(168,196,218,0.55), rgba(201,169,110,0.55))',
+                  border: '1px solid rgba(168,196,218,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   opacity: Object.keys(weekAnswers).length === 0 ? 0.5 : 1,
                 }}>
                   {weekLoading ? <><Loader2 className="h-4 w-4 animate-spin" /> Reading your week…</> : <><Sparkles className="h-4 w-4" /> Reflect on my week</>}
@@ -503,43 +518,43 @@ export default function CareerCompassScreen() {
             ) : (
               <>
                 {weekResult.week_theme && (
-                  <div style={{ ...GLASS, padding: '18px 20px', background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)', borderRadius: 20, textAlign: 'center' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#9b5cff', marginBottom: 8 }}>This week's theme</p>
-                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: 'white' }}>{weekResult.week_theme}</p>
+                  <div style={{ ...GLASS, padding: '18px 20px', background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: 20, textAlign: 'center' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 8 }}>This week's theme</p>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: '#100C1E' }}>{weekResult.week_theme}</p>
                   </div>
                 )}
                 {weekResult.energy_summary && (
-                  <GlassCard>
+                  <div style={CARD}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--lunar)', marginBottom: 8 }}>Energy summary</p>
-                    <p style={{ fontSize: 14, color: 'white', lineHeight: 1.65 }}>{weekResult.energy_summary}</p>
-                  </GlassCard>
+                    <p style={{ fontSize: 14, color: '#100C1E', lineHeight: 1.65 }}>{weekResult.energy_summary}</p>
+                  </div>
                 )}
                 {weekResult.what_to_keep && weekResult.what_to_keep.length > 0 && (
-                  <GlassCard>
+                  <div style={CARD}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5A8A5A', marginBottom: 8 }}>Keep doing</p>
-                    {weekResult.what_to_keep.map((w, i) => <p key={i} style={{ fontSize: 13, color: 'white', paddingTop: 4, paddingBottom: 4 }}>· {w}</p>)}
-                  </GlassCard>
+                    {weekResult.what_to_keep.map((w, i) => <p key={i} style={{ fontSize: 13, color: '#100C1E', paddingTop: 4, paddingBottom: 4 }}>· {w}</p>)}
+                  </div>
                 )}
                 {weekResult.what_to_release && weekResult.what_to_release.length > 0 && (
-                  <GlassCard>
+                  <div style={CARD}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#E05E5E', marginBottom: 8 }}>Release</p>
-                    {weekResult.what_to_release.map((w, i) => <p key={i} style={{ fontSize: 13, color: 'white', paddingTop: 4, paddingBottom: 4 }}>· {w}</p>)}
-                  </GlassCard>
+                    {weekResult.what_to_release.map((w, i) => <p key={i} style={{ fontSize: 13, color: '#100C1E', paddingTop: 4, paddingBottom: 4 }}>· {w}</p>)}
+                  </div>
                 )}
                 {weekResult.next_week_intention && (
-                  <GlassCard>
+                  <div style={CARD}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 8 }}>Next week intention</p>
-                    <p style={{ fontSize: 14, color: 'white', lineHeight: 1.65 }}>{weekResult.next_week_intention}</p>
-                  </GlassCard>
+                    <p style={{ fontSize: 14, color: '#100C1E', lineHeight: 1.65 }}>{weekResult.next_week_intention}</p>
+                  </div>
                 )}
                 {weekResult.affirmation && (
                   <div style={{ textAlign: 'center', padding: '12px 0' }}>
-                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontStyle: 'italic', color: 'rgba(255,255,255,0.5)' }}>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontStyle: 'italic', color: '#5E5474' }}>
                       &ldquo;{weekResult.affirmation}&rdquo;
                     </p>
                   </div>
                 )}
-                <button onClick={() => { setWeekResult(null); setWeekAnswers({}) }} style={{ width: '100%', padding: '12px', borderRadius: 14, fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}>
+                <button onClick={() => { setWeekResult(null); setWeekAnswers({}) }} style={{ width: '100%', padding: '12px', borderRadius: 14, fontSize: 13, fontWeight: 600, color: '#5E5474', background: 'rgba(255,255,255,0.45)', border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer' }}>
                   Reflect again
                 </button>
               </>
@@ -548,8 +563,8 @@ export default function CareerCompassScreen() {
             {/* Link to work page */}
             <Link href="/work" style={{ textDecoration: 'none' }}>
               <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>See this week's open tasks</p>
-                <ChevronRight className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.2)' }} />
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#5E5474' }}>See this week's open tasks</p>
+                <ChevronRight className="h-4 w-4" style={{ color: '#8A8098' }} />
               </div>
             </Link>
           </div>

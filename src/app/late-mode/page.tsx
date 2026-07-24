@@ -4,6 +4,16 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Moon, Check, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
+// ─── Locked light-palette card style (bypasses the global .glass-card
+// class, which forces white text + dark surfaces under [data-theme="dark"]
+// regardless of local CSS var overrides) ──────────────────────────────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+
 const STEPS = [
   { id: 1, text: 'Sit up. Take one breath.',              icon: '🌿' },
   { id: 2, text: 'Drink a full glass of water.',          icon: '💧' },
@@ -37,13 +47,26 @@ export default function LateModeScreen() {
   const allDone = checked.size === STEPS.length
 
   return (
-    <div style={{ background: 'linear-gradient(160deg, #FDF8F3 0%, #EDE5F5 100%)', minHeight: '100vh' }}>
+    <div
+      style={{
+        background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+        minHeight: '100vh',
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--depth': '#100C1E',
+        '--mid': '#32284A',
+        '--mist': '#5E5474',
+        '--surface': 'rgba(255,255,255,0.6)',
+        '--surface-border': 'rgba(180,150,100,0.18)',
+        '--text-1': '#100C1E',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(155,92,255,0.12)' }}>
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(201,169,110,0.15)' }}>
               <Moon className="h-5 w-5" style={{ color: 'var(--violet)' }} />
             </div>
             <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Recovery Mode</p>
@@ -74,8 +97,8 @@ export default function LateModeScreen() {
                   <div
                     className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
                     style={{
-                      background: done ? 'var(--violet)' : 'rgba(155,92,255,0.1)',
-                      border: done ? 'none' : '1.5px solid rgba(155,92,255,0.2)',
+                      background: done ? 'var(--violet)' : 'rgba(201,169,110,0.12)',
+                      border: done ? 'none' : '1.5px solid rgba(201,169,110,0.25)',
                     }}
                   >
                     {done && <Check className="h-3.5 w-3.5 text-white" />}
@@ -86,14 +109,14 @@ export default function LateModeScreen() {
           </div>
 
           {/* Affirmations */}
-          <div className="glass-card mb-6" style={{ padding: '20px' }}>
+          <div className="mb-6" style={{ ...CARD, padding: '20px' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>
               When the spiral tries to start:
             </p>
             {AFFIRMATIONS.map((a, i) => (
               <p key={i} className="text-sm leading-relaxed py-2" style={{
                 color: 'var(--mid)',
-                borderBottom: i < AFFIRMATIONS.length - 1 ? '1px solid rgba(155,92,255,0.08)' : 'none',
+                borderBottom: i < AFFIRMATIONS.length - 1 ? '1px solid rgba(180,150,100,0.14)' : 'none',
               }}>
                 &ldquo;{a}&rdquo;
               </p>

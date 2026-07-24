@@ -54,6 +54,17 @@ function MoonIllustration({ phase, illumination, size = 100 }: { phase: string; 
   )
 }
 
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
+
 export default function MoonPortal() {
   const [moon, setMoon] = useState<MoonData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -68,7 +79,7 @@ export default function MoonPortal() {
   const guidance = moon?.sign?.name ? MOON_SIGN_GUIDANCE[moon.sign.name] : null
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">
@@ -86,23 +97,23 @@ export default function MoonPortal() {
           <>
             {/* Phase hero */}
             <div className="relative rounded-[24px] p-6 mb-4 overflow-hidden"
-              style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
+              style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
               <div className="absolute right-6 top-1/2 -translate-y-1/2">
                 <MoonIllustration phase={moon.phase.name} illumination={moon.phase.illumination} size={90} />
               </div>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 w-28 h-28 pointer-events-none"
-                style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.2) 0%, transparent 70%)', filter: 'blur(16px)' }} />
+                style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.18) 0%, transparent 70%)', filter: 'blur(16px)' }} />
               <div className="relative z-10 pr-28">
-                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(185,139,255,0.55)' }}>Moon Phase</p>
-                <p className="font-display text-2xl font-bold text-white mb-1">{moon.phase.emoji} {moon.phase.name}</p>
-                <p className="text-sm mb-3" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(201,169,110,0.9)' }}>Moon Phase</p>
+                <p className="font-display text-2xl font-bold mb-1" style={{ color: '#100C1E' }}>{moon.phase.emoji} {moon.phase.name}</p>
+                <p className="text-sm mb-3" style={{ color: 'rgba(16,12,30,0.6)' }}>
                   {moon.phase.illumination}% illuminated · {moon.phase.angle}° phase angle
                 </p>
-                <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(185,139,255,0.8)' }}>{moon.phase.description}</p>
+                <p className="text-sm leading-relaxed italic" style={{ color: '#C9A96E' }}>{moon.phase.description}</p>
                 {moon.phase.next_exact && (
                   <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
-                    style={{ background: 'rgba(155,92,255,0.2)', border: '1px solid rgba(155,92,255,0.3)' }}>
-                    <span className="text-xs font-semibold" style={{ color: 'rgba(185,139,255,0.9)' }}>
+                    style={{ background: 'rgba(201,169,110,0.2)', border: '1px solid rgba(201,169,110,0.3)' }}>
+                    <span className="text-xs font-semibold" style={{ color: '#C9A96E' }}>
                       ✦ {moon.phase.next_exact.name} · {moon.phase.next_exact.time}
                     </span>
                   </div>
@@ -152,7 +163,7 @@ export default function MoonPortal() {
 
             {/* Your natal moon context */}
             <div className="rounded-[20px] p-5"
-              style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.18)' }}>
+              style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.18)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your Natal Moon</p>

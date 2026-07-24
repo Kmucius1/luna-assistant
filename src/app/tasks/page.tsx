@@ -11,11 +11,12 @@ import Link from 'next/link'
 import type { DryphubTask } from '@/lib/dryp-crm'
 
 const GLASS: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.62)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 20,
   backdropFilter: 'blur(14px)',
   WebkitBackdropFilter: 'blur(14px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
 const STATUS_FILTERS: { value: TaskStatus | 'all'; label: string }[] = [
@@ -105,28 +106,35 @@ export default function TasksPage() {
   if (loading) return <AppLayout><LoadingPage /></AppLayout>
 
   return (
-    <div className="bg-app min-h-screen">
+    <div
+      className="bg-app min-h-screen"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '0 0 180px' }}>
 
           {/* Header */}
           <div style={{ padding: '20px 20px 16px' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(255,255,255,0.4)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#5E5474', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div>
-                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white' }}>Tasks</h1>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Tasks</h1>
+                <p style={{ fontSize: 12, color: '#5E5474', marginTop: 2 }}>
                   {openCount} open · {doneCount} done
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(155,92,255,0.3)', background: 'rgba(155,92,255,0.1)', color: '#9b5cff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.12)', color: '#C9A96E', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   {aiLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                   AI rank
                 </button>
-                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: '#C9A96E', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add task
                 </button>
               </div>
@@ -164,29 +172,29 @@ export default function TasksPage() {
                   {dryphubTasks.map(task => {
                     const isOverdue = task.due_date && new Date(task.due_date) < new Date()
                     const isDueToday = task.due_date && new Date(task.due_date).toDateString() === new Date().toDateString()
-                    const priorityColor = task.priority === 'high' || task.priority === 'urgent' ? '#E05E5E' : task.priority === 'medium' ? '#C9A96E' : 'rgba(255,255,255,0.3)'
+                    const priorityColor = task.priority === 'high' || task.priority === 'urgent' ? '#E05E5E' : task.priority === 'medium' ? '#C9A96E' : 'rgba(50,40,74,0.3)'
                     return (
-                      <div key={task.id} style={{ background: 'rgba(201,169,110,0.05)', border: `1px solid ${isOverdue ? 'rgba(224,94,94,0.25)' : 'rgba(201,169,110,0.12)'}`, borderRadius: 12, padding: '10px 12px' }}>
+                      <div key={task.id} style={{ background: 'rgba(201,169,110,0.08)', border: `1px solid ${isOverdue ? 'rgba(224,94,94,0.25)' : 'rgba(201,169,110,0.15)'}`, borderRadius: 12, padding: '10px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                           <div style={{ width: 6, height: 6, borderRadius: '50%', background: priorityColor, marginTop: 5, flexShrink: 0 }} />
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 13, fontWeight: 600, color: 'white', lineHeight: 1.35 }}>{task.title}</p>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: '#100C1E', lineHeight: 1.35 }}>{task.title}</p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 4 }}>
                               {task.account_name && (
-                                <span style={{ fontSize: 11, color: 'rgba(201,169,110,0.7)', fontWeight: 500 }}>{task.account_name}</span>
+                                <span style={{ fontSize: 11, color: 'rgba(201,169,110,0.9)', fontWeight: 500 }}>{task.account_name}</span>
                               )}
                               {task.due_date && (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: isOverdue ? '#E05E5E' : isDueToday ? '#C9A96E' : 'rgba(255,255,255,0.35)', fontWeight: isOverdue || isDueToday ? 700 : 400 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: isOverdue ? '#E05E5E' : isDueToday ? '#C9A96E' : '#5E5474', fontWeight: isOverdue || isDueToday ? 700 : 400 }}>
                                   {isOverdue && <AlertCircle className="h-3 w-3" />}
                                   {!isOverdue && <Clock className="h-3 w-3" />}
                                   {isOverdue ? 'Overdue · ' : isDueToday ? 'Due today · ' : 'Due '}
                                   {new Date(task.due_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>
                               )}
-                              <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', textTransform: 'capitalize' }}>{task.status.replace(/_/g, ' ')}</span>
+                              <span style={{ fontSize: 11, color: '#8A8098', textTransform: 'capitalize' }}>{task.status.replace(/_/g, ' ')}</span>
                             </div>
                             {task.description && (
-                              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 4, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{task.description}</p>
+                              <p style={{ fontSize: 11, color: '#5E5474', marginTop: 4, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>{task.description}</p>
                             )}
                           </div>
                         </div>
@@ -221,7 +229,7 @@ export default function TasksPage() {
           <div style={{ padding: '0 16px' }}>
 
             {saveError && (
-              <div style={{ ...GLASS, padding: '10px 14px', marginBottom: 14, borderColor: 'rgba(255,120,120,0.3)', color: 'rgba(255,180,180,0.9)', fontSize: 13 }}>
+              <div style={{ ...GLASS, padding: '10px 14px', marginBottom: 14, borderColor: 'rgba(224,94,94,0.35)', color: '#B23B3B', fontSize: 13 }}>
                 {saveError}
               </div>
             )}
@@ -230,8 +238,8 @@ export default function TasksPage() {
             {showForm && (
               <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>New task</p>
-                  <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E' }}>New task</p>
+                  <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E5474' }}>
                     <X className="h-4 w-4" />
                   </button>
                 </div>
@@ -241,15 +249,15 @@ export default function TasksPage() {
 
             {/* AI ranking banner */}
             {aiLoading && (
-              <div style={{ ...GLASS, padding: 14, background: 'rgba(155,92,255,0.08)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#9b5cff' }} />
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>AI is ranking your tasks…</p>
+              <div style={{ ...GLASS, padding: 14, background: 'rgba(201,169,110,0.1)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#C9A96E' }} />
+                <p style={{ fontSize: 13, color: '#32284A' }}>AI is ranking your tasks…</p>
               </div>
             )}
             {aiRankings && !aiLoading && (
-              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <p style={{ fontSize: 12, color: '#9b5cff' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
-                <button onClick={() => setAiRankings(null)} style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
+              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <p style={{ fontSize: 12, color: '#8A6F2A' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
+                <button onClick={() => setAiRankings(null)} style={{ fontSize: 11, color: '#5E5474', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
               </div>
             )}
 
@@ -258,8 +266,8 @@ export default function TasksPage() {
               {STATUS_FILTERS.map(f => (
                 <button key={f.value} onClick={() => setStatusFilter(f.value)} style={{
                   padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 0.15s',
-                  background: statusFilter === f.value ? 'rgba(155,92,255,0.9)' : 'rgba(255,255,255,0.06)',
-                  color:      statusFilter === f.value ? 'white' : 'rgba(255,255,255,0.5)',
+                  background: statusFilter === f.value ? '#C9A96E' : 'rgba(255,255,255,0.55)',
+                  color:      statusFilter === f.value ? 'white' : '#5E5474',
                 }}>
                   {f.label}
                 </button>
@@ -269,15 +277,15 @@ export default function TasksPage() {
             {/* Category filters */}
             {categories.length > 0 && (
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 14 }}>
-                <button onClick={() => setCategoryFilter('all')} style={{ padding: '6px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: categoryFilter === 'all' ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <button onClick={() => setCategoryFilter('all')} style={{ padding: '6px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: 'pointer', background: categoryFilter === 'all' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.45)', color: '#5E5474', border: '1px solid rgba(180,150,100,0.16)' }}>
                   All categories
                 </button>
                 {categories.map(cat => (
                   <button key={cat} onClick={() => setCategoryFilter(cat === categoryFilter ? 'all' : cat)} style={{
                     padding: '6px 12px', borderRadius: 20, fontSize: 11, fontWeight: 600, cursor: 'pointer', textTransform: 'capitalize',
-                    background: categoryFilter === cat ? 'rgba(155,92,255,0.2)' : 'rgba(255,255,255,0.05)',
-                    color:      categoryFilter === cat ? '#9b5cff' : 'rgba(255,255,255,0.4)',
-                    border:     categoryFilter === cat ? '1px solid rgba(155,92,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                    background: categoryFilter === cat ? 'rgba(201,169,110,0.22)' : 'rgba(255,255,255,0.45)',
+                    color:      categoryFilter === cat ? '#8A6F2A' : '#5E5474',
+                    border:     categoryFilter === cat ? '1px solid rgba(201,169,110,0.4)' : '1px solid rgba(180,150,100,0.14)',
                   }}>
                     {cat}
                   </button>
@@ -288,8 +296,8 @@ export default function TasksPage() {
             {/* Task list */}
             {filtered.length === 0 ? (
               <div style={{ ...GLASS, padding: 36, textAlign: 'center' }}>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.35)', marginBottom: 16 }}>No tasks match these filters.</p>
-                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: 'rgba(155,92,255,0.9)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                <p style={{ fontSize: 14, color: '#5E5474', marginBottom: 16 }}>No tasks match these filters.</p>
+                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: '#C9A96E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add your first task
                 </button>
               </div>
@@ -298,7 +306,7 @@ export default function TasksPage() {
                 {filtered.map((task, i) => (
                   <div key={task.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     {aiRankings && (
-                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(155,92,255,0.15)', color: '#9b5cff', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
+                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(201,169,110,0.22)', color: '#8A6F2A', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
                     )}
                     <div style={{ flex: 1 }}>
                       <TaskCard task={task} onStatusChange={handleStatusChange} />

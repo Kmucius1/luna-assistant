@@ -20,7 +20,7 @@ interface Props {
   pageNoScroll?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
+export function CategoryPager({ pages, accentColor = '#C9A96E', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const [animKey, setAnimKey] = useState(0)
@@ -66,10 +66,10 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
     >
       {!hidePills && <div style={{
         flexShrink: 0,
-        background: 'var(--luna-panel-strong, rgba(8,4,26,0.92))',
+        background: 'rgba(255,255,255,0.75)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        borderBottom: '1px solid rgba(180,150,100,0.15)',
         paddingTop: 10, paddingBottom: 10,
         marginLeft: -24, marginRight: -24,
         paddingLeft: 24, paddingRight: 24,
@@ -93,8 +93,8 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
                     transition: 'all 0.18s ease',
                   }}
                 >
-                  <Icon style={{ width: 18, height: 18, color: isActive ? '#b98bff' : 'rgba(255,255,255,0.4)' }} />
-                  <span style={{ fontSize: 9.5, fontWeight: 700, color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)', whiteSpace: 'nowrap' }}>
+                  <Icon style={{ width: 18, height: 18, color: isActive ? accent : 'rgba(50,40,74,0.35)' }} />
+                  <span style={{ fontSize: 9.5, fontWeight: 700, color: isActive ? accent : 'rgba(50,40,74,0.35)', whiteSpace: 'nowrap' }}>
                     {p.label}
                   </span>
                 </button>
@@ -118,8 +118,8 @@ export function CategoryPager({ pages, accentColor = '#9b5cff', activeIndex, onC
                     cursor: 'pointer',
                     flexShrink: 0,
                     background: isActive ? accentFaint : 'transparent',
-                    border: `1px solid ${isActive ? accent : 'rgba(255,255,255,0.09)'}`,
-                    color: isActive ? '#b98bff' : 'rgba(255,255,255,0.38)',
+                    border: `1px solid ${isActive ? accent : 'rgba(180,150,100,0.18)'}`,
+                    color: isActive ? accent : 'rgba(50,40,74,0.35)',
                     transition: 'all 0.18s ease',
                   }}
                 >

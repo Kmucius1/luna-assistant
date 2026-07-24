@@ -38,11 +38,11 @@ interface CheckIn {
 const TYPE_CFG = {
   morning: { label: 'Morning', emoji: '🌅', color: '#A8C4DA' },
   midday:  { label: 'Midday',  emoji: '☀️', color: '#C9A96E' },
-  night:   { label: 'Night',   emoji: '🌙', color: '#B89FD8' },
+  night:   { label: 'Night',   emoji: '🌙', color: '#8A7A5A' },
 }
 
 const ASPECT_COLORS: Record<string, string> = {
-  conjunction: '#9b5cff',
+  conjunction: '#B8974F',
   square:      '#C96B5A',
   opposition:  '#C9A96E',
   trine:       '#5A8A7A',
@@ -104,7 +104,7 @@ function CheckInCard({ checkIn }: { checkIn: CheckIn }) {
         <div className="flex items-center gap-2 flex-shrink-0">
           {checkIn.mood_rating && (
             <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
+              style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--violet)' }}>
               {checkIn.mood_rating}/10
             </span>
           )}
@@ -129,7 +129,7 @@ function CheckInCard({ checkIn }: { checkIn: CheckIn }) {
           {checkIn.pride_goal  && <div><p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-3)' }}>Proud of / working toward</p><p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{checkIn.pride_goal}</p></div>}
           {checkIn.ai_response && (
             <div className="rounded-2xl p-3 space-y-2"
-              style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.12)' }}>
+              style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.12)' }}>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>LUNA said</span>
@@ -197,7 +197,7 @@ function PatternChips({ patterns }: { patterns: PatternEntry[] }) {
           <div className="flex flex-wrap gap-1.5">
             {vals.slice(0, 4).map(v => (
               <span key={v} className="px-2.5 py-1 rounded-full text-xs"
-                style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--text-2)', border: '1px solid rgba(155,92,255,0.18)' }}>
+                style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--text-2)', border: '1px solid rgba(201,169,110,0.18)' }}>
                 {v}
               </span>
             ))}
@@ -271,18 +271,18 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
   if (!coaching) {
     return (
       <div className="rounded-[20px] p-5 text-center space-y-3"
-        style={{ background: 'linear-gradient(145deg, #16133A, #1F1848)', border: '1px solid rgba(155,92,255,0.25)' }}>
-        <Sparkles className="h-6 w-6 mx-auto" style={{ color: 'rgba(185,139,255,0.8)' }} />
-        <p className="text-base font-bold text-white">Get your daily coaching</p>
-        <p className="text-sm" style={{ color: 'rgba(185,139,255,0.7)' }}>
+        style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.6), rgba(250,244,232,0.7))', border: '1px solid rgba(201,169,110,0.25)' }}>
+        <Sparkles className="h-6 w-6 mx-auto" style={{ color: '#C9A96E' }} />
+        <p className="text-base font-bold text-[#100C1E]">Get your daily coaching</p>
+        <p className="text-sm" style={{ color: '#5E5474' }}>
           LUNA reviews your check-ins, transit reflections, and patterns — then gives you deep personalized feedback on your path to your highest self.
         </p>
         <button onClick={generateCoaching} disabled={loading}
           className="w-full py-3 rounded-[14px] text-sm font-bold transition-all"
-          style={{ background: 'var(--violet)', color: 'white', opacity: loading ? 0.7 : 1 }}>
+          style={{ background: 'var(--violet)', color: '#100C1E', opacity: loading ? 0.7 : 1 }}>
           {loading ? (
             <span className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+              <div className="w-4 h-4 rounded-full border-2 border-[#100C1E] border-t-transparent animate-spin" />
               LUNA is reflecting on your day...
             </span>
           ) : 'Generate my daily coaching →'}
@@ -296,26 +296,26 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
     <div className="space-y-3">
       {/* Score + theme */}
       <div className="rounded-[20px] p-5 relative overflow-hidden"
-        style={{ background: 'linear-gradient(145deg, #16133A, #1F1848)', border: '1px solid rgba(155,92,255,0.3)' }}>
+        style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.6), rgba(250,244,232,0.7))', border: '1px solid rgba(201,169,110,0.3)' }}>
         <div className="absolute top-0 right-0 w-40 h-40 pointer-events-none"
-          style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.25), transparent 60%)', filter: 'blur(20px)' }} />
+          style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.25), transparent 60%)', filter: 'blur(20px)' }} />
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(185,139,255,0.6)' }}>Growth Score</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(201,169,110,0.6)' }}>Growth Score</p>
               <div className="flex items-end gap-2">
-                <span className="text-5xl font-bold text-white">{coaching.growth_score}</span>
-                <span className="text-lg text-white/40 pb-1">/10</span>
+                <span className="text-5xl font-bold text-[#100C1E]">{coaching.growth_score}</span>
+                <span className="text-lg text-[#8A8098] pb-1">/10</span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(185,139,255,0.6)' }}>Theme</p>
-              <p className="text-2xl font-bold capitalize" style={{ color: 'rgba(185,139,255,0.95)' }}>{coaching.theme}</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(201,169,110,0.6)' }}>Theme</p>
+              <p className="text-2xl font-bold capitalize" style={{ color: 'rgba(201,169,110,0.95)' }}>{coaching.theme}</p>
             </div>
           </div>
-          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.1)' }}>
+          <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(180,150,100,0.18)' }}>
             <div className="h-full rounded-full"
-              style={{ width: `${coaching.growth_score * 10}%`, background: 'linear-gradient(90deg, #9b5cff, #C9A96E)' }} />
+              style={{ width: `${coaching.growth_score * 10}%`, background: 'linear-gradient(90deg, #C9A96E, #C9A96E)' }} />
           </div>
         </div>
       </div>
@@ -342,7 +342,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Highest self */}
       <div className="rounded-[20px] p-4 space-y-2"
-        style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.2)' }}>
+        style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
         <div className="flex items-center gap-2">
           <Star className="h-4 w-4" style={{ color: 'var(--violet)' }} />
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your highest self</p>
@@ -362,7 +362,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Affirmation */}
       <div className="rounded-[20px] p-5 text-center"
-        style={{ background: 'linear-gradient(135deg, rgba(155,92,255,0.1), rgba(201,169,110,0.07))', border: '1px solid rgba(155,92,255,0.2)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.1), rgba(201,169,110,0.07))', border: '1px solid rgba(201,169,110,0.2)' }}>
         <Heart className="h-4 w-4 mx-auto mb-2" style={{ color: 'var(--violet)' }} />
         <p className="text-sm font-semibold italic leading-relaxed" style={{ color: 'var(--text-1)' }}>
           &ldquo;{coaching.affirmation}&rdquo;
@@ -401,8 +401,8 @@ function DayStrip({ dates, selected, onSelect }: {
               border:     `1px solid ${isSelected ? 'var(--violet)' : 'var(--surface-border)'}`,
               minWidth:   60,
             }}>
-            <p className="text-xs font-bold mb-0.5" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--text-4)' }}>{dayLabel}</p>
-            <p className="text-lg font-bold leading-none" style={{ color: isSelected ? 'white' : 'var(--text-1)' }}>{parseInt(day)}</p>
+            <p className="text-xs font-bold mb-0.5" style={{ color: isSelected ? 'rgba(16,12,30,0.7)' : 'var(--text-4)' }}>{dayLabel}</p>
+            <p className="text-lg font-bold leading-none" style={{ color: isSelected ? '#100C1E' : 'var(--text-1)' }}>{parseInt(day)}</p>
           </button>
         )
       })}
@@ -426,7 +426,7 @@ function SectionHeader({ icon, label, count, open, onToggle, accent }: {
         <p className="text-sm font-bold uppercase tracking-wider" style={{ color: accent ?? 'var(--text-3)' }}>{label}</p>
         {count > 0 && (
           <span className="text-xs px-2 py-0.5 rounded-full font-bold"
-            style={{ background: 'rgba(155,92,255,0.12)', color: 'var(--violet)' }}>
+            style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)' }}>
             {count}
           </span>
         )}
@@ -533,6 +533,17 @@ export default function MemoryPage() {
   const cachedScore = getDayCoaching(selectedDate)?.growth_score
 
   return (
+    <div style={{
+      '--text-1': '#100C1E',
+      '--text-2': '#32284A',
+      '--text-3': '#5E5474',
+      '--text-4': '#8A8098',
+      '--violet': '#C9A96E',
+      '--golden': '#C9A96E',
+      '--surface': 'rgba(255,255,255,0.6)',
+      '--surface-border': 'rgba(180,150,100,0.18)',
+      '--surface-strong': 'rgba(255,255,255,0.75)',
+    } as React.CSSProperties}>
     <AppLayout>
       <div className="space-y-5 pt-4 pb-nav">
 
@@ -606,7 +617,7 @@ export default function MemoryPage() {
           <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>{humanDate(selectedDate)}</h2>
           {cachedScore && (
             <span className="text-xs px-3 py-1 rounded-full font-bold"
-              style={{ background: 'rgba(155,92,255,0.12)', color: 'var(--violet)', border: '1px solid rgba(155,92,255,0.2)' }}>
+              style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>
               ✦ {cachedScore}/10
             </span>
           )}
@@ -777,5 +788,6 @@ export default function MemoryPage() {
         )}
       </div>
     </AppLayout>
+    </div>
   )
 }

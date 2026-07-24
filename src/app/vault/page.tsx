@@ -15,7 +15,15 @@ export default function VaultScreen() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
 
   return (
-    <div className="bg-sanctuary min-h-screen">
+    <div className="bg-sanctuary min-h-screen" style={{
+      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+      '--text-1': '#100C1E',
+      '--text-2': '#32284A',
+      '--text-3': '#5E5474',
+      '--text-4': '#8A8098',
+      '--violet': '#C9A96E',
+      '--golden': '#C9A96E',
+    } as React.CSSProperties}>
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -35,7 +43,7 @@ export default function VaultScreen() {
           </p>
 
           {/* Weekly selection reminder */}
-          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.1)' }}>
+          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>Weekly selection</p>
             <p className="text-sm" style={{ color: 'var(--text-2)' }}>
               Each week, choose one from each lane: work · creative · money · personal. Everything else rests.
@@ -53,7 +61,7 @@ export default function VaultScreen() {
                   <div className="flex items-center gap-3">
                     <span className="text-xl">{cat.emoji}</span>
                     <p className="font-semibold" style={{ color: 'var(--text-1)' }}>{cat.label}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--text-3)' }}>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--text-3)' }}>
                       {cat.items.length}
                     </span>
                   </div>
@@ -85,7 +93,7 @@ export default function VaultScreen() {
           {/* Add new */}
           <div className="mt-6">
             <button className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-semibold transition-all"
-              style={{ border: '1.5px dashed rgba(155,92,255,0.2)', color: 'var(--text-3)' }}>
+              style={{ border: '1.5px dashed rgba(201,169,110,0.2)', color: 'var(--text-3)' }}>
               <Plus className="h-4 w-4" />
               Add to vault
             </button>

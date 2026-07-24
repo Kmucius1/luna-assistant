@@ -4,15 +4,16 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Sparkles, Plus, Check, Star } from 'lucide-react'
 
 const G: React.CSSProperties = {
-  background: 'rgba(20,12,50,0.68)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 24,
   backdropFilter: 'blur(18px)',
   WebkitBackdropFilter: 'blur(18px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#9b5cff',
+  textTransform: 'uppercase', color: '#C9A96E',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10,
 }
@@ -87,13 +88,13 @@ export default function ManifestationPage() {
     <AppLayout>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 8 }}>
 
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: 'white', margin: 0 }}>Manifestation</h1>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: '-8px 0 0' }}>Intentions &amp; vision board</p>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: 0 }}>Manifestation</h1>
+        <p style={{ fontSize: 13, color: '#5E5474', margin: '-8px 0 0' }}>Intentions &amp; vision board</p>
 
         {/* Affirmation */}
-        <div style={{ ...G, padding: '18px 20px', background: 'linear-gradient(140deg, rgba(40,14,90,0.55) 0%, rgba(16,5,44,0.72) 100%)' }}>
+        <div style={{ ...G, padding: '18px 20px', background: 'linear-gradient(140deg, rgba(255,255,255,0.6) 0%, rgba(250,244,232,0.7) 100%)' }}>
           <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Today's Affirmation</div>
-          <p style={{ fontSize: 15, fontStyle: 'italic', color: 'rgba(185,139,255,0.9)', margin: 0 }}>"{affirmation}"</p>
+          <p style={{ fontSize: 15, fontStyle: 'italic', color: '#32284A', margin: 0 }}>"{affirmation}"</p>
         </div>
 
         {/* Add intention */}
@@ -106,19 +107,19 @@ export default function ManifestationPage() {
               onKeyDown={e => e.key === 'Enter' && addIntention()}
               placeholder="What are you calling in?"
               style={{
-                flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)',
-                borderRadius: 12, padding: '10px 14px', color: 'white', fontSize: 13, outline: 'none',
+                flex: 1, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)',
+                borderRadius: 12, padding: '10px 14px', color: '#100C1E', fontSize: 13, outline: 'none',
               }}
             />
             <button
               onClick={addIntention}
               style={{
                 flexShrink: 0, width: 40, height: 40, borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: 'linear-gradient(135deg, #6B3DFF 0%, #8D5CFF 100%)',
+                background: 'linear-gradient(135deg, #C9A96E 0%, #B8974F 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >
-              <Plus style={{ width: 18, height: 18, color: 'white' }} />
+              <Plus style={{ width: 18, height: 18, color: '#100C1E' }} />
             </button>
           </div>
         </div>
@@ -128,7 +129,7 @@ export default function ManifestationPage() {
           <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Vision Board</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {!loading && intentions.length === 0 && (
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', margin: 0 }}>
+              <p style={{ fontSize: 13, color: '#8A8098', margin: 0 }}>
                 Nothing here yet — set an intention above to start your vision board.
               </p>
             )}
@@ -138,14 +139,14 @@ export default function ManifestationPage() {
                 onClick={() => toggle(i.id)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 14,
-                  border: `1px solid ${i.done ? 'rgba(107,227,139,0.35)' : 'rgba(255,255,255,0.08)'}`,
-                  background: i.done ? 'rgba(107,227,139,0.08)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${i.done ? 'rgba(107,227,139,0.35)' : 'rgba(180,150,100,0.18)'}`,
+                  background: i.done ? 'rgba(107,227,139,0.08)' : 'rgba(255,255,255,0.5)',
                   cursor: 'pointer', textAlign: 'left', width: '100%',
                 }}
               >
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-                  border: `1px solid ${i.done ? '#6BE38B' : 'rgba(155,92,255,0.4)'}`,
+                  border: `1px solid ${i.done ? '#6BE38B' : 'rgba(201,169,110,0.5)'}`,
                   background: i.done ? 'rgba(107,227,139,0.18)' : 'transparent',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
@@ -153,7 +154,7 @@ export default function ManifestationPage() {
                 </div>
                 <p style={{
                   fontSize: 13, margin: 0, flex: 1, lineHeight: 1.4,
-                  color: i.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.82)',
+                  color: i.done ? '#8A8098' : '#100C1E',
                   textDecoration: i.done ? 'line-through' : 'none',
                 }}>
                   {i.text}

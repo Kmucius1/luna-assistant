@@ -4,14 +4,15 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { RefreshCw, Check, AlertTriangle } from 'lucide-react'
 import { formatCurrency } from '@/lib/money/format'
 
-const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
+const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const GOLDEN = '#C9A96E'
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)',
+  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5E5474',
 }
 
 interface Bill {
@@ -29,13 +30,13 @@ function getBillStyle(bill: Bill): BillStyle {
   if (bill.status === 'late' || bill.status === 'failed') return { bg: 'rgba(255,0,0,0.13)', border: '#FF0000', badge: bill.status.toUpperCase(), badgeColor: '#FF4444' }
   if (bill.autopay_status === 'on') return { bg: 'rgba(65,105,225,0.15)', border: '#6A8AE8', badge: 'Autopay', badgeColor: '#6A8AE8' }
   const days = bill.days_until
-  if (days == null) return { bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.11)', badge: 'Upcoming', badgeColor: 'rgba(255,255,255,0.4)' }
+  if (days == null) return { bg: 'rgba(180,150,100,0.08)', border: 'rgba(180,150,100,0.16)', badge: 'Upcoming', badgeColor: '#5E5474' }
   if (days < 0) return { bg: 'rgba(255,0,0,0.13)', border: '#FF0000', badge: 'OVERDUE', badgeColor: '#FF4444' }
   if (days === 0) return { bg: 'rgba(201,107,90,0.13)', border: '#C96B5A', badge: 'DUE TODAY', badgeColor: '#C96B5A' }
   if (days <= 2) return { bg: 'rgba(224,94,34,0.13)', border: '#E05E22', badge: `Due in ${days}d`, badgeColor: '#E05E22' }
   if (days <= 6) return { bg: 'rgba(201,146,58,0.13)', border: '#C9923A', badge: `Due in ${days}d`, badgeColor: '#C9923A' }
   if (days <= 13) return { bg: 'rgba(201,169,110,0.13)', border: '#C9A96E', badge: `Due in ${days}d`, badgeColor: '#C9A96E' }
-  return { bg: 'rgba(255,255,255,0.06)', border: 'rgba(255,255,255,0.11)', badge: `${days} days`, badgeColor: 'rgba(255,255,255,0.4)' }
+  return { bg: 'rgba(180,150,100,0.08)', border: 'rgba(180,150,100,0.16)', badge: `${days} days`, badgeColor: '#5E5474' }
 }
 
 export default function BillsPage() {
@@ -69,8 +70,8 @@ export default function BillsPage() {
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px' }}>
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: 'white', marginBottom: 4 }}>Bills</h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Know what&apos;s coming before it arrives</p>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Bills</h1>
+            <p style={{ fontSize: 13, color: '#32284A' }}>Know what&apos;s coming before it arrives</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 20, paddingBottom: 4 }}>
@@ -88,20 +89,20 @@ export default function BillsPage() {
             </div>
             <div style={{ ...CARD, minWidth: 140, padding: 14, flexShrink: 0 }}>
               <p style={{ ...LABEL_STYLE, marginBottom: 5 }}>Next Due</p>
-              <p style={{ fontSize: 14, fontWeight: 700, color: 'white' }}>{nextDue?.due_date ?? '—'}</p>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>{nextDue?.name ?? ''}</p>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E' }}>{nextDue?.due_date ?? '—'}</p>
+              <p style={{ fontSize: 11, color: '#5E5474' }}>{nextDue?.name ?? ''}</p>
             </div>
           </div>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <RefreshCw style={{ width: 20, height: 20, color: 'rgba(255,255,255,0.4)' }} className="animate-spin mx-auto" />
+              <RefreshCw style={{ width: 20, height: 20, color: '#5E5474' }} className="animate-spin mx-auto" />
             </div>
           ) : bills.length === 0 ? (
             <div style={{ ...CARD, padding: 32, textAlign: 'center' }}>
-              <AlertTriangle style={{ width: 28, height: 28, color: 'rgba(255,255,255,0.3)', margin: '0 auto 10px' }} />
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 6 }}>No bills found.</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.6 }}>
+              <AlertTriangle style={{ width: 28, height: 28, color: '#5E5474', margin: '0 auto 10px' }} />
+              <p style={{ fontSize: 14, color: '#32284A', marginBottom: 6 }}>No bills found.</p>
+              <p style={{ fontSize: 12, color: '#5E5474', lineHeight: 1.6 }}>
                 Import statements to auto-detect bills from your real charges.
               </p>
             </div>
@@ -115,13 +116,13 @@ export default function BillsPage() {
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 10 }}>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3, flexWrap: 'wrap' }}>
-                          <p style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>{bill.name}</p>
+                          <p style={{ fontSize: 15, fontWeight: 700, color: '#100C1E' }}>{bill.name}</p>
                           <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 20, background: `${style.badgeColor}22`, color: style.badgeColor, border: `1px solid ${style.badgeColor}55` }}>{style.badge}</span>
-                          {!bill.date_is_confirmed && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)' }}>estimated date</span>}
+                          {!bill.date_is_confirmed && <span style={{ fontSize: 10, color: '#5E5474' }}>estimated date</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                          {bill.due_date && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Due {bill.due_date}</span>}
-                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', textTransform: 'capitalize' }}>{bill.amount_type} · {bill.ownership_type}</span>
+                          {bill.due_date && <span style={{ fontSize: 11, color: '#32284A' }}>Due {bill.due_date}</span>}
+                          <span style={{ fontSize: 11, color: '#5E5474', textTransform: 'capitalize' }}>{bill.amount_type} · {bill.ownership_type}</span>
                           {bill.autopay_status === 'on' && <span style={{ fontSize: 11, color: '#6A8AE8', display: 'flex', alignItems: 'center', gap: 3 }}><Check style={{ width: 10, height: 10 }} /> Autopay</span>}
                         </div>
                       </div>
@@ -133,7 +134,7 @@ export default function BillsPage() {
                       style={{ width: '100%', height: 36, borderRadius: 10, border: '1px solid #5A8A6A', background: bill.status === 'paid' ? 'rgba(90,138,106,0.25)' : 'rgba(90,138,106,0.12)', color: '#5A8A6A', fontSize: 12, fontWeight: 600, cursor: bill.status === 'paid' ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                       <Check style={{ width: 12, height: 12 }} /> {bill.status === 'paid' ? 'Paid' : 'Mark Paid'}
                     </button>
-                    {bill.notes && <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.38)', lineHeight: 1.5, marginTop: 8 }}>{bill.notes}</p>}
+                    {bill.notes && <p style={{ fontSize: 11, color: '#5E5474', lineHeight: 1.5, marginTop: 8 }}>{bill.notes}</p>}
                   </div>
                 )
               })}

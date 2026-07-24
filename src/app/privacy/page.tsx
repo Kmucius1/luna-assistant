@@ -9,37 +9,37 @@ export default function PrivacyPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)',
-      color: 'rgba(255,255,255,0.88)',
+      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+      color: '#32284A',
       fontFamily: 'system-ui, -apple-system, sans-serif',
     }}>
       {/* Header */}
       <div style={{
-        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        borderBottom: '1px solid rgba(180,150,100,0.16)',
         padding: '18px 24px',
         display: 'flex',
         alignItems: 'center',
         gap: 12,
-        background: 'rgba(10,8,28,0.94)',
+        background: 'rgba(255,252,248,0.92)',
         backdropFilter: 'blur(20px)',
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 14 }}>☽</span>
           </div>
-          <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '0.18em', color: 'white' }}>LUNA</span>
+          <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '0.18em', color: '#100C1E' }}>LUNA</span>
         </Link>
-        <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>/</span>
-        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14 }}>Privacy Policy</span>
+        <span style={{ color: '#5E5474', fontSize: 14 }}>/</span>
+        <span style={{ color: '#32284A', fontSize: 14 }}>Privacy Policy</span>
       </div>
 
       {/* Content */}
       <div style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px 80px' }}>
-        <h1 style={{ fontSize: 32, fontWeight: 800, color: 'white', marginBottom: 8, letterSpacing: '-0.01em' }}>
+        <h1 style={{ fontSize: 32, fontWeight: 800, color: '#100C1E', marginBottom: 8, letterSpacing: '-0.01em' }}>
           Privacy Policy
         </h1>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginBottom: 48 }}>
+        <p style={{ color: '#5E5474', fontSize: 13, marginBottom: 48 }}>
           Effective date: June 23, 2026 &nbsp;·&nbsp; Last updated: June 23, 2026
         </p>
 
@@ -88,12 +88,12 @@ export default function PrivacyPage() {
         <Section title="6. Google API Scopes">
           <p style={{ marginBottom: 12 }}>LUNA requests the following Google OAuth scopes:</p>
           <ul style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.readonly</code> — Read email messages and labels</li>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.send</code> — Send emails on your behalf (used for AI-drafted replies)</li>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.modify</code> — Mark messages as read or starred</li>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>calendar.readonly</code> — Read calendar events</li>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>calendar.events</code> — Create and update calendar events</li>
-            <li><code style={{ background: 'rgba(255,255,255,0.08)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>userinfo.email</code> — Identify your Google account email</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.readonly</code> — Read email messages and labels</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.send</code> — Send emails on your behalf (used for AI-drafted replies)</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>gmail.modify</code> — Mark messages as read or starred</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>calendar.readonly</code> — Read calendar events</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>calendar.events</code> — Create and update calendar events</li>
+            <li><code style={{ background: 'rgba(180,150,100,0.12)', padding: '2px 7px', borderRadius: 5, fontSize: 12 }}>userinfo.email</code> — Identify your Google account email</li>
           </ul>
           <p style={{ marginTop: 12 }}>LUNA&apos;s use of Google user data is limited to the purposes described above and complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
         </Section>
@@ -129,9 +129,9 @@ export default function PrivacyPage() {
           DRYP Digital / Ad-Vantage Media Agency
         </Section>
 
-        <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid rgba(180,150,100,0.16)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
           <Link href="/terms" style={{ color: '#8B9FD4', fontSize: 13, textDecoration: 'none' }}>Terms of Service →</Link>
-          <Link href="/" style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, textDecoration: 'none' }}>← Back to LUNA</Link>
+          <Link href="/" style={{ color: '#5E5474', fontSize: 13, textDecoration: 'none' }}>← Back to LUNA</Link>
         </div>
       </div>
     </div>
@@ -144,7 +144,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 style={{ fontSize: 17, fontWeight: 700, color: '#C9A96E', marginBottom: 14, letterSpacing: '-0.01em' }}>
         {title}
       </h2>
-      <div style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(255,255,255,0.72)' }}>
+      <div style={{ fontSize: 14, lineHeight: 1.75, color: '#32284A' }}>
         {children}
       </div>
     </div>

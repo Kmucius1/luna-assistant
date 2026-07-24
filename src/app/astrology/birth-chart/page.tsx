@@ -88,12 +88,23 @@ function PlanetCard({ planet, sign, degree, emoji, meaning }: {
   )
 }
 
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
+
 export default function BirthChartPage() {
   const [activeTab, setActiveTab] = useState<'big3' | 'planets' | 'angles'>('big3')
   const [expandedPlanet, setExpandedPlanet] = useState<string | null>('Sun')
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         {/* Header */}
         <div className="flex items-center gap-3 mb-5 pt-2">
@@ -111,18 +122,18 @@ export default function BirthChartPage() {
 
         {/* Chart summary card */}
         <div className="relative rounded-[22px] p-5 mb-5 overflow-hidden"
-          style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
+          style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
           <div className="absolute top-0 right-0 w-40 h-40 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
+            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.18) 0%, transparent 60%)', filter: 'blur(16px)' }} />
           <div className="relative z-10">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(185,139,255,0.6)' }}>Zoe Taylor · Natal Chart</p>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(201,169,110,0.9)' }}>Zoe Taylor · Natal Chart</p>
             <div className="grid grid-cols-3 gap-3 mb-4">
               {ZOE_CHART.bigThree.map(p => (
                 <div key={p.label} className="text-center rounded-xl p-3"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.18)' }}>
                   <p className="text-lg mb-1">{p.emoji}</p>
-                  <p className="text-white font-bold text-xs">{p.sign}</p>
-                  <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{p.label} {p.degree}</p>
+                  <p className="font-bold text-xs" style={{ color: '#100C1E' }}>{p.sign}</p>
+                  <p style={{ fontSize: '0.65rem', color: 'rgba(16,12,30,0.45)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{p.label} {p.degree}</p>
                 </div>
               ))}
             </div>
@@ -136,9 +147,9 @@ export default function BirthChartPage() {
                 { label: 'Midheaven Virgo', emoji: '⬆' },
               ].map(t => (
                 <div key={t.label} className="flex items-center gap-1 px-2 py-1 rounded-full"
-                  style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
                   <span style={{ fontSize: 11 }}>{t.emoji}</span>
-                  <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{t.label}</span>
+                  <span style={{ fontSize: '0.65rem', color: 'rgba(16,12,30,0.65)', fontWeight: 600 }}>{t.label}</span>
                 </div>
               ))}
             </div>
@@ -152,7 +163,7 @@ export default function BirthChartPage() {
               className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
               style={{
                 background: activeTab === tab ? 'var(--violet)' : 'var(--surface)',
-                color: activeTab === tab ? 'white' : 'var(--text-3)',
+                color: activeTab === tab ? '#100C1E' : 'var(--text-3)',
                 border: `1px solid ${activeTab === tab ? 'var(--violet)' : 'var(--surface-border)'}`,
               }}>
               {tab === 'big3' ? 'Big 3' : tab === 'planets' ? 'Planets' : 'Nodes & Angles'}

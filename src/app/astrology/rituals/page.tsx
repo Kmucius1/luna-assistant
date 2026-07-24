@@ -36,6 +36,17 @@ const PERSONAL_RITUAL_OVERLAY = {
   note: 'Your natal Moon in Cancer means any ritual involving water, warmth, and emotional safety will land deeper for you regardless of what sign the transiting Moon is in. Tea, bath, soft candlelight, and quiet are your personal ritual foundation.',
 }
 
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
+
 export default function RitualsPage() {
   const [moon, setMoon] = useState<MoonData | null>(null)
   const [context, setContext] = useState<RitualContext | null>(null)
@@ -79,7 +90,7 @@ export default function RitualsPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">
@@ -97,22 +108,22 @@ export default function RitualsPage() {
           <>
             {/* Current moon header */}
             <div className="relative rounded-[22px] p-5 mb-4 overflow-hidden"
-              style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
+              style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
               <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none"
-                style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
+                style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.18) 0%, transparent 60%)', filter: 'blur(16px)' }} />
               <div className="relative z-10">
-                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(185,139,255,0.55)' }}>Today's Ritual Space</p>
+                <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(201,169,110,0.9)' }}>Today's Ritual Space</p>
                 {moon ? (
                   <>
-                    <p className="font-display text-xl font-bold text-white mb-1">
+                    <p className="font-display text-xl font-bold mb-1" style={{ color: '#100C1E' }}>
                       {moon.phase.emoji} {moon.phase.name} in {moon.sign.emoji} {moon.sign.name}
                     </p>
-                    <p className="text-sm" style={{ color: 'rgba(185,139,255,0.7)' }}>
+                    <p className="text-sm" style={{ color: '#C9A96E' }}>
                       {isNewMoon ? 'Plant seeds. Set intentions. Begin.' : isFullMoon ? 'Release. Illuminate. Celebrate.' : 'Build. Integrate. Witness.'}
                     </p>
                   </>
                 ) : (
-                  <p className="text-white font-bold">Moon Ritual Space</p>
+                  <p className="font-bold" style={{ color: '#100C1E' }}>Moon Ritual Space</p>
                 )}
               </div>
             </div>
@@ -201,7 +212,7 @@ export default function RitualsPage() {
                     <div className="flex flex-wrap gap-1">
                       {cat.items.map(item => (
                         <span key={item} className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: 'rgba(155,92,255,0.15)', color: 'var(--violet)', border: '1px solid rgba(155,92,255,0.2)' }}>
+                          style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>
                           {item}
                         </span>
                       ))}
@@ -213,7 +224,7 @@ export default function RitualsPage() {
 
             {/* Personal Cancer Moon note */}
             <div className="rounded-[18px] p-4"
-              style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.18)' }}>
+              style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.18)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your Natal Moon Layer</p>

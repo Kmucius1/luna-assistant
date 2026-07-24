@@ -1,0 +1,250 @@
+.page {
+  /* Hardcoded, not var(--text-1)/var(--golden) — those tokens are
+     theme-dependent and resolve to near-white under dark mode, which
+     caused a real invisible-text bug elsewhere in this app this session. */
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --bronze: #8A6A3A;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.09);
+
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 12px 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100%;
+}
+
+/* ── Top bar ──────────────────────────────────────────── */
+
+.topBar { display: flex; align-items: center; justify-content: space-between; }
+.topBar h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 19px; font-weight: 700; letter-spacing: 0.08em; color: var(--ink-1);
+  margin: 0; display: flex; align-items: center; gap: 5px;
+}
+.topBar h1 svg { color: var(--gold); }
+
+.backButton, .moreButton {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.18);
+  color: var(--ink-2); box-shadow: var(--soft-shadow);
+}
+
+/* ── Hero + floating score card ───────────────────────── */
+
+.heroWrap { position: relative; margin-bottom: 62px; }
+
+.hero {
+  position: relative;
+  height: 210px;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--soft-shadow);
+}
+.hero :global(img) { object-fit: cover; }
+
+.heroOverlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(30,22,12,0.55) 30%, rgba(30,22,12,0.1) 70%);
+}
+
+.heroContent { position: relative; z-index: 1; padding: 16px; color: #fff; max-width: 62%; }
+.heroContent h2 { font-family: var(--font-display-var, serif); font-size: 19px; font-weight: 700; margin: 0 0 4px; }
+.heroContent p { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9); margin: 0; }
+
+.scoreCard {
+  position: absolute;
+  left: 14px; right: 50%;
+  bottom: -54px;
+  min-width: 170px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(180,150,100,0.18);
+  border-radius: 18px;
+  box-shadow: var(--soft-shadow);
+  padding: 12px 14px;
+}
+
+.scoreLabel {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--bronze); margin-bottom: 4px;
+}
+.scoreLabel svg { color: var(--gold); }
+
+.scoreNumber { font-family: var(--font-display-var, serif); font-size: 26px; font-weight: 700; color: var(--ink-1); line-height: 1; }
+
+.scoreBarOuter { height: 4px; border-radius: 3px; background: rgba(180,150,100,0.16); overflow: hidden; margin: 6px 0 8px; }
+.scoreBarInner { height: 100%; background: var(--gold); border-radius: 3px; }
+
+.scoreRows { display: flex; flex-direction: column; gap: 3px; }
+.scoreRow { display: flex; align-items: center; gap: 6px; font-size: 8px; color: var(--ink-3); font-weight: 600; }
+.scoreRow span { width: 46px; flex-shrink: 0; }
+.scoreRowTrack { flex: 1; height: 3px; border-radius: 2px; background: rgba(180,150,100,0.14); overflow: hidden; }
+.scoreRowFill { height: 100%; background: var(--gold); border-radius: 2px; }
+
+/* ── Luna's Take ──────────────────────────────────────── */
+
+.lunaTake {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 16px; box-shadow: var(--soft-shadow);
+  padding: 12px 14px;
+}
+.lunaTake svg { color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+.lunaTake p { margin: 0; font-size: 12px; line-height: 1.4; color: var(--ink-2); font-style: italic; }
+
+/* ── Section headers ──────────────────────────────────── */
+
+.sectionHeader {
+  display: flex; align-items: center; gap: 5px; justify-content: space-between;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-1); margin-bottom: 8px;
+}
+.sectionHeader svg { color: var(--gold); flex-shrink: 0; }
+.sectionHint { font-size: 9.5px; font-weight: 600; text-transform: none; color: var(--ink-3); letter-spacing: 0; margin-left: auto; }
+
+/* ── Today's Reset ────────────────────────────────────── */
+
+.resetCard {
+  display: flex; gap: 10px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 18px; box-shadow: var(--soft-shadow); padding: 10px;
+}
+.resetPhoto { position: relative; width: 96px; border-radius: 13px; overflow: hidden; flex-shrink: 0; }
+.resetPhoto :global(img) { object-fit: cover; }
+.resetBody { flex: 1; min-width: 0; }
+.resetLabel { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bronze); margin-bottom: 5px; }
+.resetBody ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.resetBody li { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--ink-1); cursor: pointer; }
+.resetItemDone { color: var(--ink-3) !important; text-decoration: line-through; opacity: 0.65; }
+.resetCheck {
+  width: 15px; height: 15px; border-radius: 50%; flex-shrink: 0;
+  border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold);
+}
+
+/* ── Feeling picker ───────────────────────────────────── */
+
+.feelingRow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.feelingCard {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.55); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 14px; padding: 10px 2px; min-height: 60px;
+  font-size: 9px; font-weight: 600; color: var(--ink-3);
+}
+.feelingCard svg { color: var(--bronze); }
+.feelingCardActive { background: rgba(201,169,110,0.14); border-color: var(--gold); color: var(--ink-1); }
+.feelingCardActive svg { color: var(--gold); }
+
+/* ── Recovery ─────────────────────────────────────────── */
+
+.recoveryCard {
+  display: flex; gap: 10px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 18px; box-shadow: var(--soft-shadow); padding: 10px;
+}
+.recoveryPhoto { position: relative; width: 86px; border-radius: 13px; overflow: hidden; flex-shrink: 0; }
+.recoveryPhoto :global(img) { object-fit: cover; }
+.recoveryBody { flex: 1; min-width: 0; }
+.recoveryBody h3 { font-family: var(--font-display-var, serif); font-size: 13px; font-weight: 700; color: var(--ink-1); margin: 0 0 5px; }
+.recoveryBody ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.recoveryBody li { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--ink-2); font-weight: 500; }
+.recoveryBody li svg { color: var(--gold); flex-shrink: 0; }
+
+/* ── Self Care row ────────────────────────────────────── */
+
+.selfCareRow { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.selfCareRow::-webkit-scrollbar { display: none; }
+.selfCareCard { flex-shrink: 0; width: 84px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; background: none; border: none; padding: 0; }
+.selfCarePhoto { position: relative; width: 84px; height: 84px; border-radius: 14px; overflow: hidden; box-shadow: var(--soft-shadow); }
+.selfCarePhoto :global(img) { object-fit: cover; }
+.selfCareLabel { font-size: 10.5px; font-weight: 700; color: var(--ink-1); }
+.selfCareDue { font-size: 9px; font-weight: 600; color: var(--ink-3); }
+.selfCareDueOverdue { font-size: 9px; font-weight: 700; color: #C96B5A; }
+
+/* ── Sunshine ─────────────────────────────────────────── */
+
+.sunshineCard { position: relative; border-radius: 20px; overflow: hidden; box-shadow: var(--soft-shadow); min-height: 150px; display: flex; align-items: flex-end; }
+.sunshineCard :global(img) { object-fit: cover; }
+.sunshineOverlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(30,22,12,0.72) 25%, rgba(30,22,12,0.1) 75%); }
+.sunshineContent { position: relative; z-index: 1; padding: 12px 14px; width: 100%; color: #fff; }
+.sunshineStats { display: flex; gap: 18px; margin-bottom: 6px; }
+.sunshineStats span { display: block; font-size: 8px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+.sunshineStats strong { font-size: 15px; font-weight: 700; }
+.sunshineContent p { margin: 0; font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.94); max-width: 90%; }
+
+/* ── Movement ─────────────────────────────────────────── */
+
+.movementCard {
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 16px; box-shadow: var(--soft-shadow); padding: 12px 14px;
+}
+.movementToday { margin: 0 0 4px; font-size: 12.5px; color: var(--ink-1); }
+.movementToday strong { color: var(--gold); }
+.movementNote { margin: 0; font-size: 10.5px; color: var(--ink-3); line-height: 1.35; }
+
+/* ── Hydration ────────────────────────────────────────── */
+
+.hydrationCard {
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 16px; box-shadow: var(--soft-shadow); padding: 12px 14px;
+}
+.hydrationInfo { display: flex; align-items: baseline; gap: 5px; margin-bottom: 6px; }
+.hydrationInfo strong { font-family: var(--font-display-var, serif); font-size: 18px; color: var(--ink-1); }
+.hydrationInfo span { font-size: 10.5px; color: var(--ink-3); }
+.hydrationBarOuter { height: 6px; border-radius: 4px; background: rgba(180,150,100,0.16); overflow: hidden; margin-bottom: 10px; }
+.hydrationBarInner { height: 100%; background: linear-gradient(90deg, var(--gold), #A8C4DA); border-radius: 4px; }
+.hydrationButton {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  width: 100%; background: rgba(201,169,110,0.14); border: 1px solid rgba(201,169,110,0.35);
+  color: var(--bronze); font-size: 12px; font-weight: 700; padding: 9px; border-radius: 12px; min-height: 40px;
+}
+
+/* ── Sleep ────────────────────────────────────────────── */
+
+.sleepCard {
+  display: flex; align-items: baseline; gap: 8px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 16px; box-shadow: var(--soft-shadow); padding: 14px;
+}
+.sleepCard strong { font-family: var(--font-display-var, serif); font-size: 22px; color: var(--ink-1); }
+.sleepCard > span { font-size: 11px; color: var(--ink-3); }
+.sleepEmpty { margin: 0; font-size: 12px; color: var(--ink-3); }
+.sleepEmpty a { color: var(--gold); font-weight: 700; text-decoration: none; }
+
+/* ── Soon teasers ─────────────────────────────────────── */
+
+.soonRow { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.soonCard {
+  position: relative;
+  background: rgba(255,255,255,0.45); border: 1px dashed rgba(180,150,100,0.3);
+  border-radius: 14px; padding: 14px; min-height: 52px;
+  font-size: 12px; font-weight: 700; color: var(--ink-3);
+  display: flex; align-items: flex-end;
+}
+.soonBadge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 8px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #14110b; background: var(--gold); padding: 2px 7px; border-radius: 999px;
+}
+
+/* ── Journal ──────────────────────────────────────────── */
+
+.journalCard {
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 16px; box-shadow: var(--soft-shadow); padding: 14px;
+}
+.journalSave {
+  width: 100%; margin-top: 8px; background: linear-gradient(135deg, var(--gold) 0%, #B8974F 100%);
+  color: var(--ink-1); font-size: 12.5px; font-weight: 700; padding: 10px; border-radius: 14px; border: none; min-height: 40px;
+}
+.journalSave:disabled { opacity: 0.5; }
+.journalSaved { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.journalSaved svg { color: var(--gold); }
+.journalSaved a { color: var(--gold); font-weight: 700; text-decoration: none; }

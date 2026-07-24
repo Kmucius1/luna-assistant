@@ -41,13 +41,13 @@ export default function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-5"
-      style={{ background: 'linear-gradient(160deg, #1E1A38 0%, #141030 50%, #0D0B1E 100%)' }}
+      style={{ background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)' }}
     >
       {/* Ambient orbs */}
       <div className="fixed -top-24 -right-24 w-96 h-96 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(155,92,255,0.25), transparent)', filter: 'blur(70px)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.22), transparent)', filter: 'blur(70px)' }} />
       <div className="fixed bottom-0 -left-24 w-72 h-72 rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(106,79,155,0.2), transparent)', filter: 'blur(60px)' }} />
+        style={{ background: 'radial-gradient(circle, rgba(180,150,100,0.16), transparent)', filter: 'blur(60px)' }} />
 
       <div className="w-full max-w-sm relative z-10">
 
@@ -56,22 +56,22 @@ export default function LoginPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-breathe"
             style={{
-              background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
-              boxShadow: '0 8px 40px rgba(155,92,255,0.45)',
+              background: 'linear-gradient(135deg, #C9A96E, #B08D52)',
+              boxShadow: '0 8px 40px rgba(201,169,110,0.35)',
             }}
           >
             <Sparkles className="h-7 w-7 text-white" />
           </div>
           <h1
             className="text-4xl font-bold tracking-widest mb-1"
-            style={{ color: '#ffffff', fontFamily: 'var(--font-display)', letterSpacing: '0.12em' }}
+            style={{ color: '#100C1E', fontFamily: 'var(--font-display)', letterSpacing: '0.12em' }}
           >
             LUNA
           </h1>
-          <p className="text-sm italic mb-1" style={{ color: '#C4A8E8', fontFamily: 'var(--font-display)' }}>
+          <p className="text-sm italic mb-1" style={{ color: '#8A6D3B', fontFamily: 'var(--font-display)' }}>
             Your personal sanctuary
           </p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p className="text-sm" style={{ color: '#5E5474' }}>
             {mode === 'login' ? 'Welcome back.' : 'Your sanctuary awaits.'}
           </p>
         </div>
@@ -79,17 +79,18 @@ export default function LoginPage() {
         {/* Form card */}
         <div
           style={{
-            background: 'rgba(255,255,255,0.06)',
-            border: '1px solid rgba(255,255,255,0.11)',
+            background: 'rgba(255,255,255,0.6)',
+            border: '1px solid rgba(180,150,100,0.18)',
             borderRadius: 24,
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
+            boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
             padding: '28px 24px',
           }}
         >
           <h2
             className="text-xs font-bold uppercase tracking-widest mb-5"
-            style={{ color: 'rgba(196,168,232,0.9)', letterSpacing: '0.14em' }}
+            style={{ color: '#8A6D3B', letterSpacing: '0.14em' }}
           >
             {mode === 'login' ? 'Sign in' : 'Create account'}
           </h2>
@@ -98,7 +99,7 @@ export default function LoginPage() {
             <div>
               <label
                 className="text-xs font-semibold uppercase tracking-widest block mb-2"
-                style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.11em' }}
+                style={{ color: '#5E5474', letterSpacing: '0.11em' }}
               >
                 Email
               </label>
@@ -112,8 +113,8 @@ export default function LoginPage() {
                 className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
                 style={{
                   background: '#ffffff',
-                  border: '1.5px solid rgba(155,92,255,0.25)',
-                  color: '#1a1230',
+                  border: '1.5px solid rgba(201,169,110,0.3)',
+                  color: '#100C1E',
                   fontFamily: 'var(--font-sans)',
                 }}
               />
@@ -122,7 +123,7 @@ export default function LoginPage() {
             <div>
               <label
                 className="text-xs font-semibold uppercase tracking-widest block mb-2"
-                style={{ color: 'rgba(255,255,255,0.45)', letterSpacing: '0.11em' }}
+                style={{ color: '#5E5474', letterSpacing: '0.11em' }}
               >
                 Password
               </label>
@@ -136,8 +137,8 @@ export default function LoginPage() {
                   className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all pr-12"
                   style={{
                     background: '#ffffff',
-                    border: '1.5px solid rgba(155,92,255,0.25)',
-                    color: '#1a1230',
+                    border: '1.5px solid rgba(201,169,110,0.3)',
+                    color: '#100C1E',
                     fontFamily: 'var(--font-sans)',
                   }}
                 />
@@ -145,7 +146,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPw(!showPw)}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
-                  style={{ color: 'rgba(100,80,140,0.7)' }}
+                  style={{ color: '#5E5474' }}
                 >
                   {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -155,7 +156,7 @@ export default function LoginPage() {
             {error && (
               <p
                 className="text-sm px-3 py-2.5 rounded-xl"
-                style={{ background: 'rgba(224,94,94,0.12)', color: '#FF8A8A', border: '1px solid rgba(224,94,94,0.2)' }}
+                style={{ background: 'rgba(224,94,94,0.1)', color: '#B84A4A', border: '1px solid rgba(224,94,94,0.25)' }}
               >
                 {error}
               </p>
@@ -163,7 +164,7 @@ export default function LoginPage() {
             {message && (
               <p
                 className="text-sm px-3 py-2.5 rounded-xl"
-                style={{ background: 'rgba(90,180,90,0.12)', color: '#7FD97F', border: '1px solid rgba(90,180,90,0.2)' }}
+                style={{ background: 'rgba(90,180,90,0.12)', color: '#2F6B2F', border: '1px solid rgba(90,180,90,0.25)' }}
               >
                 {message}
               </p>
@@ -174,8 +175,8 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 disabled:opacity-60"
               style={{
-                background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
-                boxShadow: '0 4px 28px rgba(155,92,255,0.4)',
+                background: 'linear-gradient(135deg, #C9A96E, #B08D52)',
+                boxShadow: '0 4px 28px rgba(201,169,110,0.4)',
                 fontSize: 15,
                 letterSpacing: '0.02em',
               }}
@@ -184,12 +185,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="text-center text-sm mt-5" style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <p className="text-center text-sm mt-5" style={{ color: '#5E5474' }}>
             {mode === 'login' ? "Don't have an account? " : 'Already have one? '}
             <button
               onClick={() => { setMode(m => m === 'login' ? 'signup' : 'login'); setError(''); setMessage('') }}
               className="font-semibold underline"
-              style={{ color: '#C4A8E8' }}
+              style={{ color: '#8A6D3B' }}
             >
               {mode === 'login' ? 'Sign up' : 'Sign in'}
             </button>
@@ -198,7 +199,7 @@ export default function LoginPage() {
 
         <p
           className="text-center text-xs mt-8 italic"
-          style={{ color: 'rgba(255,255,255,0.22)', fontFamily: 'var(--font-display)' }}
+          style={{ color: '#5E5474', fontFamily: 'var(--font-display)' }}
         >
           &ldquo;You are not behind. You are returning.&rdquo;
         </p>

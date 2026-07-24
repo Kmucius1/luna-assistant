@@ -43,7 +43,7 @@ const ROOMS: Room[] = [
   { slug: 'fitness', label: 'Fitness', tagline: ['Train your body.', 'Build strength.'], image: '/images/rooms/fitness.jpg', href: '/fitness', icon: Dumbbell, accent: 'rgba(210,150,150,0.32)' },
   { slug: 'work', label: 'Work', tagline: ['Build your brand.', 'Create impact.'], image: '/images/rooms/work.jpg', href: '/work', icon: Briefcase, accent: 'rgba(180,165,140,0.35)' },
   { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.jpg', href: '/create', icon: PenLine, accent: 'rgba(201,169,110,0.32)' },
-  { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.jpg', href: '/wellness', icon: Flower2, accent: 'rgba(150,175,160,0.32)', comingSoon: true },
+  { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.jpg', href: '/wellness', icon: Flower2, accent: 'rgba(150,175,160,0.32)' },
   { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.jpg', href: '/astrology', icon: MoonStar, accent: 'rgba(150,160,200,0.32)' },
   { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign, accent: 'rgba(190,175,140,0.35)' },
   { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.jpg', href: '/brain-dump', icon: Brain, accent: 'rgba(180,170,190,0.32)' },

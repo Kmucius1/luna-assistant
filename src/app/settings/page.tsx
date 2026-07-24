@@ -12,11 +12,12 @@ import { useTheme } from '@/lib/theme'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 20,
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
   padding: 20,
   marginBottom: 14,
 }
@@ -26,20 +27,20 @@ function SectionLabel({ icon, text, sub }: { icon: React.ReactNode; text: string
     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
       {icon}
       <div>
-        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.45)' }}>{text}</p>
-        {sub && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 1 }}>{sub}</p>}
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5E5474' }}>{text}</p>
+        {sub && <p style={{ fontSize: 10, color: '#5E5474', marginTop: 1 }}>{sub}</p>}
       </div>
     </div>
   )
 }
 
 function FieldLabel({ text }: { text: string }) {
-  return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.38)', marginBottom: 6 }}>{text}</p>
+  return <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5E5474', marginBottom: 6 }}>{text}</p>
 }
 
 const INPUT_STYLE: React.CSSProperties = {
-  width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-  borderRadius: 12, padding: '10px 14px', fontSize: 13, color: 'white', outline: 'none',
+  width: '100%', background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(180,150,100,0.2)',
+  borderRadius: 12, padding: '10px 14px', fontSize: 13, color: '#100C1E', outline: 'none',
   fontFamily: 'inherit', lineHeight: 1.5, resize: 'vertical', boxSizing: 'border-box',
 }
 
@@ -65,16 +66,16 @@ function ConnRow({ item, onDisconnect, connecting }: {
   connecting: string | null
 }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(180,150,100,0.14)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <div style={{ width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: item.connected ? 'rgba(90,138,90,0.2)' : 'rgba(255,255,255,0.07)',
-          border: `1px solid ${item.connected ? 'rgba(90,138,90,0.4)' : 'rgba(255,255,255,0.1)'}` }}>
-          <Mail className="h-4 w-4" style={{ color: item.connected ? '#8AB88A' : 'rgba(255,255,255,0.4)' }} />
+          background: item.connected ? 'rgba(90,138,90,0.2)' : 'rgba(255,255,255,0.55)',
+          border: `1px solid ${item.connected ? 'rgba(90,138,90,0.4)' : 'rgba(180,150,100,0.18)'}` }}>
+          <Mail className="h-4 w-4" style={{ color: item.connected ? '#8AB88A' : '#5E5474' }} />
         </div>
         <div>
-          <p style={{ fontSize: 13, fontWeight: 600, color: item.connected ? 'white' : 'rgba(255,255,255,0.55)' }}>{item.email}</p>
-          <p style={{ fontSize: 10, color: item.connected ? '#8AB88A' : 'rgba(255,255,255,0.35)' }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: item.connected ? '#100C1E' : '#5E5474' }}>{item.email}</p>
+          <p style={{ fontSize: 10, color: item.connected ? '#8AB88A' : '#5E5474' }}>
             {item.connected ? '✓ Gmail connected' : 'Not connected'}
             {item.connected && item.calendarConnected ? ' · ✓ Calendar' : ''}
           </p>
@@ -82,7 +83,7 @@ function ConnRow({ item, onDisconnect, connecting }: {
       </div>
       <div style={{ display: 'flex', gap: 6 }}>
         {item.connected ? (
-          <button onClick={() => onDisconnect(item.email)} style={{ padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button onClick={() => onDisconnect(item.email)} style={{ padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', color: '#32284A', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
             <LogOut className="h-3 w-3" /> Disconnect
           </button>
         ) : (
@@ -120,7 +121,7 @@ function OAuthBanner() {
     <div style={{ padding: '14px 16px', borderRadius: 16, background: 'rgba(90,138,90,0.12)', border: '1px solid rgba(90,138,90,0.3)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <Check className="h-4 w-4 flex-shrink-0" style={{ color: '#8AB88A' }} />
       <p style={{ fontSize: 13, color: '#8AB88A', flex: 1 }}>Connected: {decodeURIComponent(connected)}</p>
-      <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)' }}><X className="h-4 w-4" /></button>
+      <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E5474' }}><X className="h-4 w-4" /></button>
     </div>
   )
 
@@ -130,20 +131,20 @@ function OAuthBanner() {
         <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#E05E5E' }} />
         <div style={{ flex: 1 }}>
           <p style={{ fontSize: 13, color: '#E05E5E', fontWeight: 700, marginBottom: 4 }}>Connection failed</p>
-          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.5 }}>
             {ERROR_MESSAGES[error ?? ''] ?? `Error: ${error} — see fix below.`}
           </p>
           {params.get('reason') && (
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', marginTop: 6, fontFamily: 'monospace', background: 'rgba(0,0,0,0.3)', padding: '6px 8px', borderRadius: 6 }}>
+            <p style={{ fontSize: 11, color: '#5E5474', marginTop: 6, fontFamily: 'monospace', background: 'rgba(180,150,100,0.1)', padding: '6px 8px', borderRadius: 6 }}>
               {decodeURIComponent(params.get('reason')!)}
             </p>
           )}
         </div>
-        <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', flexShrink: 0 }}><X className="h-4 w-4" /></button>
+        <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E5474', flexShrink: 0 }}><X className="h-4 w-4" /></button>
       </div>
       {/* Fix instructions */}
       <div style={{ padding: '0 16px 16px' }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>How to fix</p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#32284A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>How to fix</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {[
             { n: '1', text: 'Go to console.cloud.google.com → your project → APIs & Services → OAuth consent screen' },
@@ -153,7 +154,7 @@ function OAuthBanner() {
           ].map(step => (
             <div key={step.n} style={{ display: 'flex', gap: 10 }}>
               <div style={{ width: 20, height: 20, borderRadius: 10, background: 'rgba(224,94,94,0.2)', color: '#E05E5E', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{step.n}</div>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.5 }}>{step.text}</p>
+              <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.5 }}>{step.text}</p>
             </div>
           ))}
           <a href="https://console.cloud.google.com" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, color: '#7BAEC8', textDecoration: 'none', marginTop: 4 }}>
@@ -266,14 +267,21 @@ export default function SettingsPage() {
   const allConnected = ZOES_ACCOUNTS.every(a => a.connected)
 
   return (
-    <div className="bg-app min-h-screen">
+    <div
+      className="bg-app min-h-screen"
+      style={{
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px' }}>
 
           {/* Page title */}
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 3 }}>Settings</h1>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)' }}>Connect your accounts and customize LUNA</p>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 3 }}>Settings</h1>
+            <p style={{ fontSize: 13, color: '#5E5474' }}>Connect your accounts and customize LUNA</p>
           </div>
 
           {/* OAuth result banner */}
@@ -284,14 +292,14 @@ export default function SettingsPage() {
           {/* ── FINANCE & BANKING ────────────────────────────────── */}
           <div style={CARD}>
             <SectionLabel icon={<DollarSign className="h-4 w-4" style={{ color: 'rgba(201,169,110,0.7)' }} />} text="Finance & Banking" sub="CSV import" />
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, marginBottom: 14 }}>
+            <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.6, marginBottom: 14 }}>
               Import your bank statements to track spending, bills, and subscriptions. Download a CSV from your bank and drag it into LUNA.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
               <Link href="/money/import" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.1)', color: '#C9A96E', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                 Import CSV
               </Link>
-              <Link href="/money" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+              <Link href="/money" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(180,150,100,0.18)', background: 'rgba(255,255,255,0.6)', color: '#32284A', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                 Money Dashboard →
               </Link>
             </div>
@@ -299,10 +307,10 @@ export default function SettingsPage() {
 
           {/* ── CONNECTIONS ───────────────────────────────────────── */}
           <div style={CARD}>
-            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: 'rgba(155,92,255,0.7)' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
+            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: '#C9A96E' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
 
             {/* Gmail accounts */}
-            <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Gmail Accounts</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Gmail Accounts</p>
             {ZOES_ACCOUNTS.map(item => (
               <ConnRow key={item.email} item={item} onDisconnect={handleDisconnect} connecting={connecting} />
             ))}
@@ -310,8 +318,8 @@ export default function SettingsPage() {
             {/* Connection note + troubleshooting */}
             {!allConnected && (
               <>
-                <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.18)' }}>
-                  <p style={{ fontSize: 12, color: 'rgba(185,139,255,0.8)', lineHeight: 1.5 }}>
+                <div style={{ marginTop: 12, padding: '10px 14px', borderRadius: 12, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                  <p style={{ fontSize: 12, color: '#8A6D3B', lineHeight: 1.5 }}>
                     Connect both Google Workspace accounts so LUNA reads all your emails and calendar events. Gmail + Calendar are authorized together in one sign-in.
                   </p>
                 </div>
@@ -325,7 +333,7 @@ export default function SettingsPage() {
                     ].map((s, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', flexShrink: 0 }}>{i + 1}.</span>
-                        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{s}</p>
+                        <p style={{ fontSize: 11, color: '#32284A', lineHeight: 1.5 }}>{s}</p>
                       </div>
                     ))}
                   </div>
@@ -337,26 +345,26 @@ export default function SettingsPage() {
             )}
 
             {/* Calendar status */}
-            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-              <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>Google Calendar</p>
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(180,150,100,0.14)' }}>
+              <p style={{ fontSize: 10, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>Google Calendar</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: calendarCount !== null ? 'rgba(90,138,90,0.2)' : 'rgba(255,255,255,0.07)',
-                    border: `1px solid ${calendarCount !== null ? 'rgba(90,138,90,0.4)' : 'rgba(255,255,255,0.1)'}` }}>
-                    <Calendar className="h-4 w-4" style={{ color: calendarCount !== null ? '#8AB88A' : 'rgba(255,255,255,0.4)' }} />
+                    background: calendarCount !== null ? 'rgba(90,138,90,0.2)' : 'rgba(255,255,255,0.55)',
+                    border: `1px solid ${calendarCount !== null ? 'rgba(90,138,90,0.4)' : 'rgba(180,150,100,0.18)'}` }}>
+                    <Calendar className="h-4 w-4" style={{ color: calendarCount !== null ? '#8AB88A' : '#5E5474' }} />
                   </div>
                   <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: calendarCount !== null ? 'white' : 'rgba(255,255,255,0.55)' }}>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: calendarCount !== null ? '#100C1E' : '#5E5474' }}>
                       {calendarCount !== null ? `${calendarCount} event${calendarCount !== 1 ? 's' : ''} today` : 'Calendar not connected'}
                     </p>
-                    <p style={{ fontSize: 10, color: calendarCount !== null ? '#8AB88A' : 'rgba(255,255,255,0.35)' }}>
+                    <p style={{ fontSize: 10, color: calendarCount !== null ? '#8AB88A' : '#5E5474' }}>
                       {calendarCount !== null ? '✓ Connected via Google OAuth · auto-syncs with Gmail' : 'Connects automatically when you sign into Google above'}
                     </p>
                   </div>
                 </div>
-                <button onClick={checkCalendar} disabled={checkingCal} style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <RefreshCw className={`h-3 w-3 ${checkingCal ? 'animate-spin' : ''}`} style={{ color: 'rgba(255,255,255,0.45)' }} />
+                <button onClick={checkCalendar} disabled={checkingCal} style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                  <RefreshCw className={`h-3 w-3 ${checkingCal ? 'animate-spin' : ''}`} style={{ color: '#5E5474' }} />
                 </button>
               </div>
               {calendarCount === null && connStatus.connected && (
@@ -371,27 +379,27 @@ export default function SettingsPage() {
 
           {/* ── APPEARANCE ───────────────────────────────────────── */}
           <div style={CARD}>
-            <SectionLabel icon={<Sun className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.45)' }} />} text="Appearance" />
+            <SectionLabel icon={<Sun className="h-4 w-4" style={{ color: '#5E5474' }} />} text="Appearance" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: 'white', marginBottom: 2 }}>Theme</p>
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>Currently {theme === 'dark' ? 'dark' : 'light'} mode</p>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#100C1E', marginBottom: 2 }}>Theme</p>
+                <p style={{ fontSize: 11, color: '#5E5474' }}>Currently {theme === 'dark' ? 'dark' : 'light'} mode</p>
               </div>
-              <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 14, border: '1px solid rgba(155,92,255,0.3)', background: 'rgba(155,92,255,0.1)', cursor: 'pointer', color: 'white', fontSize: 13, fontWeight: 600 }}>
-                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#C9A96E' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#9b5cff' }} /> Dark mode</>}
+              <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 14, border: '1px solid rgba(201,169,110,0.35)', background: 'rgba(201,169,110,0.12)', cursor: 'pointer', color: '#100C1E', fontSize: 13, fontWeight: 600 }}>
+                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#C9A96E' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#C9A96E' }} /> Dark mode</>}
               </button>
             </div>
           </div>
 
           {/* ── ACCOUNT ──────────────────────────────────────────── */}
           <div style={CARD}>
-            <SectionLabel icon={<User className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.45)' }} />} text="Account" />
+            <SectionLabel icon={<User className="h-4 w-4" style={{ color: '#5E5474' }} />} text="Account" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #9b5cff, #7C3FE0)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(155,92,255,0.4)' }}>Z</div>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(201,169,110,0.4)' }}>Z</div>
                 <div>
-                  <p style={{ fontSize: 15, fontWeight: 700, color: 'white' }}>Zoe Taylor</p>
-                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Owner · DRYP Digital</p>
+                  <p style={{ fontSize: 15, fontWeight: 700, color: '#100C1E' }}>Zoe Taylor</p>
+                  <p style={{ fontSize: 12, color: '#5E5474' }}>Owner · DRYP Digital</p>
                 </div>
               </div>
               <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 12, border: '1px solid rgba(224,94,94,0.3)', background: 'rgba(224,94,94,0.08)', color: '#E05E5E', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
@@ -403,7 +411,7 @@ export default function SettingsPage() {
           {/* ── AI PROFILE ───────────────────────────────────────── */}
           <form onSubmit={handleSave}>
             <div style={CARD}>
-              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: 'rgba(155,92,255,0.7)' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
+              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: '#C9A96E' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
 
               <div style={{ marginBottom: 14 }}>
                 <FieldLabel text="Your preferred tone" />
@@ -435,7 +443,7 @@ export default function SettingsPage() {
             </div>
 
             <div style={CARD}>
-              <SectionLabel icon={<User className="h-4 w-4" style={{ color: 'rgba(255,255,255,0.45)' }} />} text="Projects & Contacts" />
+              <SectionLabel icon={<User className="h-4 w-4" style={{ color: '#5E5474' }} />} text="Projects & Contacts" />
               <div style={{ marginBottom: 14 }}>
                 <FieldLabel text="Main projects (comma-separated)" />
                 <textarea value={projectsInput} rows={2} style={INPUT_STYLE}
@@ -465,9 +473,9 @@ export default function SettingsPage() {
             {/* Save */}
             <button type="submit" disabled={saving} style={{
               width: '100%', padding: '14px 0', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
-              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #9b5cff, #7C3FE0)',
+              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #C9A96E, #B08D52)',
               color: saved ? '#8AB88A' : 'white',
-              boxShadow: saved ? 'none' : '0 6px 24px rgba(155,92,255,0.35)',
+              boxShadow: saved ? 'none' : '0 6px 24px rgba(201,169,110,0.35)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               transition: 'all 0.3s ease',
             }}>

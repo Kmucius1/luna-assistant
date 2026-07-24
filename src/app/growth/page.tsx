@@ -18,10 +18,18 @@ export default function GrowthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen bg-app" style={{
+      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+      '--text-1': '#100C1E',
+      '--text-3': '#5E5474',
+      '--text-4': '#8A8098',
+      '--violet': '#C9A96E',
+      '--surface': 'rgba(255,255,255,0.6)',
+      '--surface-border': 'rgba(180,150,100,0.18)',
+    } as React.CSSProperties}>
       {/* Ambient */}
       <div className="fixed top-0 left-0 w-full h-[400px] pointer-events-none z-0"
-        style={{ background: 'radial-gradient(ellipse at 50% -10%, rgba(155,92,255,0.1) 0%, transparent 60%)', filter: 'blur(40px)' }} />
+        style={{ background: 'radial-gradient(ellipse at 50% -10%, rgba(201,169,110,0.1) 0%, transparent 60%)', filter: 'blur(40px)' }} />
 
       <AppLayout>
         {/* Header */}
@@ -50,18 +58,18 @@ export default function GrowthPage() {
 
         {/* Intro card */}
         <div className="relative rounded-[22px] p-5 mb-5 overflow-hidden"
-          style={{ background: 'linear-gradient(145deg, #16133A 0%, #1F1848 60%, #16133A 100%)', border: '1px solid rgba(155,92,255,0.25)' }}>
+          style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.6) 0%, rgba(250,244,232,0.7) 60%, rgba(255,255,255,0.6) 100%)', border: '1px solid rgba(201,169,110,0.25)' }}>
           <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none"
-            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(155,92,255,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
+            style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4" style={{ color: 'rgba(185,139,255,0.7)' }} />
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(185,139,255,0.5)' }}>Pattern Recognition</p>
+              <TrendingUp className="h-4 w-4" style={{ color: '#C9A96E' }} />
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#C9A96E' }}>Pattern Recognition</p>
             </div>
-            <p className="font-display text-lg font-bold text-white mb-2">
+            <p className="font-display text-lg font-bold text-[#100C1E] mb-2">
               LUNA sees what you cannot see yet.
             </p>
-            <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            <p className="text-sm leading-relaxed" style={{ color: '#32284A' }}>
               Every check-in, voice note, selection, and journal entry builds a picture of your patterns. Energy cycles, recurring needs, emotional themes, growth momentum — all tracked, all reflected back to you.
             </p>
           </div>
@@ -93,7 +101,7 @@ export default function GrowthPage() {
 
         {/* How it works */}
         <div className="mt-6 rounded-[20px] p-4"
-          style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.12)' }}>
+          style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.12)' }}>
           <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>How LUNA Learns You</p>
           <div className="space-y-2 text-xs" style={{ color: 'var(--text-3)' }}>
             <p>· Everything you tap, speak, or type is stored locally in your browser</p>

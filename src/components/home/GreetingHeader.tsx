@@ -40,7 +40,7 @@ function weatherIconFor(forecast: string) {
 export function useTodayContext() {
   const location = useLocation()
   const [now, setNow] = useState<{ hour: number; weekday: string; dateLabel: string } | null>(null)
-  const [weather, setWeather] = useState<{ tempF: number; forecast: string } | null>(null)
+  const [weather, setWeather] = useState<{ tempF: number; forecast: string; uvIndex: number | null } | null>(null)
   const [weatherError, setWeatherError] = useState(false)
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export function useTodayContext() {
 
 export function GreetingHeader({ now, weather, weatherError, backHref }: {
   now: { hour: number; weekday: string; dateLabel: string } | null
-  weather: { tempF: number; forecast: string } | null
+  weather: { tempF: number; forecast: string; uvIndex: number | null } | null
   weatherError: boolean
   /** Only /today needs this — it's not in the bottom nav, so without this
       there's no way back to /home besides the browser's own back button.

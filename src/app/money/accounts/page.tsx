@@ -4,10 +4,11 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { RefreshCw, Link as LinkIcon, Plus } from 'lucide-react'
 import { formatCurrency } from '@/lib/money/format'
 
-const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
+const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
   padding: 18, marginBottom: 12,
 }
 const GOLDEN = '#C9A96E'
@@ -77,10 +78,10 @@ export default function AccountsPage() {
         <div style={{ padding: '20px 16px 180px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: 'white', marginBottom: 2 }}>Accounts</h1>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Checking, savings, cards, cash, and loans</p>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 2 }}>Accounts</h1>
+              <p style={{ fontSize: 12, color: '#5E5474' }}>Checking, savings, cards, cash, and loans</p>
             </div>
-            <button onClick={load} style={{ padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)', cursor: 'pointer' }}>
+            <button onClick={load} style={{ padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', color: '#32284A', cursor: 'pointer' }}>
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
@@ -88,16 +89,16 @@ export default function AccountsPage() {
           <div style={{ ...CARD, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', textAlign: 'center', padding: 24 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLDEN, marginBottom: 8 }}>Total Balance</p>
             <p style={{ fontSize: 36, fontWeight: 700, color: GOLDEN }}>{formatCurrency(totalBalance)}</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>across {accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
+            <p style={{ fontSize: 12, color: '#5E5474', marginTop: 4 }}>across {accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(255,255,255,0.4)' }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E5474' }}>
               <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
             </div>
           ) : accounts.length === 0 ? (
             <div style={{ ...CARD, textAlign: 'center', padding: 32 }}>
-              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>No accounts yet.</p>
+              <p style={{ fontSize: 15, color: '#5E5474', marginBottom: 16 }}>No accounts yet.</p>
             </div>
           ) : (
             accounts.map(acct => (
@@ -106,8 +107,8 @@ export default function AccountsPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ fontSize: 26 }}>{TYPE_ICONS[acct.account_type] ?? '💰'}</div>
                     <div>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: 'white', marginBottom: 2 }}>{acct.nickname}</p>
-                      <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', textTransform: 'capitalize' }}>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: '#100C1E', marginBottom: 2 }}>{acct.nickname}</p>
+                      <p style={{ fontSize: 11, color: '#5E5474', textTransform: 'capitalize' }}>
                         {acct.account_type.replace('_', ' ')}{acct.last_four ? ` · ···${acct.last_four}` : ''} · {acct.ownership_type}
                         {acct.plaid_account_id && ' · linked'}
                       </p>
@@ -118,12 +119,12 @@ export default function AccountsPage() {
                   </div>
                 </div>
                 {(acct.account_type === 'credit_card' || acct.account_type === 'business_credit_card') && acct.credit_limit && (
-                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>
+                  <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(180,150,100,0.15)', fontSize: 11, color: '#32284A' }}>
                     Limit {formatCurrency(acct.credit_limit)}{acct.minimum_payment ? ` · Min payment ${formatCurrency(acct.minimum_payment)}` : ''}{acct.payment_due_date ? ` · Due ${acct.payment_due_date}` : ''}
                   </div>
                 )}
                 <button onClick={() => toggleIncluded(acct)}
-                  style={{ marginTop: 10, fontSize: 11, color: acct.include_in_safe_to_spend ? GOLDEN : 'rgba(255,255,255,0.35)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                  style={{ marginTop: 10, fontSize: 11, color: acct.include_in_safe_to_spend ? GOLDEN : '#5E5474', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
                   {acct.include_in_safe_to_spend ? '✓ Counted in Safe to Spend' : 'Not counted in Safe to Spend'}
                 </button>
               </div>
@@ -133,32 +134,32 @@ export default function AccountsPage() {
           {showAdd ? (
             <div style={CARD}>
               <input value={form.nickname} onChange={e => setForm(p => ({ ...p, nickname: e.target.value }))} placeholder="Nickname (e.g. Chase Total Checking)"
-                style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'dark' }} />
+                style={{ width: '100%', background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: '#100C1E', outline: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'light' }} />
               <input value={form.institution_name} onChange={e => setForm(p => ({ ...p, institution_name: e.target.value }))} placeholder="Institution (e.g. Chase)"
-                style={{ width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'dark' }} />
+                style={{ width: '100%', background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: '#100C1E', outline: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'light' }} />
               <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
                 <select value={form.account_type} onChange={e => setForm(p => ({ ...p, account_type: e.target.value }))}
-                  style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 8px', fontSize: 12.5, color: 'white' }}>
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 8px', fontSize: 12.5, color: '#100C1E' }}>
                   {ACCOUNT_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
                 </select>
                 <select value={form.ownership_type} onChange={e => setForm(p => ({ ...p, ownership_type: e.target.value }))}
-                  style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 8px', fontSize: 12.5, color: 'white' }}>
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 8px', fontSize: 12.5, color: '#100C1E' }}>
                   <option value="personal">personal</option>
                   <option value="business">business</option>
                 </select>
               </div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
                 <input value={form.last_four} onChange={e => setForm(p => ({ ...p, last_four: e.target.value }))} placeholder="Last 4"
-                  style={{ width: 90, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', colorScheme: 'dark' }} />
+                  style={{ width: 90, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: '#100C1E', outline: 'none', colorScheme: 'light' }} />
                 <input value={form.current_balance} onChange={e => setForm(p => ({ ...p, current_balance: e.target.value }))} placeholder="Current balance" type="number"
-                  style={{ flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: 'white', outline: 'none', colorScheme: 'dark' }} />
+                  style={{ flex: 1, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: '#100C1E', outline: 'none', colorScheme: 'light' }} />
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={addAccount} disabled={saving || !form.nickname.trim()}
-                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #C9A96E, #B8903A)', color: '#1A1240', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #C9A96E, #B8903A)', color: '#100C1E', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                   {saving ? 'Saving…' : 'Save account'}
                 </button>
-                <button onClick={() => setShowAdd(false)} style={{ padding: '11px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: 'none', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+                <button onClick={() => setShowAdd(false)} style={{ padding: '11px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.5)', color: '#32284A', border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
               </div>
             </div>
           ) : (

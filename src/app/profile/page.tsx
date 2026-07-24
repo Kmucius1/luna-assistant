@@ -5,6 +5,21 @@ import { Save, Check, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 const PROFILE_KEY = 'luna_zoe_profile_v2'
 
+// ─── Locked light-palette card styles (bypass the global .glass-card /
+// .soul-card classes, which force white text + dark surfaces under
+// [data-theme="dark"] regardless of local CSS var overrides) ──────────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+const SOUL_CARD: React.CSSProperties = {
+  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
+  border: '1px solid rgba(201,169,110,0.22)',
+  borderRadius: 20,
+}
+
 export interface ZoeProfile {
   // Communication
   communication_style: string
@@ -150,7 +165,7 @@ function SectionHeader({ title, icon, color = 'var(--violet)' }: { title: string
   )
 }
 
-function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg = 'rgba(155,92,255,0.08)' }:
+function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg = 'rgba(201,169,110,0.08)' }:
   { items: string[]; onChange: (items: string[]) => void; placeholder: string; color?: string; bg?: string }) {
   const [input, setInput] = useState('')
   function add() {
@@ -159,7 +174,7 @@ function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg =
     setInput('')
   }
   return (
-    <div className="glass-card p-4">
+    <div className="p-4" style={CARD}>
       <div className="flex flex-wrap gap-2 mb-3">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium"
@@ -176,7 +191,7 @@ function TagEditor({ items, onChange, placeholder, color = 'var(--violet)', bg =
           onKeyDown={e => { if (e.key === 'Enter') add() }}
           placeholder={placeholder}
           className="flex-1 px-3 py-2 rounded-xl text-xs outline-none"
-          style={{ background: 'rgba(155,92,255,0.05)', color: 'var(--depth)', border: '1px solid rgba(155,92,255,0.1)' }} />
+          style={{ background: 'rgba(201,169,110,0.05)', color: 'var(--depth)', border: '1px solid rgba(201,169,110,0.1)' }} />
         <button onClick={add}
           className="px-3 py-2 rounded-xl" style={{ background: bg, color }}>
           <Plus className="h-4 w-4" />
@@ -234,7 +249,19 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-sanctuary min-h-screen">
+    <div
+      className="min-h-screen"
+      style={{
+        background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--depth': '#100C1E',
+        '--mid': '#32284A',
+        '--mist': '#5E5474',
+        '--faint': '#8A8098',
+        '--golden': '#C9A96E',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -256,7 +283,7 @@ export default function ProfilePage() {
           </p>
 
           {/* Fixed design block */}
-          <div className="soul-card p-4 mb-2">
+          <div className="p-4 mb-2" style={SOUL_CARD}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>My Design (fixed)</p>
             <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>Self-Projected Projector · 4/6 Profile</p>
             <p className="text-xs mt-1" style={{ color: 'var(--mid)' }}>Scorpio Sun · Cancer Moon · Gemini Rising · Virgo Midheaven</p>
@@ -266,7 +293,7 @@ export default function ProfilePage() {
           {/* ── COMMUNICATION ── */}
           <SectionHeader title="How I Communicate" icon="💬" />
           <Collapsible title="Communication style" defaultOpen>
-            <div className="glass-card p-4">
+            <div className="p-4" style={CARD}>
               <textarea value={profile.communication_style}
                 onChange={e => set('communication_style', e.target.value)}
                 rows={3} placeholder="How do you communicate when calm? When hurt?"
@@ -311,7 +338,7 @@ export default function ProfilePage() {
 
           {/* ── KEY RELATIONSHIPS ── */}
           <SectionHeader title="Key Relationships" icon="👥" />
-          <div className="glass-card p-4 space-y-3">
+          <div className="p-4 space-y-3" style={CARD}>
             {profile.relationships.map((r, i) => (
               <div key={i} className="flex items-start gap-2">
                 <div className="flex-1">
@@ -324,18 +351,18 @@ export default function ProfilePage() {
                 </button>
               </div>
             ))}
-            <div className="pt-2 border-t" style={{ borderColor: 'rgba(155,92,255,0.08)' }}>
+            <div className="pt-2 border-t" style={{ borderColor: 'rgba(201,169,110,0.08)' }}>
               <input value={newRelName} onChange={e => setNewRelName(e.target.value)}
                 placeholder="Name (e.g. Kaleb, Mom, Client A)"
                 className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-                style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.1)' }} />
+                style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(201,169,110,0.1)' }} />
               <input value={newRelCtx} onChange={e => setNewRelCtx(e.target.value)}
                 placeholder="Context (relationship type, dynamics, anything LUNA should know)"
                 className="w-full bg-transparent outline-none text-xs mb-3"
                 style={{ color: 'var(--depth)' }} />
               <button onClick={addRelationship}
                 className="text-xs font-semibold px-3 py-1.5 rounded-xl"
-                style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--violet)' }}>
                 <Plus className="inline h-3 w-3 mr-1" />Add person
               </button>
             </div>
@@ -345,7 +372,7 @@ export default function ProfilePage() {
           <SectionHeader title="My Goals" icon="🎯" color="#5A8A5A" />
           <div className="space-y-2 mb-3">
             {profile.goals.map((g, i) => (
-              <div key={i} className="glass-card p-4 flex gap-3">
+              <div key={i} className="p-4 flex gap-3" style={CARD}>
                 <div className="flex-1">
                   <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{g.title}</p>
                   <div className="flex items-center gap-2 mt-1">
@@ -361,16 +388,16 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-          <div className="glass-card p-4">
+          <div className="p-4" style={CARD}>
             <p className="text-xs font-semibold mb-3" style={{ color: 'var(--mist)' }}>Add a goal</p>
             <input value={newGoalTitle} onChange={e => setNewGoalTitle(e.target.value)}
               placeholder="Goal title"
               className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.08)' }} />
+              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(201,169,110,0.08)' }} />
             <input value={newGoalWhen} onChange={e => setNewGoalWhen(e.target.value)}
               placeholder="Timeframe (e.g. 6 months, Long-term)"
               className="w-full bg-transparent outline-none text-xs mb-2 pb-1.5"
-              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(155,92,255,0.08)' }} />
+              style={{ color: 'var(--depth)', borderBottom: '1px solid rgba(201,169,110,0.08)' }} />
             <input value={newGoalWhy} onChange={e => setNewGoalWhy(e.target.value)}
               placeholder="Why this matters to me..."
               className="w-full bg-transparent outline-none text-xs mb-3"
@@ -393,7 +420,7 @@ export default function ProfilePage() {
 
           {/* ── SPIRITUAL ── */}
           <SectionHeader title="My Astrology" icon="⭐" />
-          <div className="glass-card p-4 mb-3">
+          <div className="p-4 mb-3" style={CARD}>
             <p className="text-xs font-semibold mb-2" style={{ color: 'var(--mist)' }}>
               Notes on your chart — what feels most alive or relevant
             </p>
@@ -404,7 +431,7 @@ export default function ProfilePage() {
           </div>
 
           <SectionHeader title="My Human Design" icon="💜" />
-          <div className="glass-card p-4 mb-3">
+          <div className="p-4 mb-3" style={CARD}>
             <textarea value={profile.human_design_notes}
               onChange={e => set('human_design_notes', e.target.value)}
               rows={3} className="w-full bg-transparent outline-none text-sm resize-none"
@@ -413,7 +440,7 @@ export default function ProfilePage() {
 
           {/* ── EXTRA ── */}
           <SectionHeader title="Anything Else" icon="✏️" color="var(--mist)" />
-          <div className="glass-card p-4 mb-6">
+          <div className="p-4 mb-6" style={CARD}>
             <textarea value={profile.custom_context}
               onChange={e => set('custom_context', e.target.value)}
               rows={3} placeholder="Anything LUNA should know that does not fit above..."

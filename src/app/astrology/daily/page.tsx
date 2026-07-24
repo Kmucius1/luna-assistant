@@ -53,11 +53,22 @@ const TAB_STYLE = (active: boolean): React.CSSProperties => ({
   fontSize: 12,
   fontWeight: 700,
   cursor: 'pointer',
-  border: `1px solid ${active ? 'rgba(155,92,255,0.45)' : 'var(--surface-border)'}`,
-  background: active ? 'rgba(155,92,255,0.18)' : 'var(--surface)',
+  border: `1px solid ${active ? 'rgba(201,169,110,0.45)' : 'var(--surface-border)'}`,
+  background: active ? 'rgba(201,169,110,0.18)' : 'var(--surface)',
   color: active ? 'var(--violet)' : 'var(--text-3)',
   whiteSpace: 'nowrap',
 })
+
+const THEME_VARS = {
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+  '--text-4': '#8A8098',
+  '--violet': '#C9A96E',
+  '--surface': 'rgba(255,255,255,0.6)',
+  '--surface-border': 'rgba(180,150,100,0.2)',
+  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+} as React.CSSProperties
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DailyReadingPage() {
@@ -104,10 +115,10 @@ export default function DailyReadingPage() {
   })()
 
   return (
-    <div className="min-h-screen bg-app">
+    <div className="min-h-screen" style={THEME_VARS}>
       <div
         className="fixed top-0 right-0 w-[500px] h-[500px] pointer-events-none z-0"
-        style={{ background: 'radial-gradient(circle at 75% 15%, rgba(155,92,255,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
+        style={{ background: 'radial-gradient(circle at 75% 15%, rgba(201,169,110,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
       />
       <div
         className="fixed bottom-0 left-0 w-[350px] h-[350px] pointer-events-none z-0"
@@ -148,7 +159,7 @@ export default function DailyReadingPage() {
             <button
               onClick={() => fetchWindow()}
               className="px-6 py-3 rounded-[14px] text-sm font-semibold tap-scale"
-              style={{ background: 'rgba(155,92,255,0.15)', border: '1px solid rgba(155,92,255,0.3)', color: 'var(--violet)' }}
+              style={{ background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.3)', color: 'var(--violet)' }}
             >
               Try Again
             </button>
@@ -162,8 +173,8 @@ export default function DailyReadingPage() {
             <div
               className="rounded-[22px] p-6"
               style={{
-                background: 'linear-gradient(145deg, rgba(155,92,255,0.22) 0%, rgba(90,60,150,0.12) 100%)',
-                border: '1px solid rgba(155,92,255,0.30)',
+                background: 'linear-gradient(145deg, rgba(201,169,110,0.22) 0%, rgba(201,169,110,0.10) 100%)',
+                border: '1px solid rgba(201,169,110,0.30)',
               }}
             >
               <Label>{today.reading_json.date}</Label>
@@ -183,7 +194,7 @@ export default function DailyReadingPage() {
                 </span>
               </div>
 
-              <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(255,255,255,0.9)' }}>
+              <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(16,12,30,0.9)' }}>
                 {today.reading_json.luna_message}
               </p>
             </div>
@@ -239,7 +250,7 @@ export default function DailyReadingPage() {
               <Tabs.Content value="journal">
                 <SectionCard>
                   <Label>Journal prompt</Label>
-                  <p className="text-base font-display italic leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  <p className="text-base font-display italic leading-relaxed mb-4" style={{ color: 'rgba(16,12,30,0.9)' }}>
                     &ldquo;{today.reading_json.guidance.journal_prompt}&rdquo;
                   </p>
                   <Label>Affirmation</Label>

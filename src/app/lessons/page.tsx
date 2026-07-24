@@ -70,7 +70,15 @@ export default function LessonsScreen() {
   }
 
   return (
-    <div className="bg-sanctuary min-h-screen">
+    <div className="bg-sanctuary min-h-screen" style={{
+      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+      '--depth': '#100C1E',
+      '--mid': '#5E5474',
+      '--mist': '#8A8098',
+      '--violet': '#C9A96E',
+      '--golden': '#C9A96E',
+      '--herb': '#B8C9B4',
+    } as React.CSSProperties}>
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -179,7 +187,7 @@ export default function LessonsScreen() {
               <div key={i} className="glass-card p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{lesson.week}</p>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)' }}>
                     {lesson.theme}
                   </span>
                 </div>

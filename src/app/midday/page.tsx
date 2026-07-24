@@ -6,6 +6,21 @@ import { Sun, Sparkles, Droplets, Apple, RefreshCw, Home } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { MIDDAY_REMINDERS } from '@/lib/luna/reminders'
 
+// ─── Locked light-palette card styles (bypass the global .glass-card /
+// .soul-card classes, which force white text + dark surfaces under
+// [data-theme="dark"] regardless of local CSS var overrides) ──────────
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
+}
+const SOUL_CARD: React.CSSProperties = {
+  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
+  border: '1px solid rgba(201,169,110,0.22)',
+  borderRadius: 20,
+}
+
 const ENERGY_CHIPS = [
   { emoji: '🔥', label: 'Flowing',   value: 'flowing'   },
   { emoji: '😌', label: 'Steady',    value: 'steady'    },
@@ -79,7 +94,18 @@ export default function MiddayPage() {
   }
 
   return (
-    <div className="bg-sanctuary min-h-screen">
+    <div
+      className="bg-sanctuary min-h-screen"
+      style={{
+        '--violet': '#C9A96E',
+        '--violet-deep': '#B08D52',
+        '--depth': '#100C1E',
+        '--mid': '#32284A',
+        '--mist': '#5E5474',
+        '--faint': '#8A8098',
+        '--golden': '#C9A96E',
+      } as React.CSSProperties}
+    >
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -104,7 +130,7 @@ export default function MiddayPage() {
           {!result ? (
             <div className="space-y-4">
               {/* Today's reminders */}
-              <div className="glass-card p-4">
+              <div className="p-4" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--golden)' }}>
                   Today&apos;s Reminders
                 </p>
@@ -116,7 +142,7 @@ export default function MiddayPage() {
               </div>
 
               {/* Energy check */}
-              <div className="glass-card p-4">
+              <div className="p-4" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--mist)' }}>
                   How is your energy right now?
                 </p>
@@ -125,7 +151,7 @@ export default function MiddayPage() {
                     <button key={e.value} onClick={() => setEnergy(energy === e.value ? '' : e.value)}
                       className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                       style={{
-                        background: energy === e.value ? 'var(--violet)' : 'rgba(155,92,255,0.08)',
+                        background: energy === e.value ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
                         color: energy === e.value ? 'white' : 'var(--mid)',
                       }}>
                       {e.emoji} {e.label}
@@ -135,7 +161,7 @@ export default function MiddayPage() {
               </div>
 
               {/* Body check */}
-              <div className="glass-card p-4">
+              <div className="p-4" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--mist)' }}>
                   Body check
                 </p>
@@ -144,7 +170,7 @@ export default function MiddayPage() {
                     <button key={key} onClick={() => toggleCheck(key)}
                       className="w-full flex items-center gap-3 py-2 transition-all">
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ background: checks[key] ? `${color}22` : 'rgba(155,92,255,0.06)' }}>
+                        style={{ background: checks[key] ? `${color}22` : 'rgba(201,169,110,0.06)' }}>
                         <Icon className="h-4 w-4" style={{ color: checks[key] ? color : 'var(--mist)' }} />
                       </div>
                       <span className="text-sm font-medium flex-1 text-left" style={{ color: checks[key] ? 'var(--depth)' : 'var(--mid)' }}>
@@ -188,7 +214,7 @@ export default function MiddayPage() {
             <div className="space-y-4 animate-fade-up">
 
               {/* Energy read */}
-              <div className="soul-card p-5">
+              <div className="p-5" style={SOUL_CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>
                   Midday read
                 </p>
@@ -198,7 +224,7 @@ export default function MiddayPage() {
               </div>
 
               {/* What matters */}
-              <div className="glass-card p-4">
+              <div className="p-4" style={CARD}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>
                   What matters right now
                 </p>
@@ -209,11 +235,11 @@ export default function MiddayPage() {
 
               {/* Release + Body */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="glass-card p-4">
+                <div className="p-4" style={CARD}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#C87B7B' }}>Let go of</p>
                   <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.let_go_of}</p>
                 </div>
-                <div className="glass-card p-4">
+                <div className="p-4" style={CARD}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#A8C4DA' }}>Your body</p>
                   <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.body_check}</p>
                 </div>
@@ -221,7 +247,7 @@ export default function MiddayPage() {
 
               {/* HD note */}
               {result.hd_reminder && (
-                <div className="glass-card p-4">
+                <div className="p-4" style={CARD}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Projector note</p>
                   <p className="text-sm" style={{ color: 'var(--mid)' }}>{result.hd_reminder}</p>
                 </div>

@@ -25,7 +25,7 @@
 /* ── Header ───────────────────────────────────────────── */
 
 .header {
-  flex: 0.75 1 0;
+  flex: 0.6 1 0;
   min-height: 0;
   position: relative;
   border-radius: 18px;
@@ -221,7 +221,7 @@
 
 /* ── Meal cards ───────────────────────────────────────── */
 
-.mealsList { flex: 2.5 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.mealsList { flex: 2.9 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
 
 .mealCard {
   flex: 1;
@@ -233,7 +233,7 @@
   border: 1px solid rgba(180, 150, 100, 0.14);
   border-radius: 16px;
   box-shadow: var(--soft-shadow);
-  padding: 7px;
+  padding: 6px 7px;
 }
 
 .mealPhoto {
@@ -278,18 +278,7 @@
 
 .mealTitleRow svg { display: none; }
 
-.mealDesc {
-  font-size: 9px;
-  color: var(--ink-3);
-  margin: 2px 0 3px;
-  line-height: 1.25;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-}
-
-.mealStats { display: flex; gap: 10px; font-size: 9px; color: var(--ink-2); }
+.mealStats { display: flex; gap: 10px; font-size: 10px; font-weight: 600; color: var(--ink-2); margin-top: 3px; }
 .mealStats span { display: flex; align-items: center; gap: 3px; }
 .mealStats svg { color: var(--gold); width: 10px; height: 10px; }
 

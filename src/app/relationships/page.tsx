@@ -45,7 +45,7 @@ const PEOPLE: Person[] = [
     lastContact: 'Today',
     health: 'strong',
     note: "Can't wait to see the deck!",
-    color: '#9b5cff',
+    color: '#4F9A94',
   },
   {
     id: '3',
@@ -109,7 +109,7 @@ const PEOPLE: Person[] = [
 
 const HEALTH_COLORS: Record<string, string> = {
   strong:  '#5A9E5A',
-  good:    '#9b5cff',
+  good:    '#6A9FB8',
   nurture: '#C9A96E',
   overdue: '#B85A5A',
 }
@@ -137,11 +137,11 @@ const AI_PROMPTS = [
 ]
 
 function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }) {
-  const cardBg    = dark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.8)'
-  const cardBorder = dark ? 'rgba(255,255,255,0.07)' : 'rgba(155,92,255,0.1)'
-  const nameColor = dark ? 'rgba(255,255,255,0.9)' : 'var(--depth)'
-  const subColor  = dark ? 'rgba(255,255,255,0.45)' : 'var(--mid)'
-  const noteColor = dark ? 'rgba(255,255,255,0.35)' : 'var(--mist)'
+  const cardBg    = dark ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.8)'
+  const cardBorder = dark ? 'rgba(180,150,100,0.18)' : 'rgba(201,169,110,0.15)'
+  const nameColor = dark ? '#100C1E' : 'var(--depth)'
+  const subColor  = dark ? '#5E5474' : 'var(--mid)'
+  const noteColor = dark ? '#8A8098' : 'var(--mist)'
 
   return (
     <div className="rounded-2xl p-4 flex items-start gap-4 transition-all"
@@ -181,8 +181,8 @@ function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }
           <Link href="/messages">
             <button className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-lg transition-all"
               style={{
-                background: dark ? 'rgba(155,92,255,0.12)' : 'rgba(155,92,255,0.08)',
-                color: '#A98FD8',
+                background: dark ? 'rgba(201,169,110,0.15)' : 'rgba(201,169,110,0.1)',
+                color: '#C9A96E',
               }}>
               <MessageCircle className="h-3 w-3" />
               Message
@@ -230,7 +230,20 @@ export default function RelationshipsPage() {
     <>
       {/* ── MOBILE ── */}
       <div className="lg:hidden min-h-screen"
-        style={{ background: 'linear-gradient(180deg, #EDE8F5 0%, #F5F0FC 30%, #FDF8F3 70%)' }}>
+        style={{
+          background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
+          '--text-1': '#100C1E',
+          '--text-2': '#32284A',
+          '--text-3': '#5E5474',
+          '--depth': '#100C1E',
+          '--mid': '#5E5474',
+          '--mist': '#8A8098',
+          '--violet': '#C9A96E',
+          '--violet-deep': '#B8974F',
+          '--surface': 'rgba(255,255,255,0.6)',
+          '--surface-strong': 'rgba(255,255,255,0.75)',
+          '--surface-border': 'rgba(180,150,100,0.18)',
+        } as React.CSSProperties}>
         <AppLayout noPad>
           <div className="px-4 pt-12 pb-nav space-y-4">
 
@@ -252,8 +265,8 @@ export default function RelationshipsPage() {
                   className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all"
                   style={{
                     background: filter === f.key ? 'var(--violet)' : 'rgba(255,255,255,0.8)',
-                    color: filter === f.key ? 'white' : 'var(--mid)',
-                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(155,92,255,0.12)'}`,
+                    color: filter === f.key ? '#100C1E' : 'var(--mid)',
+                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(201,169,110,0.15)'}`,
                   }}>
                   {f.label}
                 </button>
@@ -269,13 +282,13 @@ export default function RelationshipsPage() {
 
             {/* Add person */}
             <button className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-medium"
-              style={{ background: 'var(--surface)', border: '1.5px dashed rgba(155,92,255,0.3)', color: 'var(--violet)' }}>
+              style={{ background: 'var(--surface)', border: '1.5px dashed rgba(201,169,110,0.35)', color: 'var(--violet)' }}>
               <Plus className="h-4 w-4" />
               Add someone
             </button>
 
             {/* AI Coach */}
-            <div className="rounded-2xl p-4" style={{ background: 'var(--surface-strong)', border: '1px solid rgba(155,92,255,0.12)' }}>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--surface-strong)', border: '1px solid rgba(201,169,110,0.15)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                 <p className="text-sm font-bold" style={{ color: 'var(--text-1)' }}>Relationship Coach</p>
@@ -287,7 +300,7 @@ export default function RelationshipsPage() {
                 {AI_PROMPTS.map(p => (
                   <button key={p} onClick={() => setAiInput(p)}
                     className="text-xs px-3 py-1.5 rounded-xl transition-all"
-                    style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                    style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--violet)' }}>
                     {p}
                   </button>
                 ))}
@@ -303,12 +316,12 @@ export default function RelationshipsPage() {
               <button
                 onClick={askAI}
                 disabled={aiLoading || !aiInput.trim()}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
+                className="w-full py-3 rounded-xl text-sm font-semibold text-[#100C1E] transition-all disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                 {aiLoading ? 'Thinking...' : 'Get guidance'}
               </button>
               {aiReply && (
-                <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(155,92,255,0.06)', border: '1px solid rgba(155,92,255,0.12)' }}>
+                <div className="mt-3 p-3 rounded-xl" style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
                   <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{aiReply}</p>
                 </div>
               )}
@@ -319,9 +332,9 @@ export default function RelationshipsPage() {
 
       {/* ── DESKTOP ── */}
       <div className="hidden lg:block min-h-screen"
-        style={{ background: 'linear-gradient(180deg, #1E1A38 0%, #141030 40%, #0D0B1E 100%)' }}>
+        style={{ background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)' }}>
         <div className="fixed top-0 right-0 w-[600px] h-[600px] pointer-events-none"
-          style={{ background: 'radial-gradient(circle at 80% 20%, rgba(155,92,255,0.12) 0%, transparent 60%)', filter: 'blur(40px)' }} />
+          style={{ background: 'radial-gradient(circle at 80% 20%, rgba(201,169,110,0.15) 0%, transparent 60%)', filter: 'blur(40px)' }} />
 
         <AppLayout noPad>
           <div className="pt-20 pb-[110px] px-8">
@@ -329,8 +342,8 @@ export default function RelationshipsPage() {
             {/* Header */}
             <div className="flex items-end justify-between mb-6">
               <div>
-                <p className="text-base font-semibold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.35)' }}>Your Circle</p>
-                <h1 className="font-display text-4xl font-bold text-white">Relationships</h1>
+                <p className="text-base font-semibold uppercase tracking-widest mb-1" style={{ color: '#8A8098' }}>Your Circle</p>
+                <h1 className="font-display text-4xl font-bold text-[#100C1E]">Relationships</h1>
                 {needsAttention > 0 && (
                   <p className="text-base mt-1" style={{ color: '#C9A96E' }}>
                     {needsAttention} connection{needsAttention > 1 ? 's' : ''} need your attention
@@ -339,9 +352,9 @@ export default function RelationshipsPage() {
               </div>
               <button className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid var(--surface-border)',
-                  color: 'rgba(255,255,255,0.8)',
+                  background: 'rgba(255,255,255,0.5)',
+                  border: '1px solid rgba(180,150,100,0.18)',
+                  color: '#32284A',
                 }}>
                 <Plus className="h-4 w-4" />
                 Add person
@@ -354,9 +367,9 @@ export default function RelationshipsPage() {
                 <button key={f.key} onClick={() => setFilter(f.key)}
                   className="px-5 py-2 rounded-full text-sm font-medium transition-all"
                   style={{
-                    background: filter === f.key ? 'rgba(155,92,255,0.85)' : 'rgba(255,255,255,0.06)',
-                    color: filter === f.key ? 'white' : 'rgba(255,255,255,0.5)',
-                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(255,255,255,0.08)'}`,
+                    background: filter === f.key ? 'rgba(201,169,110,0.85)' : 'rgba(255,255,255,0.5)',
+                    color: filter === f.key ? '#100C1E' : '#8A8098',
+                    border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(180,150,100,0.18)'}`,
                   }}>
                   {f.label}
                 </button>
@@ -372,19 +385,19 @@ export default function RelationshipsPage() {
 
             {/* AI Coach — desktop */}
             <div className="rounded-2xl p-6"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5" style={{ color: '#b98bff' }} />
-                <p className="text-base font-semibold text-white">Relationship Coach</p>
+                <Sparkles className="h-5 w-5" style={{ color: '#C9A96E' }} />
+                <p className="text-base font-semibold text-[#100C1E]">Relationship Coach</p>
               </div>
-              <p className="text-sm mb-4" style={{ color: 'rgba(255,255,255,0.45)' }}>
+              <p className="text-sm mb-4" style={{ color: '#5E5474' }}>
                 Describe a situation and get thoughtful, grounded guidance.
               </p>
               <div className="flex flex-wrap gap-2 mb-4">
                 {AI_PROMPTS.map(p => (
                   <button key={p} onClick={() => setAiInput(p)}
                     className="text-sm px-4 py-2 rounded-xl transition-all"
-                    style={{ background: 'rgba(155,92,255,0.12)', color: '#b98bff', border: '1px solid rgba(155,92,255,0.2)' }}>
+                    style={{ background: 'rgba(201,169,110,0.15)', color: '#C9A96E', border: '1px solid rgba(201,169,110,0.25)' }}>
                     {p}
                   </button>
                 ))}
@@ -401,8 +414,8 @@ export default function RelationshipsPage() {
                 />
               </div>
               {aiReply && (
-                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(155,92,255,0.08)', border: '1px solid rgba(155,92,255,0.15)' }}>
-                  <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{aiReply}</p>
+                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.18)' }}>
+                  <p className="text-sm leading-relaxed" style={{ color: '#32284A' }}>{aiReply}</p>
                 </div>
               )}
             </div>

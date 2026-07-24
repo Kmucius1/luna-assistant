@@ -93,25 +93,40 @@ function AppIcon({ href, emoji, label, desc, delay }: { href: string; emoji: str
 
 export default function MorePage() {
   return (
-    <AppLayout>
-      <div className="pt-5 pb-4">
-        <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>All Features</h1>
-        <p className="text-sm mb-6" style={{ color: 'var(--text-3)' }}>Everything LUNA can do for you.</p>
+    <div
+      style={{
+        '--text-1': '#100C1E',
+        '--text-2': '#32284A',
+        '--text-3': '#5E5474',
+        '--text-4': '#8A8098',
+        '--surface': 'rgba(255,255,255,0.6)',
+        '--surface-border': 'rgba(180,150,100,0.18)',
+        '--surface-strong': 'rgba(255,255,255,0.7)',
+        '--app-bg-from': '#FBF8F2',
+        '--app-bg-mid': '#F6F1E7',
+        '--app-bg-to': '#F0E9DA',
+      } as React.CSSProperties}
+    >
+      <AppLayout>
+        <div className="pt-5 pb-4">
+          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>All Features</h1>
+          <p className="text-sm mb-6" style={{ color: 'var(--text-3)' }}>Everything LUNA can do for you.</p>
 
-        <div className="space-y-8">
-          {CATEGORIES.map((cat) => (
-            <div key={cat.name}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3"
-                style={{ color: 'var(--text-4)' }}>{cat.name}</p>
-              <div className="grid grid-cols-3 gap-3">
-                {cat.items.map((item, i) => (
-                  <AppIcon key={item.href} {...item} delay={i * 0.04} />
-                ))}
+          <div className="space-y-8">
+            {CATEGORIES.map((cat) => (
+              <div key={cat.name}>
+                <p className="text-xs font-bold uppercase tracking-widest mb-3"
+                  style={{ color: 'var(--text-4)' }}>{cat.name}</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {cat.items.map((item, i) => (
+                    <AppIcon key={item.href} {...item} delay={i * 0.04} />
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </AppLayout>
+      </AppLayout>
+    </div>
   )
 }

@@ -11,6 +11,18 @@ interface BoardItem {
   liked: boolean
 }
 
+// --luna-purple-2 / --luna-panel are global constants (always purple/dark,
+// not theme-toggled) and --text-1/--text-3 are theme-toggled globally —
+// pinning all four here locks this page to the warm ivory palette
+// regardless of which theme is active elsewhere, so text/panels never go
+// invisible against the light background.
+const LIGHT_PALETTE_VARS = {
+  '--text-1': '#100C1E',
+  '--text-3': '#5E5474',
+  '--luna-purple-2': '#C9A96E',
+  '--luna-panel': 'rgba(255,255,255,0.6)',
+} as React.CSSProperties
+
 export default function StyleBoardPage() {
   const [board, setBoard] = useState<BoardItem[] | null>(null)
   const [likedCount, setLikedCount] = useState(0)
@@ -50,15 +62,15 @@ export default function StyleBoardPage() {
   }
 
   return (
-    <div className="bg-app min-h-screen">
+    <div className="bg-app min-h-screen" style={LIGHT_PALETTE_VARS}>
       <AppLayout wide>
         <div className="pt-4 pb-2">
           <Link href="/creative" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
             <ArrowLeft size={14} style={{ color: 'var(--luna-purple-2)' }} />
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--luna-purple-2)' }}>Atelier</span>
           </Link>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'white', margin: '10px 0 4px' }}>Style Board</h1>
-          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-1)', margin: '10px 0 4px' }}>Style Board</h1>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
             Tap the ones that feel like you. {likedCount > 0 && `${likedCount} liked so far.`}
           </p>
         </div>
@@ -93,7 +105,7 @@ export default function StyleBoardPage() {
                     position: 'absolute', top: 8, right: 8,
                     width: 30, height: 30, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: item.liked ? 'rgba(155,92,255,0.85)' : 'rgba(10,4,28,0.55)',
+                    background: item.liked ? 'rgba(201,169,110,0.85)' : 'rgba(10,4,28,0.55)',
                     backdropFilter: 'blur(6px)',
                   }}
                 >

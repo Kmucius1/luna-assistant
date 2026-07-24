@@ -3,9 +3,9 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Mic, MicOff, Send, RotateCcw, Volume2, Loader2 } from 'lucide-react'
 
-const BG     = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
+const BG     = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const GOLDEN = '#C9A96E'
-const VIOLET = '#7B5EA7'
+const VIOLET = '#B8974F'
 
 interface Message {
   id: string
@@ -226,9 +226,9 @@ export default function ChatPage() {
         {/* ── Header ── */}
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
-          background: 'rgba(10,8,32,0.92)', backdropFilter: 'blur(20px)',
+          background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
+          borderBottom: '1px solid rgba(180,150,100,0.16)',
           padding: '14px 20px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         }}>
@@ -237,16 +237,16 @@ export default function ChatPage() {
               width: 36, height: 36, borderRadius: '50%',
               background: `linear-gradient(135deg, ${VIOLET}, ${GOLDEN})`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16,
+              fontSize: 16, color: '#FFFFFF',
             }}>✦</div>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', letterSpacing: '-0.01em' }}>LUNA</p>
-              <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.06em' }}>{getTimeBadge(hour)} · listening</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: '#100C1E', letterSpacing: '-0.01em' }}>LUNA</p>
+              <p style={{ fontSize: 11, color: '#5E5474', letterSpacing: '0.06em' }}>{getTimeBadge(hour)} · listening</p>
             </div>
           </div>
           <button
             onClick={() => void clearChat()}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 6 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E5474', padding: 6 }}
             title="Start fresh">
             <RotateCcw style={{ width: 16, height: 16 }} />
           </button>
@@ -256,18 +256,18 @@ export default function ChatPage() {
         <div style={{ padding: '80px 16px 140px', maxWidth: 600, margin: '0 auto' }}>
           {!loaded && (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-              <div style={{ fontSize: 22, opacity: 0.3 }}>✦</div>
+              <div style={{ fontSize: 22, opacity: 0.4, color: '#100C1E' }}>✦</div>
             </div>
           )}
 
           {loaded && historyError && messages.length === 0 && (
             <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>
+              <p style={{ fontSize: 14, color: '#5E5474', marginBottom: 14 }}>
                 Couldn&apos;t load your conversation — it&apos;s still there, this is just a connection hiccup.
               </p>
               <button
                 onClick={() => { setLoaded(false); void loadHistory() }}
-                style={{ padding: '10px 20px', borderRadius: 14, border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '10px 20px', borderRadius: 14, border: '1px solid rgba(180,150,100,0.3)', background: 'rgba(255,255,255,0.6)', color: '#100C1E', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
               >
                 Try again
               </button>
@@ -283,7 +283,7 @@ export default function ChatPage() {
             return (
               <div key={msg.id}>
                 {showTime && (
-                  <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.22)', margin: '16px 0 8px', letterSpacing: '0.06em' }}>
+                  <p style={{ textAlign: 'center', fontSize: 11, color: '#8A8098', margin: '16px 0 8px', letterSpacing: '0.06em' }}>
                     {formatTime(msg.created_at)}
                   </p>
                 )}
@@ -300,7 +300,7 @@ export default function ChatPage() {
                       width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
                       background: `linear-gradient(135deg, ${VIOLET}, ${GOLDEN})`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 12, marginBottom: 2,
+                      fontSize: 12, marginBottom: 2, color: '#FFFFFF',
                     }}>✦</div>
                   )}
                   <div style={{
@@ -308,9 +308,10 @@ export default function ChatPage() {
                     padding: isTyping ? '12px 18px' : '13px 16px',
                     borderRadius: isLuna ? '18px 18px 18px 4px' : '18px 18px 4px 18px',
                     background: isLuna
-                      ? 'rgba(255,255,255,0.07)'
-                      : `linear-gradient(135deg, ${VIOLET}CC, #5B3E8A)`,
-                    border: isLuna ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                      ? 'rgba(255,255,255,0.7)'
+                      : `linear-gradient(135deg, ${GOLDEN}, #B8903A)`,
+                    border: isLuna ? '1px solid rgba(180,150,100,0.18)' : 'none',
+                    boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
                     backdropFilter: isLuna ? 'blur(12px)' : 'none',
                     WebkitBackdropFilter: isLuna ? 'blur(12px)' : 'none',
                   }}>
@@ -319,7 +320,7 @@ export default function ChatPage() {
                         {[0, 1, 2].map(i => (
                           <div key={i} style={{
                             width: 6, height: 6, borderRadius: '50%',
-                            background: 'rgba(255,255,255,0.4)',
+                            background: '#8A8098',
                             animation: `pulse 1.2s ease-in-out ${i * 0.2}s infinite`,
                           }} />
                         ))}
@@ -329,7 +330,7 @@ export default function ChatPage() {
                         <p style={{
                           fontSize: 15,
                           fontWeight: isLuna ? 450 : 500,
-                          color: 'rgba(255,255,255,0.92)',
+                          color: '#100C1E',
                           lineHeight: 1.65,
                           whiteSpace: 'pre-wrap',
                           margin: 0,
@@ -341,7 +342,7 @@ export default function ChatPage() {
                             style={{
                               display: 'flex', alignItems: 'center', gap: 5, marginTop: 8,
                               background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                              color: speakingId === msg.id ? GOLDEN : 'rgba(255,255,255,0.35)',
+                              color: speakingId === msg.id ? GOLDEN : '#8A8098',
                             }}
                           >
                             {speakLoadingId === msg.id
@@ -365,9 +366,9 @@ export default function ChatPage() {
         {/* ── Input bar ── */}
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-          background: 'rgba(10,8,32,0.94)', backdropFilter: 'blur(20px)',
+          background: 'rgba(255,255,255,0.78)', backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(255,255,255,0.07)',
+          borderTop: '1px solid rgba(180,150,100,0.16)',
           padding: '12px 16px 28px',
         }}>
           <div style={{ maxWidth: 600, margin: '0 auto', display: 'flex', gap: 10, alignItems: 'flex-end' }}>
@@ -375,12 +376,13 @@ export default function ChatPage() {
             <button
               onClick={toggleVoice}
               style={{
-                width: 44, height: 44, borderRadius: '50%', flexShrink: 0, border: 'none',
+                width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                border: listening ? 'none' : '1px solid rgba(180,150,100,0.2)',
                 cursor: 'pointer',
                 background: listening
                   ? `linear-gradient(135deg, #C96B5A, #A84040)`
-                  : 'rgba(255,255,255,0.08)',
-                color: listening ? 'white' : 'rgba(255,255,255,0.5)',
+                  : 'rgba(255,255,255,0.5)',
+                color: listening ? 'white' : '#5E5474',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.2s',
               }}>
@@ -397,9 +399,9 @@ export default function ChatPage() {
                 placeholder={listening ? 'Listening…' : 'Talk to LUNA…'}
                 rows={1}
                 style={{
-                  width: '100%', resize: 'none', border: '1px solid rgba(255,255,255,0.12)',
+                  width: '100%', resize: 'none', border: '1px solid rgba(180,150,100,0.2)',
                   borderRadius: 22, padding: '11px 16px',
-                  background: 'rgba(255,255,255,0.07)', color: 'white',
+                  background: 'rgba(255,255,255,0.6)', color: '#100C1E',
                   fontSize: 15, lineHeight: 1.5, outline: 'none',
                   fontFamily: 'inherit',
                   boxSizing: 'border-box',
@@ -422,8 +424,8 @@ export default function ChatPage() {
                 cursor: input.trim() && !sending ? 'pointer' : 'default',
                 background: input.trim() && !sending
                   ? `linear-gradient(135deg, ${GOLDEN}, #B8903A)`
-                  : 'rgba(255,255,255,0.06)',
-                color: input.trim() && !sending ? '#1A1240' : 'rgba(255,255,255,0.2)',
+                  : 'rgba(255,255,255,0.5)',
+                color: input.trim() && !sending ? '#100C1E' : '#8A8098',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.2s',
               }}>

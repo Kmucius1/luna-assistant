@@ -8,22 +8,23 @@ import {
   Building2, Wallet, TrendingUp, TrendingDown, HelpCircle, Loader2, Settings,
 } from 'lucide-react'
 
-const BG = 'linear-gradient(180deg, #1A1240 0%, #100C30 35%, #0A0820 65%, #060418 100%)'
+const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const GOLDEN = '#C9A96E'
 const GREEN  = '#5A8A6A'
 const RED    = '#C96B5A'
 
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.06)',
-  border: '1px solid rgba(255,255,255,0.11)',
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18,
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
 const LABEL: React.CSSProperties = {
   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: 'rgba(255,255,255,0.42)',
+  textTransform: 'uppercase', color: '#5E5474',
 }
 
 interface SafeToSpend {
@@ -56,8 +57,8 @@ function Card({ href, icon: Icon, label, value, sub, color }: {
           <Icon style={{ width: 15, height: 15, color: color ?? GOLDEN }} />
           <span style={LABEL}>{label}</span>
         </div>
-        <p style={{ fontSize: 20, fontWeight: 800, color: 'white', margin: 0 }}>{value}</p>
-        {sub && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '4px 0 0' }}>{sub}</p>}
+        <p style={{ fontSize: 20, fontWeight: 800, color: '#100C1E', margin: 0 }}>{value}</p>
+        {sub && <p style={{ fontSize: 12, color: '#5E5474', margin: '4px 0 0' }}>{sub}</p>}
       </div>
     </Link>
   )
@@ -87,10 +88,10 @@ export default function MoneyDashboard() {
         <div style={{ padding: '80px 18px 140px', maxWidth: 520, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: 'white', margin: 0 }}>Money</h1>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#100C1E', margin: 0 }}>Money</h1>
             <div style={{ display: 'flex', gap: 10 }}>
-              <Link href="/money/import" style={{ color: 'rgba(255,255,255,0.6)' }}><Upload style={{ width: 19, height: 19 }} /></Link>
-              <Link href="/money/settings" style={{ color: 'rgba(255,255,255,0.6)' }}><Settings style={{ width: 19, height: 19 }} /></Link>
+              <Link href="/money/import" style={{ color: '#32284A' }}><Upload style={{ width: 19, height: 19 }} /></Link>
+              <Link href="/money/settings" style={{ color: '#32284A' }}><Settings style={{ width: 19, height: 19 }} /></Link>
             </div>
           </div>
 
@@ -101,22 +102,22 @@ export default function MoneyDashboard() {
           ) : error ? (
             <div style={{ ...CARD, padding: 20, textAlign: 'center' }}>
               <AlertTriangle style={{ width: 24, height: 24, color: RED, margin: '0 auto 8px' }} />
-              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>{error}</p>
+              <p style={{ fontSize: 13, color: '#32284A' }}>{error}</p>
             </div>
           ) : sts ? (
             <>
               {/* Safe to Spend — the largest number, per spec */}
               <div style={{ ...CARD, padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, rgba(201,169,110,0.12), rgba(90,138,106,0.08))', border: '1.5px solid rgba(201,169,110,0.25)' }}>
                 <p style={LABEL}>Safe to Spend</p>
-                <p style={{ fontSize: 44, fontWeight: 900, color: sts.safeToSpend >= 0 ? 'white' : RED, margin: '6px 0' }}>
+                <p style={{ fontSize: 44, fontWeight: 900, color: sts.safeToSpend >= 0 ? '#100C1E' : RED, margin: '6px 0' }}>
                   {formatCurrency(sts.safeToSpend)}
                 </p>
                 {sts.dailySpendingAmount != null && sts.daysUntilNextConfirmedIncome != null && (
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                  <p style={{ fontSize: 13, color: '#32284A', margin: 0 }}>
                     {formatCurrency(sts.dailySpendingAmount)} per day for {sts.daysUntilNextConfirmedIncome} days
                   </p>
                 )}
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 8 }}>
+                <p style={{ fontSize: 11, color: '#5E5474', marginTop: 8 }}>
                   After bills, reserves, debt minimums &amp; a {formatCurrency(sts.safetyBuffer)} buffer
                 </p>
               </div>
@@ -135,8 +136,8 @@ export default function MoneyDashboard() {
 
               <Link href="/money/accounts" style={{ textDecoration: 'none' }}>
                 <div style={{ ...CARD, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'white' }}>Accounts</span>
-                  <ArrowRight style={{ width: 16, height: 16, color: 'rgba(255,255,255,0.4)' }} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#100C1E' }}>Accounts</span>
+                  <ArrowRight style={{ width: 16, height: 16, color: '#5E5474' }} />
                 </div>
               </Link>
             </>
