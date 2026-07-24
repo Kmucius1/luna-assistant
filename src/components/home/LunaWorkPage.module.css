@@ -1,0 +1,262 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --soft-shadow: 0 6px 22px rgba(60, 46, 24, 0.09);
+
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 10px 12px 4px;
+  gap: 7px;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+
+.header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.header h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--ink-1);
+  margin: 0 0 2px;
+}
+
+.header p { margin: 0; font-size: 10px; color: var(--ink-3); }
+
+.headerActions { display: flex; gap: 6px; flex-shrink: 0; }
+
+.iconButton {
+  position: relative;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(180,150,100,0.2);
+  color: var(--gold);
+  box-shadow: var(--soft-shadow);
+}
+
+.iconButton svg { width: 16px; height: 16px; }
+
+.iconButton i {
+  position: absolute; top: 6px; right: 7px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+
+.hero {
+  flex: 0 0 auto;
+  position: relative;
+  min-height: 108px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--soft-shadow);
+  display: flex;
+}
+
+.hero :global(img) { object-fit: cover; }
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, rgba(255,252,248,0.97) 42%, rgba(20,15,10,0.15) 62%, rgba(20,15,10,0.05) 100%);
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  width: 58%;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.heroLabel {
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+
+.heroContent h2 {
+  font-family: var(--font-display-var, serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-1);
+  margin: 0 0 2px;
+  line-height: 1.15;
+}
+
+.heroContent p {
+  font-size: 8.5px;
+  color: var(--ink-3);
+  margin: 0 0 6px;
+}
+
+.heroMetrics { display: flex; gap: 10px; margin-bottom: 6px; }
+.heroMetric { display: flex; align-items: center; gap: 4px; }
+.heroMetric svg { color: var(--gold); width: 12px; height: 12px; flex-shrink: 0; }
+.heroMetricText strong { display: block; font-size: 10px; color: var(--ink-1); font-weight: 700; line-height: 1.1; }
+.heroMetricText span { font-size: 6.5px; color: var(--ink-3); }
+
+.heroButton {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--ink-1);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: none;
+  align-self: flex-start;
+}
+
+/* ── Two-column rows ──────────────────────────────────── */
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 0; }
+.rowTasksAgenda { flex: 2 1 0; }
+.rowProjectsActions { flex: 1.5 1 0; }
+.rowTimerNotes { flex: 0.9 1 0; }
+
+.col { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+
+.sectionHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.sectionHeader h2 {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0;
+}
+
+.sectionHeader button, .sectionHeader a {
+  font-size: 8px; font-weight: 600; color: var(--ink-3);
+  background: none; border: none; text-decoration: none;
+}
+
+.card {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: rgba(255,255,255,0.6);
+  border: 1px solid rgba(180,150,100,0.14);
+  border-radius: 14px;
+  box-shadow: var(--soft-shadow);
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Priority Tasks */
+
+.taskRow { display: flex; align-items: center; gap: 6px; flex: 1; min-height: 0; }
+.taskCheck { flex-shrink: 0; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(180,150,100,0.4); display: flex; align-items: center; justify-content: center; background: none; }
+.taskCheckDone { background: var(--ink-1); border-color: var(--ink-1); }
+.taskCheck svg { width: 9px; height: 9px; color: #fff; }
+.taskBody { flex: 1; min-width: 0; overflow: hidden; }
+.taskBody strong { display: block; font-size: 9.5px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.taskBody span { font-size: 7px; color: var(--ink-3); }
+.taskTime { flex-shrink: 0; font-size: 7.5px; color: var(--ink-3); }
+
+/* Today's Agenda */
+
+.agendaRow { display: flex; align-items: center; gap: 6px; flex: 1; min-height: 0; }
+.agendaTime { flex-shrink: 0; width: 40px; font-size: 7.5px; font-weight: 600; color: var(--ink-3); }
+.agendaBar { flex-shrink: 0; width: 2px; align-self: stretch; background: rgba(180,150,100,0.3); border-radius: 2px; }
+.agendaBody { flex: 1; min-width: 0; overflow: hidden; }
+.agendaBody strong { display: block; font-size: 9px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.agendaBody span { font-size: 6.5px; color: var(--ink-3); }
+
+/* Active Projects */
+
+.projectRow { display: flex; align-items: center; gap: 7px; flex: 1; min-height: 0; }
+.projectBadge {
+  flex-shrink: 0; width: 26px; height: 26px; border-radius: 7px;
+  background: var(--ink-1); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6px; font-weight: 700; text-align: center; line-height: 1.1;
+  overflow: hidden; padding: 2px;
+}
+.projectBody { flex: 1; min-width: 0; }
+.projectTop { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.projectTop strong { font-size: 9px; font-weight: 600; color: var(--ink-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.healthBadge { flex-shrink: 0; font-size: 6px; font-weight: 700; text-transform: uppercase; padding: 1px 5px; border-radius: 999px; }
+.healthExcellent, .healthGood { background: rgba(90,160,90,0.16); color: #3f7a3f; }
+.healthAt_risk { background: rgba(200,140,60,0.18); color: #a06a1e; }
+.healthChurning { background: rgba(190,80,70,0.16); color: #b5544a; }
+.healthNew { background: rgba(201,169,110,0.16); color: var(--gold); }
+.projectMeta { font-size: 6.5px; color: var(--ink-3); }
+
+/* Quick Actions */
+
+.actionsGrid { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.actionCard {
+  display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  background: rgba(255,255,255,0.5);
+  border: 1px solid rgba(180,150,100,0.12);
+  border-radius: 9px; padding: 4px 6px;
+  position: relative;
+  overflow: hidden;
+}
+.actionCard svg { color: var(--gold); width: 12px; height: 12px; }
+.actionCard strong { font-size: 7.5px; color: var(--ink-1); font-weight: 600; }
+.actionCard span { font-size: 6px; color: var(--ink-3); }
+.actionBadge {
+  position: absolute; top: 2px; right: 2px;
+  font-size: 5px; font-weight: 700; text-transform: uppercase;
+  color: #14110b; background: var(--gold); padding: 1px 3px; border-radius: 999px;
+}
+
+/* Focus Timer */
+
+.timerCard { position: relative; overflow: hidden; }
+.timerCard :global(img) { object-fit: cover; }
+.timerOverlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,15,10,0.15) 0%, rgba(20,15,10,0.7) 100%); }
+.timerContent { position: relative; z-index: 1; color: #fff; display: flex; flex-direction: column; height: 100%; justify-content: flex-end; }
+.timerLabel { font-size: 6.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+.timerCount { font-family: var(--font-display-var, serif); font-size: 18px; font-weight: 500; margin: 1px 0 4px; }
+.timerButton {
+  align-self: flex-start;
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  color: #fff; font-size: 7.5px; font-weight: 600;
+  padding: 3px 9px; border-radius: 999px;
+}
+.timerButton svg { width: 9px; height: 9px; }
+
+/* Quick Notes */
+
+.noteCard { justify-content: space-between; }
+.noteQuote { font-size: 8.5px; color: var(--ink-2); line-height: 1.3; margin: 0; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.noteTime { flex-shrink: 0; font-size: 6.5px; color: var(--ink-3); margin-top: 3px; }
+.emptyNote { font-size: 8px; color: var(--ink-3); text-align: center; margin: auto; }
