@@ -2,11 +2,11 @@
 // one day's structured astrology/numerology/Chinese-day-energy reading.
 // Reused by the interactive daily-readings route (today, on-demand) and the
 // generate-readings cron (backfilling the 6-day window).
-import * as Astronomy from 'astronomy-engine'
 import { callAI } from '@/lib/ai'
 import {
   getCurrentPlanets,
   getTransitsToNatal,
+  getMoonPhase,
   SIGN_ENERGY_DESCRIPTIONS,
   type TransitAspect,
 } from '@/lib/astrology'
@@ -57,19 +57,8 @@ export interface GeneratedReading {
   }
 }
 
-// Same 22.5°-boundary phase logic as /api/astrology/moon — copied locally
-// rather than imported, since route files aren't meant to be imported as
-// modules.
 function getMoonPhaseName(date: Date): string {
-  const angle = ((Astronomy.MoonPhase(date) % 360) + 360) % 360
-  if (angle < 22.5 || angle >= 337.5) return 'New Moon'
-  if (angle < 67.5) return 'Waxing Crescent'
-  if (angle < 112.5) return 'First Quarter'
-  if (angle < 157.5) return 'Waxing Gibbous'
-  if (angle < 202.5) return 'Full Moon'
-  if (angle < 247.5) return 'Waning Gibbous'
-  if (angle < 292.5) return 'Last Quarter'
-  return 'Waning Crescent'
+  return getMoonPhase(date).name
 }
 
 const REQUIRED_TOP_LEVEL: (keyof ReadingJSON)[] = [

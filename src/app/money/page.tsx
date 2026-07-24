@@ -1,73 +1,54 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { formatCurrency } from '@/lib/money/format'
 import {
-  AlertTriangle, RefreshCw, ArrowRight, Upload, Copy as DuplicateIcon,
-  Building2, Wallet, TrendingUp, TrendingDown, HelpCircle, Loader2, Settings,
+  Sparkles, Upload, Settings, Car, Smartphone, TriangleAlert, Mic, Info, ChevronLeft,
 } from 'lucide-react'
-
-const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
-const GOLDEN = '#C9A96E'
-const GREEN  = '#5A8A6A'
-const RED    = '#C96B5A'
-
-const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.6)',
-  border: '1px solid rgba(180,150,100,0.16)',
-  borderRadius: 18,
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
-}
-
-const LABEL: React.CSSProperties = {
-  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#5E5474',
-}
+import styles from './money.module.css'
 
 interface SafeToSpend {
   safeToSpend: number; dailySpendingAmount: number | null; daysUntilNextConfirmedIncome: number | null
-  safetyBuffer: number; billsDue: number; groceryReserve: number; gasReserve: number; minimumDebtPayments: number
+  postedBalances: number; confirmedIncome: number; billsDue: number; subscriptionsDue: number
+  groceryReserve: number; gasReserve: number; necessityReserve: number
+  safetyBuffer: number; minimumDebtPayments: number; plannedSavings: number
 }
+interface BillPreview { id: string; name: string; due_date: string; expected_amount: number | null; minimum_amount: number | null; autopay_status: string }
+interface AlertPreview { id: string; kind: 'duplicate' | 'subscription'; reason: string; severity: string }
+interface SavingsPreview { id: string; name: string; goal_type: string; current_amount: number; target_amount: number }
 interface DashboardData {
   safe_to_spend: SafeToSpend
-  bills_due_today: unknown[]
   bills_due_this_week: unknown[]
   bills_due_this_month: unknown[]
-  subscription_alerts_count: number
-  duplicate_charges_count: number
-  personal_spending: number
-  business_spending: number
-  reimbursements_owed: number
-  business_expenses_paid_personally: number
+  bills_preview: BillPreview[]
+  alerts_preview: AlertPreview[]
+  alerts_total_count: number
+  savings_preview: SavingsPreview[]
   savings_total: number
-  debt_total: number
-  unknown_transactions_count: number
 }
 
-function Card({ href, icon: Icon, label, value, sub, color }: {
-  href: string; icon: React.ElementType; label: string; value: string; sub?: string; color?: string
-}) {
-  return (
-    <Link href={href} style={{ textDecoration: 'none' }}>
-      <div style={{ ...CARD, padding: 16, height: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <Icon style={{ width: 15, height: 15, color: color ?? GOLDEN }} />
-          <span style={LABEL}>{label}</span>
-        </div>
-        <p style={{ fontSize: 20, fontWeight: 800, color: '#100C1E', margin: 0 }}>{value}</p>
-        {sub && <p style={{ fontSize: 12, color: '#5E5474', margin: '4px 0 0' }}>{sub}</p>}
-      </div>
-    </Link>
-  )
+const SEVERITY_COLOR: Record<string, string> = { high: '#C96B5A', medium: '#C9A96E', low: '#8A8098' }
+
+function daysUntil(dateStr: string): number {
+  const today = new Date(); today.setHours(0, 0, 0, 0)
+  return Math.ceil((new Date(dateStr).getTime() - today.getTime()) / 86_400_000)
+}
+
+function dueLabel(days: number): string {
+  if (days < 0) return 'Overdue'
+  if (days === 0) return 'Due today'
+  if (days === 1) return 'Due in 1 day'
+  if (days <= 7) return `Due in ${days} days`
+  return 'Due next week'
 }
 
 export default function MoneyDashboard() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [lunaMessage, setLunaMessage] = useState<string | null>(null)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -76,73 +57,138 @@ export default function MoneyDashboard() {
       .then(d => { if (d.error) setError(d.error); else setData(d) })
       .catch(() => setError('Could not load your Money dashboard.'))
       .finally(() => setLoading(false))
+    fetch('/api/money/summary', { cache: 'no-store' }).then(r => r.json()).then(d => setLunaMessage(d.message ?? null)).catch(() => {})
   }, [])
 
   useEffect(() => { load() }, [load])
 
   const sts = data?.safe_to_spend
+  const totalAvailable = sts ? sts.postedBalances + sts.confirmedIncome : 0
+  const percentAvailable = sts && totalAvailable > 0 ? Math.max(0, Math.min(100, Math.round((sts.safeToSpend / totalAvailable) * 100))) : 0
+  const ringCircumference = 2 * Math.PI * 32
 
   return (
-    <div style={{ background: BG, minHeight: '100vh' }}>
+    <div className={styles.page}>
       <AppLayout noPad>
-        <div style={{ padding: '80px 18px 140px', maxWidth: 520, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#100C1E', margin: 0 }}>Money</h1>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Link href="/money/import" style={{ color: '#32284A' }}><Upload style={{ width: 19, height: 19 }} /></Link>
-              <Link href="/money/settings" style={{ color: '#32284A' }}><Settings style={{ width: 19, height: 19 }} /></Link>
-            </div>
+        <div className={styles.topRow}>
+          <Link href="/work-home" className={styles.iconButton} aria-label="Back"><ChevronLeft size={18} /></Link>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/money/import" className={styles.iconButton} aria-label="Import"><Upload size={17} /></Link>
+            <Link href="/money/settings" className={styles.iconButton} aria-label="Settings"><Settings size={17} /></Link>
           </div>
-
-          {loading ? (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 40 }}>
-              <Loader2 className="w-6 h-6 animate-spin" style={{ color: GOLDEN }} />
-            </div>
-          ) : error ? (
-            <div style={{ ...CARD, padding: 20, textAlign: 'center' }}>
-              <AlertTriangle style={{ width: 24, height: 24, color: RED, margin: '0 auto 8px' }} />
-              <p style={{ fontSize: 13, color: '#32284A' }}>{error}</p>
-            </div>
-          ) : sts ? (
-            <>
-              {/* Safe to Spend — the largest number, per spec */}
-              <div style={{ ...CARD, padding: 24, textAlign: 'center', background: 'linear-gradient(135deg, rgba(201,169,110,0.12), rgba(90,138,106,0.08))', border: '1.5px solid rgba(201,169,110,0.25)' }}>
-                <p style={LABEL}>Safe to Spend</p>
-                <p style={{ fontSize: 44, fontWeight: 900, color: sts.safeToSpend >= 0 ? '#100C1E' : RED, margin: '6px 0' }}>
-                  {formatCurrency(sts.safeToSpend)}
-                </p>
-                {sts.dailySpendingAmount != null && sts.daysUntilNextConfirmedIncome != null && (
-                  <p style={{ fontSize: 13, color: '#32284A', margin: 0 }}>
-                    {formatCurrency(sts.dailySpendingAmount)} per day for {sts.daysUntilNextConfirmedIncome} days
-                  </p>
-                )}
-                <p style={{ fontSize: 11, color: '#5E5474', marginTop: 8 }}>
-                  After bills, reserves, debt minimums &amp; a {formatCurrency(sts.safetyBuffer)} buffer
-                </p>
-              </div>
-
-              {/* Grid of dashboard cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <Card href="/money/bills" icon={AlertTriangle} label="Bills Due" value={String(data!.bills_due_this_week.length)} sub={`this week · ${data!.bills_due_this_month.length} this month`} color={data!.bills_due_this_week.length ? RED : GREEN} />
-                <Card href="/money/subscriptions" icon={RefreshCw} label="Subscriptions" value={String(data!.subscription_alerts_count)} sub="need review" />
-                <Card href="/money/duplicates" icon={DuplicateIcon} label="Duplicate Charges" value={String(data!.duplicate_charges_count)} sub="open alerts" color={data!.duplicate_charges_count ? RED : GREEN} />
-                <Card href="/money/transactions?ownership=unknown" icon={HelpCircle} label="Unknown" value={String(data!.unknown_transactions_count)} sub="last 30 days" />
-                <Card href="/money/transactions?ownership=personal" icon={Wallet} label="Personal Spending" value={formatCurrency(data!.personal_spending)} sub="last 30 days" />
-                <Card href="/money/transactions?ownership=dryp_business" icon={Building2} label="Business Spending" value={formatCurrency(data!.business_spending)} sub="last 30 days" />
-                <Card href="/money/transactions?reimbursable=true" icon={TrendingUp} label="Reimbursements Owed" value={formatCurrency(data!.reimbursements_owed)} sub={`${data!.business_expenses_paid_personally} biz on personal`} />
-                <Card href="/money/debt" icon={TrendingDown} label="Debt" value={formatCurrency(data!.debt_total)} sub={`Savings ${formatCurrency(data!.savings_total)}`} />
-              </div>
-
-              <Link href="/money/accounts" style={{ textDecoration: 'none' }}>
-                <div style={{ ...CARD, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#100C1E' }}>Accounts</span>
-                  <ArrowRight style={{ width: 16, height: 16, color: '#5E5474' }} />
-                </div>
-              </Link>
-            </>
-          ) : null}
         </div>
+
+        <div className={styles.heroWrap}>
+          <div className={styles.heroPhoto}><Image src="/images/rooms/money-hero.jpg" alt="" fill sizes="(max-width: 640px) 100vw, 640px" priority /></div>
+          <div className={styles.heroFade} />
+          <div className={styles.heroContent}>
+            <h1>Money</h1>
+            <p>Know what&apos;s covered. Know what&apos;s yours.</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <p className={styles.loadingText}>Loading your money picture…</p>
+        ) : error ? (
+          <div className={styles.stsCard}>
+            <p style={{ fontSize: 13, color: '#C96B5A', textAlign: 'center' }}>{error}</p>
+          </div>
+        ) : sts ? (
+          <>
+            <div className={styles.stsCard}>
+              <div className={styles.stsTop}>
+                <div style={{ flex: 1 }}>
+                  <div className={styles.stsLabel}><Info size={11} /> Safe to Spend</div>
+                  <p className={styles.stsNumber}>{formatCurrency(sts.safeToSpend)}<span>available</span></p>
+                  {sts.dailySpendingAmount != null && sts.daysUntilNextConfirmedIncome != null ? (
+                    <p className={styles.stsPerDay}>{formatCurrency(sts.dailySpendingAmount)} per day until your next confirmed income</p>
+                  ) : (
+                    <p className={styles.stsPerDay}>No confirmed upcoming income on file yet</p>
+                  )}
+                </div>
+                <div className={styles.ring}>
+                  <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
+                    <circle cx={36} cy={36} r={32} fill="none" stroke="rgba(180,150,100,0.16)" strokeWidth={6} />
+                    <circle cx={36} cy={36} r={32} fill="none" stroke="#C9A96E" strokeWidth={6} strokeLinecap="round"
+                      strokeDasharray={ringCircumference} strokeDashoffset={ringCircumference * (1 - percentAvailable / 100)} />
+                  </svg>
+                  <div className={styles.ringLabel}><strong>{percentAvailable}%</strong><span>of available funds</span></div>
+                </div>
+              </div>
+
+              <div className={styles.breakdown}>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#5A8A6A' }} /><span>Available Cash</span><strong>{formatCurrency(sts.postedBalances)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C9A96E' }} /><span>Bills Reserved</span><strong>-{formatCurrency(sts.billsDue)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C9A96E' }} /><span>Subscriptions Reserved</span><strong>-{formatCurrency(sts.subscriptionsDue)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#D9A85C' }} /><span>Gas &amp; Groceries Reserved</span><strong>-{formatCurrency(sts.groceryReserve + sts.gasReserve)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C96B5A' }} /><span>Debt Minimums Reserved</span><strong>-{formatCurrency(sts.minimumDebtPayments)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#8A8098' }} /><span>Required Savings</span><strong>-{formatCurrency(sts.plannedSavings)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#5E5474' }} /><span>Safety Buffer</span><strong>-{formatCurrency(sts.safetyBuffer)}</strong></div>
+              </div>
+            </div>
+
+            <div className={styles.lunaCard}>
+              <div style={{ flex: 1 }}>
+                <div className={styles.lunaLabel}><Sparkles size={11} /> Luna&apos;s Message</div>
+                <p className={styles.lunaText}>{lunaMessage ?? 'Luna is putting today\'s money picture together…'}</p>
+              </div>
+            </div>
+
+            <div className={styles.grid2}>
+              <div className={styles.gridCard}>
+                <div className={styles.gridHeader}><span>Upcoming Bills</span><Link href="/money/bills">View all</Link></div>
+                {data!.bills_preview.length === 0 ? <p className={styles.emptyText}>Nothing due soon.</p> : data!.bills_preview.map(b => {
+                  const d = daysUntil(b.due_date)
+                  return (
+                    <div key={b.id} className={styles.billRow}>
+                      <div className={styles.billIcon}>{b.name.toLowerCase().includes('insurance') ? <Car size={13} /> : b.name.toLowerCase().includes('phone') ? <Smartphone size={13} /> : <TriangleAlert size={13} />}</div>
+                      <div className={styles.billInfo}><strong>{b.name}</strong><span>{dueLabel(d)}</span></div>
+                      <span className={styles.billAmount}>{formatCurrency(b.expected_amount ?? b.minimum_amount ?? 0)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className={styles.gridCard}>
+                <div className={styles.gridHeader}><span>Money Alerts</span><Link href="/money/duplicates">View all</Link></div>
+                {data!.alerts_preview.length === 0 ? <p className={styles.emptyText}>Nothing needs review.</p> : data!.alerts_preview.map(a => (
+                  <div key={a.id} className={styles.alertRow}>
+                    <span className={styles.alertDot} style={{ background: SEVERITY_COLOR[a.severity] ?? '#8A8098' }} />
+                    <span>{a.reason}</span>
+                    <Link href={a.kind === 'duplicate' ? '/money/duplicates' : '/money/subscriptions'} className={styles.alertReview}>Review</Link>
+                  </div>
+                ))}
+              </div>
+
+              <div className={styles.gridCard}>
+                <div className={styles.gridHeader}><span>Savings Progress</span><Link href="/money/savings">View all</Link></div>
+                {data!.savings_preview.length === 0 ? (
+                  <p className={styles.emptyText}>No savings goals yet.</p>
+                ) : data!.savings_preview.map(g => {
+                  const pct = g.target_amount > 0 ? Math.min(100, Math.round((g.current_amount / g.target_amount) * 100)) : 0
+                  return (
+                    <div key={g.id} className={styles.savingsRow}>
+                      <div className={styles.savingsTop}>
+                        <div className={styles.savingsIcon}>{g.goal_type === 'travel' ? '✈️' : g.goal_type === 'emergency_fund' ? '🌳' : '💰'}</div>
+                        <strong>{g.name}</strong>
+                        <span>{pct}%</span>
+                      </div>
+                      <div className={styles.savingsTrack}><div className={styles.savingsFill} style={{ width: `${pct}%` }} /></div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className={`${styles.gridCard} ${styles.askCard}`}>
+                <div>
+                  <div className={styles.gridHeader} style={{ marginBottom: 4 }}><span>Ask Luna</span></div>
+                  <p>What&apos;s on your mind? Ask anything about your money.</p>
+                </div>
+                <Link href="/luna?tab=chat&prompt=Can I afford to spend money right now?" className={styles.askButton}><Mic size={13} /> Ask</Link>
+              </div>
+            </div>
+          </>
+        ) : null}
       </AppLayout>
     </div>
   )

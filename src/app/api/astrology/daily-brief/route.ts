@@ -39,9 +39,9 @@ const BRIEF_PROMPT = `You are LUNA, Zoe's deeply personal cosmic guide.
 ZOE'S NATAL CHART (confirmed):
 - Sun: Scorpio
 - Moon: Cancer
-- Rising: Cancer
+- Rising: Gemini
 - Mercury: Scorpio
-- Venus: Capricorn
+- Venus: Sagittarius (29°, right at the Capricorn cusp)
 - Mars: Libra
 - Human Design: Self-Projected Projector, Profile 4/6, Self-Projected Authority
 

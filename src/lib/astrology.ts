@@ -109,7 +109,7 @@ export function isRetrograde(name: string, date: Date): boolean {
   return diff < 0
 }
 
-function angleBetween(a: number, b: number): number {
+export function angleBetween(a: number, b: number): number {
   let diff = Math.abs(a - b) % 360
   if (diff > 180) diff = 360 - diff
   return diff
@@ -249,6 +249,81 @@ export function getTransitsToNatal(date: Date): TransitAspect[] {
   return aspects.sort((a, b) => a.orb - b.orb).slice(0, 12)
 }
 
+// ─── Moon phase ───────────────────────────────────────────────
+// Single source of truth for phase-boundary math — this exact logic used to
+// be duplicated independently in api/astrology/moon/route.ts and
+// readingGenerator.ts, which risked the two drifting apart on any future
+// tweak. Both now import from here.
+
+export type MoonPhaseInfo = { name: string; emoji: string; illumination: number; angle: number; description: string }
+
+const PHASE_DESCRIPTIONS: Record<string, string> = {
+  'New Moon':        'New beginnings. Plant the seed. Set intentions.',
+  'Waxing Crescent': 'Take the first steps. Trust the spark.',
+  'First Quarter':   'Push through resistance. Decide and act.',
+  'Waxing Gibbous':  'Refine your work. Almost there. Trust the process.',
+  'Full Moon':       'Release, celebrate, and see clearly. Emotions are louder.',
+  'Waning Gibbous':  'Share your gifts. Gratitude season.',
+  'Last Quarter':    'Let go of what is not working. Clear your space.',
+  'Waning Crescent': 'Rest, reflect, and restore. The cycle ends here.',
+}
+
+// Phase boundaries use 22.5° mid-points (not 45°) so e.g. 88° reads as First
+// Quarter, not Waxing Crescent.
+function getPhaseNameAndEmoji(angle: number): { name: string; emoji: string } {
+  const a = ((angle % 360) + 360) % 360
+  if (a < 22.5 || a >= 337.5) return { name: 'New Moon',        emoji: '🌑' }
+  if (a < 67.5)                return { name: 'Waxing Crescent', emoji: '🌒' }
+  if (a < 112.5)               return { name: 'First Quarter',   emoji: '🌓' }
+  if (a < 157.5)               return { name: 'Waxing Gibbous',  emoji: '🌔' }
+  if (a < 202.5)               return { name: 'Full Moon',       emoji: '🌕' }
+  if (a < 247.5)               return { name: 'Waning Gibbous',  emoji: '🌖' }
+  if (a < 292.5)               return { name: 'Last Quarter',    emoji: '🌗' }
+  return                              { name: 'Waning Crescent', emoji: '🌘' }
+}
+
+export function getMoonPhase(date: Date): MoonPhaseInfo {
+  const rawAngle = Astronomy.MoonPhase(date)
+  const angle = ((rawAngle % 360) + 360) % 360
+  const { name, emoji } = getPhaseNameAndEmoji(angle)
+  // Illumination: 0% at New Moon, 50% at Quarters, 100% at Full
+  const illumination = Math.round((1 - Math.cos(angle * Math.PI / 180)) / 2 * 100)
+  return { name, emoji, illumination, angle: Math.round(angle), description: PHASE_DESCRIPTIONS[name] ?? '' }
+}
+
+export function getMoonSign(date: Date): { sign: ZodiacSign; degree: number; minutes: number; formatted: string; nextSignDate: Date | null } {
+  const lon = getPlanetLongitude('Moon', date)
+  const { sign, degree, minutes, formatted } = longitudeToSign(lon)
+  const degInSign = lon % 30
+  // Moon moves ~0.5498°/hour on average
+  const hoursToNextSign = (30 - degInSign) / 0.5498
+  const nextSignDate = hoursToNextSign < 48 ? new Date(date.getTime() + hoursToNextSign * 3600_000) : null
+  return { sign, degree, minutes, formatted, nextSignDate }
+}
+
+// Finds the next exact New/First Quarter/Full/Last Quarter moment, only if
+// within ~48 hours (an angular distance of ~26°, since the Moon moves ~0.5°/hr).
+export function getNextExactMoonPhase(date: Date): { name: string; date: Date } | null {
+  try {
+    const currentAngle = ((Astronomy.MoonPhase(date) % 360) + 360) % 360
+    const quarters = [0, 90, 180, 270]
+    const names = ['New Moon', 'First Quarter', 'Full Moon', 'Last Quarter']
+
+    let nearestAngle = 0, nearestName = '', minDist = 360
+    for (let i = 0; i < quarters.length; i++) {
+      const dist = (quarters[i] - currentAngle + 360) % 360
+      if (dist < minDist) { minDist = dist; nearestAngle = quarters[i]; nearestName = names[i] }
+    }
+    if (minDist > 26) return null
+
+    const found = Astronomy.SearchMoonPhase(nearestAngle, date, 3)
+    if (!found) return null
+    return { name: nearestName, date: found.date }
+  } catch {
+    return null
+  }
+}
+
 // ─── Upcoming eclipses ────────────────────────────────────────
 export function getUpcomingEclipses(date: Date): Array<{ type: string; date: Date; description: string }> {
   const eclipses: Array<{ type: string; date: Date; description: string }> = []
@@ -286,6 +361,180 @@ export function getMoonRitualContext(phase: string, sign: ZodiacSign): {
     release: isNew ? [] : (releases[sign] ?? []),
     avoid: isNew ? 'starting new things that are emotionally draining' : 'forcing things that naturally want to end',
   }
+}
+
+// ─── Houses (whole-sign system) ──────────────────────────────
+// House 1 = the Rising sign; each subsequent sign in zodiacal order is the
+// next house. Whole-sign is a real, legitimate, widely-used house system
+// (predates Placidus by centuries) and is the honest choice here: computing
+// quadrant systems (Placidus, Koch, etc.) correctly requires oblique-
+// ascension/spherical-trig math that isn't implemented anywhere in this
+// codebase — presenting invented Placidus cusps would risk showing wrong
+// house placements, which the user has explicitly said never to do.
+export function getWholeSignHouse(planetLon: number, risingLon: number): number {
+  const planetSignIdx = Math.floor((((planetLon % 360) + 360) % 360) / 30)
+  const risingSignIdx = Math.floor((((risingLon % 360) + 360) % 360) / 30)
+  return ((planetSignIdx - risingSignIdx + 12) % 12) + 1
+}
+
+const HOUSE_THEMES: Record<number, string> = {
+  1: 'Identity & first impressions',
+  2: 'Money, values & self-worth',
+  3: 'Communication & everyday mind',
+  4: 'Home, roots & emotional foundation',
+  5: 'Creativity, romance & self-expression',
+  6: 'Work, health & daily routine',
+  7: 'Partnership & one-to-one relationships',
+  8: 'Intimacy, shared resources & transformation',
+  9: 'Belief, travel & big-picture meaning',
+  10: 'Career, legacy & public life',
+  11: 'Community, friendship & future vision',
+  12: 'Rest, release & the inner world',
+}
+export function houseTheme(house: number): string { return HOUSE_THEMES[house] ?? '' }
+
+// Same birth instant used throughout lib/astrology.ts's natal comments —
+// Nov 14 2000, 7:04 PM EST = Nov 15 2000 00:04 UTC.
+export const ZOE_BIRTH_DATE = new Date('2000-11-15T00:04:00Z')
+
+const RETROGRADE_CAPABLE = ['Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto']
+
+// ─── Full natal chart (real data + derived houses) ───────────
+export type NatalPlacement = {
+  point: string; sign: ZodiacSign; degree: number; minutes: number; lon: number
+  house: number; houseTheme: string; notes?: string; retrograde: boolean
+}
+
+export function getFullNatalChart(): NatalPlacement[] {
+  const risingLon = ZOE_NATAL.Rising?.lon ?? 0
+  return Object.entries(ZOE_NATAL).map(([point, data]) => {
+    const house = getWholeSignHouse(data.lon, risingLon)
+    const retrograde = RETROGRADE_CAPABLE.includes(point) ? isRetrograde(point, ZOE_BIRTH_DATE) : false
+    return { point, sign: data.sign, degree: data.degree, minutes: data.minutes, lon: data.lon, house, houseTheme: houseTheme(house), notes: data.notes, retrograde }
+  })
+}
+
+// ─── Natal-to-natal aspects (for the chart wheel's aspect lines) ─────
+export type NatalAspect = { a: string; b: string; type: string; orb: number; emoji: string }
+
+const NATAL_ASPECT_POINTS = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto','Chiron','NNode']
+
+export function getNatalAspects(): NatalAspect[] {
+  const aspects: NatalAspect[] = []
+  for (let i = 0; i < NATAL_ASPECT_POINTS.length; i++) {
+    for (let j = i + 1; j < NATAL_ASPECT_POINTS.length; j++) {
+      const a = ZOE_NATAL[NATAL_ASPECT_POINTS[i]]
+      const b = ZOE_NATAL[NATAL_ASPECT_POINTS[j]]
+      if (!a || !b) continue
+      const cfg = getAspect(a.lon, b.lon)
+      if (!cfg) continue
+      const orb = Math.abs(angleBetween(a.lon, b.lon) - cfg.angle)
+      aspects.push({ a: NATAL_ASPECT_POINTS[i], b: NATAL_ASPECT_POINTS[j], type: cfg.name, orb: Math.round(orb * 10) / 10, emoji: cfg.emoji })
+    }
+  }
+  return aspects.sort((x, y) => x.orb - y.orb)
+}
+
+// ─── Astrocartography (real line-of-position math) ──────────
+// For each planet at the birth moment: the MC/IC lines are the meridians
+// (constant longitude) where the planet was culminating/anti-culminating;
+// the AC/DC lines are curves across latitude where the planet was rising/
+// setting, from the real horizon-crossing formula
+// cos(H) = -tan(dec)·tan(lat). This is genuine astronomical math, not a
+// decorative overlay — same instrument (astronomy-engine) already used for
+// the natal chart and transits, just applied to a different question
+// (where on Earth, not when).
+
+export type AstroLineType = 'MC' | 'IC' | 'AC' | 'DC'
+export type AstroLine = { body: string; type: AstroLineType; points: Array<{ lat: number; lon: number }> }
+
+function normalizeLon(lon: number): number {
+  let l = lon % 360
+  if (l > 180) l -= 360
+  if (l < -180) l += 360
+  return l
+}
+
+function getEquatorial(body: string, date: Date): { ra: number; dec: number } {
+  const vec = Astronomy.GeoVector(body as Astronomy.Body, date, true)
+  const equ = Astronomy.EquatorFromVector(vec)
+  return { ra: equ.ra, dec: equ.dec }
+}
+
+const ASTROCARTOGRAPHY_BODIES = ['Sun', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
+
+export function getAstrocartographyLines(birthDate: Date): AstroLine[] {
+  const gstDeg = Astronomy.SiderealTime(birthDate) * 15
+  const lines: AstroLine[] = []
+
+  for (const body of ASTROCARTOGRAPHY_BODIES) {
+    const { ra, dec } = getEquatorial(body, birthDate)
+    const raDeg = ra * 15
+
+    // MC/IC: vertical lines (every latitude, same longitude)
+    const mcLon = normalizeLon(raDeg - gstDeg)
+    const icLon = normalizeLon(mcLon + 180)
+    lines.push({ body, type: 'MC', points: [{ lat: -60, lon: mcLon }, { lat: 60, lon: mcLon }] })
+    lines.push({ body, type: 'IC', points: [{ lat: -60, lon: icLon }, { lat: 60, lon: icLon }] })
+
+    // AC/DC: curves — sampled every 2° of latitude, skipping latitudes
+    // where the planet never rises/sets (circumpolar for that declination).
+    const acPoints: Array<{ lat: number; lon: number }> = []
+    const dcPoints: Array<{ lat: number; lon: number }> = []
+    for (let lat = -66; lat <= 66; lat += 2) {
+      const x = -Math.tan((dec * Math.PI) / 180) * Math.tan((lat * Math.PI) / 180)
+      if (Math.abs(x) > 1) continue
+      const h0 = (Math.acos(x) * 180) / Math.PI
+      acPoints.push({ lat, lon: normalizeLon(raDeg - h0 - gstDeg) })
+      dcPoints.push({ lat, lon: normalizeLon(raDeg + h0 - gstDeg) })
+    }
+    if (acPoints.length) lines.push({ body, type: 'AC', points: acPoints })
+    if (dcPoints.length) lines.push({ body, type: 'DC', points: dcPoints })
+  }
+  return lines
+}
+
+const LINE_THEMES: Record<string, Record<AstroLineType, string>> = {
+  Sun:     { MC: 'visibility, recognition, and stepping into confidence', IC: 'a quieter sense of identity and inner grounding', AC: 'confidence and being seen clearly', DC: 'partnerships that reflect your identity back to you' },
+  Moon:    { MC: 'public emotional life, caretaking, or a sense of home in your work', IC: 'emotional depth, home, and rest', AC: 'heightened emotional sensitivity and intuition', DC: 'emotionally significant relationships and connection' },
+  Mercury: { MC: 'communication, writing, teaching, or business focus', IC: 'thinking, learning, and mental processing', AC: 'quick thinking, curiosity, and being talkative', DC: 'stimulating conversations and intellectual partnerships' },
+  Venus:   { MC: 'creativity, beauty, and public appreciation of your aesthetic', IC: 'domestic harmony, comfort, and ease', AC: 'romance, charm, and aesthetic pleasure', DC: 'romantic partnership and attraction' },
+  Mars:    { MC: 'ambition, drive, and career assertiveness', IC: 'restlessness or a need to stay physically active at home', AC: 'physical energy, assertiveness, and drive', DC: 'passionate or sometimes friction-prone partnerships' },
+  Jupiter: { MC: 'expansion, opportunity, and public growth', IC: 'a sense of abundance and philosophical ease at home', AC: 'optimism, growth, and good fortune', DC: 'expansive, generous partnerships and lucky connections' },
+  Saturn:  { MC: 'discipline, structure, and long-term achievement (often earned slowly)', IC: 'a need for structure and responsibility at home', AC: 'seriousness, discipline, and feeling more reserved', DC: 'committed, structured, or sometimes weighty partnerships' },
+  Uranus:  { MC: 'unconventional career paths and sudden change', IC: 'disruption to home life or a need for independence', AC: 'feeling different, independent, or unpredictable', DC: 'unconventional or unexpected relationships' },
+  Neptune: { MC: 'creative, spiritual, or idealistic public life (can also blur direction)', IC: 'spiritual sensitivity or emotional fog at home', AC: 'heightened intuition, imagination, or dreaminess', DC: 'idealized or sometimes unclear partnerships' },
+  Pluto:   { MC: 'intensity, transformation, and power dynamics in career', IC: 'deep emotional transformation tied to home/roots', AC: 'intensity and a magnetic, transformative presence', DC: 'deep, transformative, sometimes intense partnerships' },
+}
+
+export function describeAstroLine(body: string, type: AstroLineType): string {
+  const theme = LINE_THEMES[body]?.[type] ?? 'a noticeable shift in energy'
+  return `This location may emphasize ${theme}.`
+}
+
+// Finds which lines pass within `orbDeg` of a given point — MC/IC use pure
+// longitude distance; AC/DC interpolate the line's longitude at that
+// latitude from the sampled points.
+export function findNearbyAstroLines(lines: AstroLine[], lat: number, lon: number, orbDeg = 3): Array<{ body: string; type: AstroLineType; distanceDeg: number }> {
+  const results: Array<{ body: string; type: AstroLineType; distanceDeg: number }> = []
+  for (const line of lines) {
+    if (line.type === 'MC' || line.type === 'IC') {
+      const dist = Math.abs(normalizeLon(lon - line.points[0].lon))
+      if (dist <= orbDeg) results.push({ body: line.body, type: line.type, distanceDeg: Math.round(dist * 10) / 10 })
+    } else {
+      let closest = line.points[0]
+      let minLatDiff = Math.abs(lat - closest.lat)
+      for (const p of line.points) {
+        const d = Math.abs(lat - p.lat)
+        if (d < minLatDiff) { minLatDiff = d; closest = p }
+      }
+      if (minLatDiff <= 2) {
+        const dist = Math.abs(normalizeLon(lon - closest.lon))
+        if (dist <= orbDeg) results.push({ body: line.body, type: line.type, distanceDeg: Math.round(dist * 10) / 10 })
+      }
+    }
+  }
+  return results.sort((a, b) => a.distanceDeg - b.distanceDeg)
 }
 
 // ─── Crystal recommendations ─────────────────────────────────

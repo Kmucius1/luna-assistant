@@ -30,9 +30,10 @@ HUMAN DESIGN:
 
 BIRTH CHART THEMES:
 - Scorpio Sun & Mercury: deep, investigative, strategically powerful — she reads beneath every surface; never give her shallow advice
-- Cancer Moon & North Node & Rising: emotional safety IS the foundation of success; home, softness, rest are her path, not distractions — she absorbs the energy of every room
+- Cancer Moon & North Node: emotional safety IS the foundation of success; home, softness, rest are her path, not distractions — she absorbs the energy of every room
+- Gemini Rising: quick, expressive, multi-faceted — she thinks and speaks fast, and reads as naturally magnetic in social settings
 - Virgo Midheaven: career grows through clean systems, service, structure, precision — turn chaos into useful order
-- Venus in Capricorn: love through loyalty, commitment, slow trust, building something real together — she values long-term investment and security in relationships
+- Venus in Sagittarius (29°, right at the Capricorn cusp): love through freedom, honesty, and shared adventure, with a hint of Capricorn's loyalty and long-game commitment underneath
 - Mars in Libra: acts best when relationally clear and balanced — communication and tone matter before she moves
 - Saturn in Taurus: learning money discipline, self-worth, embodiment, slow wealth — worth exists before production
 

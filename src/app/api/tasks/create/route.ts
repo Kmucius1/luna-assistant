@@ -10,9 +10,16 @@ function adminDb() {
   )
 }
 
+// Matches the real public.tasks schema (supabase/schema.sql) — this
+// whitelist previously listed several columns that don't exist on the
+// table (due_time, priority, completed, notes) and was missing several
+// real ones (project, source_id, urgency_level, estimated_minutes,
+// money_impact, priority_score), so those fields were silently dropped on
+// every insert regardless of what callers sent.
 const ALLOWED_TASK_FIELDS = [
-  'title', 'description', 'due_date', 'due_time', 'priority', 'status',
-  'category', 'completed', 'source', 'notes',
+  'title', 'description', 'category', 'project', 'client_name', 'status',
+  'due_date', 'priority_score', 'urgency_level', 'money_impact',
+  'emotional_weight', 'estimated_minutes', 'source', 'source_id', 'next_action',
 ] as const
 
 export async function POST(request: NextRequest) {

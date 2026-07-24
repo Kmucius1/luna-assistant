@@ -15,6 +15,7 @@ import {
   PenLine,
   Plane,
   ShirtIcon,
+  Sparkles,
   Sun,
   UtensilsCrossed,
 } from 'lucide-react'
@@ -47,8 +48,8 @@ const ROOMS: Room[] = [
   { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.jpg', href: '/astrology', icon: MoonStar, accent: 'rgba(150,160,200,0.32)' },
   { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign, accent: 'rgba(190,175,140,0.35)' },
   { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.jpg', href: '/brain-dump', icon: Brain, accent: 'rgba(180,170,190,0.32)' },
-  { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.jpg', href: '/travel', icon: Plane, accent: 'rgba(150,185,195,0.32)', comingSoon: true },
-  { slug: 'next', label: 'Next Move', tagline: ['Plan your next step.', 'Make it happen.'], image: '/images/rooms/next-move.jpg', href: '/next', icon: ArrowRight, accent: 'rgba(200,180,150,0.35)', comingSoon: true },
+  { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.jpg', href: '/travel', icon: Plane, accent: 'rgba(150,185,195,0.32)' },
+  { slug: 'spiritual', label: 'Spiritual', tagline: ['Tarot, crystals,', 'rituals & more.'], image: '/images/rooms/wellness.jpg', href: '/spirit', icon: Sparkles, accent: 'rgba(200,180,220,0.32)' },
 ]
 
 const PAGE_SIZE = 4

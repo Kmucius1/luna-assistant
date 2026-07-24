@@ -1,0 +1,110 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --gold-soft: #F2E5CF;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 12px 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+
+.topRow { display: flex; align-items: center; justify-content: space-between; }
+.iconButton {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.18);
+  color: var(--ink-2);
+}
+
+.heroWrap { position: relative; border-radius: 22px; overflow: hidden; box-shadow: var(--soft-shadow); min-height: 128px; display: flex; }
+.heroPhoto { position: absolute; inset: 0; }
+.heroPhoto :global(img) { object-fit: cover; }
+.heroFade { position: absolute; inset: 0; background: linear-gradient(90deg, var(--ivory-1) 30%, rgba(251,248,242,0.55) 62%, rgba(251,248,242,0) 100%); }
+.heroContent { position: relative; z-index: 1; padding: 16px; max-width: 66%; }
+.heroContent h1 { font-family: var(--font-display-var, serif); font-size: 30px; font-weight: 700; color: var(--ink-1); margin: 0 0 4px; }
+.heroContent p { margin: 0; font-size: 12px; color: var(--ink-3); line-height: 1.4; }
+
+/* ── Safe to Spend hero card ──────────────────────────── */
+
+.stsCard {
+  background: rgba(255,255,255,0.7); border: 1.5px solid rgba(201,169,110,0.28);
+  border-radius: 22px; box-shadow: var(--soft-shadow); padding: 18px;
+}
+.stsTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.stsLabel { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.stsNumber { font-family: var(--font-display-var, serif); font-size: 40px; font-weight: 700; color: var(--ink-1); line-height: 1; margin: 0; }
+.stsNumber span { font-size: 15px; font-weight: 600; color: var(--ink-3); margin-left: 6px; }
+.stsPerDay { font-size: 12.5px; color: var(--ink-2); margin: 8px 0 0; font-weight: 600; }
+
+.ring { flex-shrink: 0; position: relative; width: 78px; height: 78px; }
+.ringLabel { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ringLabel strong { font-size: 15px; font-weight: 700; color: var(--ink-1); }
+.ringLabel span { font-size: 7px; color: var(--ink-3); text-align: center; line-height: 1.1; margin-top: 1px; }
+
+.breakdown { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(180,150,100,0.16); display: flex; flex-direction: column; gap: 8px; }
+.breakdownRow { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+.dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.breakdownRow span:nth-child(2) { flex: 1; }
+.breakdownRow strong { font-weight: 700; color: var(--ink-1); }
+
+/* ── Luna's message ───────────────────────────────────── */
+
+.lunaCard {
+  background: var(--gold-soft); border: 1px solid rgba(180,150,100,0.2);
+  border-radius: 18px; padding: 14px; display: flex; gap: 10px; align-items: flex-start;
+}
+.lunaLabel { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); margin-bottom: 4px; }
+.lunaText { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-1); flex: 1; }
+.lunaCard svg:last-child { flex-shrink: 0; color: var(--ink-3); margin-top: 2px; }
+
+/* ── 2x2 grid ─────────────────────────────────────────── */
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gridCard { background: rgba(255,255,255,0.65); border: 1px solid rgba(180,150,100,0.16); border-radius: 16px; box-shadow: var(--soft-shadow); padding: 12px; display: flex; flex-direction: column; }
+.gridHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.gridHeader span:first-child { font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+.gridHeader a { font-size: 10px; font-weight: 700; color: var(--gold); text-decoration: none; }
+
+.billRow, .alertRow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(180,150,100,0.1); }
+.billRow:last-of-type, .alertRow:last-of-type { border-bottom: none; }
+.billIcon { width: 26px; height: 26px; border-radius: 8px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; color: var(--gold); flex-shrink: 0; }
+.billInfo { flex: 1; min-width: 0; }
+.billInfo strong { display: block; font-size: 11.5px; color: var(--ink-1); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.billInfo span { font-size: 9.5px; color: var(--ink-3); }
+.billAmount { font-size: 11.5px; font-weight: 700; color: var(--ink-1); flex-shrink: 0; }
+
+.alertDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.alertRow span:nth-child(2) { flex: 1; font-size: 11px; color: var(--ink-1); line-height: 1.3; }
+.alertReview { font-size: 10px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+
+.moreLink { font-size: 10.5px; font-weight: 700; color: var(--gold); text-align: center; margin-top: 6px; text-decoration: none; }
+
+.savingsRow { margin-bottom: 8px; }
+.savingsRow:last-of-type { margin-bottom: 0; }
+.savingsTop { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.savingsIcon { width: 22px; height: 22px; border-radius: 7px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; color: var(--gold); flex-shrink: 0; font-size: 11px; }
+.savingsTop strong { font-size: 11.5px; color: var(--ink-1); flex: 1; }
+.savingsTop span { font-size: 9.5px; color: var(--ink-3); }
+.savingsTrack { height: 5px; border-radius: 3px; background: rgba(180,150,100,0.14); overflow: hidden; margin-left: 30px; }
+.savingsFill { height: 100%; background: var(--gold); border-radius: 3px; }
+
+.askCard { display: flex; flex-direction: column; justify-content: space-between; }
+.askCard p { margin: 0 0 10px; font-size: 12px; color: var(--ink-2); line-height: 1.4; }
+.askButton {
+  align-self: flex-start; display: flex; align-items: center; gap: 6px;
+  background: var(--gold); color: #fff; border: none; border-radius: 999px;
+  padding: 8px 14px; font-size: 11.5px; font-weight: 700;
+}
+
+.emptyText { font-size: 11.5px; color: var(--ink-3); text-align: center; padding: 12px 0; }
+.loadingText { font-size: 12px; color: var(--ink-3); text-align: center; padding: 30px; }

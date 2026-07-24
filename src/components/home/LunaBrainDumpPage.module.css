@@ -1,0 +1,125 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --gold-soft: #F2E5CF;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 12px 14px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+
+.topBar { display: flex; align-items: center; justify-content: space-between; }
+.topBar h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 18px; font-weight: 700; letter-spacing: 0.1em; color: var(--ink-1);
+  margin: 0; display: flex; align-items: center; gap: 5px; text-transform: uppercase;
+}
+.topBar h1 svg { color: var(--gold); }
+.iconButton {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.18);
+  color: var(--ink-2);
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+
+.heroWrap { position: relative; border-radius: 20px; overflow: hidden; box-shadow: var(--soft-shadow); min-height: 110px; display: flex; }
+.heroPhoto { position: absolute; inset: 0; }
+.heroPhoto :global(img) { object-fit: cover; }
+.heroFade { position: absolute; inset: 0; background: linear-gradient(90deg, var(--ivory-1) 32%, rgba(251,248,242,0.5) 62%, rgba(251,248,242,0) 100%); }
+.heroContent { position: relative; z-index: 1; padding: 14px 16px; max-width: 64%; }
+.heroContent h2 { font-family: var(--font-display-var, serif); font-size: 22px; font-weight: 700; color: var(--ink-1); margin: 0 0 4px; }
+.heroContent p { margin: 0; font-size: 11px; color: var(--ink-3); line-height: 1.4; }
+
+/* ── Capture card ─────────────────────────────────────── */
+
+.captureCard { background: rgba(255,255,255,0.7); border: 1px solid rgba(180,150,100,0.18); border-radius: 20px; box-shadow: var(--soft-shadow); padding: 14px; }
+.captureHeader { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.captureLabel { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
+.captureSub { margin: 0; font-size: 11.5px; color: var(--ink-3); line-height: 1.35; }
+.captureActions { display: flex; gap: 8px; flex-shrink: 0; }
+.micButton, .otherButton {
+  width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.micButton { background: var(--gold); color: #fff; }
+.micButton.recording { background: #C96B5A; }
+.otherButton { background: rgba(255,255,255,0.7); border: 1px solid rgba(180,150,100,0.2); color: var(--ink-2); }
+
+.captureField {
+  width: 100%; border: none; background: none; resize: none; outline: none;
+  font-size: 13.5px; color: var(--ink-1); line-height: 1.4; min-height: 54px;
+  border-top: 1px solid rgba(180,150,100,0.16); padding-top: 10px; margin-top: 2px;
+  font-family: inherit;
+}
+.captureField::placeholder { color: #A89E90; }
+
+.recordingBar { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(180,150,100,0.16); margin-top: 2px; }
+.recordingDot { width: 8px; height: 8px; border-radius: 50%; background: #C96B5A; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.recordingBar span { font-size: 12px; color: var(--ink-2); font-weight: 600; }
+.recordingActions { display: flex; gap: 6px; margin-left: auto; }
+.recordingActions button { background: none; border: none; font-size: 11px; font-weight: 700; color: var(--gold); padding: 4px 8px; }
+
+.saveRow { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.savedNote { font-size: 11px; color: var(--gold); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.saveButton { background: var(--gold); color: #fff; border: none; border-radius: 999px; padding: 8px 16px; font-size: 12px; font-weight: 700; min-height: 36px; }
+.saveButton:disabled { opacity: 0.4; }
+
+/* ── Quick categories ─────────────────────────────────── */
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-1); }
+.sectionHeader a, .sectionHeader button { font-size: 10.5px; font-weight: 700; color: var(--gold); text-decoration: none; background: none; border: none; text-transform: none; letter-spacing: 0; }
+
+.categoryRow { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.categoryRow::-webkit-scrollbar { display: none; }
+.categoryChip {
+  flex-shrink: 0; width: 68px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16); border-radius: 14px; padding: 10px 4px;
+}
+.categoryChip svg { color: var(--gold); }
+.categoryChip span { font-size: 10px; font-weight: 600; color: var(--ink-2); }
+.categoryChipActive { background: var(--gold-soft); border-color: var(--gold); }
+
+/* ── Recent entries ───────────────────────────────────── */
+
+.entryRow {
+  display: flex; align-items: center; gap: 10px; text-decoration: none;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.14); border-radius: 14px;
+  padding: 10px 12px; margin-bottom: 7px; box-shadow: var(--soft-shadow);
+}
+.entryIcon { width: 34px; height: 34px; border-radius: 10px; background: var(--gold-soft); display: flex; align-items: center; justify-content: center; color: var(--gold); flex-shrink: 0; }
+.entryInfo { flex: 1; min-width: 0; }
+.entryInfo strong { display: block; font-size: 12.5px; color: var(--ink-1); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.entryMeta { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.entryMeta span:first-child { font-size: 10px; color: var(--ink-3); }
+.entryBadge { font-size: 9px; font-weight: 700; color: var(--gold); background: var(--gold-soft); padding: 1px 7px; border-radius: 999px; }
+.entryArrow { color: var(--ink-3); flex-shrink: 0; }
+
+/* ── Ask Luna card ─────────────────────────────────────── */
+
+.askCard {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--gold-soft); border: 1px solid rgba(180,150,100,0.2); border-radius: 18px; padding: 14px;
+}
+.askIcon { width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.askCard strong { display: block; font-size: 13px; color: var(--ink-1); margin-bottom: 2px; }
+.askCard p { margin: 0; font-size: 11px; color: var(--ink-3); line-height: 1.3; }
+.askButton {
+  flex-shrink: 0; display: flex; align-items: center; gap: 5px;
+  background: transparent; border: 1.5px solid var(--gold); color: var(--gold);
+  border-radius: 999px; padding: 8px 14px; font-size: 11.5px; font-weight: 700; text-decoration: none;
+}
+
+.emptyState { text-align: center; padding: 24px 16px; }
+.emptyState p { font-size: 12.5px; color: var(--ink-3); margin: 0 0 12px; line-height: 1.4; }

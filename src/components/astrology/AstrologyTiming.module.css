@@ -1,0 +1,23 @@
+.sectionHeader { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--astro-text); margin: 4px 0 8px; }
+
+.timelineRow {
+  display: block; text-decoration: none;
+  background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 16px;
+  box-shadow: var(--astro-shadow); padding: 12px 14px; margin-bottom: 8px;
+}
+.timelineHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.timelineTitle { font-size: 13.5px; font-weight: 700; color: var(--astro-text); }
+.timelinePill { font-size: 8.5px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--astro-gold-soft); color: var(--astro-gold); }
+.timelineMeta { font-size: 11px; color: var(--astro-muted); }
+
+.linkCard {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px;
+  box-shadow: var(--astro-shadow); padding: 12px 14px; text-decoration: none;
+  font-size: 13px; font-weight: 600; color: var(--astro-text); margin-bottom: 8px;
+}
+.linkCard svg { color: var(--astro-gold); }
+
+.soonGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.soonCard { position: relative; background: var(--astro-surface); border: 1px dashed var(--astro-border); border-radius: 14px; padding: 12px; font-size: 12px; font-weight: 700; color: var(--astro-muted); min-height: 50px; display: flex; align-items: flex-end; }
+.soonBadge { position: absolute; top: 8px; right: 8px; font-size: 8px; font-weight: 700; text-transform: uppercase; color: #14110b; background: var(--astro-gold); padding: 2px 7px; border-radius: 999px; }

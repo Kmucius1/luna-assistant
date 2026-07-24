@@ -1,0 +1,113 @@
+.shell {
+  --astro-background: #FBF8F2;
+  --astro-surface: #FFFDFA;
+  --astro-card: #FFFFFF;
+  --astro-text: #171512;
+  --astro-muted: #716B63;
+  --astro-gold: #C58D32;
+  --astro-gold-soft: #F2E5CF;
+  --astro-border: rgba(67, 51, 34, 0.09);
+  --astro-shadow: 0 14px 38px rgba(72, 54, 31, 0.07);
+
+  background: var(--astro-background);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top bar ──────────────────────────────────────────── */
+
+.topBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+}
+
+.topBarTitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-display-var, serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--astro-text);
+}
+.topBarTitle svg { color: var(--astro-gold); width: 13px; height: 13px; }
+
+.iconButton {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--astro-card);
+  border: 1px solid var(--astro-border);
+  color: var(--astro-text);
+  box-shadow: var(--astro-shadow);
+}
+
+/* ── Content ──────────────────────────────────────────── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Astrology sub-nav (5 tabs) ───────────────────────── */
+
+.subNav {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 8px 10px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+  background: var(--astro-surface);
+  border-top: 1px solid var(--astro-border);
+  order: 2;
+}
+
+/* Desktop: DesktopTabBar is hidden for this room (AppLayout hideBottomNav),
+   so this bar moves to a top segmented row instead of floating at the very
+   bottom of a wide viewport. */
+@media (min-width: 1024px) {
+  .subNav {
+    order: 0;
+    border-top: none;
+    border-bottom: 1px solid var(--astro-border);
+    border-radius: 0;
+    max-width: 480px;
+    margin: 0 auto 4px;
+    padding: 6px;
+  }
+  .content { order: 1; }
+}
+
+.subNavTab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  padding: 6px 2px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--astro-muted);
+  min-height: 48px;
+}
+
+.subNavTab svg { width: 20px; height: 20px; }
+
+.subNavTabActive {
+  color: var(--astro-text);
+  background: var(--astro-gold-soft);
+}
+.subNavTabActive svg { color: var(--astro-gold); }
+
+.subNavLabel { font-size: 9.5px; font-weight: 600; }
+.subNavTabActive .subNavLabel { font-weight: 700; }

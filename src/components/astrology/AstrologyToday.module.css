@@ -1,0 +1,80 @@
+.greeting { padding: 6px 2px 0; }
+.greeting h1 { font-family: var(--font-display-var, serif); font-size: 22px; font-weight: 700; color: var(--astro-text); margin: 0 0 3px; }
+.greeting p { margin: 0; font-size: 12.5px; color: var(--astro-muted); }
+
+.card {
+  background: var(--astro-card);
+  border: 1px solid var(--astro-border);
+  border-radius: 20px;
+  box-shadow: var(--astro-shadow);
+  padding: 14px;
+}
+
+.cardLink { text-decoration: none; display: block; }
+
+.cardLabel {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--astro-gold); margin-bottom: 8px;
+}
+
+/* ── Moon card ────────────────────────────────────────── */
+
+.moonRow { display: flex; align-items: center; gap: 14px; }
+.moonVisual { position: relative; width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0; background: radial-gradient(circle at 35% 32%, #eee 0%, #b9b3a8 55%, #6b6558 100%); overflow: hidden; box-shadow: inset -8px -6px 14px rgba(0,0,0,0.35); }
+.moonShadow { position: absolute; inset: 0; background: #17151280; }
+.moonInfo strong { display: block; font-family: var(--font-display-var, serif); font-size: 17px; color: var(--astro-text); margin-bottom: 2px; }
+.moonInfo span { display: block; font-size: 11.5px; color: var(--astro-muted); }
+
+/* ── Theme card ───────────────────────────────────────── */
+
+.themeQuote { font-family: var(--font-display-var, serif); font-size: 17px; font-weight: 700; color: var(--astro-text); line-height: 1.35; margin: 0 0 8px; }
+.themeBody { font-size: 12.5px; color: var(--astro-muted); line-height: 1.5; margin: 0; }
+
+/* ── Transit card ─────────────────────────────────────── */
+
+.transitHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.transitStatus { display: flex; gap: 6px; }
+.pill { font-size: 8.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; }
+.pillGold { background: var(--astro-gold-soft); color: var(--astro-gold); }
+.pillMuted { background: #F0EDE6; color: var(--astro-muted); }
+.transitTitle { font-family: var(--font-display-var, serif); font-size: 18px; font-weight: 700; color: var(--astro-text); margin: 0 0 8px; }
+.transitDates { display: flex; gap: 14px; margin-bottom: 10px; }
+.transitDates div { font-size: 9.5px; color: var(--astro-muted); }
+.transitDates strong { display: block; font-size: 11.5px; color: var(--astro-text); font-weight: 700; margin-top: 1px; }
+
+.categoryGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 4px; }
+.categoryItem { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; color: var(--astro-text); }
+.categoryItem svg { color: var(--astro-gold); flex-shrink: 0; margin-top: 2px; width: 12px; height: 12px; }
+
+.useList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.useList li { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: var(--astro-text); line-height: 1.35; }
+.useList svg { color: var(--astro-gold); flex-shrink: 0; margin-top: 2px; width: 13px; height: 13px; }
+
+/* ── Daily outlook grid ───────────────────────────────── */
+
+.outlookGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.outlookCard {
+  background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px;
+  padding: 10px 8px; text-align: center; box-shadow: var(--astro-shadow);
+}
+.outlookCard span:first-child { display: block; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--astro-muted); margin-bottom: 4px; }
+.outlookLabel { font-size: 12px; font-weight: 700; color: var(--astro-gold); }
+
+/* ── Luna message ─────────────────────────────────────── */
+
+.lunaCard { background: var(--astro-gold-soft); border: 1px solid var(--astro-border); border-radius: 20px; padding: 14px; }
+.lunaLabel { display: flex; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--astro-gold); margin-bottom: 6px; }
+.lunaLabel svg { width: 12px; height: 12px; }
+.lunaText { font-size: 13px; color: var(--astro-text); line-height: 1.5; margin: 0; font-style: italic; }
+
+/* ── Upcoming dates ───────────────────────────────────── */
+
+.upcomingList { display: flex; flex-direction: column; gap: 8px; }
+.upcomingRow { display: flex; align-items: center; gap: 10px; background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px; padding: 10px 12px; box-shadow: var(--astro-shadow); }
+.upcomingIcon { width: 32px; height: 32px; border-radius: 50%; background: var(--astro-gold-soft); display: flex; align-items: center; justify-content: center; color: var(--astro-gold); flex-shrink: 0; }
+.upcomingBody strong { display: block; font-size: 12.5px; color: var(--astro-text); font-weight: 700; }
+.upcomingBody span { font-size: 10.5px; color: var(--astro-muted); }
+
+.sectionHeader { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--astro-text); margin: 4px 0 -4px; }
+
+.loadingText { font-size: 12px; color: var(--astro-muted); text-align: center; padding: 20px; }

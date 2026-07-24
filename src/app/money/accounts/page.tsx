@@ -116,6 +116,9 @@ export default function AccountsPage() {
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <p style={{ fontSize: 18, fontWeight: 700, color: GOLDEN }}>{formatCurrency(acct.current_balance ?? 0)}</p>
+                    {acct.available_balance != null && acct.available_balance !== acct.current_balance && (
+                      <p style={{ fontSize: 10.5, color: '#5E5474', marginTop: 2 }}>{formatCurrency(acct.available_balance)} available</p>
+                    )}
                   </div>
                 </div>
                 {(acct.account_type === 'credit_card' || acct.account_type === 'business_credit_card') && acct.credit_limit && (

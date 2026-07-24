@@ -14,6 +14,9 @@ interface AppLayoutProps {
   className?: string
   /** Hub/list pages: a roomy desktop cap without stretching cards edge-to-edge */
   wide?: boolean
+  /** Rooms with their own internal 5-tab bottom nav (e.g. Astrology) render
+      that instead of the main app dock, rather than stacking two bottom bars. */
+  hideBottomNav?: boolean
 }
 
 const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
@@ -25,7 +28,7 @@ const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 // so it doesn't get this bar on top of that.
 const TOP_BAR_ROUTES = ['/explore']
 
-export function AppLayout({ children, noScroll, noPad, className, wide }: AppLayoutProps) {
+export function AppLayout({ children, noScroll, noPad, className, wide, hideBottomNav }: AppLayoutProps) {
   const pathname = usePathname()
   const showTopBar = TOP_BAR_ROUTES.includes(pathname)
 
@@ -60,7 +63,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
             style={{
               flex: 1, minHeight: 0, overflow: 'hidden',
               display: 'flex', flexDirection: 'column',
-              paddingBottom: DOCK_CLEAR,
+              paddingBottom: hideBottomNav ? 0 : DOCK_CLEAR,
             }}
           >
             {children}
@@ -70,7 +73,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
             className={noPad ? '' : 'px-4 md:px-8 lg:px-10'}
             style={{
               flex: 1, overflowY: 'auto', overflowX: 'hidden',
-              paddingBottom: DOCK_CLEAR,
+              paddingBottom: hideBottomNav ? 0 : DOCK_CLEAR,
             }}
           >
             <div className="animate-page-enter content-enter">
@@ -80,8 +83,8 @@ export function AppLayout({ children, noScroll, noPad, className, wide }: AppLay
         )}
       </main>
 
-      <BottomNav />
-      <DesktopTabBar />
+      {!hideBottomNav && <BottomNav />}
+      {!hideBottomNav && <DesktopTabBar />}
     </SwipeContainer>
   )
 }

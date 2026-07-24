@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Utensils, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid } from 'lucide-react'
+import { Home, Utensils, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid, Sparkles } from 'lucide-react'
 
 // Home is the 12-room app grid at /home; the app's own landing
 // page ("/") redirects straight to /today instead (see
@@ -12,7 +12,8 @@ const TABS = [
   { href: '/food',           label: 'Food',      icon: Utensils      },
   { href: '/work-home',      label: 'Work',      icon: Briefcase     },
   { href: '/luna',           label: 'LUNA',      icon: MessageCircle },
-  { href: '/astrology-home', label: 'Astrology', icon: Moon          },
+  { href: '/astrology',      label: 'Astrology', icon: Moon          },
+  { href: '/spirit',         label: 'Spirit',    icon: Sparkles      },
   { href: '/creative-home',  label: 'Creative',  icon: Scissors      },
   { href: '/explore',        label: 'Explore',   icon: LayoutGrid    },
 ]
@@ -24,7 +25,8 @@ export function DesktopTabBar() {
     if (href === '/home') return pathname === '/home'
     if (href === '/food') return pathname.startsWith('/food')
     if (href === '/work-home') return pathname.startsWith('/work') || pathname.startsWith('/tasks') || pathname.startsWith('/calendar') || pathname.startsWith('/email') || pathname.startsWith('/money')
-    if (href === '/astrology-home') return pathname.startsWith('/astrology') || pathname.startsWith('/manifest') || pathname.startsWith('/journal')
+    if (href === '/astrology') return pathname.startsWith('/astrology') || pathname.startsWith('/manifest')
+    if (href === '/spirit') return pathname.startsWith('/spirit') || pathname.startsWith('/tarot')
     if (href === '/creative-home') return pathname.startsWith('/creative')
     return pathname.startsWith(href)
   }

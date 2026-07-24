@@ -2,10 +2,12 @@
 import { useState, useEffect, useRef } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { GlassCard } from '@/components/ui/GlassCard'
-import { Sparkles, Moon, Star, RefreshCw, ChevronLeft } from 'lucide-react'
+import { Sparkles, Moon, Star, RefreshCw, Gem, CheckCircle2 } from 'lucide-react'
 import { format } from 'date-fns'
-import { drawCards, DrawnCard } from '@/lib/tarot-deck'
-import { saveTarotReading, getTarotHistory, getTarotStats, TarotHistoryEntry } from '@/lib/tarot-history'
+import Link from 'next/link'
+import { getTarotHistory, getTarotStats, TarotHistoryEntry } from '@/lib/tarot-history'
+import { getCrystalRecommendations, type ZodiacSign } from '@/lib/astrology'
+import crystalsData from '@/data/crystals/crystals.json'
 
 // ─── Moon phases ────────────────────────────────────────────────
 const MOON_PHASES = [
@@ -109,6 +111,32 @@ const MOON_RITUALS: Record<string, { title: string; desc: string; steps: string[
   'Waning Crescent': { title: 'Deep Rest and Restore',    desc: 'This is the rarest, most sacred phase — and the one Projectors most need to honor.', steps: ['Do less than you think you should.', 'No new decisions or initiatives if possible.', 'Ask out loud: "What does my body need?" Then do that thing.', 'Sleep before midnight.', 'Sit quietly for 5 minutes without your phone. Just be.', 'Know: rest is not laziness. It is how you fill up for the next cycle.'] },
 }
 
+// ─── Live crystal library (moon-driven, src/data/crystals/crystals.json) ──
+interface CrystalEntry {
+  name: string; color: string; lightColor: string; emoji: string
+  signs: string[]; phases: string[]; moods: string[]
+  properties: string; howToUse: string; affirmation: string; chakra: string; lunaNote: string
+}
+const CRYSTAL_LIBRARY = crystalsData as CrystalEntry[]
+
+// ─── Ritual elements per sign (scents/colors/crystals/elements) ──────────
+const RITUAL_ELEMENTS_BY_SIGN: Record<string, { scents: string[]; colors: string[]; crystals: string[]; elements: string[] }> = {
+  Aries:       { scents:['cinnamon','black pepper','ginger'], colors:['red','orange'], crystals:['carnelian','red jasper'], elements:['fire','candle'] },
+  Taurus:      { scents:['rose','vanilla','sandalwood'], colors:['green','gold'], crystals:['rose quartz','malachite'], elements:['earth','flowers'] },
+  Gemini:      { scents:['peppermint','lavender','eucalyptus'], colors:['yellow','silver'], crystals:['citrine','clear quartz'], elements:['air','journal'] },
+  Cancer:      { scents:['jasmine','ylang ylang','coconut'], colors:['silver','white'], crystals:['moonstone','selenite'], elements:['water','bath','tea'] },
+  Leo:         { scents:['frankincense','amber','bergamot'], colors:['gold','orange'], crystals:['sunstone','tiger eye'], elements:['fire','sun','mirror'] },
+  Virgo:       { scents:['lavender','rosemary','neroli'], colors:['sage','navy'], crystals:['amazonite','amethyst'], elements:['earth','herbs','lists'] },
+  Libra:       { scents:['rose','peony','lily'], colors:['pink','light blue'], crystals:['rose quartz','lapis lazuli'], elements:['air','flowers','beauty'] },
+  Scorpio:     { scents:['patchouli','dark rose','oud'], colors:['deep red','black'], crystals:['obsidian','black tourmaline'], elements:['water','candle','shadow work'] },
+  Sagittarius: { scents:['sage','cedar','citrus'], colors:['purple','gold'], crystals:['lapis lazuli','sodalite'], elements:['fire','travel object','journal'] },
+  Capricorn:   { scents:['vetiver','cedar','frankincense'], colors:['charcoal','forest green'], crystals:['smoky quartz','garnet'], elements:['earth','structure','goals'] },
+  Aquarius:    { scents:['eucalyptus','star anise','violet'], colors:['electric blue','silver'], crystals:['amethyst','labradorite'], elements:['air','community','innovation'] },
+  Pisces:      { scents:['ocean','jasmine','vanilla'], colors:['sea blue','lavender'], crystals:['aquamarine','moonstone'], elements:['water','dreams','art'] },
+}
+
+interface RitualContext { intention: string; ritual: string[]; release: string[]; avoid: string }
+
 // ─── HD Profile detail ──────────────────────────────────────────
 const HD_CHART = {
   type: 'Self-Projected Projector',
@@ -120,10 +148,10 @@ const HD_CHART = {
   placements: [
     { label: 'Sun',        value: 'Scorpio',   note: 'Transformation, depth, investigation — you already sense the truth before it surfaces' },
     { label: 'Moon',       value: 'Cancer',    note: 'Emotional safety is your foundation — home, rest, and softness are the work, not distractions from it' },
-    { label: 'Rising',     value: 'Cancer',    note: 'Warm, protective energy — you draw people in who need nurturing; you absorb the room' },
+    { label: 'Rising',     value: 'Gemini',    note: 'Quick, expressive, multi-faceted energy — you think and speak fast, and adapt to whoever is in the room' },
     { label: 'North Node', value: 'Cancer',    note: 'Destiny: emotional wisdom, creating safety for others, building home (literal and metaphorical)' },
     { label: 'Midheaven',  value: 'Virgo',     note: 'Career through service, precision, systems — your legacy grows when chaos becomes clean structure' },
-    { label: 'Venus',      value: 'Capricorn', note: 'Love through loyalty, slow trust, long-term building — you invest deeply and need a partner doing the same' },
+    { label: 'Venus',      value: 'Sagittarius', note: 'Love through freedom, honesty, and shared adventure, right at the Capricorn cusp — you need a partner who can keep up and still build something real with you' },
     { label: 'Mercury',    value: 'Scorpio',   note: 'Strategic, investigative communication — you speak to excavate truth, not fill silence' },
     { label: 'Mars',       value: 'Libra',     note: 'Acts best through balance and relational clarity — tone and communication matter before you move' },
     { label: 'Saturn',     value: 'Taurus',    note: 'Life lesson: self-worth before production, slow wealth, embodiment — you are valuable before you earn' },
@@ -132,24 +160,8 @@ const HD_CHART = {
   centers_undefined: ['Heart/Will', 'Sacral', 'Solar Plexus', 'Root', 'Spleen'],
 }
 
-// ─── Tarot Spreads ──────────────────────────────────────────────
-interface Spread {
-  key: string; emoji: string; name: string; description: string; positions: string[]; count: number
-}
-const SPREADS: Spread[] = [
-  { key: 'daily',  emoji: '🌅', name: 'Daily Clarity',              description: 'One message for right now',                       positions: ['Message for today'],                                                       count: 1 },
-  { key: 'love',   emoji: '💜', name: 'Love & Connection',          description: 'Current energy / Open to / Release',              positions: ['Current energy', 'Open to receive', 'What to release'],                   count: 3 },
-  { key: 'work',   emoji: '💼', name: 'Career & Purpose',           description: 'Where you are / Best action / Outcome',           positions: ['Where you are', 'Best action', 'Outcome'],                                count: 3 },
-  { key: 'money',  emoji: '💰', name: 'Money & Abundance',          description: 'Current flow / Blocks / Invitation',              positions: ['Current flow', 'The block', 'The invitation'],                            count: 3 },
-  { key: 'shadow', emoji: '🌑', name: 'Shadow Work',                description: 'Hidden / Surfacing / Integrate',                  positions: ["What's hidden", "What's surfacing", 'What to integrate'],                 count: 3 },
-  { key: 'now',    emoji: '✨', name: 'What do I need right now?',  description: 'One truth for this exact moment',                 positions: ['Truth for now'],                                                           count: 1 },
-  { key: 'next',   emoji: '🌙', name: 'Next Chapter',               description: 'Leaving / Arriving / The gift between',           positions: ["What's leaving", "What's arriving", 'The gift between'],                  count: 3 },
-  { key: 'full',   emoji: '🔮', name: 'Full Reading',               description: 'Complete picture of where you are',               positions: ['Foundation', 'Present energy', 'Challenge', 'What to call in', 'Outcome'], count: 5 },
-]
-
-interface CardReading { card: string; position: string; reversed: boolean; personal_reading: string; chart_connection: string; key_message: string }
-interface TarotReading { overall_theme: string; tagline: string; card_readings: CardReading[]; overall_message: string; action: string; affirmation: string; time_note: string }
-type TarotView = 'select' | 'drawing' | 'reading'
+// Full tarot spread-drawing/AI-reading engine lives at /tarot — the Oracle
+// tab here links out to it rather than duplicating SPREADS/drawCards/etc.
 interface HdGuidance { daily_focus: string; invitation_watch: string; not_self_check: string; strategy_note: string; voice_prompt: string; affirmation: string }
 
 const JOURNAL_PROMPTS = [
@@ -200,20 +212,18 @@ export default function SpiritScreen() {
   const [activeTab, setActiveTab]             = useState<SpiritTab>('today')
   const [realMoon, setRealMoon]               = useState<RealMoonData | null>(null)
 
-  // Tarot state
-  const [tarotView, setTarotView]           = useState<TarotView>('select')
-  const [selectedSpread, setSelectedSpread] = useState<Spread | null>(null)
-  const [drawnCards, setDrawnCards]         = useState<DrawnCard[]>([])
-  const [flipped, setFlipped]               = useState<boolean[]>([])
-  const [tarotReading, setTarotReading]     = useState<TarotReading | null>(null)
-  const [tarotLoading, setTarotLoading]     = useState(false)
-  const [tarotError, setTarotError]         = useState(false)
-  const [tarotContext, setTarotContext]      = useState('')
-  const [resonance, setResonance]           = useState<1|2|3|null>(null)
-  const [tarotSaved, setTarotSaved]         = useState(false)
+  // Tarot state — quick daily rune + read-only history/stats display; the
+  // full spread-drawing/AI-reading engine lives at /tarot (linked from Oracle)
   const [tarotHistory, setTarotHistory]     = useState<TarotHistoryEntry[]>([])
   const [tarotStats, setTarotStats]         = useState({ total: 0, resonance_avg: 0, accuracy_pct: 0, by_spread: {} as Record<string, number> })
-  const [readingId]                         = useState(() => `tarot_${Date.now()}`)
+
+  // Crystals state
+  const [crystalFilter, setCrystalFilter]     = useState<'today' | 'all'>('today')
+  const [expandedCrystal, setExpandedCrystal] = useState<string | null>(null)
+
+  // Ritual state
+  const [ritualContext, setRitualContext]     = useState<RitualContext | null>(null)
+  const [ritualCompleted, setRitualCompleted] = useState<Set<string>>(new Set())
 
   // HD guidance state
   const [hdGuidance, setHdGuidance] = useState<HdGuidance | null>(null)
@@ -227,6 +237,10 @@ export default function SpiritScreen() {
   const journalPmt = JOURNAL_PROMPTS[getDailyIndex(JOURNAL_PROMPTS)]
   const today      = format(new Date(), 'EEEE, MMMM d')
   const moonRitual = MOON_RITUALS[realMoon?.phase.name ?? moon.name] ?? MOON_RITUALS['Full Moon']
+  const todaysCrystals = realMoon
+    ? (getCrystalRecommendations(realMoon.sign.name as ZodiacSign, realMoon.phase.name) as unknown as CrystalEntry[])
+    : []
+  const ritualElements = RITUAL_ELEMENTS_BY_SIGN[realMoon?.sign.name ?? 'Cancer'] ?? RITUAL_ELEMENTS_BY_SIGN.Cancer
 
   // ─── Guidance with localStorage cache ───────────────────────
   async function loadGuidance(force = false) {
@@ -286,67 +300,14 @@ export default function SpiritScreen() {
     } catch {} finally { setHdLoading(false) }
   }
 
-  // ─── Tarot ──────────────────────────────────────────────────
-  function chooseSpread(spread: Spread) {
-    setSelectedSpread(spread)
-    const cards = drawCards(spread.count).map((c, i) => ({ ...c, position: spread.positions[i] }))
-    setDrawnCards(cards)
-    setFlipped(new Array(spread.count).fill(false))
-    setTarotReading(null); setResonance(null); setTarotSaved(false); setTarotError(false); setTarotContext('')
-    setTarotView('drawing')
-  }
-
-  function flipCard(i: number) {
-    setFlipped(prev => { const n = [...prev]; n[i] = true; return n })
-  }
-
-  async function getReading() {
-    if (!selectedSpread) return
-    setTarotLoading(true); setTarotError(false); setTarotView('reading')
-    try {
-      const h   = new Date().getHours()
-      const tod = `${h % 12 || 12}:${new Date().getMinutes().toString().padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`
-      const res = await fetch('/api/ai/tarot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          spread_key:  selectedSpread.key,
-          spread_name: selectedSpread.name,
-          positions:   selectedSpread.positions,
-          cards: drawnCards.map(c => ({ name: c.name, reversed: c.reversed, position: c.position ?? '', keywords: c.keywords })),
-          time_of_day: tod,
-          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          context: tarotContext.trim() || undefined,
-        }),
-      })
-      if (!res.ok) throw new Error()
-      setTarotReading(await res.json())
-    } catch { setTarotError(true) }
-    finally { setTarotLoading(false) }
-  }
-
-  function rateResonance(r: 1|2|3) {
-    if (!selectedSpread || !tarotReading) return
-    setResonance(r)
-    if (!tarotSaved) {
-      saveTarotReading({
-        id: readingId,
-        date: new Date().toISOString().slice(0, 10),
-        spread_key:      selectedSpread.key,
-        spread_name:     selectedSpread.name,
-        cards:           drawnCards,
-        reading_summary: tarotReading.overall_message,
-        resonance: r,
-      })
-      setTarotSaved(true)
-      setTarotHistory(getTarotHistory())
-      setTarotStats(getTarotStats())
-    }
-  }
-
-  function resetTarot() {
-    setTarotView('select'); setSelectedSpread(null); setDrawnCards([])
-    setFlipped([]); setTarotReading(null); setResonance(null); setTarotSaved(false); setTarotError(false); setTarotContext('')
+  // ─── Ritual: toggle a checklist step ─────────────────────────
+  function toggleRitualStep(step: string) {
+    setRitualCompleted(prev => {
+      const next = new Set(prev)
+      if (next.has(step)) next.delete(step)
+      else next.add(step)
+      return next
+    })
   }
 
   // ─── Effects ─────────────────────────────────────────────────
@@ -372,6 +333,16 @@ export default function SpiritScreen() {
   useEffect(() => {
     if (activeTab === 'hd' && !hdFetched.current) loadHdGuidance()
   }, [activeTab])
+
+  // Live sign/phase-driven ritual context (astrology.ts getMoonRitualContext,
+  // via /api/astrology/rituals) — fetched once real moon data is known
+  useEffect(() => {
+    if (!realMoon) return
+    fetch(`/api/astrology/rituals?phase=${encodeURIComponent(realMoon.phase.name)}&sign=${encodeURIComponent(realMoon.sign.name)}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && !data.error) setRitualContext(data) })
+      .catch(() => {})
+  }, [realMoon?.phase.name, realMoon?.sign.name])
 
   const TABS: { value: SpiritTab; label: string }[] = [
     { value: 'today',    label: '✨ Today'    },
@@ -597,290 +568,72 @@ export default function SpiritScreen() {
 
           {/* ═══ ORACLE ═══════════════════════════════════════════ */}
           {activeTab === 'oracle' && (
-            <div className="animate-fade-up">
+            <div className="space-y-4 animate-fade-up">
 
-              {/* SPREAD SELECT */}
-              {tarotView === 'select' && (
-                <div className="space-y-4">
-                  {tarotStats.total > 0 && (
-                    <div className="flex gap-2 text-center">
-                      {[
-                        { v: tarotStats.total,        l: 'Readings' },
-                        { v: `${tarotStats.accuracy_pct}%`, l: 'Resonant' },
-                        { v: tarotStats.resonance_avg > 0 ? tarotStats.resonance_avg.toFixed(1) : '—', l: 'Avg score' },
-                      ].map(s => (
-                        <div key={s.l} className="flex-1 rounded-2xl py-3" style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.14)' }}>
-                          <p className="text-lg font-bold" style={{ color: 'var(--violet)' }}>{s.v}</p>
-                          <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{s.l}</p>
-                        </div>
-                      ))}
+              {tarotStats.total > 0 && (
+                <div className="flex gap-2 text-center">
+                  {[
+                    { v: tarotStats.total,        l: 'Readings' },
+                    { v: `${Math.round(tarotStats.accuracy_pct)}%`, l: 'Resonant' },
+                    { v: tarotStats.resonance_avg > 0 ? tarotStats.resonance_avg.toFixed(1) : '—', l: 'Avg score' },
+                  ].map(s => (
+                    <div key={s.l} className="flex-1 rounded-2xl py-3" style={{ background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.14)' }}>
+                      <p className="text-lg font-bold" style={{ color: 'var(--violet)' }}>{s.v}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{s.l}</p>
                     </div>
-                  )}
-
-                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-4)' }}>Choose your spread</p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {SPREADS.map(s => {
-                      const cnt = tarotStats.by_spread[s.key] ?? 0
-                      return (
-                        <button key={s.key} onClick={() => chooseSpread(s)} style={{
-                          background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)',
-                          borderRadius: 18, padding: '14px 14px 12px', textAlign: 'left', cursor: 'pointer',
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                            <span style={{ fontSize: 22 }}>{s.emoji}</span>
-                            {cnt > 0 && <span style={{ fontSize: 11, color: 'rgba(201,169,110,0.55)', fontWeight: 600 }}>{cnt}×</span>}
-                          </div>
-                          <p style={{ fontSize: 12, fontWeight: 700, color: '#100C1E', marginBottom: 3 }}>{s.name}</p>
-                          <p style={{ fontSize: 11, color: '#8A8098', lineHeight: 1.4 }}>{s.description}</p>
-                          <p style={{ fontSize: 11, color: 'rgba(201,169,110,0.6)', marginTop: 6, fontWeight: 600 }}>{s.count === 1 ? '1 card' : `${s.count} cards`}</p>
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {/* Daily rune */}
-                  <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
-                    <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-4)' }}>Daily rune</p>
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: 'rgba(201,169,110,0.08)', border: '1.5px solid rgba(201,169,110,0.15)' }}>
-                        <span className="text-xl font-bold" style={{ color: 'var(--violet)', fontFamily: 'serif' }}>{todayRune.symbol}</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{todayRune.name} — <span style={{ fontWeight: 400, color: 'var(--text-3)' }}>{todayRune.meaning}</span></p>
-                        <p className="text-sm italic mt-1" style={{ color: 'var(--text-2)' }}>&ldquo;{todayRune.message}&rdquo;</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* History */}
-                  {tarotHistory.length > 0 && (
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-4)' }}>Recent readings</p>
-                      <div className="space-y-2">
-                        {tarotHistory.slice(0, 3).map((h, i) => (
-                          <div key={i} className="rounded-2xl px-4 py-3 flex items-center justify-between"
-                            style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
-                            <div>
-                              <p className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{h.spread_name}</p>
-                              <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>{h.cards.slice(0, 3).map(c => c.emoji).join(' ')}</p>
-                            </div>
-                            {h.resonance && (
-                              <span style={{ fontSize: 16 }}>{h.resonance === 3 ? '🎯' : h.resonance === 2 ? '✓' : '○'}</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               )}
 
-              {/* DRAWING */}
-              {tarotView === 'drawing' && selectedSpread && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <button onClick={resetTarot} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A8098', display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
-                      <ChevronLeft className="h-3.5 w-3.5" /> Spreads
-                    </button>
-                    <span style={{ fontSize: 11, color: '#8A8098' }}>·</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)' }}>{selectedSpread.emoji} {selectedSpread.name}</span>
+              {/* Draw Your Cards — full spread selection + AI reading lives
+                  at /tarot; kept as one app-wide engine, linked from here */}
+              <Link href="/tarot" className="block rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.16), rgba(184,151,79,0.1))', border: '1px solid rgba(201,169,110,0.28)', textDecoration: 'none' }}>
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(201,169,110,0.18)', border: '1.5px solid rgba(201,169,110,0.3)' }}>🔮</div>
+                  <div className="flex-1">
+                    <p className="font-display text-lg font-semibold" style={{ color: 'var(--text-1)' }}>Draw Your Cards</p>
+                    <p className="text-sm mt-0.5" style={{ color: 'var(--text-2)' }}>Choose a spread, flip your cards, get a full AI-guided reading.</p>
                   </div>
+                  <Sparkles className="h-5 w-5 flex-shrink-0" style={{ color: 'var(--violet)' }} />
+                </div>
+              </Link>
 
-                  <p className="text-sm" style={{ color: 'var(--text-3)' }}>
-                    Tap each card to reveal it. When all are flipped, get your reading.
-                  </p>
+              {/* Daily rune */}
+              <div className="rounded-2xl p-4" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-4)' }}>Daily rune</p>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(201,169,110,0.08)', border: '1.5px solid rgba(201,169,110,0.15)' }}>
+                    <span className="text-xl font-bold" style={{ color: 'var(--violet)', fontFamily: 'serif' }}>{todayRune.symbol}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{todayRune.name} — <span style={{ fontWeight: 400, color: 'var(--text-3)' }}>{todayRune.meaning}</span></p>
+                    <p className="text-sm italic mt-1" style={{ color: 'var(--text-2)' }}>&ldquo;{todayRune.message}&rdquo;</p>
+                  </div>
+                </div>
+              </div>
 
-                  <div style={{ display: 'grid', gap: 12, gridTemplateColumns: drawnCards.length === 1 ? '1fr' : drawnCards.length === 2 ? '1fr 1fr' : 'repeat(3, 1fr)' }}>
-                    {drawnCards.slice(0, Math.min(drawnCards.length, 3)).map((card, i) => (
-                      <button key={i} onClick={() => flipCard(i)} style={{
-                        borderRadius: 16, cursor: flipped[i] ? 'default' : 'pointer',
-                        background: flipped[i] ? 'rgba(201,169,110,0.08)' : 'rgba(201,169,110,0.15)',
-                        padding: '16px 12px', textAlign: 'center',
-                        border: flipped[i] ? '1px solid rgba(201,169,110,0.2)' : '1px solid rgba(201,169,110,0.35)',
-                        transition: 'all 0.3s',
-                      } as React.CSSProperties}>
-                        {flipped[i] ? (
-                          <>
-                            <div style={{ fontSize: drawnCards.length <= 2 ? 32 : 22, marginBottom: 6 }}>{card.emoji}</div>
-                            <p style={{ fontSize: drawnCards.length <= 2 ? 12 : 10, fontWeight: 700, color: '#100C1E', marginBottom: 2, lineHeight: 1.3 }}>{card.name}</p>
-                            {card.reversed && <p style={{ fontSize: 10, color: '#E05E5E', fontWeight: 600 }}>Reversed</p>}
-                            <p style={{ fontSize: 10, color: '#8A8098', marginTop: 3 }}>{card.position}</p>
-                          </>
-                        ) : (
-                          <>
-                            <div style={{ fontSize: 22, marginBottom: 6, opacity: 0.4 }}>✦</div>
-                            <p style={{ fontSize: 10, color: '#8A8098' }}>{card.position}</p>
-                            <p style={{ fontSize: 10, color: '#8A8098', marginTop: 2 }}>tap to reveal</p>
-                          </>
+              {/* Recent readings (read-only history from /tarot) */}
+              {tarotHistory.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-4)' }}>Recent readings</p>
+                    <Link href="/tarot" className="text-xs font-semibold" style={{ color: 'var(--violet)' }}>View all →</Link>
+                  </div>
+                  <div className="space-y-2">
+                    {tarotHistory.slice(0, 3).map((h, i) => (
+                      <div key={i} className="rounded-2xl px-4 py-3 flex items-center justify-between"
+                        style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
+                        <div>
+                          <p className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{h.spread_name}</p>
+                          <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>{h.cards.slice(0, 3).map(c => c.emoji).join(' ')}</p>
+                        </div>
+                        {h.resonance && (
+                          <span style={{ fontSize: 16 }}>{h.resonance === 3 ? '🎯' : h.resonance === 2 ? '✓' : '○'}</span>
                         )}
-                      </button>
+                      </div>
                     ))}
                   </div>
-
-                  {drawnCards.length > 3 && (
-                    <div className="grid grid-cols-2 gap-3">
-                      {drawnCards.slice(3).map((card, i) => (
-                        <button key={i+3} onClick={() => flipCard(i+3)} style={{
-                          borderRadius: 16, cursor: flipped[i+3] ? 'default' : 'pointer',
-                          background: flipped[i+3] ? 'rgba(201,169,110,0.08)' : 'rgba(201,169,110,0.15)',
-                          padding: '16px 12px', textAlign: 'center',
-                          border: flipped[i+3] ? '1px solid rgba(201,169,110,0.2)' : '1px solid rgba(201,169,110,0.35)',
-                        } as React.CSSProperties}>
-                          {flipped[i+3] ? (
-                            <>
-                              <div style={{ fontSize: 24, marginBottom: 6 }}>{card.emoji}</div>
-                              <p style={{ fontSize: 11, fontWeight: 700, color: '#100C1E', marginBottom: 2 }}>{card.name}</p>
-                              {card.reversed && <p style={{ fontSize: 10, color: '#E05E5E', fontWeight: 600 }}>Reversed</p>}
-                              <p style={{ fontSize: 10, color: '#8A8098', marginTop: 3 }}>{card.position}</p>
-                            </>
-                          ) : (
-                            <>
-                              <div style={{ fontSize: 24, marginBottom: 6, opacity: 0.4 }}>✦</div>
-                              <p style={{ fontSize: 10, color: '#8A8098' }}>{card.position}</p>
-                            </>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {flipped.length > 0 && flipped.every(Boolean) && (
-                    <div className="space-y-3">
-                      <textarea
-                        value={tarotContext}
-                        onChange={e => setTarotContext(e.target.value)}
-                        placeholder="What are you asking about? (optional — adds depth to your reading)"
-                        rows={2}
-                        style={{
-                          width: '100%', background: 'rgba(255,255,255,0.5)',
-                          border: '1px solid rgba(180,150,100,0.18)', borderRadius: 14,
-                          padding: '12px 14px', color: '#100C1E', fontSize: 13,
-                          resize: 'none', outline: 'none', fontFamily: 'inherit',
-                        }}
-                      />
-                      <button onClick={getReading} style={{
-                        width: '100%', padding: '14px', borderRadius: 18, border: 'none', cursor: 'pointer',
-                        background: 'linear-gradient(135deg, #C9A96E, #B8974F)', color: '#100C1E', fontSize: 14, fontWeight: 700,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                      }}>
-                        <Sparkles className="h-4 w-4" /> Get my reading
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* READING */}
-              {tarotView === 'reading' && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <button onClick={resetTarot} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8A8098', display: 'flex', alignItems: 'center', gap: 4, fontSize: 12 }}>
-                      <ChevronLeft className="h-3.5 w-3.5" /> New spread
-                    </button>
-                    {selectedSpread && <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)' }}>{selectedSpread.emoji} {selectedSpread.name}</span>}
-                  </div>
-
-                  {tarotLoading && (
-                    <div className="text-center py-12">
-                      <div className="w-12 h-12 rounded-full mx-auto mb-4" style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.3), transparent)', animation: 'breathe 3s ease infinite' }} />
-                      <p className="text-sm" style={{ color: 'var(--text-3)' }}>Reading your cards…</p>
-                      <p className="text-xs mt-2" style={{ color: 'var(--text-4)' }}>Channeling your reading — this takes a moment</p>
-                    </div>
-                  )}
-
-                  {!tarotLoading && tarotError && (
-                    <div className="text-center py-8">
-                      <p className="text-sm mb-4" style={{ color: '#8A8098' }}>Couldn&apos;t get a reading. Try again.</p>
-                      <button onClick={getReading} style={{ padding: '10px 20px', borderRadius: 14, background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.25)', color: 'var(--violet)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Retry</button>
-                    </div>
-                  )}
-
-                  {!tarotLoading && tarotReading && (
-                    <>
-                      <div className="rounded-2xl p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.12), rgba(184,151,79,0.1))', border: '1px solid rgba(201,169,110,0.25)' }}>
-                        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(201,169,110,0.7)' }}>{tarotReading.overall_theme}</p>
-                        <p className="font-display text-lg italic" style={{ color: '#100C1E' }}>&ldquo;{tarotReading.tagline}&rdquo;</p>
-                        {tarotReading.time_note && (
-                          <p className="text-xs mt-3 italic" style={{ color: '#8A8098' }}>{tarotReading.time_note}</p>
-                        )}
-                      </div>
-
-                      {tarotReading.card_readings.map((cr, i) => {
-                        const drawn = drawnCards[i]
-                        return (
-                          <div key={i} className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
-                            <div className="p-4 pb-4">
-                              <div className="flex items-center gap-3 mb-3">
-                                <span style={{ fontSize: 22 }}>{drawn?.emoji ?? '🔮'}</span>
-                                <div>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <p className="text-sm font-bold" style={{ color: '#100C1E' }}>{cr.card}</p>
-                                    {cr.reversed && <span style={{ fontSize: 11, fontWeight: 700, padding: '1px 6px', borderRadius: 20, background: 'rgba(224,94,94,0.15)', color: '#E05E5E' }}>Reversed</span>}
-                                  </div>
-                                  <p className="text-xs mt-0.5" style={{ color: 'var(--violet)' }}>{cr.position}</p>
-                                </div>
-                              </div>
-                              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{cr.personal_reading}</p>
-                              {cr.chart_connection && (
-                                <div className="mt-3 px-3 py-2 rounded-xl" style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
-                                  <p className="text-xs leading-relaxed" style={{ color: 'var(--violet)' }}>✦ {cr.chart_connection}</p>
-                                </div>
-                              )}
-                              {cr.key_message && (
-                                <p className="text-sm font-semibold mt-3 italic" style={{ color: 'var(--violet)' }}>&ldquo;{cr.key_message}&rdquo;</p>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-
-                      <GlassCard>
-                        <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--golden)' }}>Overall message</p>
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{tarotReading.overall_message}</p>
-                      </GlassCard>
-
-                      {tarotReading.action && (
-                        <GlassCard>
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#5A8A5A' }}>Call to action</p>
-                          <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{tarotReading.action}</p>
-                        </GlassCard>
-                      )}
-
-                      <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
-                        <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>&ldquo;{tarotReading.affirmation}&rdquo;</p>
-                      </div>
-
-                      {/* Resonance rating */}
-                      <div className="rounded-2xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
-                        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-4)' }}>Did this resonate?</p>
-                        <div className="flex gap-3 justify-center">
-                          {([
-                            { v: 3 as const, label: 'Deeply', emoji: '🎯' },
-                            { v: 2 as const, label: 'Partially', emoji: '✓' },
-                            { v: 1 as const, label: 'Not really', emoji: '○' },
-                          ] as { v: 1|2|3; label: string; emoji: string }[]).map(opt => (
-                            <button key={opt.v} onClick={() => rateResonance(opt.v)} style={{
-                              flex: 1, padding: '10px 4px', borderRadius: 14,
-                              border: resonance === opt.v ? '1.5px solid rgba(201,169,110,0.5)' : '1px solid rgba(180,150,100,0.18)',
-                              background: resonance === opt.v ? 'rgba(201,169,110,0.15)' : 'transparent',
-                              cursor: 'pointer', fontSize: 11,
-                              fontWeight: resonance === opt.v ? 700 : 400,
-                              color: resonance === opt.v ? 'var(--violet)' : '#8A8098',
-                            }}>
-                              <div style={{ fontSize: 18, marginBottom: 4 }}>{opt.emoji}</div>
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                        {tarotSaved && <p className="text-xs mt-2" style={{ color: '#8A8098' }}>Saved to your history ✓</p>}
-                      </div>
-
-                      <button onClick={resetTarot} style={{ width: '100%', padding: '12px', borderRadius: 16, border: '1px solid rgba(180,150,100,0.18)', background: 'transparent', color: '#8A8098', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                        New reading
-                      </button>
-                    </>
-                  )}
                 </div>
               )}
             </div>
@@ -1012,39 +765,80 @@ export default function SpiritScreen() {
           {/* ═══ CRYSTALS ═════════════════════════════════════════ */}
           {activeTab === 'crystals' && (
             <div className="space-y-4 animate-fade-up">
-              {/* Today's crystal — featured */}
-              <div className="rounded-2xl p-5" style={{ background: `linear-gradient(135deg, ${crystal.color}18, ${crystal.color}06)`, border: `1.5px solid ${crystal.color}30` }}>
-                <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-4)' }}>Your crystal today</p>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl animate-float flex-shrink-0"
-                    style={{ background: `${crystal.color}22`, border: `2px solid ${crystal.color}44` }}>💎</div>
-                  <div>
-                    <p className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>{crystal.name}</p>
-                    <p className="text-sm mt-1" style={{ color: 'var(--text-2)' }}>{crystal.desc}</p>
-                    <p className="text-xs mt-2 italic" style={{ color: 'var(--text-3)' }}>{crystal.use}</p>
-                  </div>
+              {/* Live moon-based recommendation */}
+              <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.15), rgba(184,151,79,0.1))', border: '1px solid rgba(201,169,110,0.25)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <Gem className="h-4 w-4" style={{ color: 'var(--violet)' }} />
+                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Crystal recommendation today</p>
                 </div>
+                {realMoon ? (
+                  <p className="text-sm" style={{ color: 'var(--text-1)' }}>
+                    Based on {realMoon.phase.emoji} {realMoon.phase.name} in {realMoon.sign.emoji} {realMoon.sign.name}
+                  </p>
+                ) : (
+                  <p className="text-sm italic" style={{ color: 'var(--text-3)' }}>Loading live moon data…</p>
+                )}
               </div>
 
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-4)' }}>Crystal library</p>
-              <div className="space-y-3">
-                {CRYSTALS.map((c, i) => (
-                  <div key={i} className="rounded-2xl p-4 flex items-start gap-4"
-                    style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
-                      style={{ background: `${c.color}22`, border: `1.5px solid ${c.color}55` }}>💎</div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold" style={{ color: 'var(--text-1)' }}>{c.name}</p>
-                        {c.name === crystal.name && (
-                          <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)' }}>Today</span>
-                        )}
-                      </div>
-                      <p className="text-sm mt-0.5" style={{ color: 'var(--text-2)' }}>{c.desc}</p>
-                      <p className="text-xs mt-1 italic" style={{ color: 'var(--text-3)' }}>{c.use}</p>
-                    </div>
-                  </div>
+              {/* Filter */}
+              <div className="flex gap-2">
+                {(['today', 'all'] as const).map(f => (
+                  <button key={f} onClick={() => setCrystalFilter(f)}
+                    className="px-4 py-2 rounded-full text-xs font-semibold transition-all"
+                    style={{
+                      background: crystalFilter === f ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
+                      color: crystalFilter === f ? '#100C1E' : 'var(--mid)',
+                      border: '1px solid rgba(201,169,110,0.15)',
+                    }}>
+                    {f === 'today' ? `Today (${todaysCrystals.length})` : `Full Library (${CRYSTAL_LIBRARY.length})`}
+                  </button>
                 ))}
+              </div>
+
+              {/* Crystal cards */}
+              <div className="space-y-3">
+                {(crystalFilter === 'today' ? (todaysCrystals.length ? todaysCrystals : CRYSTAL_LIBRARY.slice(0, 4)) : CRYSTAL_LIBRARY).map(c => {
+                  const isExpanded = expandedCrystal === c.name
+                  return (
+                    <button key={c.name} onClick={() => setExpandedCrystal(isExpanded ? null : c.name)}
+                      className="w-full rounded-2xl p-4 text-left"
+                      style={{ background: 'rgba(255,255,255,0.5)', border: `1px solid ${isExpanded ? c.color + '55' : 'rgba(180,150,100,0.18)'}` }}>
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl flex-shrink-0"
+                          style={{ background: `${c.color}22`, border: `1.5px solid ${c.color}55` }}>{c.emoji}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold" style={{ color: 'var(--text-1)' }}>{c.name}</p>
+                          <p className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>{c.properties}</p>
+                        </div>
+                      </div>
+
+                      {isExpanded && (
+                        <div className="mt-4 pt-4 space-y-3" style={{ borderTop: '1px solid rgba(180,150,100,0.18)' }}>
+                          <div className="flex flex-wrap gap-1.5">
+                            {[...c.signs, ...c.phases].slice(0, 4).map(tag => (
+                              <span key={tag} className="text-xs px-2 py-0.5 rounded-full"
+                                style={{ background: c.color + '18', color: c.lightColor, border: `1px solid ${c.color}25` }}>{tag}</span>
+                            ))}
+                            <span className="text-xs px-2 py-0.5 rounded-full"
+                              style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>{c.chakra}</span>
+                          </div>
+                          <div className="rounded-xl p-3" style={{ background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                            <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>LUNA</p>
+                            <p className="text-sm italic leading-relaxed" style={{ color: 'var(--text-1)' }}>{c.lunaNote}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-4)' }}>How to use</p>
+                            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{c.howToUse}</p>
+                          </div>
+                          <div className="rounded-xl p-3" style={{ background: c.color + '10', border: `1px solid ${c.color}20` }}>
+                            <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: c.lightColor }}>Affirmation</p>
+                            <p className="text-sm italic" style={{ color: 'var(--text-1)' }}>{c.affirmation}</p>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -1053,24 +847,82 @@ export default function SpiritScreen() {
           {activeTab === 'ritual' && (
             <div className="space-y-4 animate-fade-up">
 
-              {/* Moon phase ritual */}
+              {/* Moon phase ritual — live sign/phase-driven via astrology.ts getMoonRitualContext */}
               <div className="rounded-2xl p-5" style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.1), rgba(184,151,79,0.06))', border: '1px solid rgba(201,169,110,0.2)' }}>
                 <div className="flex items-center gap-2 mb-1">
                   <Moon className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>
-                    {realMoon?.phase.name ?? moon.name} Ritual
+                    {realMoon?.phase.name ?? moon.name} Ritual — {realMoon?.sign.name ?? 'your'} energy
                   </p>
                 </div>
-                <p className="font-display text-lg font-semibold mb-2" style={{ color: 'var(--text-1)' }}>{moonRitual.title}</p>
+                <p className="font-display text-lg font-semibold mb-1" style={{ color: 'var(--text-1)' }}>{moonRitual.title}</p>
                 <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-2)' }}>{moonRitual.desc}</p>
-                <div className="space-y-3">
-                  {moonRitual.steps.map((step, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
-                        style={{ background: 'rgba(201,169,110,0.2)', color: 'var(--violet)' }}>{i + 1}</div>
-                      <p className="text-sm leading-relaxed pt-0.5" style={{ color: 'var(--text-1)' }}>{step}</p>
-                    </div>
-                  ))}
+
+                {ritualContext?.intention && (
+                  <p className="text-sm leading-relaxed mb-2" style={{ color: 'var(--text-2)' }}>
+                    <span className="font-semibold" style={{ color: 'var(--violet)' }}>Set your intention around:</span>{' '}{ritualContext.intention}
+                  </p>
+                )}
+                {ritualContext?.avoid && (
+                  <p className="text-sm mb-4" style={{ color: 'var(--text-3)' }}>
+                    <span className="font-semibold">Avoid:</span> {ritualContext.avoid}
+                  </p>
+                )}
+
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-4)' }}>Your ritual steps</p>
+                <div className="space-y-2">
+                  {(ritualContext?.ritual?.length ? ritualContext.ritual : moonRitual.steps).map((step, i) => {
+                    const done = ritualCompleted.has(step)
+                    return (
+                      <button key={i} onClick={() => toggleRitualStep(step)}
+                        className="w-full rounded-xl p-3 flex items-center gap-3 text-left transition-all"
+                        style={{
+                          background: done ? 'rgba(90,140,120,0.1)' : 'rgba(255,255,255,0.5)',
+                          border: `1px solid ${done ? 'rgba(90,140,120,0.3)' : 'rgba(180,150,100,0.18)'}`,
+                        }}>
+                        <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
+                          style={{ background: done ? '#5A8A7A' : 'transparent', border: done ? 'none' : '2px solid var(--text-4)' }}>
+                          {done && <CheckCircle2 className="h-4 w-4 text-white" />}
+                        </div>
+                        <p className="text-sm leading-relaxed" style={{ color: done ? '#5A8A7A' : 'var(--text-1)', textDecoration: done ? 'line-through' : 'none' }}>{step}</p>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {ritualContext?.release && ritualContext.release.length > 0 && (
+                  <div className="mt-4 rounded-xl p-4" style={{ background: 'rgba(201,107,90,0.08)', border: '1px solid rgba(201,107,90,0.15)' }}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#C96B5A' }}>Full moon release</p>
+                    <p className="text-xs mb-2" style={{ color: 'var(--text-3)' }}>Write these on paper. Burn or bury after your ritual.</p>
+                    <ul className="space-y-1.5">
+                      {ritualContext.release.map((r, i) => (
+                        <li key={i} className="text-sm flex items-start gap-2" style={{ color: 'var(--text-1)' }}>
+                          <span style={{ color: '#C96B5A', fontWeight: 'bold', marginTop: 2, flexShrink: 0 }}>✕</span>{r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="mt-4">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-4)' }}>Ritual elements for {realMoon?.sign.name ?? 'Cancer'}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'Scents', items: ritualElements.scents },
+                      { label: 'Colors', items: ritualElements.colors },
+                      { label: 'Crystals', items: ritualElements.crystals },
+                      { label: 'Elements', items: ritualElements.elements },
+                    ].map(cat => (
+                      <div key={cat.label} className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
+                        <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-4)' }}>{cat.label}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {cat.items.map(item => (
+                            <span key={item} className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>{item}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -1102,7 +954,7 @@ export default function SpiritScreen() {
                 <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: 'var(--violet)' }}>🌙 Evening ritual</p>
                 <div className="space-y-4">
                   {[
-                    { step: 1, title: 'Energy clearing',       desc: 'Hands on your chest. Ask: "What is mine and what did I absorb today?" As Cancer Rising, you absorb rooms — release what isn\'t yours.' },
+                    { step: 1, title: 'Energy clearing',       desc: 'Hands on your chest. Ask: "What is mine and what did I absorb today?" With your Cancer Moon, you absorb rooms — release what isn\'t yours.' },
                     { step: 2, title: 'HD review',             desc: 'Did you wait for invitation today or push? Notice without judgment. Bitterness is information, not failure.' },
                     { step: 3, title: 'Three gratitudes',      desc: 'What did you do? What happened for you? What are you grateful for? These are three different things.' },
                     { step: 4, title: 'Body release',          desc: 'Shake your hands. Roll your shoulders. Your body carried your work today — acknowledge it and let it go.' },

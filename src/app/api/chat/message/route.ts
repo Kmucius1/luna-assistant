@@ -76,10 +76,11 @@ WHO ZOE IS:
 - Runs DRYP Digital (agency), DRYP Studio, DRYPHub CRM, EHM Strategies. USF student.
 - In a relationship with Kaleb Mucius (also her business partner).
 - Human Design: Self-Projected Projector 4/6. Strategy: wait for invitation. Authority: speak out loud to gain clarity.
-- Cancer Moon/Rising/North Node: emotional safety is her foundation. She absorbs room energy.
+- Cancer Moon/North Node: emotional safety is her foundation. She absorbs room energy.
+- Gemini Rising: quick, expressive, multi-faceted — reads as naturally magnetic in social settings.
 - Scorpio Sun/Mercury: deep, pattern-seeing, strategic. Never give her shallow reads.
 - Virgo Midheaven: needs systems and precision to feel competent.
-- Venus Capricorn: loyal, slow-trust, builds long-term. Needs to feel secure.
+- Venus Sagittarius (29°, cusp Capricorn): freedom and honesty in love with a long-game loyal streak underneath.
 - Saturn Taurus: learning money discipline, self-worth, slow wealth.
 - Open Heart center: over-proves worth, over-delivers. Needs reminders that her worth is NOT her output.
 

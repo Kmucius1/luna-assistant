@@ -27,15 +27,21 @@ export async function GET() {
       reimbursableRes,
       savingsRes,
       debtsRes,
+      subsReviewRes,
+      dupesPreviewRes,
+      goalsPreviewRes,
     ] = await Promise.all([
       computeSafeToSpend(db, userId),
-      db.from('bills').select('id, name, due_date, expected_amount, minimum_amount, status').eq('user_id', userId).in('status', ['upcoming', 'needs_review']).gte('due_date', today).lte('due_date', daysFromNow(31)),
+      db.from('bills').select('id, name, due_date, expected_amount, minimum_amount, status, autopay_status, account_id').eq('user_id', userId).in('status', ['upcoming', 'needs_review']).gte('due_date', today).lte('due_date', daysFromNow(31)),
       db.from('subscriptions').select('id').eq('user_id', userId).eq('status', 'review'),
       db.from('duplicate_charge_alerts').select('id').eq('user_id', userId).eq('status', 'open'),
       db.from('transactions').select('amount, ownership_type, direction, category').eq('user_id', userId).gte('posted_date', daysFromNow(-30)),
       db.from('transactions').select('amount').eq('user_id', userId).eq('reimbursable', true).eq('review_status', 'unreviewed'),
       db.from('savings_goals').select('current_amount').eq('user_id', userId).eq('active', true),
       db.from('debts').select('balance').eq('user_id', userId),
+      db.from('subscriptions').select('display_name, merchant_normalized, expected_amount').eq('user_id', userId).eq('status', 'review').limit(5),
+      db.from('duplicate_charge_alerts').select('id, reason, severity').eq('user_id', userId).eq('status', 'open').order('severity', { ascending: false }).limit(5),
+      db.from('savings_goals').select('id, name, goal_type, current_amount, target_amount').eq('user_id', userId).eq('active', true).order('priority', { ascending: true }).limit(3),
     ])
 
     const bills = (billsRes.data ?? []) as BillRow[]
@@ -63,18 +69,32 @@ export async function GET() {
     const savingsTotal = ((savingsRes.data ?? []) as SavingsRow[]).reduce((s, g) => s + (g.current_amount ?? 0), 0)
     const debtTotal = ((debtsRes.data ?? []) as DebtRow[]).reduce((s, d) => s + (d.balance ?? 0), 0)
 
+    // Unified alerts preview for the hero-adjacent "Money Alerts" card —
+    // combines duplicate/unusual-charge alerts with subscriptions flagged
+    // for review, each with a plain reason string, newest/highest-severity first.
+    interface DupeRow { id: string; reason: string; severity: string }
+    interface SubReviewRow { display_name: string | null; merchant_normalized: string; expected_amount: number | null }
+    const alertsPreview = [
+      ...((dupesPreviewRes.data ?? []) as DupeRow[]).map(d => ({ id: d.id, kind: 'duplicate' as const, reason: d.reason, severity: d.severity })),
+      ...((subsReviewRes.data ?? []) as SubReviewRow[]).map(s => ({ id: s.merchant_normalized, kind: 'subscription' as const, reason: `${s.display_name ?? s.merchant_normalized} needs review`, severity: 'low' as const })),
+    ].slice(0, 5)
+
     return NextResponse.json({
       safe_to_spend: safeToSpend,
       bills_due_today: billsDueToday,
       bills_due_this_week: billsDueThisWeek,
       bills_due_this_month: billsDueThisMonth,
+      bills_preview: bills.slice(0, 3),
       subscription_alerts_count: (subsRes.data ?? []).length,
       duplicate_charges_count: (duplicatesRes.data ?? []).length,
+      alerts_preview: alertsPreview,
+      alerts_total_count: (dupesPreviewRes.data ?? []).length + (subsReviewRes.data ?? []).length,
       personal_spending: personalSpending,
       business_spending: businessSpending,
       reimbursements_owed: reimbursementsOwed,
       business_expenses_paid_personally: businessExpensesPaidPersonally,
       savings_total: savingsTotal,
+      savings_preview: goalsPreviewRes.data ?? [],
       debt_total: debtTotal,
       unknown_transactions_count: unknownCount,
     }, { headers: { 'Cache-Control': 'no-store' } })

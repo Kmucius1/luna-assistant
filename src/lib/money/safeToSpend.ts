@@ -5,6 +5,7 @@ export interface SafeToSpendBreakdown {
   confirmedIncome: number
   pendingOutflows: number
   billsDue: number
+  subscriptionsDue: number
   groceryReserve: number
   gasReserve: number
   necessityReserve: number
@@ -68,6 +69,16 @@ export async function computeSafeToSpend(db: SupabaseClient, userId: string): Pr
     .in('status', ['upcoming', 'needs_review'])
   const billsDue = (bills ?? []).reduce((s, b) => s + (b.expected_amount ?? b.minimum_amount ?? 0), 0)
 
+  // Active personal subscriptions with a charge expected inside the
+  // planning window — previously excluded from the reserve entirely, which
+  // meant e.g. a real upcoming Netflix charge didn't reduce Safe to Spend
+  // unless someone had also duplicated it into `bills`.
+  const { data: subs } = await db.from('subscriptions')
+    .select('expected_amount, next_expected_date, status, ownership_type')
+    .eq('user_id', userId).eq('ownership_type', 'personal').lte('next_expected_date', cutoffDate).gte('next_expected_date', today)
+    .in('status', ['keep', 'review'])
+  const subscriptionsDue = (subs ?? []).reduce((s, sub) => s + (sub.expected_amount ?? 0), 0)
+
   const scale = daysToCutoff / 7
   const groceryReserve = weeklyGrocery * scale
   const gasReserve = weeklyGas * scale
@@ -81,13 +92,13 @@ export async function computeSafeToSpend(db: SupabaseClient, userId: string): Pr
   // schema — treated as 0 until Zoe defines a concrete contribution rule.
   const plannedSavings = 0
 
-  const safeToSpend = postedBalances + confirmedIncome - pendingOutflows - billsDue
+  const safeToSpend = postedBalances + confirmedIncome - pendingOutflows - billsDue - subscriptionsDue
     - groceryReserve - gasReserve - necessityReserve - minimumDebtPayments - plannedSavings - safetyBuffer
 
   const dailySpendingAmount = daysUntilNextConfirmedIncome ? safeToSpend / daysUntilNextConfirmedIncome : null
 
   return {
-    postedBalances, confirmedIncome, pendingOutflows, billsDue,
+    postedBalances, confirmedIncome, pendingOutflows, billsDue, subscriptionsDue,
     groceryReserve, gasReserve, necessityReserve, minimumDebtPayments, plannedSavings, safetyBuffer,
     safeToSpend, daysUntilNextConfirmedIncome, dailySpendingAmount, cutoffDate,
     notComputed: ['medication_and_necessity_reserve', 'planned_savings_per_period'],

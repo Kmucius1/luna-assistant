@@ -1,0 +1,45 @@
+.tabRow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 4px; }
+.tab {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 38px; border-radius: 12px;
+  background: var(--astro-card); border: 1px solid var(--astro-border);
+  font-size: 11.5px; font-weight: 600; color: var(--astro-muted);
+}
+.tabActive { background: var(--astro-gold-soft); color: var(--astro-text); font-weight: 700; border-color: var(--astro-gold); }
+
+.wheelCard { background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 20px; box-shadow: var(--astro-shadow); padding: 14px; }
+
+.uncertaintyNote { display: flex; gap: 8px; align-items: flex-start; background: var(--astro-gold-soft); border-radius: 14px; padding: 10px 12px; font-size: 11px; color: var(--astro-text); line-height: 1.4; }
+.uncertaintyNote svg { color: var(--astro-gold); flex-shrink: 0; margin-top: 1px; width: 14px; height: 14px; }
+
+.bigThreeGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bigThreeCard { background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 16px; box-shadow: var(--astro-shadow); padding: 12px 8px; text-align: center; }
+.bigThreeLabel { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--astro-muted); margin-bottom: 4px; }
+.bigThreeSign { font-family: var(--font-display-var, serif); font-size: 14px; font-weight: 700; color: var(--astro-text); }
+.bigThreeDegree { font-size: 9.5px; color: var(--astro-muted); margin-top: 2px; }
+
+.placementRow {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px;
+  padding: 10px 12px; box-shadow: var(--astro-shadow);
+}
+.placementGlyph { width: 30px; height: 30px; border-radius: 50%; background: var(--astro-gold-soft); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--astro-gold); flex-shrink: 0; }
+.placementInfo { flex: 1; min-width: 0; }
+.placementInfo strong { display: block; font-size: 13px; color: var(--astro-text); font-weight: 700; }
+.placementInfo span { font-size: 11px; color: var(--astro-muted); }
+.placementHouse { font-size: 10.5px; color: var(--astro-muted); text-align: right; flex-shrink: 0; }
+.retroTag { color: #C96B5A; font-weight: 700; }
+
+.houseCard { background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px; padding: 10px 12px; box-shadow: var(--astro-shadow); }
+.houseCard strong { font-size: 12.5px; color: var(--astro-text); }
+.houseCard p { margin: 2px 0 0; font-size: 11px; color: var(--astro-muted); }
+.houseOccupants { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+.houseOccupants span { font-size: 10px; font-weight: 700; color: var(--astro-gold); background: var(--astro-gold-soft); padding: 2px 7px; border-radius: 999px; }
+
+.aspectRow { display: flex; align-items: center; gap: 10px; background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 12px; padding: 9px 12px; box-shadow: var(--astro-shadow); font-size: 12px; color: var(--astro-text); }
+.aspectType { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--astro-gold); flex-shrink: 0; width: 76px; }
+.aspectOrb { margin-left: auto; font-size: 10px; color: var(--astro-muted); flex-shrink: 0; }
+
+.sheetSection { margin-bottom: 14px; }
+.sheetSection h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--astro-gold, #C58D32); margin: 0 0 4px; }
+.sheetSection p { margin: 0; font-size: 13px; line-height: 1.5; color: #32284A; }
