@@ -34,10 +34,13 @@ export function DesktopTabBar() {
       style={{ pointerEvents: 'none' }}>
       <div className="flex items-center gap-1 px-3 py-2.5 rounded-[28px]"
         style={{
-          background: 'var(--dock-bg)',
+          // Hardcoded warm dark-brown dock, not var(--dock-bg) — locked to
+          // this palette regardless of the site-wide theme toggle, matching
+          // the approved desktop reference (light header + warm dark dock).
+          background: 'rgba(35,28,20,0.94)',
           backdropFilter: 'blur(32px)',
           WebkitBackdropFilter: 'blur(32px)',
-          border: '1px solid var(--dock-border)',
+          border: '1px solid rgba(201,169,110,0.22)',
           boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
           pointerEvents: 'all',
           transform: 'translateZ(0)',
@@ -49,13 +52,13 @@ export function DesktopTabBar() {
             <Link key={href} href={href}
               className="relative flex flex-col items-center gap-1 px-5 py-2 rounded-[20px] transition-all duration-200 group"
               style={{
-                background: active ? 'var(--tab-active-bg)' : 'transparent',
+                background: active ? '#FBF8F2' : 'transparent',
                 minWidth: 72,
               }}>
               <Icon className="h-5 w-5 transition-transform duration-150 group-hover:scale-110"
-                style={{ color: active ? 'var(--tab-active-text)' : 'var(--tab-inactive-text)' }} strokeWidth={1.6} />
+                style={{ color: active ? '#100C1E' : 'rgba(245,239,226,0.65)' }} strokeWidth={1.6} />
               <span className="text-xs font-medium whitespace-nowrap transition-colors"
-                style={{ color: active ? 'var(--tab-active-text)' : 'var(--tab-inactive-text)' }}>
+                style={{ color: active ? '#100C1E' : 'rgba(245,239,226,0.65)' }}>
                 {label}
               </span>
             </Link>
