@@ -1,0 +1,163 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --bronze: #8A6A3A;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.09);
+
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 16px 16px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 100%;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.header h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 27px; font-weight: 700; color: var(--ink-1); margin: 0 0 3px;
+  display: flex; align-items: center; gap: 6px;
+}
+.header h1 svg { color: var(--gold); width: 18px; height: 18px; }
+.header p { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-3); }
+
+.closeButton {
+  flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.2);
+  color: var(--ink-2); box-shadow: var(--soft-shadow);
+}
+
+/* ── Prompt + board ───────────────────────────────────── */
+
+.prompt { display: flex; align-items: center; gap: 8px; font-family: var(--font-display-var, serif); font-size: 18px; color: var(--ink-1); margin: 0; }
+.prompt svg { color: var(--gold); width: 18px; height: 18px; flex-shrink: 0; }
+
+.board { position: relative; border-radius: 22px; overflow: hidden; box-shadow: var(--soft-shadow); min-height: 190px; display: flex; align-items: flex-end; }
+.board :global(img) { object-fit: cover; }
+.boardOverlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,15,8,0) 55%, rgba(20,15,8,0.15) 100%); }
+.boardLabel {
+  position: relative; z-index: 1; margin: 12px;
+  background: rgba(20,15,10,0.72); color: #fff; padding: 8px 14px; border-radius: 14px;
+}
+.boardLabel strong { display: block; font-size: 13px; font-weight: 700; }
+.boardLabel span { font-size: 10.5px; color: rgba(255,255,255,0.8); }
+.boardButton {
+  position: absolute; z-index: 1; bottom: 12px; right: 12px;
+  background: rgba(255,255,255,0.9); color: var(--ink-1);
+  font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: none;
+}
+
+/* ── Six quick-action cards ───────────────────────────── */
+
+.actionGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.actionCard {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.14);
+  border-radius: 18px; padding: 16px 8px; box-shadow: var(--soft-shadow);
+  min-height: 44px;
+}
+.actionCard svg { color: var(--gold); width: 22px; height: 22px; margin-bottom: 2px; }
+.actionCard strong { font-size: 12px; font-weight: 700; color: var(--ink-1); }
+.actionCard span { font-size: 10px; color: var(--ink-3); line-height: 1.25; }
+.actionBadge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 7px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+  color: #14110b; background: var(--gold); padding: 1.5px 6px; border-radius: 999px;
+}
+
+/* ── Check-in ─────────────────────────────────────────── */
+
+.sectionHeader { display: flex; align-items: baseline; justify-content: space-between; }
+.sectionHeader h2 { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bronze); margin: 0; }
+.sectionHeader span { display: flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+
+.checkinRow { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.checkinRow::-webkit-scrollbar { display: none; }
+
+.checkinCard {
+  flex: 0 0 auto; width: 140px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.14);
+  border-radius: 16px; box-shadow: var(--soft-shadow); overflow: hidden;
+}
+
+.checkinPhoto { position: relative; width: 100%; height: 90px; }
+.checkinPhoto :global(img) { object-fit: cover; }
+
+.checkinBody { padding: 8px 10px 10px; }
+.checkinQuestion { font-size: 11px; font-weight: 700; color: var(--ink-1); margin: 0 0 6px; }
+.checkinOptions { display: flex; flex-wrap: wrap; gap: 4px; }
+.checkinChip {
+  font-size: 9px; font-weight: 600; color: var(--ink-2);
+  background: rgba(201,169,110,0.1); border: 1px solid rgba(180,150,100,0.18);
+  border-radius: 999px; padding: 4px 8px; min-height: 24px;
+}
+.checkinChipActive { background: var(--gold); color: #14110b; border-color: var(--gold); }
+
+.showPathsButton {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; background: var(--bronze); color: #fff;
+  font-size: 13.5px; font-weight: 700; padding: 13px; border-radius: 999px; border: none;
+  min-height: 44px;
+}
+.showPathsButton:disabled { opacity: 0.6; }
+
+/* ── Generated path cards ─────────────────────────────── */
+
+.pathsWrap { display: flex; flex-direction: column; gap: 10px; }
+.pathCard {
+  background: rgba(255,255,255,0.65); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 18px; padding: 14px 16px; box-shadow: var(--soft-shadow);
+}
+.pathKind { font-size: 10px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+.pathCard h3 { font-family: var(--font-display-var, serif); font-size: 17px; font-weight: 700; color: var(--ink-1); margin: 0 0 5px; }
+.pathWhy { font-size: 12.5px; color: var(--ink-2); line-height: 1.4; margin: 0 0 8px; }
+.pathMeta { display: flex; gap: 12px; font-size: 11px; color: var(--ink-3); margin-bottom: 8px; flex-wrap: wrap; }
+.pathMeta span { display: flex; align-items: center; gap: 4px; }
+.pathSteps { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pathSteps li { font-size: 12px; color: var(--ink-2); display: flex; gap: 6px; }
+.pathSteps li b { color: var(--gold); flex-shrink: 0; }
+.pathActions { display: flex; gap: 8px; }
+.pathActions button {
+  flex: 1; min-height: 40px; font-size: 11.5px; font-weight: 700;
+  border-radius: 999px; border: 1px solid rgba(180,150,100,0.2);
+  background: rgba(255,255,255,0.6); color: var(--ink-2);
+}
+.pathActionSave { background: var(--gold) !important; color: #14110b !important; border-color: var(--gold) !important; }
+.pathActionSaved { opacity: 0.6; }
+
+.loadingNote, .errorNote { text-align: center; font-size: 12.5px; color: var(--ink-3); padding: 12px; }
+
+/* ── Daily Creative Spark ─────────────────────────────── */
+
+.sparkCard { display: flex; gap: 12px; background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.14); border-radius: 18px; padding: 10px; box-shadow: var(--soft-shadow); }
+.sparkPhoto { position: relative; width: 84px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.sparkPhoto :global(img) { object-fit: cover; }
+.sparkBody { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sparkText { font-family: var(--font-display-var, serif); font-size: 13.5px; font-weight: 700; color: var(--ink-1); margin: 0 0 3px; line-height: 1.25; }
+.sparkTip { font-size: 10.5px; color: var(--ink-3); margin: 0 0 8px; }
+.sparkActions { display: flex; gap: 12px; margin-top: auto; }
+.sparkActions button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; font-weight: 600; color: var(--ink-3); background: none; border: none; min-height: 32px; }
+.sparkActions svg { width: 16px; height: 16px; color: var(--gold); }
+.sparkActionDone { color: var(--gold) !important; }
+
+/* ── Bottom category grid ──────────────────────────────── */
+
+.categoryGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.categoryCard {
+  position: relative;
+  display: flex; flex-direction: column; gap: 3px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.14);
+  border-radius: 16px; padding: 14px; box-shadow: var(--soft-shadow);
+  min-height: 44px;
+}
+.categoryCard svg { color: var(--gold); width: 18px; height: 18px; }
+.categoryCard strong { font-size: 12.5px; font-weight: 700; color: var(--ink-1); }
+.categoryCard span { font-size: 10px; color: var(--ink-3); }

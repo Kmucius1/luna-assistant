@@ -38,7 +38,7 @@ const ROOMS: Room[] = [
   { slug: 'style', label: 'Style', tagline: ['Dress the life', "you're building."], image: '/images/rooms/style.jpg', href: '/style', icon: ShirtIcon },
   { slug: 'fitness', label: 'Fitness', tagline: ['Train your body.', 'Build strength.'], image: '/images/rooms/fitness.jpg', href: '/fitness', icon: Dumbbell },
   { slug: 'work', label: 'Work', tagline: ['Build your brand.', 'Create impact.'], image: '/images/rooms/work.jpg', href: '/work', icon: Briefcase },
-  { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.jpg', href: '/creative', icon: PenLine },
+  { slug: 'create', label: 'Create', tagline: ['Bring your ideas', 'to life.'], image: '/images/rooms/atelier.jpg', href: '/create', icon: PenLine },
   { slug: 'wellness', label: 'Wellness', tagline: ['Protect your peace.', 'Nourish your soul.'], image: '/images/rooms/wellness.jpg', href: '/wellness', icon: Flower2, comingSoon: true },
   { slug: 'astrology', label: 'Astrology', tagline: ['Align with', 'the universe.'], image: '/images/rooms/astrology.jpg', href: '/astrology', icon: MoonStar },
   { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign },
