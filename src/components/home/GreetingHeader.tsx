@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Bell, ChevronLeft, Cloud, CloudRain, Heart, Sparkles, Sun, Wind } from 'lucide-react'
 
 import { useLocation } from '@/hooks/useLocation'
+import { getGreeting } from '@/lib/luna/greeting'
 import styles from './GreetingHeader.module.css'
 
 const QUOTES = [
@@ -20,13 +21,6 @@ const QUOTES = [
 export function dayIndex(): number {
   const start = new Date(new Date().getFullYear(), 0, 0).getTime()
   return Math.floor((Date.now() - start) / 86_400_000)
-}
-
-function getGreeting(hour: number): string {
-  if (hour < 12) return 'Good Morning'
-  if (hour < 17) return 'Good Afternoon'
-  if (hour < 21) return 'Good Evening'
-  return 'Good Night'
 }
 
 function weatherIconFor(forecast: string) {

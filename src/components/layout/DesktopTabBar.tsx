@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Home, Utensils, Briefcase, MessageCircle, Moon, Scissors, LayoutGrid, Sparkles } from 'lucide-react'
 
-// Home is the 12-room app grid at /home; the app's own landing
-// page ("/") redirects straight to /today instead (see
-// LUNA_V2_MIGRATION_PLAN.md) — they're deliberately two different screens.
+// Home is the 12-room app grid at /home — also where "/" redirects to,
+// so this tab matches the app's real landing page (see
+// LUNA_V2_MIGRATION_PLAN.md). /today is one of the 12 rooms, reached
+// from here, not a separate top-level destination.
 const TABS = [
   { href: '/home',           label: 'Home',      icon: Home          },
   { href: '/food',           label: 'Food',      icon: Utensils      },

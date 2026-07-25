@@ -1,0 +1,130 @@
+.page {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-2: #32284A;
+  --ink-3: #5E5474;
+  --gold: #C9A96E;
+  --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 12px 14px 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--soft-shadow);
+  color: var(--ink-1);
+  flex-shrink: 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin: 0 0 2px;
+}
+.eyebrow svg { color: var(--gold); }
+
+.header h1 {
+  font-family: var(--font-display-var, serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink-1);
+  margin: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.14);
+  border-radius: 12px;
+  box-shadow: var(--soft-shadow);
+  padding: 12px 14px;
+  text-align: left;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(180, 150, 100, 0.4);
+  flex-shrink: 0;
+  color: #fff;
+}
+.checkboxDone { background: var(--gold); border-color: var(--gold); }
+
+.rowLabel { font-size: 13px; font-weight: 600; color: var(--ink-1); }
+.rowLabelDone { color: var(--ink-3); text-decoration: line-through; }
+
+.completeButton {
+  margin-top: auto;
+  width: 100%;
+  background: var(--gold);
+  color: #14110b;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+}
+.completeButton:disabled { opacity: 0.6; }
+
+.doneCard {
+  margin: auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  box-shadow: var(--soft-shadow);
+  padding: 28px 24px;
+}
+.doneIcon { color: var(--gold); margin-bottom: 4px; }
+.doneCard h1 { font-family: var(--font-display-var, serif); font-size: 18px; color: var(--ink-1); margin: 0; }
+.doneCard p { font-size: 13px; color: var(--ink-3); margin: 0 0 8px; }
+
+.backToFitness {
+  background: var(--gold);
+  color: #14110b;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 999px;
+  text-decoration: none;
+}

@@ -21,6 +21,8 @@ import {
 } from 'lucide-react'
 
 import { ZOE_EXERCISES_BY_DAY, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { resolveExercises } from '@/lib/luna/fitnessExercises'
+import { getGreeting } from '@/lib/luna/greeting'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaFitnessPage.module.css'
 
@@ -69,15 +71,26 @@ function toggle(list: string[], value: string): string[] {
 
 export function LunaFitnessPage() {
   const [weekday, setWeekday] = useState<string | null>(null)
+  const [hour, setHour] = useState<number | null>(null)
   const [onboarding, setOnboarding] = useState<Onboarding>(DEFAULT_ONBOARDING)
   const [activeTab, setActiveTab] = useState<OnboardingTab>('goals')
+  const [completedToday, setCompletedToday] = useState(false)
 
   useEffect(() => {
-    setWeekday(new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()))
+    const d = new Date()
+    setWeekday(new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d))
+    setHour(d.getHours())
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved) setOnboarding({ ...DEFAULT_ONBOARDING, ...JSON.parse(saved) })
     } catch { /* ignore */ }
+  }, [])
+
+  useEffect(() => {
+    fetch(`/api/fitness/workouts?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(res => res.json())
+      .then(data => setCompletedToday(!!data.completedToday))
+      .catch(() => {})
   }, [])
 
   function update(next: Onboarding) {
@@ -86,7 +99,9 @@ export function LunaFitnessPage() {
   }
 
   const gymFocus = (weekday && ZOE_GYM_BY_DAY[weekday]) ?? ZOE_GYM_BY_DAY.Monday
-  const exercises = (weekday && ZOE_EXERCISES_BY_DAY[weekday]) ?? ZOE_EXERCISES_BY_DAY.Monday
+  // NOTE: only `equipment` currently affects the displayed workout (see
+  // resolveExercises); goals/gym/days are saved but not yet applied anywhere.
+  const exercises = weekday ? resolveExercises(weekday, ZOE_EXERCISES_BY_DAY, onboarding.equipment) : ZOE_EXERCISES_BY_DAY.Monday
   const estimatedMinutes = exercises.length * 8
 
   return (
@@ -96,7 +111,7 @@ export function LunaFitnessPage() {
           <Image src="/images/rooms/hero-gym-focus.jpg" alt="Fitness" fill sizes="(max-width: 640px) 100vw, 640px" priority />
           <div className={styles.headerOverlay} />
           <div className={styles.headerContent}>
-            <h1>Good morning, Zoe. Ready to move?</h1>
+            <h1>{hour !== null ? getGreeting(hour) : 'Hello'}, Zoe. Ready to move?</h1>
             <p>Every expert started with one workout.</p>
           </div>
         </div>
@@ -110,7 +125,11 @@ export function LunaFitnessPage() {
               <div className={styles.workoutStat}><Flame size={11} /><strong>{exercises.length} exercises</strong></div>
               <div className={styles.workoutStat}><Building2 size={11} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
             </div>
-            <Link href="/plan-my-day" className={styles.startButton}>Start Workout</Link>
+            {completedToday ? (
+              <div className={styles.completedBadge}><Sparkles size={12} /> Completed today</div>
+            ) : (
+              <Link href="/fitness/workout" className={styles.startButton}>Start Workout</Link>
+            )}
           </div>
         </div>
 
