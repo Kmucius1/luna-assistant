@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -59,11 +59,25 @@ function dateLabelFor(offset: number): string {
 export function LunaFoodPage() {
   const [dayOffset, setDayOffset] = useState(0)
   const [activeTab, setActiveTab] = useState<TabId>('meal_plan')
+  const [mealIndex, setMealIndex] = useState(0)
+  const mealsScrollerRef = useRef<HTMLDivElement>(null)
 
   const quote = FOOD_QUOTES[dayIndex(0) % FOOD_QUOTES.length]
   const dateLabel = useMemo(() => dateLabelFor(dayOffset), [dayOffset])
   const activeTabMeta = TABS.find(t => t.id === activeTab)!
   const totals = todayNutritionTotals()
+
+  function handleMealsScroll() {
+    const el = mealsScrollerRef.current
+    if (!el || el.clientWidth === 0) return
+    setMealIndex(Math.round(el.scrollLeft / el.clientWidth))
+  }
+
+  function goToMeal(i: number) {
+    const el = mealsScrollerRef.current
+    if (!el) return
+    el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+  }
 
   return (
     <AppLayout noPad noScroll>
@@ -115,26 +129,39 @@ export function LunaFoodPage() {
         {activeTab === 'meal_plan' ? (
           <>
             <h2 className={styles.sectionHeader}>Today&apos;s Meals</h2>
-            <div className={styles.mealsList}>
+            <div className={styles.mealsPager} ref={mealsScrollerRef} onScroll={handleMealsScroll}>
               {TODAY_MEALS.map(meal => {
                 const Icon = MEAL_ICON[meal.mealType]
                 return (
-                  <div key={meal.id} className={styles.mealCard}>
-                    <div className={styles.mealPhoto}><Image src={meal.image} alt={meal.title} fill sizes="84px" /></div>
-                    <div className={styles.mealBody}>
-                      <div className={styles.mealLabel}><Icon size={12} /> {meal.label}</div>
-                      <div className={styles.mealTitleRow}>
-                        <h3>{meal.title}</h3>
-                        <ChevronRight size={16} />
-                      </div>
-                      <div className={styles.mealStats}>
-                        <span><Droplet size={13} /> {meal.calories} cal</span>
-                        <span><Beef size={13} /> {meal.proteinG}g protein</span>
+                  <div key={meal.id} className={styles.mealSlide}>
+                    <div className={styles.mealCard}>
+                      <div className={styles.mealPhoto}><Image src={meal.image} alt={meal.title} fill sizes="(max-width: 640px) 90vw, 400px" /></div>
+                      <div className={styles.mealBody}>
+                        <div className={styles.mealLabel}><Icon size={12} /> {meal.label}</div>
+                        <div className={styles.mealTitleRow}>
+                          <h3>{meal.title}</h3>
+                          <ChevronRight size={16} />
+                        </div>
+                        <div className={styles.mealStats}>
+                          <span><Droplet size={13} /> {meal.calories} cal</span>
+                          <span><Beef size={13} /> {meal.proteinG}g protein</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 )
               })}
+            </div>
+            <div className={styles.mealDots}>
+              {TODAY_MEALS.map((meal, i) => (
+                <button
+                  key={meal.id}
+                  type="button"
+                  className={`${styles.mealDot} ${i === mealIndex ? styles.mealDotActive : ''}`}
+                  onClick={() => goToMeal(i)}
+                  aria-label={`${meal.label}`}
+                />
+              ))}
             </div>
 
             <div className={styles.nutritionCard}>

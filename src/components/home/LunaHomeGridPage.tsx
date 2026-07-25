@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -52,7 +52,23 @@ const ROOMS: Room[] = [
   { slug: 'spiritual', label: 'Spiritual', tagline: ['Tarot, crystals,', 'rituals & more.'], image: '/images/rooms/wellness.jpg', href: '/spirit', icon: Sparkles, accent: 'rgba(200,180,220,0.32)' },
 ]
 
-const PAGE_SIZE = 2
+// Mobile: 2 rooms per page (bigger cards, easier to read on a small screen).
+// Desktop: 4 per page — matches the same 1024px cutover used by DesktopHeader/DesktopTabBar.
+const MOBILE_PAGE_SIZE = 2
+const DESKTOP_PAGE_SIZE = 4
+const DESKTOP_BREAKPOINT = '(min-width: 1024px)'
+
+function useIsDesktop(): boolean {
+  const [isDesktop, setIsDesktop] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_BREAKPOINT)
+    setIsDesktop(mq.matches)
+    const onChange = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return isDesktop
+}
 
 const HERO_FOCUS_FALLBACK = ZOE_HERO_FOCUS_BY_DAY.Monday
 
@@ -60,15 +76,24 @@ export function LunaHomeGridPage() {
   const { now, weather, weatherError } = useTodayContext()
   const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? HERO_FOCUS_FALLBACK
   const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
+  const isDesktop = useIsDesktop()
+  const pageSize = isDesktop ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE
 
   const pages = useMemo(() => {
     const chunks: Room[][] = []
-    for (let i = 0; i < ROOMS.length; i += PAGE_SIZE) chunks.push(ROOMS.slice(i, i + PAGE_SIZE))
+    for (let i = 0; i < ROOMS.length; i += pageSize) chunks.push(ROOMS.slice(i, i + pageSize))
     return chunks
-  }, [])
+  }, [pageSize])
 
   const scrollerRef = useRef<HTMLDivElement>(null)
   const [pageIndex, setPageIndex] = useState(0)
+
+  // Re-chunking on breakpoint change invalidates scroll position/pageIndex —
+  // snap back to the first page rather than leaving a stale, out-of-bounds state.
+  useEffect(() => {
+    setPageIndex(0)
+    scrollerRef.current?.scrollTo({ left: 0 })
+  }, [pageSize])
 
   function handleScroll() {
     const el = scrollerRef.current

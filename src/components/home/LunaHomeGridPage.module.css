@@ -148,6 +148,12 @@
   padding: 0 1px;
 }
 
+/* Desktop pages hold 4 rooms per page (matches DESKTOP_PAGE_SIZE in the
+   component); mobile stays at 2 per page above for bigger, legible cards. */
+@media (min-width: 1024px) {
+  .roomPage { grid-template-columns: repeat(4, 1fr); }
+}
+
 .roomCard {
   position: relative;
   min-height: 0;

@@ -243,27 +243,45 @@
   text-align: center;
 }
 
-/* ── Meal cards ───────────────────────────────────────── */
+/* ── Meal cards — one at a time, swipe horizontally ──────── */
 
-.mealsList { flex: 2.9 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.mealsPager {
+  flex: 2.9 1 0;
+  min-height: 0;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.mealsPager::-webkit-scrollbar { display: none; }
+
+.mealSlide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  display: flex;
+  padding: 0 1px;
+}
 
 .mealCard {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   display: flex;
-  gap: 10px;
+  gap: 14px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: 16px;
+  border-radius: 18px;
   box-shadow: var(--soft-shadow);
-  padding: 6px 7px;
+  padding: 10px 12px;
 }
 
 .mealPhoto {
   position: relative;
-  width: 68px;
-  border-radius: 11px;
+  width: 120px;
+  border-radius: 13px;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -272,39 +290,63 @@
 
 .mealBody { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 
+.mealDots {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.mealDot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(180,150,100,0.3);
+  border: none;
+  padding: 0;
+}
+
+.mealDotActive {
+  background: var(--gold);
+  width: 20px;
+  border-radius: 4px;
+}
+:global([data-theme='dark']) .mealDot { background: rgba(201,169,110,0.28); }
+
 .mealLabel {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 8px;
+  font-size: 9.5px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--gold);
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
-.mealLabel svg { width: 10px; height: 10px; }
+.mealLabel svg { width: 11px; height: 11px; }
 
 .mealTitleRow { display: flex; align-items: flex-start; justify-content: space-between; gap: 4px; }
 
 .mealTitleRow h3 {
   font-family: var(--font-display-var, serif);
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--ink-1);
   margin: 0;
-  line-height: 1.2;
+  line-height: 1.25;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .mealTitleRow svg { display: none; }
 
-.mealStats { display: flex; gap: 10px; font-size: 10px; font-weight: 600; color: var(--ink-2); margin-top: 3px; }
-.mealStats span { display: flex; align-items: center; gap: 3px; }
-.mealStats svg { color: var(--gold); width: 10px; height: 10px; }
+.mealStats { display: flex; gap: 14px; font-size: 11.5px; font-weight: 600; color: var(--ink-2); margin-top: 6px; }
+.mealStats span { display: flex; align-items: center; gap: 4px; }
+.mealStats svg { color: var(--gold); width: 12px; height: 12px; }
 
 /* ── Nutrition goals ──────────────────────────────────── */
 

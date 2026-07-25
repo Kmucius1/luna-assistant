@@ -46,7 +46,7 @@
 
 .greetingText h1 svg { color: #C9A96E; width: 14px; height: 14px; }
 
-.dateLine { margin: 0; font-size: 10.5px; font-weight: 600; color: #32284A; }
+.dateLine { margin: 0; font-size: 12.5px; font-weight: 600; color: #32284A; }
 :global([data-theme='dark']) .dateLine { color: rgba(245, 239, 227, 0.80); }
 
 .headerRight {
@@ -89,7 +89,7 @@
 
 .weatherIcon { color: #C9A96E; float: left; width: 13px; height: 13px; }
 
-.weatherCard p { margin: 0; font-size: 8.5px; color: #5E5474; white-space: nowrap; }
+.weatherCard p { margin: 0; font-size: 11px; color: #5E5474; white-space: nowrap; }
 :global([data-theme='dark']) .weatherCard p { color: rgba(245, 239, 227, 0.58); }
 
 .quoteLine {
@@ -98,7 +98,7 @@
   align-items: center;
   gap: 5px;
   margin: 0;
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-style: italic;
   color: #32284A;
   overflow: hidden;
