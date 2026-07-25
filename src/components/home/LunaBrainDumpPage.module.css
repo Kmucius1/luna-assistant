@@ -16,6 +16,25 @@
   min-height: 100%;
 }
 
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --gold-soft: rgba(201, 169, 110, 0.16);
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .iconButton,
+:global([data-theme='dark']) .captureCard,
+:global([data-theme='dark']) .otherButton,
+:global([data-theme='dark']) .categoryChip,
+:global([data-theme='dark']) .entryRow {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
 /* ── Header ───────────────────────────────────────────── */
 
 .topBar { display: flex; align-items: center; justify-content: space-between; }
@@ -38,6 +57,7 @@
 .heroPhoto { position: absolute; inset: 0; }
 .heroPhoto :global(img) { object-fit: cover; }
 .heroFade { position: absolute; inset: 0; background: linear-gradient(90deg, var(--ivory-1) 32%, rgba(251,248,242,0.5) 62%, rgba(251,248,242,0) 100%); }
+:global([data-theme='dark']) .heroFade { background: linear-gradient(90deg, var(--ivory-1) 32%, rgba(23,19,13,0.5) 62%, rgba(23,19,13,0) 100%); }
 .heroContent { position: relative; z-index: 1; padding: 14px 16px; max-width: 64%; }
 .heroContent h2 { font-family: var(--font-display-var, serif); font-size: 22px; font-weight: 700; color: var(--ink-1); margin: 0 0 4px; }
 .heroContent p { margin: 0; font-size: 11px; color: var(--ink-3); line-height: 1.4; }

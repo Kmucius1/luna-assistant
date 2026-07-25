@@ -4,6 +4,21 @@
   background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
   padding: 12px 14px 28px; display: flex; flex-direction: column; gap: 12px; min-height: 100%;
 }
+
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14; --ivory-2: #17130D; --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80); --ink-3: rgba(245, 239, 227, 0.58);
+  --gold-soft: rgba(201, 169, 110, 0.16); --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+:global([data-theme='dark']) .iconButton,
+:global([data-theme='dark']) .card,
+:global([data-theme='dark']) .actionButton,
+:global([data-theme='dark']) .iconRowButton {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+:global([data-theme='dark']) .confirmCard { background: var(--ivory-1); }
+
 .topBar { display: flex; align-items: center; justify-content: space-between; }
 .iconButton { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.18); color: var(--ink-2); }
 

@@ -16,6 +16,30 @@
   min-height: 100%;
 }
 
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --bronze: #D9B87A;
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .closeButton,
+:global([data-theme='dark']) .actionCard,
+:global([data-theme='dark']) .checkinCard,
+:global([data-theme='dark']) .pathCard,
+:global([data-theme='dark']) .sparkCard,
+:global([data-theme='dark']) .categoryCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+:global([data-theme='dark']) .pathActions button {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.22);
+}
+
 /* ── Header ───────────────────────────────────────────── */
 
 .header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }

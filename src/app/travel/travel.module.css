@@ -7,6 +7,16 @@
   display: flex; flex-direction: column; gap: 14px; min-height: 100%;
 }
 
+:global([data-theme='dark']) .page {
+  --travel-bg: #211C14; --travel-surface: #17130D; --travel-card: #17130D;
+  --travel-text: #F5EFE3; --travel-muted: rgba(245, 239, 227, 0.62); --travel-gold: #C58D32;
+  --travel-gold-soft: rgba(197, 141, 50, 0.18); --travel-border: rgba(201, 169, 110, 0.18);
+  --travel-shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
+}
+:global([data-theme='dark']) .searchBar {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .topRow { display: flex; align-items: center; justify-content: space-between; }
 .iconButton { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--travel-card); border: 1px solid var(--travel-border); color: var(--travel-text); }
 
@@ -14,6 +24,7 @@
 .heroPhoto { position: absolute; inset: 0; }
 .heroPhoto :global(img) { object-fit: cover; }
 .heroFade { position: absolute; inset: 0; background: linear-gradient(90deg, var(--travel-bg) 32%, rgba(251,248,242,0.5) 62%, rgba(251,248,242,0) 100%); }
+:global([data-theme='dark']) .heroFade { background: linear-gradient(90deg, var(--travel-bg) 32%, rgba(23,19,13,0.5) 62%, rgba(23,19,13,0) 100%); }
 .heroContent { position: relative; z-index: 1; padding: 16px; max-width: 60%; }
 .heroContent h1 { font-family: var(--font-display-var, serif); font-size: 32px; font-weight: 700; color: var(--travel-text); margin: 0 0 4px; }
 .heroContent p { margin: 0 0 12px; font-size: 12px; color: var(--travel-muted); line-height: 1.4; }

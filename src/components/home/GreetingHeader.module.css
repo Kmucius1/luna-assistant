@@ -26,6 +26,11 @@
   color: #32284A;
   margin-top: 1px;
 }
+:global([data-theme='dark']) .backButton {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+  color: rgba(245, 239, 227, 0.80);
+}
 
 .greetingText h1 {
   font-family: var(--font-display-var, serif);
@@ -37,10 +42,12 @@
   align-items: center;
   gap: 5px;
 }
+:global([data-theme='dark']) .greetingText h1 { color: #F5EFE3; }
 
 .greetingText h1 svg { color: #C9A96E; width: 14px; height: 14px; }
 
 .dateLine { margin: 0; font-size: 10.5px; font-weight: 600; color: #32284A; }
+:global([data-theme='dark']) .dateLine { color: rgba(245, 239, 227, 0.80); }
 
 .headerRight {
   flex-shrink: 0;
@@ -65,6 +72,11 @@
   text-align: right;
   min-width: 78px;
 }
+:global([data-theme='dark']) .weatherCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
 
 .weatherCard strong {
   display: block;
@@ -73,10 +85,12 @@
   font-weight: 500;
   color: #100C1E;
 }
+:global([data-theme='dark']) .weatherCard strong { color: #F5EFE3; }
 
 .weatherIcon { color: #C9A96E; float: left; width: 13px; height: 13px; }
 
 .weatherCard p { margin: 0; font-size: 8.5px; color: #5E5474; white-space: nowrap; }
+:global([data-theme='dark']) .weatherCard p { color: rgba(245, 239, 227, 0.58); }
 
 .quoteLine {
   flex: 0 0 auto;
@@ -91,5 +105,6 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+:global([data-theme='dark']) .quoteLine { color: rgba(245, 239, 227, 0.80); }
 
 .quoteLine svg { color: #C9A96E; flex-shrink: 0; width: 11px; height: 11px; }

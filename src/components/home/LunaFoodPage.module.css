@@ -1,9 +1,6 @@
 .page {
   --ivory-1: #FBF8F2;
   --ivory-2: #F6F1E7;
-  /* Hardcoded, not var(--text-1)/var(--golden) — see LunaTodayPage.module.css
-     for why: those tokens are theme-dependent and resolve to near-white
-     under dark mode, making text invisible on these always-light cards. */
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
@@ -20,7 +17,34 @@
   gap: 8px;
 }
 
-/* Locked light/cream palette — does not follow the site-wide dark theme. */
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .quoteCard,
+:global([data-theme='dark']) .datePill,
+:global([data-theme='dark']) .mealPlanPill,
+:global([data-theme='dark']) .comingSoon,
+:global([data-theme='dark']) .mealCard,
+:global([data-theme='dark']) .nutritionCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+:global([data-theme='dark']) .tab {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(201, 169, 110, 0.14);
+}
+:global([data-theme='dark']) .tabActive {
+  background: rgba(255, 255, 255, 0.10);
+}
+:global([data-theme='dark']) .nutritionTrack {
+  background: rgba(255, 255, 255, 0.10);
+}
 
 /* ── Header ───────────────────────────────────────────── */
 

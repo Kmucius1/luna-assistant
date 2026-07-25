@@ -1,15 +1,12 @@
 .page {
   --ivory-1: #FBF8F2;
   --ivory-2: #F6F1E7;
-  /* Hardcoded, not var(--text-1)/var(--golden) — those are theme-dependent
-     and resolve to near-white under [data-theme="dark"], which made this
-     text invisible against these always-light cards. This page is locked
-     to the light palette regardless of the site-wide theme toggle, so it
-     must not inherit theme tokens at all. */
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
   --gold: #C9A96E;
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(180, 150, 100, 0.14);
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
   /* Fills the AppLayout noScroll container exactly — this page never
@@ -26,9 +23,16 @@
   gap: 6px;
 }
 
-/* This page is locked to the light/cream palette regardless of the
-   site-wide theme toggle — matches the reference exactly and is not
-   meant to follow dark mode. */
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --card-bg: rgba(255, 255, 255, 0.07);
+  --card-border: rgba(201, 169, 110, 0.18);
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
 
 /* Header/quote now come from the shared GreetingHeader component. */
 
@@ -105,8 +109,8 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(180, 150, 100, 0.14);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   box-shadow: var(--soft-shadow);
   padding: 7px 8px;
@@ -208,8 +212,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(180, 150, 100, 0.14);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   box-shadow: var(--soft-shadow);
   padding: 6px 10px;

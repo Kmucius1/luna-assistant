@@ -55,10 +55,10 @@ export function MobileTopBar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
         <SmallMoon />
         <div>
-          <p style={{ fontSize: 10.5, fontWeight: 600, color: 'rgba(255,255,255,0.58)', margin: 0, lineHeight: 1.3 }}>
+          <p style={{ fontSize: 10.5, fontWeight: 600, color: 'var(--text-2)', margin: 0, lineHeight: 1.3 }}>
             {moon ? `${moon.name} · ${moon.illumination}%` : 'Not synced'}
           </p>
-          <p style={{ fontSize: 10, color: 'rgba(185,139,255,0.42)', margin: 0, lineHeight: 1.25 }}>
+          <p style={{ fontSize: 10, color: 'var(--text-3)', margin: 0, lineHeight: 1.25 }}>
             Illuminating your next step
           </p>
         </div>
@@ -66,14 +66,14 @@ export function MobileTopBar() {
 
       {/* Center: LUNA wordmark with sparkle */}
       <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <span style={{ position: 'absolute', top: -8, right: 4, fontSize: 9, color: '#b98bff', lineHeight: 1 }}>✦</span>
-        <span className="font-display" style={{ fontSize: 23, fontWeight: 700, letterSpacing: '0.24em', color: 'white' }}>LUNA</span>
+        <span style={{ position: 'absolute', top: -8, right: 4, fontSize: 9, color: 'var(--luna-purple-2)', lineHeight: 1 }}>✦</span>
+        <span className="font-display" style={{ fontSize: 23, fontWeight: 700, letterSpacing: '0.24em', color: 'var(--text-1)' }}>LUNA</span>
       </div>
 
       {/* Right: bell + avatar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, justifyContent: 'flex-end' }}>
         <div style={{ position: 'relative' }}>
-          <Bell style={{ width: 19, height: 19, color: 'rgba(255,255,255,0.58)' }} strokeWidth={1.5} />
+          <Bell style={{ width: 19, height: 19, color: 'var(--text-2)' }} strokeWidth={1.5} />
           <div style={{ position: 'absolute', top: -2, right: -2, width: 6, height: 6, borderRadius: '50%', background: '#4A90FF', border: '1.5px solid #0a0618' }} />
         </div>
         <div style={{

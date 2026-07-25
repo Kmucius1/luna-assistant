@@ -1,7 +1,4 @@
 .page {
-  /* Hardcoded, not var(--text-1)/var(--golden) — those tokens are
-     theme-dependent and resolve to near-white under dark mode, which
-     caused a real invisible-text bug elsewhere in this app this session. */
   --ivory-1: #FBF8F2;
   --ivory-2: #F6F1E7;
   --ink-1: #100C1E;
@@ -17,6 +14,40 @@
   flex-direction: column;
   gap: 16px;
   min-height: 100%;
+}
+
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --bronze: #D9B87A;
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .lunaTake,
+:global([data-theme='dark']) .resetCard,
+:global([data-theme='dark']) .recoveryCard,
+:global([data-theme='dark']) .movementCard,
+:global([data-theme='dark']) .hydrationCard,
+:global([data-theme='dark']) .sleepCard,
+:global([data-theme='dark']) .journalCard,
+:global([data-theme='dark']) .backButton,
+:global([data-theme='dark']) .moreButton,
+:global([data-theme='dark']) .feelingCard,
+:global([data-theme='dark']) .scoreCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+:global([data-theme='dark']) .soonCard {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(201, 169, 110, 0.28);
+}
+:global([data-theme='dark']) .scoreBarOuter,
+:global([data-theme='dark']) .scoreRowTrack,
+:global([data-theme='dark']) .hydrationBarOuter {
+  background: rgba(255, 255, 255, 0.10);
 }
 
 /* ── Top bar ──────────────────────────────────────────── */

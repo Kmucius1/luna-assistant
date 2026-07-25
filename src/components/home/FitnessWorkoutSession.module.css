@@ -16,6 +16,22 @@
   padding: 12px 14px 20px;
 }
 
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .row,
+:global([data-theme='dark']) .doneCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+:global([data-theme='dark']) .backButton { background: rgba(255, 255, 255, 0.07); }
+
 .header {
   display: flex;
   align-items: center;

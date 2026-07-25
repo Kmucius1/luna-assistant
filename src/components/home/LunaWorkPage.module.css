@@ -17,6 +17,22 @@
   gap: 7px;
 }
 
+:global([data-theme='dark']) .page {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-2: rgba(245, 239, 227, 0.80);
+  --ink-3: rgba(245, 239, 227, 0.58);
+  --soft-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
+}
+
+:global([data-theme='dark']) .iconButton,
+:global([data-theme='dark']) .card,
+:global([data-theme='dark']) .actionCard {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
 /* ── Header ───────────────────────────────────────────── */
 
 .header {
