@@ -48,8 +48,8 @@
 .matchDesc { font-size: 11px; color: var(--travel-muted); line-height: 1.4; margin: 0 0 8px; }
 .matchLink { font-size: 11px; font-weight: 700; color: var(--travel-gold); text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
 .matchScoreBadge { position: absolute; top: 10px; right: 10px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,0.92); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--travel-shadow); }
-.matchScoreBadge strong { font-size: 13px; font-weight: 700; color: var(--travel-text); }
-.matchScoreBadge span { font-size: 6px; color: var(--travel-muted); }
+.matchScoreBadge strong { font-size: 13px; font-weight: 700; color: #171512; }
+.matchScoreBadge span { font-size: 6px; color: #6E6860; }
 
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; }
 .sectionHeader h2 { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--travel-text); margin: 0; }

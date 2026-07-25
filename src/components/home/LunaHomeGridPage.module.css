@@ -101,10 +101,10 @@
   border-radius: 999px;
 }
 
-/* ── Rooms: 4-at-a-time swipeable pages ──────────────────── */
-/* Only 4 rooms show at once (1 row) instead of all 12 (3 rows) —
-   each card gets ~3x the space, so text/photos are actually legible.
-   3 pages total, swipeable via native horizontal scroll-snap (works
+/* ── Rooms: 2-at-a-time swipeable pages ──────────────────── */
+/* Only 2 rooms show at once (1 row) instead of all 12 (3 rows) —
+   each card gets ~6x the space, so text/photos are actually legible.
+   6 pages total, swipeable via native horizontal scroll-snap (works
    for touch, trackpad, and the dot buttons below). */
 
 .roomsSection {
@@ -143,7 +143,7 @@
   min-width: 0;
   scroll-snap-align: start;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   padding: 0 1px;
 }
@@ -216,7 +216,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--ink-1);
+  color: #100C1E;
   box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 

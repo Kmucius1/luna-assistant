@@ -299,7 +299,7 @@
   background: rgba(255,255,255,0.9);
   border: 1px solid rgba(180,150,100,0.2);
   box-shadow: var(--soft-shadow);
-  color: var(--ink-2);
+  color: #32284A;
 }
 
 .swipeButton svg { width: 18px; height: 18px; }

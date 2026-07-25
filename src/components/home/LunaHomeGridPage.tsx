@@ -52,7 +52,7 @@ const ROOMS: Room[] = [
   { slug: 'spiritual', label: 'Spiritual', tagline: ['Tarot, crystals,', 'rituals & more.'], image: '/images/rooms/wellness.jpg', href: '/spirit', icon: Sparkles, accent: 'rgba(200,180,220,0.32)' },
 ]
 
-const PAGE_SIZE = 4
+const PAGE_SIZE = 2
 
 const HERO_FOCUS_FALLBACK = ZOE_HERO_FOCUS_BY_DAY.Monday
 
@@ -112,7 +112,7 @@ export function LunaHomeGridPage() {
                       <span className={styles.roomLabel}>{room.label}</span>
                       <p className={styles.roomTagline}>{room.tagline[0]}<br />{room.tagline[1]}</p>
                       <div className={styles.roomPhoto}>
-                        <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 25vw, 220px" />
+                        <Image src={room.image} alt={room.label} fill sizes="(max-width: 640px) 45vw, 220px" />
                         <span className={styles.roomGoButton}><ArrowUpRight size={13} /></span>
                       </div>
                       {room.comingSoon && <span className={styles.comingSoonBadge}>Soon</span>}

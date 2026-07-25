@@ -74,7 +74,7 @@
 .boardLabel span { font-size: 10.5px; color: rgba(255,255,255,0.8); }
 .boardButton {
   position: absolute; z-index: 1; bottom: 12px; right: 12px;
-  background: rgba(255,255,255,0.9); color: var(--ink-1);
+  background: rgba(255,255,255,0.9); color: #100C1E;
   font-size: 11px; font-weight: 700; padding: 7px 14px; border-radius: 999px; border: none;
 }
 
