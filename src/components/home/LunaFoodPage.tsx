@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   Beef,
   BookOpen,
@@ -56,9 +57,15 @@ function dateLabelFor(offset: number): string {
   return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).format(d)
 }
 
+const VALID_TABS = TABS.map(t => t.id)
+
 export function LunaFoodPage() {
+  const searchParams = useSearchParams()
   const [dayOffset, setDayOffset] = useState(0)
-  const [activeTab, setActiveTab] = useState<TabId>('meal_plan')
+  const [activeTab, setActiveTab] = useState<TabId>(() => {
+    const requested = searchParams.get('tab')
+    return (VALID_TABS as string[]).includes(requested ?? '') ? (requested as TabId) : 'meal_plan'
+  })
   const [mealIndex, setMealIndex] = useState(0)
   const mealsScrollerRef = useRef<HTMLDivElement>(null)
 

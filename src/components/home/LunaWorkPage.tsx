@@ -200,7 +200,7 @@ export function LunaWorkPage() {
         </div>
 
         <div className={`${styles.row} ${styles.rowTasksAgenda}`}>
-          <div className={styles.col}>
+          <div id="tasks" className={styles.col}>
             <div className={styles.sectionHeader}><h2>Priority Tasks</h2><Link href="/tasks">View All ›</Link></div>
             <div className={styles.card}>
               {unified.length === 0 && <div className={styles.emptyNote}>Your workday is clear. Choose one thing to focus on.</div>}
@@ -223,7 +223,7 @@ export function LunaWorkPage() {
             </div>
           </div>
 
-          <div className={styles.col}>
+          <div id="agenda" className={styles.col}>
             <div className={styles.sectionHeader}><h2>Today&apos;s Agenda</h2><Link href="/calendar">View Calendar ›</Link></div>
             <div className={styles.card}>
               {!agenda && <div className={styles.emptyNote}>No plan generated yet — <Link href="/plan-my-day">build today&apos;s plan</Link>.</div>}
@@ -242,7 +242,7 @@ export function LunaWorkPage() {
         </div>
 
         <div className={`${styles.row} ${styles.rowProjectsActions}`}>
-          <div className={styles.col}>
+          <div id="projects" className={styles.col}>
             <div className={styles.sectionHeader}><h2>Active Projects</h2><Link href="/dryp-hub">View All ›</Link></div>
             <div className={styles.card}>
               {accounts.length === 0 && <div className={styles.emptyNote}>No active client projects right now.</div>}
@@ -287,7 +287,7 @@ export function LunaWorkPage() {
             </div>
           </div>
 
-          <div className={`${styles.card} ${styles.noteCard}`}>
+          <div id="notes" className={`${styles.card} ${styles.noteCard}`}>
             <div className={styles.sectionHeader}><h2>Quick Notes</h2><Link href="/journal">View All ›</Link></div>
             {note ? (
               <>

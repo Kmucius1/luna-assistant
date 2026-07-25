@@ -194,7 +194,7 @@ export function LunaStylePage() {
           </div>
         </div>
 
-        <div className={styles.closetSection}>
+        <div id="closet" className={styles.closetSection}>
           <div className={styles.sectionHeader}>
             <h2>AI Closet</h2>
             {!closetEmpty && <button type="button" onClick={() => setClosetModalOpen(true)}>View all ›</button>}
@@ -217,7 +217,7 @@ export function LunaStylePage() {
           )}
         </div>
 
-        <div className={styles.inspirationSection}>
+        <div id="inspiration" className={styles.inspirationSection}>
           <div className={styles.sectionHeader}>
             <h2>Outfit Inspiration</h2>
             <button type="button">See all ›</button>
@@ -261,7 +261,7 @@ export function LunaStylePage() {
           )}
         </div>
 
-        <div className={styles.savedSection}>
+        <div id="saved" className={styles.savedSection}>
           <div className={styles.sectionHeader}>
             <h2>Saved Looks</h2>
             {saved.length > 0 && <button type="button">View all ›</button>}

@@ -248,7 +248,7 @@ export function LunaWellnessPage() {
           </div>
         )}
 
-        <section>
+        <section id="reset">
           <div className={styles.sectionHeader}><Sun size={13} /> Today&apos;s Reset</div>
           <div className={styles.resetCard}>
             <div className={styles.resetPhoto}><Image src="/images/rooms/wellness-sunshine.jpg" alt="" fill sizes="140px" /></div>
@@ -266,7 +266,7 @@ export function LunaWellnessPage() {
           </div>
         </section>
 
-        <section>
+        <section id="mood">
           <div className={styles.sectionHeader}>How Are You Feeling? <span className={styles.sectionHint}>Choose one</span></div>
           <div className={styles.feelingRow}>
             {FEELINGS.map(f => {
@@ -334,7 +334,7 @@ export function LunaWellnessPage() {
           </div>
         </section>
 
-        <section>
+        <section id="hydration">
           <div className={styles.sectionHeader}><Droplet size={13} /> Hydration</div>
           <div className={styles.hydrationCard}>
             <div className={styles.hydrationInfo}>
@@ -346,7 +346,7 @@ export function LunaWellnessPage() {
           </div>
         </section>
 
-        <section>
+        <section id="sleep">
           <div className={styles.sectionHeader}><MoonStar size={13} /> Sleep <span className={styles.sectionHint}>Last Night</span></div>
           <div className={styles.sleepCard}>
             {typeof sleepRating === 'number' ? (

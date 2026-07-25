@@ -1,0 +1,51 @@
+.dock {
+  flex-shrink: 0;
+  display: grid;
+  gap: 4px;
+  padding: 8px 10px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+  background: var(--ivory-2);
+  border-top: 1px solid var(--card-border);
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .dock {
+    order: 0;
+    border-top: none;
+    border-bottom: 1px solid var(--card-border);
+    max-width: 640px;
+    margin: 0 auto 6px;
+    padding: 6px;
+    border-radius: 999px;
+  }
+}
+
+.dockItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 4px;
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--ink-2);
+  min-height: 44px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+}
+
+.dockItemHome {
+  color: var(--gold);
+}
+
+.dockLabel {
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

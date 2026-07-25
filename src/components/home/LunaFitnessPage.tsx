@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   Building2,
   Camera,
@@ -69,11 +70,17 @@ function toggle(list: string[], value: string): string[] {
   return list.includes(value) ? list.filter(v => v !== value) : [...list, value]
 }
 
+const VALID_TABS = ONBOARDING_TABS.map(t => t.id)
+
 export function LunaFitnessPage() {
+  const searchParams = useSearchParams()
   const [weekday, setWeekday] = useState<string | null>(null)
   const [hour, setHour] = useState<number | null>(null)
   const [onboarding, setOnboarding] = useState<Onboarding>(DEFAULT_ONBOARDING)
-  const [activeTab, setActiveTab] = useState<OnboardingTab>('goals')
+  const [activeTab, setActiveTab] = useState<OnboardingTab>(() => {
+    const requested = searchParams.get('tab')
+    return (VALID_TABS as string[]).includes(requested ?? '') ? (requested as OnboardingTab) : 'goals'
+  })
   const [completedToday, setCompletedToday] = useState(false)
 
   useEffect(() => {
