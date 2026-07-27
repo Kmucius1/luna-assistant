@@ -23,6 +23,7 @@ import {
 
 import { ZOE_EXERCISES_BY_DAY, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { resolveExercises } from '@/lib/luna/fitnessExercises'
+import { getExerciseReference } from '@/lib/luna/exerciseLibrary'
 import { getGreeting } from '@/lib/luna/greeting'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaFitnessPage.module.css'
@@ -110,6 +111,7 @@ export function LunaFitnessPage() {
   // resolveExercises); goals/gym/days are saved but not yet applied anywhere.
   const exercises = weekday ? resolveExercises(weekday, ZOE_EXERCISES_BY_DAY, onboarding.equipment) : ZOE_EXERCISES_BY_DAY.Monday
   const estimatedMinutes = exercises.length * 8
+  const previewThumbs = exercises.map(name => getExerciseReference(name)).filter((ref): ref is NonNullable<typeof ref> => !!ref).slice(0, 4)
 
   return (
     <AppLayout noPad noScroll>
@@ -131,6 +133,15 @@ export function LunaFitnessPage() {
               <div className={styles.workoutStat}><Clock size={11} /><strong>~{estimatedMinutes} min</strong></div>
               <div className={styles.workoutStat}><Flame size={11} /><strong>{exercises.length} exercises</strong></div>
               <div className={styles.workoutStat}><Building2 size={11} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
+              {previewThumbs.length > 0 && (
+                <div className={styles.thumbStack}>
+                  {previewThumbs.map((ref, i) => (
+                    <span key={i} className={styles.thumbStackItem}>
+                      <Image src={ref.image} alt="" fill sizes="18px" />
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             {completedToday ? (
               <div className={styles.completedBadge}><Sparkles size={12} /> Completed today</div>

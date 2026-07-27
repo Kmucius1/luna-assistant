@@ -90,6 +90,30 @@
   text-align: left;
 }
 
+.rowThumb {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(180, 150, 100, 0.12);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.rowEquipment {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
 .checkbox {
   display: flex;
   align-items: center;

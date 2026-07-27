@@ -93,6 +93,20 @@
 .workoutStats { display: flex; gap: 10px; margin-bottom: 6px; }
 .workoutStat { font-size: 7.5px; color: var(--ink-3); display: flex; align-items: center; gap: 3px; }
 .workoutStat strong { font-size: 9px; color: var(--ink-1); font-weight: 600; }
+
+.thumbStack { display: flex; align-items: center; margin-left: auto; }
+.thumbStackItem {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1.5px solid var(--ivory-1);
+  background: rgba(180, 150, 100, 0.12);
+  margin-left: -6px;
+}
+.thumbStackItem:first-child { margin-left: 0; }
+.thumbStackItem :global(img) { object-fit: cover; }
 .startButton {
   display: flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%;

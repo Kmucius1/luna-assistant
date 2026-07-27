@@ -1,11 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Check, CheckCircle2, ChevronLeft, Dumbbell } from 'lucide-react'
 
 import { ZOE_EXERCISES_BY_DAY, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { resolveExercises } from '@/lib/luna/fitnessExercises'
+import { getExerciseReference } from '@/lib/luna/exerciseLibrary'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './FitnessWorkoutSession.module.css'
 
@@ -89,14 +91,25 @@ export function FitnessWorkoutSession() {
         </div>
 
         <div className={styles.list}>
-          {exercises.map(name => (
-            <button key={name} type="button" className={styles.row} onClick={() => toggleExercise(name)}>
-              <span className={`${styles.checkbox} ${checked[name] ? styles.checkboxDone : ''}`}>
-                {checked[name] && <Check size={13} strokeWidth={3} />}
-              </span>
-              <span className={`${styles.rowLabel} ${checked[name] ? styles.rowLabelDone : ''}`}>{name}</span>
-            </button>
-          ))}
+          {exercises.map(name => {
+            const ref = getExerciseReference(name)
+            return (
+              <button key={name} type="button" className={styles.row} onClick={() => toggleExercise(name)}>
+                {ref && (
+                  <span className={styles.rowThumb}>
+                    <Image src={ref.image} alt={name} fill sizes="52px" />
+                  </span>
+                )}
+                <span className={styles.rowText}>
+                  <span className={`${styles.rowLabel} ${checked[name] ? styles.rowLabelDone : ''}`}>{name}</span>
+                  {ref && <span className={styles.rowEquipment}>{ref.equipment}</span>}
+                </span>
+                <span className={`${styles.checkbox} ${checked[name] ? styles.checkboxDone : ''}`}>
+                  {checked[name] && <Check size={13} strokeWidth={3} />}
+                </span>
+              </button>
+            )
+          })}
         </div>
 
         <button type="button" className={styles.completeButton} onClick={completeWorkout} disabled={submitting}>
