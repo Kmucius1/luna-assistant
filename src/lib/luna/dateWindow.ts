@@ -22,6 +22,15 @@ function formatYMD(year: number, month: number, day: number): string {
   return `${year}-${mm}-${dd}`
 }
 
+/** The 'YYYY-MM-DD' calendar date `date` falls on in `timezone`. Used to check
+    whether a stored reading's generated_at actually happened on the calendar
+    day it's serving as "today" for, vs. having been pre-generated earlier as
+    part of a prior window fetch. */
+export function localDateKeyFromDate(date: Date, timezone: string): string {
+  const { year, month, day } = localYMD(date, timezone)
+  return formatYMD(year, month, day)
+}
+
 export function getSixDayWindow(timezone: string = 'America/New_York'): string[] {
   const { year, month, day } = localYMD(new Date(), timezone)
   // Anchor at UTC noon on the resolved local date — plenty of margin from

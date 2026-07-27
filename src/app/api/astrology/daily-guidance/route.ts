@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, ZOE_NATAL, SIGN_ENERGY_DESCRIPTIONS, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
@@ -147,10 +148,10 @@ Profile: 4/6 — Opportunist / Role Model
 Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdown, no prose outside the JSON. The JSON must exactly match this schema:
 
 {
-  "horoscope": "3-sentence personalized daily horoscope. Reference current planets by plain descriptions (e.g. 'the Sun moving through Gemini'), reference Zoe's Scorpio Sun, Cancer Moon, and Gemini Rising naturally. No jargon as explanation — only as label if needed.",
+  "horoscope": "5-6 sentence personalized daily horoscope — the main thing she reads. Reference current planets and transits by name, but every single one must be immediately translated into what it actually looks or feels like in her real day: a kind of conversation, a mood, a tension, a decision, a physical feeling. Never leave a planet/sign/aspect standing alone as just a label — see the PLAIN-ENGLISH LIFE RULE below.",
   "energy": "1-2 sentences: what the day's energy FEELS like in her body and emotional field right now. Visceral, honest, specific.",
-  "do_today": ["5 specific practical things she should actually do today — personal, actionable, grounded in her life and today's transits"],
-  "dont_today": ["5 honest specific things to avoid today — real warnings, not generic cautions"],
+  "do_today": ["5 specific practical things she should actually do today — personal, actionable, grounded in her life and today's transits. If you reference a placement (like her North Node or a house), explain in plain words what to actually pay attention to — never just name the placement and stop there."],
+  "dont_today": ["5 honest specific things to avoid today — real warnings, not generic cautions, translated into real situations not just placements"],
   "career": "2-3 sentences for her career and business energy today. She runs Ad-Vantage + DRYP Digital. Specific to what the sky supports or challenges in her work.",
   "love": "2-3 sentences for her romantic and relationship energy today.",
   "sex": "2 sentences honest message about her sexual and desire energy today. Direct and real.",
@@ -161,7 +162,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
   "main_focus": "1 sentence: the single most important thing to put her energy toward today.",
   "highest_self": "3-4 sentences connecting her Human Design (Self-Projected Projector, 4/6) with her birth chart to guide her toward her highest state today. Speak to her role-model 6th line transition, her need for invitation not initiation, her clarity-through-speaking. Ground it in today's sky.",
   "affirmation": "One powerful affirmation written in first person, specific to today's energy. Not generic — written as if she is declaring it from her Scorpio Sun depth."
-}`
+}${LIFE_LANGUAGE_RULES}`
 
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
@@ -172,7 +173,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
       forceRegenerate: refresh,
       generate: async () => {
         try {
-          const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice. Never use textbook astrology jargon in descriptions — if you use a term (like "trine" or "retrograde"), it is only as a label/title, never as the explanation. Speak as if you deeply know this woman. Be specific, be real, be encouraging but honest. Make every word feel personally written for Zoe, not for a generic reader. Return ONLY valid JSON — no markdown fences, no prose outside the JSON.'
+          const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice. Never leave a planet, sign, house, or aspect standing alone as just a label — always translate it into what it actually looks or feels like in her real day (a conversation, a mood, a decision, a tension, a physical feeling). Speak as if you deeply know this woman. Be specific, be real, be encouraging but honest. Make every word feel personally written for Zoe, not for a generic reader. Return ONLY valid JSON — no markdown fences, no prose outside the JSON.'
 
           const rawText = await callAI(SYSTEM, userPrompt, 2000)
           const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()

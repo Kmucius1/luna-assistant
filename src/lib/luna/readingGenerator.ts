@@ -13,6 +13,7 @@ import {
 import { calculatePersonalDay, getPersonalDayMeaning } from '@/lib/numerology'
 import { getChineseDayEnergy, ELEMENT_GUIDANCE } from '@/lib/chineseAstrology'
 import { localDateKey } from './dailyCache'
+import { LIFE_LANGUAGE_RULES } from './voiceRules'
 
 // Mirrors the ZOE_USER_ID hardcoding pattern used by every route in this
 // app — matches the birth date already seeded in astrology_profiles.
@@ -173,18 +174,18 @@ Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, 
 {
   "title": "short title for today's energy",
   "date": "${dateStr}",
-  "main_theme": "1-2 sentences: the central theme of today, grounded in the real Moon sign/phase/transits above",
+  "main_theme": "3-4 sentences: the central theme of today, grounded in the real Moon sign/phase/transits above, but written as what today will actually feel or look like in her life — not a list of placements. See the PLAIN-ENGLISH LIFE RULE below.",
   "cosmic_weather": {
     "sun_sign": "${sunSign}", "moon_sign": "${moonSign}", "moon_phase": "${moonPhase}",
-    "major_aspects": ["short plain-language description of each top transit above"],
-    "retrogrades": ["each active retrograde, plain language"]
+    "major_aspects": ["each top transit above, named, then immediately translated into what it actually looks like today — never the placement alone"],
+    "retrogrades": ["each active retrograde, named, then what it actually means for her day-to-day right now"]
   },
   "personal_alignment": {
-    "natal_focus": "1-2 sentences on what today's transits highlight in Zoe's chart",
-    "emotional_theme": "1-2 sentences, grounded in the Moon sign/phase",
-    "relationship_theme": "1-2 sentences on love/connection energy today",
-    "career_theme": "1-2 sentences on work/business energy today — she runs Ad-Vantage and DRYP Digital",
-    "energy_theme": "1-2 sentences on body/energy today"
+    "natal_focus": "2-3 sentences on what today's transits highlight in Zoe's chart — name the placement, then spell out concretely what to pay attention to today: a specific kind of moment, feeling, or situation, not just 'the area where X lives'",
+    "emotional_theme": "1-2 sentences, grounded in the Moon sign/phase, described as an actual mood or feeling she might notice",
+    "relationship_theme": "1-2 sentences on love/connection energy today — a real, concrete relational scenario, not just a placement",
+    "career_theme": "1-2 sentences on work/business energy today — she runs Ad-Vantage and DRYP Digital — concrete, not abstract",
+    "energy_theme": "1-2 sentences on body/energy today, described physically/emotionally, not just named"
   },
   "numerology": { "personal_day": "${personalDay}", "meaning": "1 sentence expanding on the Personal Day meaning above, in Luna's voice" },
   "chinese_astrology": { "day_energy": "${chineseDay.label}", "element_focus": "${chineseDay.element}", "guidance": "1 sentence of hedged, symbolic guidance for this element" },
@@ -196,9 +197,9 @@ Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, 
   },
   "clarity_note": "1-2 sentences explicitly separating today's calculated facts (Moon sign/phase/transits) from the symbolic interpretation above",
   "luna_message": "1-2 sentences, warm and direct, Luna speaking to Zoe about today"
-}${SCIENCE_AWARE_RULES}`
+}${LIFE_LANGUAGE_RULES}${SCIENCE_AWARE_RULES}`
 
-    const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice — as if you deeply know this woman. Never use jargon as an explanation, only as a label. Speak in reflective, hedged language, never deterministic predictions.'
+    const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice — as if you deeply know this woman. Never leave a planet, sign, house, or aspect standing alone as just a label — always translate it into what it actually looks or feels like in her real day (a conversation, a mood, a decision, a tension, a physical feeling). Speak in reflective, hedged language, never deterministic predictions.'
 
     const rawText = await callAI(SYSTEM, userPrompt, 2000)
     const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()

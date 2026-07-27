@@ -84,23 +84,12 @@ const ASPECTS_DATA = [
 
 function ExpandCard({ children }: { children: React.ReactNode }) { return <>{children}</> }
 
-const THEME_VARS = {
-  '--text-1': '#100C1E',
-  '--text-2': '#32284A',
-  '--text-3': '#5E5474',
-  '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
-  '--surface': 'rgba(255,255,255,0.6)',
-  '--surface-border': 'rgba(180,150,100,0.2)',
-  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
-} as React.CSSProperties
-
 export default function DeepDivesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('planets')
   const [expanded, setExpanded] = useState<string | null>(null)
 
   return (
-    <div className="min-h-screen" style={THEME_VARS}>
+    <div className="min-h-screen">
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">

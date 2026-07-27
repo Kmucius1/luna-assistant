@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateDailyReading } from '@/lib/luna/readingGenerator'
 import { getReadingWindow, upsertReading, type StoredReading } from '@/lib/luna/dailyReadingStore'
-import { getSixDayWindow, dateFromKey } from '@/lib/luna/dateWindow'
+import { getSixDayWindow, dateFromKey, localDateKeyFromDate } from '@/lib/luna/dateWindow'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -33,7 +33,14 @@ export async function GET(req: NextRequest) {
     // clicks Regenerate or the hourly cron happens to catch it.
     const lastSource = cached?.source_log_json?.[cached.source_log_json.length - 1] as { source?: string } | undefined
     const isUpgradeable = cached?.status === 'ready' && lastSource?.source === 'fallback'
-    const needsGeneration = !cached || (refresh && dateKey === dateKeys[0]) || isUpgradeable
+    // "Today's" reading is often first created a few days early as part of an
+    // earlier window fetch (it was "coming up" then). Once that date actually
+    // becomes today, treat it as needing a fresh generation rather than
+    // reusing a reading whose generated_at is stuck days in the past — this
+    // is what caused "Generated Jul 24" to show while viewing Jul 26.
+    const isTodaySlot = dateKey === dateKeys[0]
+    const wasPregenerated = isTodaySlot && !!cached && localDateKeyFromDate(new Date(cached.generated_at), timezone) !== dateKey
+    const needsGeneration = !cached || (refresh && isTodaySlot) || isUpgradeable || wasPregenerated
 
     if (!needsGeneration && cached) {
       readings.push(cached)

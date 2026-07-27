@@ -49,6 +49,20 @@ export const SIGN_KEYWORDS = signsData.SIGN_KEYWORDS as Record<ZodiacSign, strin
 export const PLANET_EMOJIS = planetsData.PLANET_EMOJIS as Record<string, string>
 export const PLANET_KEYWORDS = planetsData.PLANET_KEYWORDS as Record<string, string>
 
+// Human-readable labels for points that aren't plain planet names — used so
+// generic transit sentences never print an internal code like "NNode" as if
+// it were a planet.
+const POINT_LABELS: Record<string, string> = {
+  NNode: 'your North Node',
+  Midheaven: 'your Midheaven',
+  Rising: 'your Rising sign',
+  Chiron: 'your Chiron',
+  Lilith: 'your Lilith',
+}
+function pointLabel(name: string): string {
+  return POINT_LABELS[name] ?? name
+}
+
 // Short body-feel phrases per sign, used by fallback-text generators (works
 // with zero AI credits). Shared by daily-guidance's buildFallback() and the
 // new readingGenerator's buildReadingFallback() — one dictionary, not two.
@@ -168,6 +182,10 @@ const TRANSIT_MEANINGS: Record<string, Record<string, string>> = {
     'Moon-Mars':     'Emotional drive is strong. Move the body. Act on what you feel.',
     'Moon-Saturn':   'Emotional seriousness. A boundary wants to be set or honored.',
     'Moon-NNode':    'A moment that feels fated. Emotional alignment with your soul path.',
+    'Mercury-NNode': "A conversation, message, or idea today points you toward where you're headed. Pay attention to what you talk about or hear — it may carry more direction than it seems to on the surface.",
+    'Sun-NNode':     'Your sense of self lines up with the direction you\'re growing toward. A good day to act like the person you\'re becoming.',
+    'Venus-NNode':   'Someone or something you\'re drawn to today connects to your bigger path forward, not just a passing preference.',
+    'Mars-NNode':    'The thing you feel driven to do today is worth following — it\'s pointed the right way, even if it feels new.',
     'Sun-Sun':       'Solar return window. The year turns. Set one big intention.',
     'Mars-Mercury':  'Direct communication energy. Say what you mean — clearly.',
     'Saturn-Sun':    'Discipline meets identity. A major lesson or responsibility arrives.',
@@ -178,6 +196,7 @@ const TRANSIT_MEANINGS: Record<string, Record<string, string>> = {
     'Moon-Saturn':   'Emotional heaviness or restriction. Your Cancer Moon needs safety first.',
     'Mars-Venus':    'Tension between what you want and what you love. Check impulse reactions.',
     'Saturn-Moon':   'Feeling burdened or emotionally flat. Rest is not failure — it is wisdom.',
+    'Mercury-NNode': 'A conversation or decision today feels harder than expected because it\'s pulling you between an old habit and where you\'re actually headed. Notice the friction — it\'s showing you which one to choose.',
   },
   trine: {
     'Moon-Venus':    'Soft and beautiful energy. Creative work, style, or pleasure flows naturally.',
@@ -203,7 +222,7 @@ function getTransitInterpretation(aspect: string, transiting: string, natal: str
   const key2 = `${natal}-${transiting}`
   return TRANSIT_MEANINGS[aspect]?.[key1]
       || TRANSIT_MEANINGS[aspect]?.[key2]
-      || `${transiting} is making a ${aspect} to the place in your chart where ${natal} lives. Pay attention to what comes up today around ${PLANET_KEYWORDS[natal] ?? natal.toLowerCase()}.`
+      || `${transiting} is lighting up ${pointLabel(natal)} today, through ${PLANET_KEYWORDS[natal] ?? natal.toLowerCase()}. Notice what comes up around that today — it's worth paying attention to.`
 }
 
 export function getTransitsToNatal(date: Date): TransitAspect[] {

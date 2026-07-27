@@ -4,17 +4,6 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import Link from 'next/link'
 import { ArrowLeft, RotateCcw, CheckCircle, XCircle } from 'lucide-react'
 
-const THEME_VARS = {
-  '--text-1': '#100C1E',
-  '--text-2': '#32284A',
-  '--text-3': '#5E5474',
-  '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
-  '--surface': 'rgba(255,255,255,0.6)',
-  '--surface-border': 'rgba(180,150,100,0.2)',
-  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
-} as React.CSSProperties
-
 type RetroData = {
   retrograde_count: number
   retrogrades: Array<{
@@ -42,7 +31,7 @@ export default function RetrogradesPage() {
   }, [])
 
   return (
-    <div className="min-h-screen" style={THEME_VARS}>
+    <div className="min-h-screen">
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
           <Link href="/astrology">
@@ -74,9 +63,9 @@ export default function RetrogradesPage() {
                   <>
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle className="h-5 w-5" style={{ color: '#5A8A7A' }} />
-                      <p className="font-bold" style={{ color: '#100C1E' }}>Clear skies — no planets retrograde</p>
+                      <p className="font-bold" style={{ color: 'var(--text-1)' }}>Clear skies — no planets retrograde</p>
                     </div>
-                    <p className="text-sm" style={{ color: 'rgba(16,12,30,0.65)' }}>
+                    <p className="text-sm" style={{ color: 'var(--text-2)' }}>
                       All planets are moving direct. This is a great time for launching, starting, and moving forward with intention.
                     </p>
                   </>
@@ -84,7 +73,7 @@ export default function RetrogradesPage() {
                   <>
                     <p className="text-xs font-bold uppercase tracking-widest mb-2"
                       style={{ color: 'rgba(201,169,110,0.9)' }}>Currently Retrograde</p>
-                    <p className="font-display text-2xl font-bold mb-1" style={{ color: '#100C1E' }}>
+                    <p className="font-display text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>
                       {data.retrograde_count} {data.retrograde_count === 1 ? 'planet' : 'planets'} in review
                     </p>
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -99,7 +88,7 @@ export default function RetrogradesPage() {
                 )}
                 {data.next_mercury_retro && !data.is_mercury_retrograde && (
                   <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(180,150,100,0.15)' }}>
-                    <p className="text-xs" style={{ color: 'rgba(16,12,30,0.5)' }}>
+                    <p className="text-xs" style={{ color: 'var(--text-3)' }}>
                       Next Mercury Retrograde: {data.next_mercury_retro}
                     </p>
                   </div>

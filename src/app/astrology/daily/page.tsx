@@ -59,17 +59,6 @@ const TAB_STYLE = (active: boolean): React.CSSProperties => ({
   whiteSpace: 'nowrap',
 })
 
-const THEME_VARS = {
-  '--text-1': '#100C1E',
-  '--text-2': '#32284A',
-  '--text-3': '#5E5474',
-  '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
-  '--surface': 'rgba(255,255,255,0.6)',
-  '--surface-border': 'rgba(180,150,100,0.2)',
-  background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
-} as React.CSSProperties
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DailyReadingPage() {
   const [data, setData] = useState<WindowResponse | null>(null)
@@ -96,7 +85,36 @@ export default function DailyReadingPage() {
     }
   }, [location.tz])
 
+  // Silent background refetch — no spinner, keeps showing the last good
+  // reading on failure. The server only actually regenerates via AI when the
+  // date has genuinely rolled over or a reading is missing/upgradeable, so
+  // this just keeps the page honest without wastefully re-generating content.
+  const fetchWindowQuiet = useCallback(async () => {
+    try {
+      const tz = encodeURIComponent(location.tz || 'America/New_York')
+      const res = await fetch(`/api/luna/daily-readings?tz=${tz}`)
+      if (!res.ok) return
+      const json = await res.json() as WindowResponse
+      setData(json)
+    } catch { /* keep showing the last good data */ }
+  }, [location.tz])
+
   useEffect(() => { fetchWindow() }, [fetchWindow])
+
+  // Always-accurate: re-check every ~20 minutes, and immediately whenever the
+  // tab regains focus (covers "left it open overnight" and date rollovers)
+  // instead of requiring a manual Regenerate tap.
+  useEffect(() => {
+    const interval = setInterval(fetchWindowQuiet, 20 * 60 * 1000)
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') fetchWindowQuiet()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
+  }, [fetchWindowQuiet])
 
   const today = data?.readings?.[0]
   const upcoming = data?.readings?.slice(1) ?? []
@@ -115,7 +133,7 @@ export default function DailyReadingPage() {
   })()
 
   return (
-    <div className="min-h-screen" style={THEME_VARS}>
+    <div className="min-h-screen">
       <div
         className="fixed top-0 right-0 w-[500px] h-[500px] pointer-events-none z-0"
         style={{ background: 'radial-gradient(circle at 75% 15%, rgba(201,169,110,0.13) 0%, transparent 65%)', filter: 'blur(60px)' }}
@@ -194,7 +212,7 @@ export default function DailyReadingPage() {
                 </span>
               </div>
 
-              <p className="text-sm leading-relaxed italic" style={{ color: 'rgba(16,12,30,0.9)' }}>
+              <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-1)' }}>
                 {today.reading_json.luna_message}
               </p>
             </div>
@@ -250,7 +268,7 @@ export default function DailyReadingPage() {
               <Tabs.Content value="journal">
                 <SectionCard>
                   <Label>Journal prompt</Label>
-                  <p className="text-base font-display italic leading-relaxed mb-4" style={{ color: 'rgba(16,12,30,0.9)' }}>
+                  <p className="text-base font-display italic leading-relaxed mb-4" style={{ color: 'var(--text-1)' }}>
                     &ldquo;{today.reading_json.guidance.journal_prompt}&rdquo;
                   </p>
                   <Label>Affirmation</Label>

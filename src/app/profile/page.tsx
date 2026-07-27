@@ -5,17 +5,18 @@ import { Save, Check, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 const PROFILE_KEY = 'luna_zoe_profile_v2'
 
-// ─── Locked light-palette card styles (bypass the global .glass-card /
-// .soul-card classes, which force white text + dark surfaces under
-// [data-theme="dark"] regardless of local CSS var overrides) ──────────
+// ─── Card surfaces — use the theme-aware --surface tokens (globals.css
+// defines correct light/dark values already) instead of hardcoded light-only
+// rgba literals, so text drawn on top (via --depth etc.) stays legible in
+// dark mode instead of going near-invisible against a translucent-gray card. ──
 const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.6)',
-  border: '1px solid rgba(180,150,100,0.18)',
+  background: 'var(--surface)',
+  border: '1px solid var(--surface-border)',
   borderRadius: 20,
   boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const SOUL_CARD: React.CSSProperties = {
-  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
+  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%), var(--surface)',
   border: '1px solid rgba(201,169,110,0.22)',
   borderRadius: 20,
 }
@@ -249,19 +250,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
-        '--violet': '#C9A96E',
-        '--violet-deep': '#B08D52',
-        '--depth': '#100C1E',
-        '--mid': '#32284A',
-        '--mist': '#5E5474',
-        '--faint': '#8A8098',
-        '--golden': '#C9A96E',
-      } as React.CSSProperties}
-    >
+    <div className="min-h-screen">
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 

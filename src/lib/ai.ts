@@ -3,6 +3,11 @@ import { AI_MODEL, AI_FALLBACK_MODEL } from './ai/config'
 
 let _groq: Groq | null = null
 function getGroq() {
+  if (!process.env.GROQ_API_KEY) {
+    // Distinct, loggable failure mode — a missing key otherwise looks
+    // identical to a real outage to every caller's catch block.
+    console.error('[ai] GROQ_API_KEY is not set in this environment — every AI call will fail auth.')
+  }
   if (!_groq) _groq = new Groq({ apiKey: process.env.GROQ_API_KEY! })
   return _groq
 }
@@ -708,7 +713,7 @@ export async function callAI(systemPrompt: string, userMessage: string, maxToken
   let lastErr: Error | null = null
 
   for (const model of models) {
-    const MAX_RETRIES = 2
+    const MAX_RETRIES = 3
     for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
       try {
         const completion = await groq.chat.completions.create({
@@ -725,8 +730,18 @@ export async function callAI(systemPrompt: string, userMessage: string, maxToken
       } catch (err) {
         lastErr = err instanceof Error ? err : new Error(String(err))
         const msg = lastErr.message.toLowerCase()
-        const isRateLimit = msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')
-        if (!isRateLimit || attempt === MAX_RETRIES - 1) break
+        const isAuthError = msg.includes('401') || msg.includes('invalid api key') || msg.includes('unauthorized')
+        if (isAuthError) {
+          console.error('[ai] Groq auth failed — GROQ_API_KEY is missing or invalid in this environment.')
+          break // retrying won't help a bad/missing key — fail fast to the next model
+        }
+        // Retry transient failures broadly (rate limits, momentary 5xx/network
+        // blips) rather than only rate-limit-shaped messages — a bad response
+        // shouldn't need to match an exact string to get a second try.
+        const isTransient = msg.includes('429') || msg.includes('rate limit') || msg.includes('too many')
+          || msg.includes('500') || msg.includes('502') || msg.includes('503') || msg.includes('timeout')
+          || msg.includes('econnreset') || msg.includes('fetch failed') || msg.includes('network')
+        if (!isTransient || attempt === MAX_RETRIES - 1) break
         await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
       }
     }
