@@ -138,7 +138,7 @@ function isNonEmptyString(value: unknown): value is string {
 
 export async function analyzeIncomingText(input: AnalyzeIncomingTextInput): Promise<TextAnalysisResult> {
   const context = buildAnalysisContext(input)
-  const raw = await callAI(TEXT_ANALYSIS_AND_DRAFTS_PROMPT, context, 2000, true)
+  const raw = await callAI(TEXT_ANALYSIS_AND_DRAFTS_PROMPT, context, 2000)
   const parsed = parseAIJson<TextAnalysisResult>(raw)
 
   if (
@@ -182,7 +182,7 @@ export async function regenerateDraftVariant(input: RegenerateDraftInput): Promi
     `Requested adjustment: ${INSTRUCTION_TEXT[instruction]}`,
   ].join('\n')
 
-  const raw = await callAI(TEXT_DRAFT_REGENERATE_PROMPT, context, 500, true)
+  const raw = await callAI(TEXT_DRAFT_REGENERATE_PROMPT, context, 500)
   const parsed = parseAIJson<{ text: string }>(raw)
 
   if (!isNonEmptyString(parsed.text)) {
