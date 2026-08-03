@@ -19,7 +19,7 @@ interface BoardItem {
 const LIGHT_PALETTE_VARS = {
   '--text-1': '#100C1E',
   '--text-3': '#5E5474',
-  '--luna-purple-2': '#C9A96E',
+  '--luna-purple-2': '#5C4530',
   '--luna-panel': 'rgba(255,255,255,0.6)',
 } as React.CSSProperties
 

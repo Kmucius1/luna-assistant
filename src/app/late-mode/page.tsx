@@ -51,7 +51,7 @@ export default function LateModeScreen() {
       style={{
         background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
         minHeight: '100vh',
-        '--violet': '#C9A96E',
+        '--violet': '#5C4530',
         '--violet-deep': '#B08D52',
         '--depth': '#100C1E',
         '--mid': '#32284A',

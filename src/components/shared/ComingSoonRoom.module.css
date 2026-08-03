@@ -38,7 +38,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #14110b;
-  background: var(--golden, #C9A96E);
+  background: var(--golden, #5C4530);
   padding: 4px 10px;
   border-radius: 999px;
   margin-bottom: 10px;
@@ -99,6 +99,6 @@
   margin-top: 20px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--golden, #C9A96E);
+  color: var(--golden, #5C4530);
   text-decoration: none;
 }

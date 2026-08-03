@@ -5,7 +5,7 @@ DAILY ANCHORS
 - Wake up at 5:00 AM.
 - Shower, get dressed in gym clothes, eat oatmeal, and drink hot tea.
 - Leave by 5:35 AM and arrive at the gym no later than 5:45 AM.
-- Work is protected from 10:30 AM to 5:30 PM every day of the week.
+- Work is protected from 10:00 AM to 6:00 PM every day of the week.
 - Breakfast, lunch, and dinner are required daily and must appear as protected schedule anchors.
 - Default lunch is around 12:30 PM. Default dinner is around 6:00 PM.
 - Plans must feel structured but flexible. Do not make Zoe feel punished when a day changes.
@@ -94,14 +94,16 @@ export const ZOE_GYM_BY_DAY: Record<string, string> = {
 // previously duplicated identically in LunaHomeGridPage.tsx and
 // LunaTodayPage.tsx, which risked the two silently drifting apart.
 // Single source of truth here, alongside the gym data it's built from.
-export const ZOE_HERO_FOCUS_BY_DAY: Record<string, { emoji: string; title: string; subtitle: string }> = {
-  Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.' },
-  Tuesday: { emoji: '💪', title: 'Sexy Back Tuesday', subtitle: 'Pull, row, and build the back you love.' },
-  Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.' },
-  Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.' },
-  Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.' },
-  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.' },
-  Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.' },
+const GYM_HERO_IMAGE = '/images/rooms/hero-gym-focus.jpg'
+
+export const ZOE_HERO_FOCUS_BY_DAY: Record<string, { emoji: string; title: string; subtitle: string; image: string; imagePosition?: string }> = {
+  Monday: { emoji: '🍑', title: 'Glute Growth Monday', subtitle: 'Move with purpose. The results follow.', image: GYM_HERO_IMAGE },
+  Tuesday: { emoji: '💪', title: 'Sexy Back Tuesday', subtitle: 'Pull, row, and build the back you love.', image: GYM_HERO_IMAGE },
+  Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.', image: GYM_HERO_IMAGE },
+  Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.', image: GYM_HERO_IMAGE },
+  Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.', image: GYM_HERO_IMAGE },
+  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.', image: GYM_HERO_IMAGE },
+  Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.', image: '/images/rooms/hero-recovery-beach.jpg', imagePosition: 'center 62%' },
 }
 
 // Structured version of the exercise lists embedded in ZOE_GYM_BY_DAY's prose

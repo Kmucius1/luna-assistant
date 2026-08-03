@@ -132,7 +132,7 @@ export default function ProjectsPage() {
                 <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Projects</h1>
                 <p style={{ fontSize: 12, color: '#5E5474', marginTop: 2 }}>{activeCount} active</p>
               </div>
-              <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', background: '#C9A96E', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+              <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', background: '#5C4530', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                 <Plus className="h-4 w-4" /> Add project
               </button>
             </div>
@@ -167,7 +167,7 @@ export default function ProjectsPage() {
                   <div><FieldLabel text="Next action" /><input value={newProject.next_action} onChange={e => setNewProject(p => ({ ...p, next_action: e.target.value }))} style={INPUT_S} placeholder="What needs to happen next?" /></div>
                   {formError && <p style={{ fontSize: 12, color: '#B23B3B', margin: 0 }}>{formError}</p>}
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button type="submit" style={{ flex: 1, padding: '11px 0', borderRadius: 14, border: 'none', background: '#C9A96E', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create project</button>
+                    <button type="submit" style={{ flex: 1, padding: '11px 0', borderRadius: 14, border: 'none', background: '#5C4530', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Create project</button>
                     <button type="button" onClick={() => setShowForm(false)} style={{ padding: '11px 18px', borderRadius: 14, border: '1px solid rgba(180,150,100,0.16)', background: 'transparent', color: '#5E5474', fontSize: 13, cursor: 'pointer' }}>Cancel</button>
                   </div>
                 </form>
@@ -225,7 +225,7 @@ export default function ProjectsPage() {
                         )}
                         {project.waiting_on && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                            <Clock className="h-3 w-3" style={{ color: '#C9A96E', flexShrink: 0 }} />
+                            <Clock className="h-3 w-3" style={{ color: '#5C4530', flexShrink: 0 }} />
                             <p style={{ fontSize: 12, color: '#8A6F2A' }}>Waiting on: {project.waiting_on}</p>
                           </div>
                         )}

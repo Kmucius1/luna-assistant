@@ -37,14 +37,14 @@ interface CheckIn {
 
 const TYPE_CFG = {
   morning: { label: 'Morning', emoji: '🌅', color: '#A8C4DA' },
-  midday:  { label: 'Midday',  emoji: '☀️', color: '#C9A96E' },
+  midday:  { label: 'Midday',  emoji: '☀️', color: '#5C4530' },
   night:   { label: 'Night',   emoji: '🌙', color: '#8A7A5A' },
 }
 
 const ASPECT_COLORS: Record<string, string> = {
   conjunction: '#B8974F',
   square:      '#C96B5A',
-  opposition:  '#C9A96E',
+  opposition:  '#5C4530',
   trine:       '#5A8A7A',
   sextile:     '#5A7A9A',
 }
@@ -272,7 +272,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
     return (
       <div className="rounded-[20px] p-5 text-center space-y-3"
         style={{ background: 'linear-gradient(145deg, rgba(255,255,255,0.6), rgba(250,244,232,0.7))', border: '1px solid rgba(201,169,110,0.25)' }}>
-        <Sparkles className="h-6 w-6 mx-auto" style={{ color: '#C9A96E' }} />
+        <Sparkles className="h-6 w-6 mx-auto" style={{ color: '#5C4530' }} />
         <p className="text-base font-bold text-[#100C1E]">Get your daily coaching</p>
         <p className="text-sm" style={{ color: '#5E5474' }}>
           LUNA reviews your check-ins, transit reflections, and patterns — then gives you deep personalized feedback on your path to your highest self.
@@ -315,7 +315,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
           </div>
           <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(180,150,100,0.18)' }}>
             <div className="h-full rounded-full"
-              style={{ width: `${coaching.growth_score * 10}%`, background: 'linear-gradient(90deg, #C9A96E, #C9A96E)' }} />
+              style={{ width: `${coaching.growth_score * 10}%`, background: 'linear-gradient(90deg, #5C4530, #5C4530)' }} />
           </div>
         </div>
       </div>
@@ -354,8 +354,8 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
       <div className="rounded-[20px] p-4 space-y-2"
         style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
         <div className="flex items-center gap-2">
-          <ArrowRight className="h-4 w-4" style={{ color: '#C9A96E' }} />
-          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#C9A96E' }}>What to do next time</p>
+          <ArrowRight className="h-4 w-4" style={{ color: '#5C4530' }} />
+          <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5C4530' }}>What to do next time</p>
         </div>
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{coaching.next_time}</p>
       </div>
@@ -538,8 +538,8 @@ export default function MemoryPage() {
       '--text-2': '#32284A',
       '--text-3': '#5E5474',
       '--text-4': '#8A8098',
-      '--violet': '#C9A96E',
-      '--golden': '#C9A96E',
+      '--violet': '#5C4530',
+      '--golden': '#5C4530',
       '--surface': 'rgba(255,255,255,0.6)',
       '--surface-border': 'rgba(180,150,100,0.18)',
       '--surface-strong': 'rgba(255,255,255,0.75)',

@@ -34,6 +34,9 @@
   min-height: 44px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
 }
 
 .dockItemHome {

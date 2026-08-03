@@ -8,8 +8,8 @@ width: 100%;
 --panel-soft: rgba(21, 21, 51, 0.82);
 --border: rgba(205, 182, 255, 0.18);
 --border-strong: rgba(159, 94, 255, 0.48);
---purple: #9b5cff;
---purple-soft: #c6a8ff;
+--purple: #5C4530;
+--purple-soft: #8A6B4A;
 --text-muted: rgba(255, 255, 255, 0.58);
 --shadow: 0 22px 55px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
@@ -121,7 +121,7 @@ box-shadow: inset 0 0 20px rgba(146,78,255,0.08), 0 0 18px rgba(117,55,220,0.1);
 .priorityList{ display: grid; gap: 7px; flex: 1; align-content: center; }
 .priorityRow{ display: grid; grid-template-columns: 30px 1fr 23px; align-items: center; gap: 11px; color: white; font-size: 14px; }
 .priorityRow > svg{ color: rgba(169,111,255,0.45); }
-.priorityNumber{ width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #d1b2ff; border: 1px solid rgba(155,92,255,0.58); background: rgba(155,92,255,0.14); }
+.priorityNumber{ width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #d1b2ff; border: 1px solid rgba(92,69,48,0.58); background: rgba(92,69,48,0.14); }
 .inlineLink,.largeInlineLink{ display: inline-flex; align-items: center; gap: 2px; width: fit-content; color: #b879ff !important; text-decoration: none; font-weight: 700; }
 .inlineLink{ font-size: 12px; margin-top: 7px; }
 .largeInlineLink{ font-size: 17px; margin-top: auto; }
@@ -138,7 +138,7 @@ box-shadow: inset 0 0 20px rgba(146,78,255,0.08), 0 0 18px rgba(117,55,220,0.1);
 .lunaMessageArt{ position: absolute; inset: 35% 0 0; background-size: cover; background-position:center bottom; background-repeat:no-repeat; opacity: .94; }
 .pillButton{ z-index: 3; margin-top: auto; width: fit-content; display: inline-flex; align-items: center; gap: 10px; padding: 13px 25px; color: white; font-size: 16px; font-weight: 700; border-radius: 999px; border: 1px solid rgba(176,108,255,.72); background: linear-gradient(135deg, rgba(103,48,181,.45), rgba(67,29,119,.48)); cursor: pointer; }
 .previewSlide{ display: grid; grid-template-rows: minmax(200px,1.06fr) minmax(180px,.94fr); gap: 14px; }
-.outfitCard{ display: grid; grid-template-columns: 265px 1fr; min-height: 0; border-color: rgba(155,92,255,.35); background: radial-gradient(circle at 87% 16%, rgba(140,79,255,.2), transparent 30%), var(--panel); }
+.outfitCard{ display: grid; grid-template-columns: 265px 1fr; min-height: 0; border-color: rgba(92,69,48,.35); background: radial-gradient(circle at 87% 16%, rgba(140,79,255,.2), transparent 30%), var(--panel); }
 .outfitImageWrap{ height: 100%; min-height: 0; overflow: hidden; border-radius: 27px 0 0 27px; display: grid; place-items: center; color: var(--purple-soft); background: linear-gradient(150deg,#241747,#0a0922); }
 .outfitImageWrap img{ width: 100%; height: 100%; object-fit: cover; }
 .outfitCopy{ min-width: 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; padding: 14px 32px; z-index: 2; overflow: hidden; }

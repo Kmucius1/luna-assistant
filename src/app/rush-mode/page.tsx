@@ -69,9 +69,9 @@ export default function RushModeScreen() {
       style={{
         background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
         minHeight: '100vh',
-        '--violet': '#C9A96E',
+        '--violet': '#5C4530',
         '--violet-deep': '#B08D52',
-        '--golden': '#C9A96E',
+        '--golden': '#5C4530',
         '--text-1': '#100C1E',
         '--text-2': '#32284A',
         '--text-3': '#5E5474',

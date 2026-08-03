@@ -23,7 +23,7 @@ export default function GrowthPage() {
       '--text-1': '#100C1E',
       '--text-3': '#5E5474',
       '--text-4': '#8A8098',
-      '--violet': '#C9A96E',
+      '--violet': '#5C4530',
       '--surface': 'rgba(255,255,255,0.6)',
       '--surface-border': 'rgba(180,150,100,0.18)',
     } as React.CSSProperties}>
@@ -63,8 +63,8 @@ export default function GrowthPage() {
             style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.2) 0%, transparent 60%)', filter: 'blur(16px)' }} />
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4" style={{ color: '#C9A96E' }} />
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#C9A96E' }}>Pattern Recognition</p>
+              <TrendingUp className="h-4 w-4" style={{ color: '#5C4530' }} />
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#5C4530' }}>Pattern Recognition</p>
             </div>
             <p className="font-display text-lg font-bold text-[#100C1E] mb-2">
               LUNA sees what you cannot see yet.

@@ -50,9 +50,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             } catch(e){
               document.documentElement.setAttribute('data-theme', 'dark');
             }
+            // Old aggressive-caching service workers caused stale-content bugs,
+            // so every registration used to get force-unregistered on every
+            // load. That also kills the push-notification service worker
+            // (/sw.js) before it can ever stay subscribed. It doesn't do any
+            // fetch/cache interception, so it can't cause that bug — only
+            // unregister anything that ISN'T it.
             if ('serviceWorker' in navigator) {
               navigator.serviceWorker.getRegistrations().then(function(regs){
-                regs.forEach(function(r){ r.unregister(); });
+                regs.forEach(function(r){
+                  var url = (r.active && r.active.scriptURL) || (r.installing && r.installing.scriptURL) || (r.waiting && r.waiting.scriptURL) || '';
+                  if (url.indexOf('/sw.js') === -1) r.unregister();
+                });
               });
             }
             if ('caches' in window) {

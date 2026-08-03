@@ -1,0 +1,116 @@
+.roomCard {
+  /* Self-contained theme tokens — this card is reused inside pages that
+     don't all define --ink-1/--ink-3 themselves (Astrology, LUNA), so it
+     can't rely on inheriting them. Defining + overriding them locally
+     means this card is readable in dark mode no matter what wraps it. */
+  --ink-1: #100C1E;
+  --ink-3: #5E5474;
+
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.16);
+  box-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+  padding: 10px 10px 8px;
+  color: inherit;
+}
+
+:global([data-theme='dark']) .roomCard {
+  --ink-1: #F5EFE3;
+  --ink-3: rgba(245, 239, 227, 0.65);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
+.roomIconBadge {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roomIcon { color: #6B5636; }
+
+.roomLabel {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--ink-1, #100C1E);
+  margin: 6px 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roomTagline {
+  flex-shrink: 0;
+  margin: 0 0 8px;
+  font-size: 10.5px;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--ink-3, #5E5474);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.roomArt {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  flex-shrink: 0;
+  border-radius: 11px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 36%, rgba(220, 195, 150, 0.28), transparent 28%),
+    linear-gradient(145deg, rgba(201, 169, 110, 0.16), rgba(240, 225, 195, 0.35));
+}
+
+.roomArt > svg {
+  position: relative;
+  z-index: 2;
+  color: rgba(80, 60, 30, 0.85);
+  filter: drop-shadow(0 0 20px rgba(201, 169, 110, 0.45));
+}
+
+.roomPhoto { object-fit: cover; }
+
+.roomGoButton {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #100C1E;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #14110b;
+  background: var(--gold, #5C4530);
+  padding: 2px 7px;
+  border-radius: 999px;
+}

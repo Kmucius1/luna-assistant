@@ -67,7 +67,7 @@ function groupByDate(events: CalendarEvent[]): { label: string; key: string; eve
 function EventCard({ ev }: { ev: CalendarEvent }) {
   const past   = new Date(ev.end) < new Date()
   const person = personFor(ev)
-  const accent = person ? person.color : ev.isToday ? '#C9A96E' : ev.isTomorrow ? '#C9A96E' : 'rgba(94,84,116,0.2)'
+  const accent = person ? person.color : ev.isToday ? '#5C4530' : ev.isTomorrow ? '#5C4530' : 'rgba(94,84,116,0.2)'
 
   return (
     <div style={{ ...G, padding: '14px 16px', opacity: past ? 0.5 : 1, borderLeft: `3px solid ${accent}` }}>
@@ -224,7 +224,7 @@ export default function CalendarPage() {
             {events.length > 0 && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
                 {(['all', 'today', 'week'] as const).map(v => (
-                  <button key={v} onClick={() => setFilter(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: filter === v ? '#C9A96E' : 'rgba(255,255,255,0.5)', color: filter === v ? 'white' : '#5E5474' }}>
+                  <button key={v} onClick={() => setFilter(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: filter === v ? '#5C4530' : 'rgba(255,255,255,0.5)', color: filter === v ? 'white' : '#5E5474' }}>
                     {v === 'all' ? 'All' : v === 'today' ? 'Today' : 'This week'}
                   </button>
                 ))}
@@ -256,7 +256,7 @@ export default function CalendarPage() {
                 {grouped.map(group => (
                   <div key={group.key}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: group.label === 'Today' ? '#C9A96E' : group.label === 'Tomorrow' ? '#C9A96E' : '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: group.label === 'Today' ? '#5C4530' : group.label === 'Tomorrow' ? '#5C4530' : '#5E5474', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                         {group.label}
                       </p>
                       <div style={{ flex: 1, height: 1, background: 'rgba(180,150,100,0.16)' }} />
@@ -276,7 +276,7 @@ export default function CalendarPage() {
             {!loading && !error && grouped.length === 0 && (
               <div style={{ ...G, padding: 32, textAlign: 'center' }}>
                 <div style={{ width: 56, height: 56, borderRadius: 18, background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <Calendar className="h-6 w-6" style={{ color: '#C9A96E' }} />
+                  <Calendar className="h-6 w-6" style={{ color: '#5C4530' }} />
                 </div>
                 <p style={{ fontSize: 16, fontWeight: 700, color: '#100C1E', marginBottom: 8 }}>No upcoming events</p>
                 <p style={{ fontSize: 13, color: '#5E5474', lineHeight: 1.6 }}>

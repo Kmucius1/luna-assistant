@@ -13,7 +13,7 @@ const G: React.CSSProperties = {
 }
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#C9A96E',
+  textTransform: 'uppercase', color: '#5C4530',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10,
 }
@@ -115,7 +115,7 @@ export default function ManifestationPage() {
               onClick={addIntention}
               style={{
                 flexShrink: 0, width: 40, height: 40, borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: 'linear-gradient(135deg, #C9A96E 0%, #B8974F 100%)',
+                background: 'linear-gradient(135deg, #5C4530 0%, #B8974F 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}
             >

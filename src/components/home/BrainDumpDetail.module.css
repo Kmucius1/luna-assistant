@@ -1,11 +1,12 @@
 .page {
   --ivory-1: #FBF8F2; --ivory-2: #F6F1E7; --ink-1: #100C1E; --ink-2: #32284A; --ink-3: #5E5474;
-  --gold: #C9A96E; --gold-soft: #F2E5CF; --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+  --gold: #5C4530; --gold-soft: #F2E5CF; --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
   background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
   padding: 12px 14px 28px; display: flex; flex-direction: column; gap: 12px; min-height: 100%;
 }
 
 :global([data-theme='dark']) .page {
+  --gold: #C4A47C;
   --ivory-1: #211C14; --ivory-2: #17130D; --ink-1: #F5EFE3;
   --ink-2: rgba(245, 239, 227, 0.80); --ink-3: rgba(245, 239, 227, 0.58);
   --gold-soft: rgba(201, 169, 110, 0.16); --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);

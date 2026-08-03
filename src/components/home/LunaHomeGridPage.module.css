@@ -4,7 +4,7 @@
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
-  --gold: #C9A96E;
+  --gold: #5C4530;
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
   flex: 1;
@@ -18,11 +18,12 @@
 }
 
 :global([data-theme='dark']) .page {
+  --gold: #C4A47C;
   --ivory-1: #211C14;
   --ivory-2: #17130D;
   --ink-1: #F5EFE3;
   --ink-2: rgba(245, 239, 227, 0.80);
-  --ink-3: rgba(245, 239, 227, 0.58);
+  --ink-3: rgba(245, 239, 227, 0.68);
   --soft-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
 }
 
@@ -35,7 +36,7 @@
 
 .hero {
   position: relative;
-  flex: 0.9 1 0;
+  flex: 1.5 1 0;
   min-height: 0;
   border-radius: 16px;
   overflow: hidden;
@@ -44,12 +45,12 @@
   align-items: center;
 }
 
-.hero :global(img) { object-fit: cover; }
+.hero :global(img) { object-fit: cover; object-position: center; }
 
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(100deg, rgba(30,20,10,0.88) 40%, rgba(30,20,10,0.35) 75%, rgba(30,20,10,0.1) 100%);
+  background: linear-gradient(90deg, rgba(20,17,12,0.88) 0%, rgba(20,17,12,0.55) 48%, rgba(20,17,12,0.1) 100%);
 }
 
 .heroContent {
@@ -108,7 +109,7 @@
    for touch, trackpad, and the dot buttons below). */
 
 .roomsSection {
-  flex: 2.3 1 0;
+  flex: 2.1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -116,8 +117,9 @@
 }
 
 .sparkSection {
-  flex: 0.85 1 0;
+  flex: 0 0 auto;
   min-height: 0;
+  margin-bottom: 4px;
   display: flex;
 }
 
@@ -247,6 +249,7 @@
   display: flex;
   justify-content: center;
   gap: 7px;
+  margin-bottom: 4px;
 }
 
 .dot {

@@ -142,7 +142,7 @@ export default function DictationScreen() {
     <div
       className="bg-sanctuary min-h-screen"
       style={{
-        '--violet': '#C9A96E',
+        '--violet': '#5C4530',
         '--violet-deep': '#B08D52',
         '--depth': '#100C1E',
         '--mid': '#32284A',
@@ -165,7 +165,7 @@ export default function DictationScreen() {
               </div>
             </div>
             <a href="/chat" style={{
-              fontSize: 12, fontWeight: 700, color: '#C9A96E', textDecoration: 'none',
+              fontSize: 12, fontWeight: 700, color: '#5C4530', textDecoration: 'none',
               padding: '6px 12px', borderRadius: 20, background: 'rgba(201,169,110,0.10)',
               border: '1px solid rgba(201,169,110,0.22)',
             }}>Talk to LUNA →</a>

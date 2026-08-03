@@ -33,7 +33,7 @@ const ENERGY_CHIPS = [
 const BODY_CHECKS = [
   { icon: Droplets, label: 'Drank water', key: 'water',   color: '#A8C4DA' },
   { icon: Apple,    label: 'Ate something', key: 'food',  color: '#B8C9B4' },
-  { icon: Sun,      label: 'Got some light/air', key: 'air', color: '#C9A96E' },
+  { icon: Sun,      label: 'Got some light/air', key: 'air', color: '#5C4530' },
 ]
 
 const MIDDAY_PROMPTS = [
@@ -97,13 +97,13 @@ export default function MiddayPage() {
     <div
       className="bg-sanctuary min-h-screen"
       style={{
-        '--violet': '#C9A96E',
+        '--violet': '#5C4530',
         '--violet-deep': '#B08D52',
         '--depth': '#100C1E',
         '--mid': '#32284A',
         '--mist': '#5E5474',
         '--faint': '#8A8098',
-        '--golden': '#C9A96E',
+        '--golden': '#5C4530',
       } as React.CSSProperties}
     >
       <AppLayout noPad className="pt-16">

@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 interface BottomSheetProps {
   isOpen: boolean
@@ -12,6 +13,10 @@ interface BottomSheetProps {
 
 export function BottomSheet({ isOpen, onClose, title, subtitle, children, height = '85vh' }: BottomSheetProps) {
   const panelRef = useRef<HTMLDivElement>(null)
+  // Portal target isn't available during SSR/first paint — mount-gate so the
+  // server and initial client render agree (both render nothing here).
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   // Close on Escape key
   useEffect(() => {
@@ -27,9 +32,15 @@ export function BottomSheet({ isOpen, onClose, title, subtitle, children, height
     return () => { document.body.style.overflow = '' }
   }, [isOpen])
 
-  if (!isOpen) return null
+  if (!isOpen || !mounted) return null
 
-  return (
+  // Rendered via portal straight into <body> — some pages wrap children in a
+  // page-enter animation that applies a `transform`, which per spec creates a
+  // new containing block for any `position: fixed` descendant. Without the
+  // portal this sheet would resolve "fixed" against that transformed
+  // ancestor's box (spanning the full scrollable page) instead of the real
+  // viewport, and render far off-screen below the fold.
+  return createPortal(
     <div style={{ position: 'fixed', inset: 0, zIndex: 200 }}>
       {/* Overlay */}
       <div
@@ -64,6 +75,7 @@ export function BottomSheet({ isOpen, onClose, title, subtitle, children, height
           {children}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

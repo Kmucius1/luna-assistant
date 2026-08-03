@@ -4,7 +4,7 @@
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
-  --gold: #C9A96E;
+  --gold: #5C4530;
   --gold-soft: #F2E5CF;
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
@@ -17,6 +17,7 @@
 }
 
 :global([data-theme='dark']) .page {
+  --gold: #C4A47C;
   --ivory-1: #211C14;
   --ivory-2: #17130D;
   --ink-1: #F5EFE3;

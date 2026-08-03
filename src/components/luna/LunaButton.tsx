@@ -20,7 +20,7 @@ export function LunaButton({ variant = 'primary', className, children, ...rest }
 
   const styles: React.CSSProperties = variant === 'secondary'
     ? { background: 'transparent', border: '1px solid var(--luna-border)', color: 'var(--luna-text)' }
-    : { background: 'rgba(155,92,255,0.16)', border: '1px solid var(--luna-border)', color: 'var(--luna-text)', boxShadow: '0 0 18px rgba(155,92,255,0.18)' }
+    : { background: 'rgba(92,69,48,0.16)', border: '1px solid var(--luna-border)', color: 'var(--luna-text)', boxShadow: '0 0 18px rgba(92,69,48,0.18)' }
 
   return (
     <button

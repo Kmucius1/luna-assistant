@@ -9,7 +9,7 @@ import { getInsights, type PatternInsights } from '@/lib/patterns'
 
 const MOOD_COLORS: Record<string, string> = {
   'good': '#5A8A7A', 'great': '#5A8A7A', 'clear': '#5A8A7A', 'aligned': '#5A8A7A', 'peaceful': '#5A8A7A',
-  'grateful': '#8A9E6B', 'motivated': '#C9A96E', 'focused': '#6A9FB8',
+  'grateful': '#8A9E6B', 'motivated': '#5C4530', 'focused': '#6A9FB8',
   'tired': '#7B93B8', 'anxious': '#C96B5A', 'heavy': '#6B6080', 'scattered': '#A88A7A', 'off': '#7A6A6A',
 }
 
@@ -68,8 +68,8 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
             <p className="text-sm font-bold" style={{ color: 'var(--text-1)' }}>Your Patterns</p>
           </div>
           <div className="flex items-center gap-1.5">
-            <Flame className="h-4 w-4" style={{ color: '#C9A96E' }} />
-            <p className="text-sm font-bold" style={{ color: '#C9A96E' }}>{insights.streakDays}d streak</p>
+            <Flame className="h-4 w-4" style={{ color: '#5C4530' }} />
+            <p className="text-sm font-bold" style={{ color: '#5C4530' }}>{insights.streakDays}d streak</p>
           </div>
         </div>
 
@@ -109,8 +109,8 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
           style={{ background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.25)' }}>
-          <Flame className="h-3.5 w-3.5" style={{ color: '#C9A96E' }} />
-          <p className="text-sm font-bold" style={{ color: '#C9A96E' }}>{insights.streakDays} day streak</p>
+          <Flame className="h-3.5 w-3.5" style={{ color: '#5C4530' }} />
+          <p className="text-sm font-bold" style={{ color: '#5C4530' }}>{insights.streakDays} day streak</p>
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
           {[
             { label: 'Voice dictation', pct: voicePct, icon: Mic,      color: 'var(--violet)' },
             { label: 'Suggestion taps', pct: tapPct,   icon: Sparkles, color: '#5A8A7A' },
-            { label: 'Typed directly',  pct: typePct,  icon: Keyboard, color: '#C9A96E' },
+            { label: 'Typed directly',  pct: typePct,  icon: Keyboard, color: '#5C4530' },
           ].map(s => (
             <div key={s.label}>
               <div className="flex items-center justify-between mb-1">

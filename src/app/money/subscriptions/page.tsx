@@ -5,7 +5,7 @@ import { RefreshCw, AlertTriangle } from 'lucide-react'
 import { formatCurrency } from '@/lib/money/format'
 
 const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const GREEN = '#5A8A6A'
 const RED = '#C96B5A'
 const AMBER = '#C9923A'

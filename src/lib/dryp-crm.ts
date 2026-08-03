@@ -144,6 +144,8 @@ const ZOE_IDS = [
   '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb', // zoe.taylor@advantagemediaagency.com
   'dc25215f-cda4-4e91-84ee-c9fe49678b6b', // zoe@drypdigital.com
 ]
+// The DRYP Hub row id (not the auth id) she posts team check-ins as.
+const ZOE_DRYP_ROW_ID = 'dc25215f-cda4-4e91-84ee-c9fe49678b6b'
 
 // DRYP Hub lives in a separate Supabase project — every call here is a
 // cross-project round trip. A short cache avoids repeating it on every
@@ -215,4 +217,75 @@ export async function getSummaryStats() {
   const data = await fetchSummaryStats()
   statsCache = { data, expiresAt: Date.now() + CACHE_TTL_MS }
   return data
+}
+
+// ─── Create a project ──────────────────────────────────────────────────────
+export interface NewProjectInput {
+  account_id: string
+  name: string
+  project_type?: string
+  due_date?: string
+}
+
+export async function createProject(input: NewProjectInput) {
+  const { data, error } = await db()
+    .from('projects')
+    .insert({
+      account_id: input.account_id,
+      name: input.name,
+      project_type: input.project_type || null,
+      due_date: input.due_date || null,
+      status: 'active',
+      phase: 'kickoff',
+      billing_type: 'one_time',
+    })
+    .select('id, name, account_id, project_type, status, phase, due_date, created_at')
+    .single()
+  if (error) throw error
+  return data
+}
+
+// ─── Team activity feed ─────────────────────────────────────────────────────
+// The `notes` table already doubles as DRYP Hub's activity log — every
+// completed task, new account, etc. lands here as a plain-English line
+// ("Kaleb Mucius completed 'schedule David & Luke meetings'"), so the most
+// recent rows across every account genuinely are "what's the team been up
+// to," no separate activity table needed.
+export interface TeamUpdate {
+  id: string
+  content: string
+  account_id?: string
+  account_name?: string
+  created_at: string
+}
+
+export async function getTeamFeed(limit = 30): Promise<TeamUpdate[]> {
+  const { data, error } = await db()
+    .from('notes')
+    .select('id, content, account_id, created_at, account:accounts(business_name)')
+    .not('content', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return (data ?? []).map((n: Record<string, unknown>) => ({
+    id: n.id as string,
+    content: n.content as string,
+    account_id: n.account_id as string | undefined,
+    account_name: (n.account as { business_name?: string } | null)?.business_name,
+    created_at: n.created_at as string,
+  }))
+}
+
+export async function postTeamUpdate(message: string, accountId?: string): Promise<void> {
+  const { error } = await db()
+    .from('notes')
+    .insert({
+      content: `Zoe Taylor: ${message}`,
+      raw_text: message,
+      source_type: 'internal_note',
+      owner_id: ZOE_DRYP_ROW_ID,
+      account_id: accountId || null,
+      visibility: 'internal',
+    })
+  if (error) throw error
 }

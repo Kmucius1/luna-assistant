@@ -4,8 +4,8 @@
   --astro-card: #FFFFFF;
   --astro-text: #171512;
   --astro-muted: #716B63;
-  --astro-gold: #C58D32;
-  --astro-gold-soft: #F2E5CF;
+  --astro-gold: #5C4530;
+  --astro-gold-soft: #EAD9C0;
   --astro-border: rgba(67, 51, 34, 0.09);
   --astro-shadow: 0 14px 38px rgba(72, 54, 31, 0.07);
 
@@ -21,8 +21,8 @@
   --astro-card: #17130D;
   --astro-text: #F5EFE3;
   --astro-muted: rgba(245, 239, 227, 0.62);
-  --astro-gold: #C58D32;
-  --astro-gold-soft: rgba(197, 141, 50, 0.18);
+  --astro-gold: #C4A47C;
+  --astro-gold-soft: rgba(196, 164, 124, 0.18);
   --astro-border: rgba(201, 169, 110, 0.18);
   --astro-shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
 }

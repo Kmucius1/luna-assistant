@@ -37,7 +37,7 @@ type TransitData = {
 const ASPECT_COLORS: Record<string, string> = {
   conjunction: '#DC82AA',
   square:      '#C96B5A',
-  opposition:  '#C9A96E',
+  opposition:  '#5C4530',
   trine:       '#5A8A7A',
   sextile:     '#5A7A9A',
 }
@@ -47,7 +47,7 @@ const THEME_VARS = {
   '--text-2': '#32284A',
   '--text-3': '#5E5474',
   '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
+  '--violet': '#5C4530',
   '--surface': 'rgba(255,255,255,0.6)',
   '--surface-border': 'rgba(180,150,100,0.2)',
   background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
@@ -279,7 +279,7 @@ export default function TransitsPage() {
                 <p className="text-sm leading-relaxed" style={{ color: '#100C1E' }}>{data.daily_theme}</p>
                 {data.moon_house && data.moon_house_meaning && (
                   <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(180,150,100,0.15)' }}>
-                    <p className="text-sm" style={{ color: '#C9A96E' }}>
+                    <p className="text-sm" style={{ color: '#5C4530' }}>
                       🌙 Moon in your <strong style={{ color: '#100C1E' }}>{ORDINALS[data.moon_house]} house</strong>
                       {' '}— {data.moon_house_meaning}
                     </p>

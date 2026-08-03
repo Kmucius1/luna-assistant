@@ -19,11 +19,32 @@ export const CREATIVE_SPARKS = [
   { text: 'Go outside and collect five images that feel like freedom.', tip: 'No rules — just what freedom looks like today.' },
 ]
 
-export function DailyCreativeSpark() {
+interface DailyCreativeSparkProps {
+  /** Home's version — a slim single-line strip, no photo, no room for the
+      room cards to lose. /create keeps the full card since it has the
+      space and the photo pulls its weight there. */
+  compact?: boolean
+}
+
+export function DailyCreativeSpark({ compact }: DailyCreativeSparkProps = {}) {
   const [sparkIndex, setSparkIndex] = useState(dayIndex() % CREATIVE_SPARKS.length)
   const [saved, setSaved] = useState(false)
   const [done, setDone] = useState(false)
   const spark = CREATIVE_SPARKS[sparkIndex]
+
+  if (compact) {
+    return (
+      <div className={styles.sparkCompact}>
+        <Sparkles size={14} className={styles.sparkCompactIcon} />
+        <p className={styles.sparkCompactText}>{spark.text}</p>
+        <div className={styles.sparkCompactActions}>
+          <button type="button" onClick={() => setSaved(s => !s)} className={saved ? styles.sparkActionDone : ''} aria-label="Save"><Bookmark size={14} /></button>
+          <button type="button" onClick={() => setDone(d => !d)} className={done ? styles.sparkActionDone : ''} aria-label="Did it"><Check size={14} /></button>
+          <button type="button" onClick={() => { setSparkIndex(i => (i + 1) % CREATIVE_SPARKS.length); setSaved(false); setDone(false) }} aria-label="More like this"><ArrowRight size={14} /></button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.sparkCard}>

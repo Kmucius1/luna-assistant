@@ -105,7 +105,7 @@ export default function DryphubPage() {
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'white' }}>D</div>
+                <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'white' }}>D</div>
                 <div>
                   <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#100C1E' }}>DRYP Hub</h1>
                   <p style={{ fontSize: 11, color: '#5E5474', marginTop: 1 }}>
@@ -158,7 +158,7 @@ export default function DryphubPage() {
             {/* Alert: new/at-risk */}
             {connected && (totalAlerts > 0 || hasAtRisk) && (
               <div style={{ ...GLASS, padding: 14, marginBottom: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Bell className="h-4 w-4 flex-shrink-0" style={{ color: '#C9A96E' }} />
+                <Bell className="h-4 w-4 flex-shrink-0" style={{ color: '#5C4530' }} />
                 <div style={{ flex: 1 }}>
                   {totalAlerts > 0 && <p style={{ fontSize: 13, color: '#8A6F2A', fontWeight: 600 }}>{totalAlerts} CRM update{totalAlerts !== 1 ? 's' : ''} in the last 24 hours</p>}
                   {hasAtRisk && <p style={{ fontSize: 12, color: '#32284A', marginTop: 2 }}>⚠ {accounts.filter(a => ['at_risk','churning'].includes(a.health_status)).length} client{accounts.filter(a => ['at_risk','churning'].includes(a.health_status)).length !== 1 ? 's' : ''} flagged at-risk or churning</p>}
@@ -171,7 +171,7 @@ export default function DryphubPage() {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 14 }}>
                 {[
                   { v: stats.activeClients, l: 'Active Clients',  c: '#8A6F2A' },
-                  { v: stats.openTasks,     l: 'Open Tasks',      c: '#C9A96E' },
+                  { v: stats.openTasks,     l: 'Open Tasks',      c: '#5C4530' },
                   { v: stats.dueToday,      l: 'Due Today',       c: stats.dueToday > 0 ? '#B23B3B' : '#5E5474' },
                 ].map(s => (
                   <div key={s.l} style={{ ...GLASS, padding: '14px 12px', textAlign: 'center' }}>
@@ -186,7 +186,7 @@ export default function DryphubPage() {
             {connected && (
               <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
                 {([['clients', 'Clients'], ['activity', `Activity${totalAlerts > 0 ? ` (${totalAlerts})` : ''}`], ['tasks', 'Tasks']] as [typeof tab, string][]).map(([v, label]) => (
-                  <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: tab === v ? '#C9A96E' : 'rgba(255,255,255,0.5)', color: tab === v ? 'white' : '#5E5474' }}>
+                  <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: tab === v ? '#5C4530' : 'rgba(255,255,255,0.5)', color: tab === v ? 'white' : '#5E5474' }}>
                     {label}
                   </button>
                 ))}
@@ -314,7 +314,7 @@ export default function DryphubPage() {
             {!loading && connected && tab === 'tasks' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ ...GLASS, padding: 18, textAlign: 'center' }}>
-                  <a href="https://www.dryphub.com/tasks" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '11px 22px', borderRadius: 14, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', color: 'white', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
+                  <a href="https://www.dryphub.com/tasks" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '11px 22px', borderRadius: 14, background: 'linear-gradient(135deg, #5C4530, #B8934A)', color: 'white', fontSize: 13, fontWeight: 700, textDecoration: 'none' }}>
                     <ExternalLink className="h-4 w-4" /> Open DRYP Tasks
                   </a>
                   {stats && (

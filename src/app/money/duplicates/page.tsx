@@ -7,7 +7,7 @@ import { formatCurrency } from '@/lib/money/format'
 const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const RED = '#C96B5A'
 const AMBER = '#C9923A'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const CARD: React.CSSProperties = {
   background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',

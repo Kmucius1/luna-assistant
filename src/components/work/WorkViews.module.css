@@ -1,0 +1,263 @@
+/* Shared card language for all Work sub-views — relies on --work-* tokens
+   inherited from WorkShell's .shell, so every rule here is already
+   dark-mode-correct with zero extra overrides needed. */
+
+.sectionHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--work-text);
+}
+.sectionHeader svg { color: var(--work-gold); flex-shrink: 0; }
+
+.card {
+  background: var(--work-card);
+  border: 1px solid var(--work-border);
+  border-radius: 18px;
+  box-shadow: var(--work-shadow);
+  padding: 16px;
+}
+
+.emptyNote { font-size: 13px; color: var(--work-muted); text-align: center; padding: 18px 4px; line-height: 1.4; }
+.emptyNote a { color: var(--work-gold); font-weight: 700; text-decoration: none; }
+
+/* ── Today ────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  min-height: 168px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--work-shadow);
+  display: flex;
+  align-items: flex-end;
+}
+.hero :global(img) { object-fit: cover; }
+.heroOverlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(15,12,8,0.86) 0%, rgba(15,12,8,0.35) 55%, rgba(15,12,8,0.08) 100%); }
+.heroContent { position: relative; z-index: 1; width: 100%; padding: 14px; color: #fff; }
+.heroLabel { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--work-gold); margin-bottom: 3px; }
+.heroContent h2 { font-family: var(--font-display-var, serif); font-size: 19px; font-weight: 700; margin: 0 0 2px; }
+.heroContent p { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); margin: 0 0 10px; }
+
+.heroMetrics { display: flex; gap: 16px; margin-bottom: 12px; }
+.heroMetric { display: flex; align-items: center; gap: 6px; }
+.heroMetric svg { color: var(--work-gold); width: 15px; height: 15px; flex-shrink: 0; }
+.heroMetricText strong { display: block; font-size: 13px; color: #fff; font-weight: 700; line-height: 1.1; }
+.heroMetricText span { font-size: 9px; color: rgba(255,255,255,0.7); }
+
+.heroButton {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  background: #fff; color: #100C1E;
+  font-size: 12.5px; font-weight: 700;
+  padding: 10px 18px; border-radius: 999px; border: none;
+}
+
+.actionsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.actionCard {
+  display: flex; flex-direction: column; gap: 3px;
+  background: var(--work-card);
+  border: 1px solid var(--work-border);
+  border-radius: 14px; padding: 10px 12px;
+  position: relative;
+  box-shadow: var(--work-shadow);
+}
+.actionCard svg { color: var(--work-gold); width: 16px; height: 16px; }
+.actionCard strong { font-size: 11.5px; color: var(--work-text); font-weight: 600; }
+.actionCard span { font-size: 9.5px; color: var(--work-muted); }
+.actionBadge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 7px; font-weight: 700; text-transform: uppercase;
+  color: #14110b; background: var(--work-gold); padding: 2px 6px; border-radius: 999px;
+}
+
+/* ── Tasks ────────────────────────────────────────────── */
+
+.taskRow { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--work-border); }
+.taskRow:last-child { border-bottom: none; }
+.taskCheck { flex-shrink: 0; width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--work-gold); display: flex; align-items: center; justify-content: center; background: none; }
+.taskCheckDone { background: var(--work-gold); }
+.taskCheck svg { width: 13px; height: 13px; color: var(--work-card); }
+.taskBody { flex: 1; min-width: 0; }
+.taskBody strong { display: block; font-size: 14px; font-weight: 600; color: var(--work-text); }
+.taskBody span { font-size: 11.5px; color: var(--work-muted); }
+.taskSourceBadge { flex-shrink: 0; font-size: 8.5px; font-weight: 700; text-transform: uppercase; color: var(--work-gold); background: var(--work-gold-soft); padding: 3px 8px; border-radius: 999px; }
+
+/* Next Up — the single most important open task, called out above the
+   regular list rather than just sitting as the first undifferentiated row. */
+.nextUpCard {
+  background: linear-gradient(145deg, var(--work-gold-soft) 0%, var(--work-card) 75%);
+  border: 1.5px solid var(--work-gold);
+  border-radius: 18px;
+  box-shadow: var(--work-shadow);
+  padding: 14px 16px;
+}
+.nextUpBadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--work-gold); margin-bottom: 8px;
+}
+.nextUpRow { display: flex; align-items: center; gap: 12px; }
+.nextUpBody { flex: 1; min-width: 0; }
+.nextUpBody strong { display: block; font-size: 16px; font-weight: 700; color: var(--work-text); font-family: var(--font-display-var, serif); }
+.nextUpBody span { font-size: 11.5px; color: var(--work-muted); }
+
+/* ── Agenda ───────────────────────────────────────────── */
+
+.agendaHeader { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.agendaRange { font-size: 10.5px; font-weight: 700; color: var(--work-gold); }
+
+.agendaRow { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--work-border); }
+.agendaRow:last-child { border-bottom: none; }
+.agendaTime { flex-shrink: 0; width: 66px; font-size: 12px; font-weight: 700; color: var(--work-gold); padding-top: 1px; }
+.agendaBar { flex-shrink: 0; width: 2px; align-self: stretch; background: var(--work-gold-soft); border-radius: 2px; }
+.agendaBody { flex: 1; min-width: 0; }
+.agendaBody strong { display: block; font-size: 14px; font-weight: 600; color: var(--work-text); }
+.agendaBody span { font-size: 11.5px; color: var(--work-muted); }
+
+.agendaNote {
+  display: flex; align-items: flex-start; gap: 8px;
+  background: var(--work-gold-soft); border-radius: 14px;
+  padding: 10px 12px; font-size: 12px; color: var(--work-text); font-style: italic; line-height: 1.4;
+}
+.agendaNote svg { color: var(--work-gold); flex-shrink: 0; margin-top: 2px; }
+
+.planButton {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; margin-top: 10px;
+  background: var(--work-gold); color: var(--work-card);
+  font-size: 13px; font-weight: 700; padding: 12px; border-radius: 12px; border: none;
+  min-height: 44px;
+}
+.planButton:disabled { opacity: 0.6; }
+
+.regenerateButton {
+  align-self: center;
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none;
+  font-size: 11px; font-weight: 700; color: var(--work-gold);
+  padding: 6px 0; min-height: 32px;
+}
+.regenerateButton:disabled { opacity: 0.6; }
+.spinning { animation: workSpin 0.8s linear infinite; }
+@keyframes workSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.trackErrorMsg { margin: 6px 0 0; font-size: 11px; font-weight: 600; color: #C96B5A; text-align: center; }
+
+/* ── Projects ─────────────────────────────────────────── */
+
+.projectRow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--work-border); }
+.projectRow:last-child { border-bottom: none; }
+.projectBadge {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+  background: var(--work-gold); color: #14110b;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; text-align: center; line-height: 1.1;
+  overflow: hidden; padding: 2px;
+}
+.projectBody { flex: 1; min-width: 0; }
+.projectTop { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.projectTop strong { font-size: 13px; font-weight: 600; color: var(--work-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.healthBadge { flex-shrink: 0; font-size: 8.5px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+.healthExcellent, .healthGood { background: rgba(90,160,90,0.16); color: #3f7a3f; }
+.healthAt_risk { background: rgba(200,140,60,0.18); color: #a06a1e; }
+.healthChurning { background: rgba(190,80,70,0.16); color: #b5544a; }
+.healthNew { background: var(--work-gold-soft); color: var(--work-gold); }
+.projectMeta { font-size: 10.5px; color: var(--work-muted); margin-top: 1px; }
+
+/* ── Notes ────────────────────────────────────────────── */
+
+.noteAddCard {
+  background: var(--work-card);
+  border: 1px solid var(--work-border);
+  border-radius: 16px;
+  box-shadow: var(--work-shadow);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.noteAddInput {
+  width: 100%;
+  background: var(--work-surface);
+  border: 1px solid var(--work-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--work-text);
+  resize: none;
+  font-family: inherit;
+}
+.noteAddInput::placeholder { color: var(--work-muted); }
+.noteAddButton {
+  align-self: flex-end;
+  display: flex; align-items: center; gap: 6px;
+  background: var(--work-gold); color: var(--work-card);
+  font-size: 12px; font-weight: 700;
+  padding: 9px 16px; border-radius: 999px; border: none;
+  min-height: 38px;
+}
+.noteAddButton:disabled { opacity: 0.5; }
+
+.noteCard { display: flex; flex-direction: column; gap: 6px; }
+.noteTitle { font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; color: var(--work-gold); margin: 0; text-transform: uppercase; }
+.noteQuote { font-size: 14px; color: var(--work-text); line-height: 1.45; margin: 0; }
+.noteTime { font-size: 10.5px; color: var(--work-muted); }
+
+/* ── Sheet forms (New Project / Team Updates / Goals) ────
+   Shared form-field language for the BottomSheet-based Quick Action
+   flows — the sheet itself supplies chrome, these style the inner form. */
+
+.sheetLabel { font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--work-muted); margin: 12px 0 6px; display: block; }
+.sheetLabel:first-child { margin-top: 0; }
+.sheetInput, .sheetSelect, .sheetTextarea {
+  width: 100%;
+  background: var(--work-surface);
+  border: 1px solid var(--work-border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13.5px;
+  color: var(--work-text);
+  font-family: inherit;
+}
+.sheetInput::placeholder, .sheetTextarea::placeholder { color: var(--work-muted); }
+.sheetTextarea { resize: none; }
+.sheetSubmit {
+  width: 100%; margin-top: 16px;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  background: var(--work-gold); color: var(--work-card);
+  font-size: 13.5px; font-weight: 700; padding: 12px; border-radius: 12px; border: none;
+  min-height: 44px;
+}
+.sheetSubmit:disabled { opacity: 0.6; }
+.sheetMsg { margin: 8px 0 0; font-size: 11.5px; color: var(--work-muted); text-align: center; }
+.sheetErrorMsg { margin: 8px 0 0; font-size: 11.5px; color: #C96B5A; text-align: center; }
+
+/* Team updates feed */
+.feedRow { display: flex; flex-direction: column; gap: 3px; padding: 10px 0; border-bottom: 1px solid var(--work-border); }
+.feedRow:last-child { border-bottom: none; }
+.feedText { font-size: 13px; color: var(--work-text); line-height: 1.4; }
+.feedMeta { display: flex; gap: 6px; align-items: center; font-size: 10px; color: var(--work-muted); }
+.feedAccountTag { font-weight: 700; color: var(--work-gold); }
+
+/* Goals list */
+.goalCard { display: flex; flex-direction: column; gap: 6px; padding: 12px 0; border-bottom: 1px solid var(--work-border); }
+.goalCard:last-child { border-bottom: none; }
+.goalTop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.goalTitle { font-size: 14px; font-weight: 700; color: var(--work-text); }
+.goalTitleDone { text-decoration: line-through; color: var(--work-muted); }
+.goalDue { font-size: 10px; color: var(--work-muted); flex-shrink: 0; }
+.goalBar { height: 6px; border-radius: 999px; background: var(--work-gold-soft); overflow: hidden; }
+.goalBarFill { height: 100%; background: var(--work-gold); border-radius: 999px; transition: width 0.2s ease; }
+.goalControls { display: flex; align-items: center; gap: 8px; }
+.goalStepButton {
+  width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--work-gold-soft); border: none; color: var(--work-gold); font-weight: 700; font-size: 14px;
+}
+.goalPercent { font-size: 11px; font-weight: 700; color: var(--work-gold); width: 34px; text-align: center; flex-shrink: 0; }
+.goalCompleteButton { font-size: 10.5px; font-weight: 700; color: var(--work-gold); background: none; border: none; padding: 4px 0; flex-shrink: 0; }

@@ -79,7 +79,7 @@ function ChipRow({ options, value, onChange }: { options: { value: string; label
         <button key={o.value || '_none'} onClick={() => onChange(value === o.value ? '' : o.value)}
           style={{
             padding: '8px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none',
-            background: value === o.value ? '#C9A96E' : 'rgba(255,255,255,0.5)',
+            background: value === o.value ? '#5C4530' : 'rgba(255,255,255,0.5)',
             color: value === o.value ? 'white' : '#32284A',
             outline: value === o.value ? '1.5px solid rgba(201,169,110,0.7)' : '1px solid rgba(180,150,100,0.16)',
             transition: 'all 0.15s ease',
@@ -377,8 +377,8 @@ export default function CommunicationCoach() {
                     onClick={listening ? stopListening : startListening}
                     className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center"
                     style={{
-                      background: listening ? '#C9A96E' : 'rgba(201,169,110,0.15)',
-                      border: `1px solid ${listening ? '#C9A96E' : 'rgba(201,169,110,0.3)'}`,
+                      background: listening ? '#5C4530' : 'rgba(201,169,110,0.15)',
+                      border: `1px solid ${listening ? '#5C4530' : 'rgba(201,169,110,0.3)'}`,
                     }}
                     title={listening ? 'Stop dictation' : 'Dictate'}>
                     {listening ? <MicOff className="h-3.5 w-3.5 text-white" /> : <Mic className="h-3.5 w-3.5" style={{ color: '#8A6F2A' }} />}
@@ -421,7 +421,7 @@ export default function CommunicationCoach() {
                     <button key={c.id} onClick={() => selectContact(c.id)}
                       style={{
                         padding: '8px 14px', borderRadius: 12, fontSize: 12.5, fontWeight: 600, cursor: 'pointer', border: 'none',
-                        background: contactId === c.id ? '#C9A96E' : 'rgba(255,255,255,0.5)',
+                        background: contactId === c.id ? '#5C4530' : 'rgba(255,255,255,0.5)',
                         color: contactId === c.id ? 'white' : '#32284A',
                         outline: contactId === c.id ? '1.5px solid rgba(201,169,110,0.7)' : '1px solid rgba(180,150,100,0.16)',
                       }}>
@@ -450,7 +450,7 @@ export default function CommunicationCoach() {
                       {RELATIONSHIP_TYPES.filter(r => r.value).map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                     </select>
                     <button onClick={saveNewContact} disabled={savingContact || !newContactName.trim()}
-                      style={{ width: '100%', padding: '10px', borderRadius: 12, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: savingContact || !newContactName.trim() ? 0.5 : 1 }}>
+                      style={{ width: '100%', padding: '10px', borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8934A)', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: savingContact || !newContactName.trim() ? 0.5 : 1 }}>
                       {savingContact ? 'Saving…' : 'Save contact'}
                     </button>
                   </div>
@@ -479,7 +479,7 @@ export default function CommunicationCoach() {
               <button
                 onClick={() => submit()}
                 disabled={!canSubmit}
-                style={{ padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: canSubmit ? 1 : 0.45, boxShadow: '0 4px 20px rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                style={{ padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #5C4530, #B8934A)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer', border: 'none', opacity: canSubmit ? 1 : 0.45, boxShadow: '0 4px 20px rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles style={{ width: 16, height: 16 }} />}
                 {loading ? 'Writing your best response…' : 'Write my best response ✦'}
               </button>
@@ -503,7 +503,7 @@ export default function CommunicationCoach() {
                     style={{ width: '100%', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.18)', borderRadius: 12, padding: '10px 14px', fontSize: 13.5, color: '#100C1E', outline: 'none', resize: 'none', marginBottom: 10, boxSizing: 'border-box', colorScheme: 'light' }}
                   />
                   <button onClick={answerClarification} disabled={!clarifyAnswer.trim() || loading}
-                    style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: !clarifyAnswer.trim() || loading ? 0.5 : 1 }}>
+                    style={{ width: '100%', padding: '12px', borderRadius: 14, background: 'linear-gradient(135deg, #5C4530, #B8934A)', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', opacity: !clarifyAnswer.trim() || loading ? 0.5 : 1 }}>
                     {loading ? 'Thinking…' : 'Continue'}
                   </button>
                 </div>
@@ -530,7 +530,7 @@ export default function CommunicationCoach() {
                       {typeof result.analysis.confidence === 'number' && (
                         <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
                           <div style={{ flex: 1, height: 4, borderRadius: 4, background: 'rgba(180,150,100,0.16)', overflow: 'hidden' }}>
-                            <div style={{ width: `${Math.min(100, Math.max(0, result.analysis.confidence))}%`, height: '100%', background: 'linear-gradient(90deg, #C9A96E, #E0C892)' }} />
+                            <div style={{ width: `${Math.min(100, Math.max(0, result.analysis.confidence))}%`, height: '100%', background: 'linear-gradient(90deg, #5C4530, #E0C892)' }} />
                           </div>
                           <span style={{ fontSize: 10.5, color: '#5E5474' }}>{result.analysis.confidence}% confident</span>
                         </div>

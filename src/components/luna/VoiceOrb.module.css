@@ -1,0 +1,162 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 28px 12px 8px;
+}
+
+.orbStage {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201, 169, 110, 0.4);
+  opacity: 0;
+}
+.ringActive {
+  animation: ringPulse 1.8s ease-out infinite;
+}
+.ring:nth-child(2) { animation-delay: 0.6s; }
+
+@keyframes ringPulse {
+  0%   { transform: scale(0.72); opacity: 0.55; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
+
+.orb {
+  position: relative;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: radial-gradient(circle at 34% 28%, #FFF8E7 0%, #F3DDAE 26%, #D9B676 52%, #B8974F 74%, #5C4530 100%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.25) inset,
+    0 8px 30px rgba(92, 69, 48, 0.35),
+    0 0 34px 6px rgba(201, 169, 110, 0.35);
+  animation: breathe 4.2s ease-in-out infinite;
+  transition: box-shadow 0.4s ease, transform 0.3s ease;
+}
+.orb:active { transform: scale(0.97); }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.035); }
+}
+
+.orbListening {
+  animation: listenPulse 1.5s ease-in-out infinite;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.3) inset,
+    0 8px 30px rgba(92, 69, 48, 0.35),
+    0 0 48px 12px rgba(201, 169, 110, 0.55);
+}
+@keyframes listenPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.07); }
+}
+
+.orbThinking {
+  animation: thinkSpin 2.4s linear infinite, breathe 4.2s ease-in-out infinite;
+}
+@keyframes thinkSpin {
+  0%   { filter: brightness(1) hue-rotate(0deg); }
+  50%  { filter: brightness(1.18) hue-rotate(6deg); }
+  100% { filter: brightness(1) hue-rotate(0deg); }
+}
+
+.orbSpeaking {
+  animation: speakPulse 0.85s ease-in-out infinite;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.3) inset,
+    0 8px 30px rgba(92, 69, 48, 0.35),
+    0 0 40px 10px rgba(201, 169, 110, 0.5);
+}
+@keyframes speakPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.045); }
+}
+
+.craterGlow {
+  position: absolute;
+  top: 22%;
+  left: 26%;
+  width: 34%;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+  pointer-events: none;
+}
+
+.status {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-3, #5E5474);
+  text-align: center;
+  min-height: 18px;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--ink-4, #8A8098);
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.4;
+}
+
+.endButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(224, 94, 94, 0.12);
+  border: 1px solid rgba(224, 94, 94, 0.3);
+  color: #C25050;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  min-height: 34px;
+}
+
+.transcript {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+.turn {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.turnUser {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #5C4530 0%, #B8974F 100%);
+  color: #fff;
+}
+.turnAssistant {
+  align-self: flex-start;
+  background: rgba(201, 169, 110, 0.12);
+  border: 1px solid rgba(201, 169, 110, 0.25);
+  color: var(--ink-1, #100C1E);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb, .orbListening, .orbThinking, .orbSpeaking, .ring, .ringActive {
+    animation: none !important;
+  }
+}

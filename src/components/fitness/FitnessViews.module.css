@@ -1,0 +1,182 @@
+/* Shared card language for all Fitness sub-views — relies on --fitness-*
+   tokens inherited from FitnessShell's .shell, so every rule here is
+   already dark-mode-correct with zero extra overrides needed. */
+
+.sectionHeader {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fitness-text);
+}
+.sectionHeader svg { color: var(--fitness-gold); flex-shrink: 0; }
+
+.card {
+  background: var(--fitness-card);
+  border: 1px solid var(--fitness-border);
+  border-radius: 18px;
+  box-shadow: var(--fitness-shadow);
+  padding: 16px;
+}
+
+.emptyNote { font-size: 13px; color: var(--fitness-muted); text-align: center; padding: 18px 4px; line-height: 1.4; }
+.emptyNote a { color: var(--fitness-gold); font-weight: 700; text-decoration: none; }
+
+.emptyCard {
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 14px; padding: 18px; text-align: center;
+}
+.emptyCard p { margin: 0; font-size: 12.5px; color: var(--fitness-muted); }
+
+/* ── Today: hero + workout card ───────────────────────── */
+
+.hero { position: relative; height: 190px; border-radius: 20px; overflow: hidden; box-shadow: var(--fitness-shadow); flex-shrink: 0; }
+.hero :global(img) { object-fit: cover; }
+.heroOverlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(20,15,10,0.82) 20%, rgba(20,15,10,0.15) 70%); }
+.heroContent { position: relative; z-index: 1; height: 100%; padding: 16px; display: flex; flex-direction: column; justify-content: flex-end; }
+.heroContent h2 { font-family: var(--font-display-var, serif); font-size: 18px; font-weight: 700; color: #fff; margin: 0 0 3px; }
+.heroContent p { font-size: 11.5px; font-weight: 600; color: rgba(255,255,255,0.88); margin: 0; }
+
+.workoutCard {
+  background: var(--fitness-card);
+  border: 1px solid var(--fitness-border);
+  border-radius: 18px; box-shadow: var(--fitness-shadow); padding: 14px 16px;
+}
+.workoutName { font-family: var(--font-display-var, serif); font-size: 17px; font-weight: 700; color: var(--fitness-text); margin: 0 0 8px; }
+.workoutStats { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; flex-wrap: wrap; }
+.workoutStat { font-size: 10.5px; color: var(--fitness-muted); display: flex; align-items: center; gap: 4px; }
+.workoutStat strong { font-size: 12px; color: var(--fitness-text); font-weight: 700; }
+
+.thumbStack { display: flex; align-items: center; margin-left: auto; }
+.thumbStackItem { position: relative; width: 24px; height: 24px; border-radius: 999px; overflow: hidden; border: 1.5px solid var(--fitness-card); background: var(--fitness-gold-soft); margin-left: -8px; }
+.thumbStackItem:first-child { margin-left: 0; }
+.thumbStackItem :global(img) { object-fit: cover; }
+
+.startButton {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; background: var(--fitness-gold); color: var(--fitness-card);
+  font-size: 13px; font-weight: 700; padding: 12px; border-radius: 12px; border: none;
+  text-decoration: none; min-height: 44px;
+}
+.completedBadge {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; background: var(--fitness-gold-soft); color: var(--fitness-text);
+  font-size: 13px; font-weight: 700; padding: 12px; border-radius: 12px; min-height: 44px;
+}
+.completedBadge svg { color: var(--fitness-gold); }
+
+/* ── Plan: week list ───────────────────────────────────── */
+
+.weekList { display: flex; flex-direction: column; gap: 6px; }
+.dayRow {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 14px; padding: 12px; min-height: 52px;
+  text-align: left; width: 100%; box-shadow: var(--fitness-shadow);
+}
+.dayRowActive { background: var(--fitness-gold-soft); border-color: var(--fitness-gold); }
+.dayRowName { flex-shrink: 0; width: 34px; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fitness-gold); }
+.dayRowText { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dayRowFocus { font-size: 13px; font-weight: 700; color: var(--fitness-text); }
+.dayRowMeta { font-size: 10.5px; color: var(--fitness-muted); margin-top: 1px; }
+.todayPill { flex-shrink: 0; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--fitness-card); background: var(--fitness-gold); padding: 3px 8px; border-radius: 999px; }
+.dayRowArrow { flex-shrink: 0; color: var(--fitness-muted); opacity: 0.6; }
+
+.sheetList { display: flex; flex-direction: column; gap: 8px; }
+.sheetRow { display: flex; align-items: center; gap: 12px; }
+.sheetThumb { position: relative; flex-shrink: 0; width: 48px; height: 48px; border-radius: 12px; overflow: hidden; background: rgba(180,150,100,0.1); }
+.sheetThumb :global(img) { object-fit: cover; }
+.sheetText { display: flex; flex-direction: column; }
+.sheetText strong { font-size: 13.5px; color: var(--text-1); }
+.sheetText span { font-size: 11px; color: var(--text-3); }
+
+/* ── Track: history / weight / water ──────────────────── */
+
+.historyList { display: flex; flex-direction: column; gap: 6px; }
+.historyRow {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 12px; padding: 10px 12px; box-shadow: var(--fitness-shadow);
+}
+.historyDate { flex-shrink: 0; width: 78px; font-size: 10.5px; font-weight: 700; color: var(--fitness-gold); }
+.historyFocus { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; color: var(--fitness-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.historyMeta { flex-shrink: 0; font-size: 10.5px; color: var(--fitness-muted); }
+
+.trackCard {
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 16px; box-shadow: var(--fitness-shadow); padding: 14px 16px;
+}
+.trackEmpty { margin: 0; font-size: 11.5px; color: var(--fitness-muted); }
+.trackErrorMsg { margin: 8px 0 0; font-size: 11px; font-weight: 600; color: #C96B5A; }
+
+.weightInputRow { display: flex; gap: 8px; }
+.weightInput {
+  flex: 1; min-width: 0; background: rgba(255,255,255,0.7); border: 1px solid rgba(180,150,100,0.25);
+  border-radius: 12px; padding: 10px 12px; font-size: 13px; color: #100C1E; min-height: 42px;
+}
+.weightInput::placeholder { color: rgba(16,12,30,0.45); }
+.weightLogButton {
+  flex-shrink: 0; background: var(--fitness-gold); color: var(--fitness-card); font-size: 12.5px; font-weight: 700;
+  padding: 0 18px; border-radius: 12px; border: none; min-height: 42px;
+}
+.weightLogButton:disabled { opacity: 0.5; }
+.weightLogged { margin: 0; font-size: 13px; color: var(--fitness-text); }
+.weightLogged strong { color: var(--fitness-gold); font-family: var(--font-display-var, serif); font-size: 15px; }
+
+.weightHistory { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.weightHistoryRow { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: var(--fitness-muted); padding: 3px 0; border-top: 1px solid var(--fitness-border); }
+.weightHistoryRow strong { color: var(--fitness-text); font-weight: 700; }
+
+.waterCard {
+  display: block; text-decoration: none;
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 16px; box-shadow: var(--fitness-shadow); padding: 14px 16px;
+}
+.waterInfo { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+.waterInfo strong { font-family: var(--font-display-var, serif); font-size: 20px; color: var(--fitness-text); }
+.waterInfo span { font-size: 11px; color: var(--fitness-muted); }
+.waterBarOuter { height: 6px; border-radius: 4px; background: var(--fitness-gold-soft); overflow: hidden; margin-bottom: 10px; }
+.waterBarInner { height: 100%; background: linear-gradient(90deg, var(--fitness-gold), #A8C4DA); border-radius: 4px; }
+.waterLink { display: flex; align-items: center; gap: 3px; font-size: 11.5px; font-weight: 700; color: var(--fitness-gold); }
+
+/* ── Setup: preferences tabs ───────────────────────────── */
+
+.tabRow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 52px;
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 12px; padding: 6px 2px;
+  font-size: 9.5px; font-weight: 600; color: var(--fitness-muted);
+}
+.tabActive { background: var(--fitness-gold-soft); border-color: var(--fitness-gold); color: var(--fitness-gold); font-weight: 700; }
+
+.onboardingCard {
+  background: var(--fitness-card); border: 1px solid var(--fitness-border);
+  border-radius: 16px; padding: 12px;
+}
+.chipGrid { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 11.5px; color: var(--fitness-text);
+  background: var(--fitness-surface); border: 1px solid var(--fitness-border);
+  border-radius: 999px; padding: 8px 13px; min-height: 36px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.chipActive { background: var(--fitness-gold); color: var(--fitness-card); font-weight: 700; border-color: var(--fitness-gold); }
+
+/* ── Photos ────────────────────────────────────────────── */
+
+.photoGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.photoAddTile {
+  aspect-ratio: 1; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--fitness-card); border: 1.5px dashed var(--fitness-border);
+  color: var(--fitness-gold); cursor: pointer;
+}
+.photoThumb { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; border: none; box-shadow: var(--fitness-shadow); }
+.photoThumb :global(img) { object-fit: cover; }
+.photoDetail { display: flex; justify-content: center; }

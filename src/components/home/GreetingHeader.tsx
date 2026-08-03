@@ -23,6 +23,17 @@ export function dayIndex(): number {
   return Math.floor((Date.now() - start) / 86_400_000)
 }
 
+function shortenForecast(forecast: string): string {
+  const f = forecast.toLowerCase()
+  if (f.includes('chance') && f.includes('shower')) return 'Scattered Showers'
+  if (f.includes('chance') && f.includes('rain')) return 'Chance of Rain'
+  if (f.includes('thunderstorm')) return 'Thunderstorms'
+  if (f.includes('partly')) return 'Partly Cloudy'
+  if (f.includes('mostly cloudy')) return 'Mostly Cloudy'
+  if (f.includes('mostly sunny') || f.includes('mostly clear')) return 'Mostly Sunny'
+  return forecast
+}
+
 function weatherIconFor(forecast: string) {
   const f = forecast.toLowerCase()
   if (f.includes('rain') || f.includes('shower')) return CloudRain
@@ -89,7 +100,7 @@ export function GreetingHeader({ now, weather, weatherError, backHref }: {
           <div className={styles.weatherCard}>
             <WeatherIcon size={17} strokeWidth={1.5} className={styles.weatherIcon} />
             <strong>{weather ? `${weather.tempF}°` : weatherError ? '—' : '…'}</strong>
-            <p>{weather ? weather.forecast : weatherError ? 'Unavailable' : 'Loading…'}</p>
+            <p>{weather ? shortenForecast(weather.forecast) : weatherError ? 'Unavailable' : 'Loading…'}</p>
           </div>
         </div>
       </div>

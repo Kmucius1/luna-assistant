@@ -22,7 +22,7 @@ const RESET_SECTIONS = [
   },
   {
     title: '✨ Soul',
-    color: '#C9A96E',
+    color: '#5C4530',
     items: ['Journal or dictate a reflection', 'Art time (drawing, sewing, painting)', 'Personal project — even 20 min', 'Gratitude list', 'Set spiritual intention for the week'],
   },
   {
@@ -97,7 +97,7 @@ export default function WeeklyResetPage() {
       '--text-1': '#100C1E',
       '--text-2': '#32284A',
       '--text-3': '#5E5474',
-      '--violet': '#C9A96E',
+      '--violet': '#5C4530',
       '--violet-mid': '#DDBD85',
       '--violet-deep': '#B8974F',
       '--mid': '#6B6080',

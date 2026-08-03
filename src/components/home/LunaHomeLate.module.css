@@ -11,7 +11,7 @@
 .homeEnergyCopy h2{ margin: 4px 0 6px; color: white; font-family: var(--font-display),Georgia,serif; font-size: clamp(18px,2vw,26px); line-height: 1.15; }
 .homeEnergyCopy p{ color: #cda5ff; font-size: 14px; margin: 0 0 12px; }
 .homeEnergyArt{ background-position:center; background-size:cover; background-repeat:no-repeat; }
-.weeklyFocusCard{ height: 100%; padding: 33px 45px 42px; display: flex; flex-direction: column; align-items: center; text-align: center; background-size: cover; background-position: center; border-color: rgba(155,92,255,.55); }
+.weeklyFocusCard{ height: 100%; padding: 33px 45px 42px; display: flex; flex-direction: column; align-items: center; text-align: center; background-size: cover; background-position: center; border-color: rgba(92,69,48,.55); }
 .weeklyTopRow{ width: 100%; display: flex; justify-content: space-between; align-items: center; }
 .weeklyTopRow > span{ padding: 11px 18px; border-radius: 999px; color: white; font-size: 13px; font-weight: 800; letter-spacing: .1em; background: rgba(128,68,212,.42); border: 1px solid rgba(198,168,255,.24); }
 .starSigil{ position: relative; width: 95px; height: 95px; margin-top: 25px; display: grid; place-items: center; filter: drop-shadow(0 0 17px rgba(207,170,255,.65)); }

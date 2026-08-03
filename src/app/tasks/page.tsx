@@ -130,11 +130,11 @@ export default function TasksPage() {
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.12)', color: '#C9A96E', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.12)', color: '#5C4530', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   {aiLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                   AI rank
                 </button>
-                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: '#C9A96E', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={() => setShowForm(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: 'none', background: '#5C4530', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add task
                 </button>
               </div>
@@ -172,7 +172,7 @@ export default function TasksPage() {
                   {dryphubTasks.map(task => {
                     const isOverdue = task.due_date && new Date(task.due_date) < new Date()
                     const isDueToday = task.due_date && new Date(task.due_date).toDateString() === new Date().toDateString()
-                    const priorityColor = task.priority === 'high' || task.priority === 'urgent' ? '#E05E5E' : task.priority === 'medium' ? '#C9A96E' : 'rgba(50,40,74,0.3)'
+                    const priorityColor = task.priority === 'high' || task.priority === 'urgent' ? '#E05E5E' : task.priority === 'medium' ? '#5C4530' : 'rgba(50,40,74,0.3)'
                     return (
                       <div key={task.id} style={{ background: 'rgba(201,169,110,0.08)', border: `1px solid ${isOverdue ? 'rgba(224,94,94,0.25)' : 'rgba(201,169,110,0.15)'}`, borderRadius: 12, padding: '10px 12px' }}>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
@@ -184,7 +184,7 @@ export default function TasksPage() {
                                 <span style={{ fontSize: 11, color: 'rgba(201,169,110,0.9)', fontWeight: 500 }}>{task.account_name}</span>
                               )}
                               {task.due_date && (
-                                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: isOverdue ? '#E05E5E' : isDueToday ? '#C9A96E' : '#5E5474', fontWeight: isOverdue || isDueToday ? 700 : 400 }}>
+                                <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 11, color: isOverdue ? '#E05E5E' : isDueToday ? '#5C4530' : '#5E5474', fontWeight: isOverdue || isDueToday ? 700 : 400 }}>
                                   {isOverdue && <AlertCircle className="h-3 w-3" />}
                                   {!isOverdue && <Clock className="h-3 w-3" />}
                                   {isOverdue ? 'Overdue · ' : isDueToday ? 'Due today · ' : 'Due '}
@@ -250,7 +250,7 @@ export default function TasksPage() {
             {/* AI ranking banner */}
             {aiLoading && (
               <div style={{ ...GLASS, padding: 14, background: 'rgba(201,169,110,0.1)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#C9A96E' }} />
+                <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#5C4530' }} />
                 <p style={{ fontSize: 13, color: '#32284A' }}>AI is ranking your tasks…</p>
               </div>
             )}
@@ -266,7 +266,7 @@ export default function TasksPage() {
               {STATUS_FILTERS.map(f => (
                 <button key={f.value} onClick={() => setStatusFilter(f.value)} style={{
                   padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', transition: 'all 0.15s',
-                  background: statusFilter === f.value ? '#C9A96E' : 'rgba(255,255,255,0.55)',
+                  background: statusFilter === f.value ? '#5C4530' : 'rgba(255,255,255,0.55)',
                   color:      statusFilter === f.value ? 'white' : '#5E5474',
                 }}>
                   {f.label}
@@ -297,7 +297,7 @@ export default function TasksPage() {
             {filtered.length === 0 ? (
               <div style={{ ...GLASS, padding: 36, textAlign: 'center' }}>
                 <p style={{ fontSize: 14, color: '#5E5474', marginBottom: 16 }}>No tasks match these filters.</p>
-                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: '#C9A96E', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                <button onClick={() => setShowForm(true)} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 14, border: 'none', background: '#5C4530', color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
                   <Plus className="h-4 w-4" /> Add your first task
                 </button>
               </div>

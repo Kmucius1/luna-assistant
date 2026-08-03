@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { AlertTriangle } from 'lucide-react'
 
 import { NatalWheel, type WheelPlacement, type WheelAspect } from './NatalWheel'
+import { AstrologyHero } from './AstrologyHero'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import styles from './AstrologyChart.module.css'
 
@@ -48,7 +49,7 @@ export function AstrologyChart() {
     fetch('/api/astrology/natal-chart').then(r => r.json()).then(setData).catch(() => {})
   }, [])
 
-  if (!data) return <p style={{ fontSize: 12, color: '#716B63', textAlign: 'center', padding: 30 }}>Calculating your chart…</p>
+  if (!data) return <p style={{ fontSize: 12, color: 'var(--astro-muted)', textAlign: 'center', padding: 30 }}>Calculating your chart…</p>
 
   const byPoint = Object.fromEntries(data.placements.map(p => [p.point, p]))
   const sun = byPoint.Sun, moon = byPoint.Moon, rising = byPoint.Rising
@@ -62,6 +63,8 @@ export function AstrologyChart() {
 
   return (
     <>
+      <AstrologyHero image="/images/astrology/chart.jpg" label="My Chart" title="Your Natal Blueprint" subtitle="Every placement, house, and aspect — mapped from your exact birth data." />
+
       <div className={styles.tabRow}>
         {TABS.map(t => (
           <button key={t} type="button" onClick={() => setTab(t)} className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}>{t}</button>
@@ -132,7 +135,7 @@ export function AstrologyChart() {
 
       {tab === 'Aspects' && (
         <>
-          {data.aspects.length === 0 && <p style={{ fontSize: 12, color: '#716B63', textAlign: 'center' }}>No major aspects found.</p>}
+          {data.aspects.length === 0 && <p style={{ fontSize: 12, color: 'var(--astro-muted)', textAlign: 'center' }}>No major aspects found.</p>}
           {data.aspects.map(a => (
             <div key={`${a.a}-${a.b}`} className={styles.aspectRow}>
               <span className={styles.aspectType}>{a.type}</span>

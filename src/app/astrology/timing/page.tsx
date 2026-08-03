@@ -3,7 +3,7 @@ import { AstrologyTiming } from '@/components/astrology/AstrologyTiming'
 
 export default function AstrologyTimingPage() {
   return (
-    <AstrologyShell>
+    <AstrologyShell backHref="/home">
       <AstrologyTiming />
     </AstrologyShell>
   )

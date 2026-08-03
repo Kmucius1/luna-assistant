@@ -12,7 +12,7 @@ const POINT_GLYPHS: Record<string, string> = {
 }
 
 const ASPECT_COLORS: Record<string, string> = {
-  conjunction: '#C58D32', square: '#C96B5A', opposition: '#8A6D9E', trine: '#5A8A7A', sextile: '#5A7A9A',
+  conjunction: '#5C4530', square: '#C96B5A', opposition: '#8A6D9E', trine: '#5A8A7A', sextile: '#5A7A9A',
 }
 
 export interface WheelPlacement { point: string; sign: string; degree: number; minutes: number; lon: number; house: number }
@@ -67,7 +67,7 @@ export function NatalWheel({ placements, aspects, onSelectPoint, selected }: Nat
           <g key={i}>
             <path d={`M ${cx} ${cy} L ${p1.x} ${p1.y} A ${outerR} ${outerR} 0 0 0 ${p2.x} ${p2.y} Z`}
               fill={i % 2 === 0 ? '#FFFDFA' : '#F8F2E4'} stroke="rgba(67,51,34,0.09)" strokeWidth={1} />
-            <text x={signGlyphPos.x} y={signGlyphPos.y} textAnchor="middle" dominantBaseline="middle" fontSize={15} fill="#C58D32">{SIGN_GLYPHS[ZODIAC_SIGNS[signIdx]]}</text>
+            <text x={signGlyphPos.x} y={signGlyphPos.y} textAnchor="middle" dominantBaseline="middle" fontSize={15} fill="#5C4530">{SIGN_GLYPHS[ZODIAC_SIGNS[signIdx]]}</text>
             <text x={houseNumPos.x} y={houseNumPos.y} textAnchor="middle" dominantBaseline="middle" fontSize={9} fontWeight={700} fill="#716B63">{i + 1}</text>
           </g>
         )
@@ -82,7 +82,7 @@ export function NatalWheel({ placements, aspects, onSelectPoint, selected }: Nat
         if (!a || !b) return null
         const pa = pointOnCircle(cx, cy, aspectR, angleFor(a.lon, risingLon))
         const pb = pointOnCircle(cx, cy, aspectR, angleFor(b.lon, risingLon))
-        return <line key={`${asp.a}-${asp.b}`} x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y} stroke={ASPECT_COLORS[asp.type] ?? '#C58D32'} strokeWidth={asp.orb < 2 ? 1.4 : 0.7} opacity={0.55} />
+        return <line key={`${asp.a}-${asp.b}`} x1={pa.x} y1={pa.y} x2={pb.x} y2={pb.y} stroke={ASPECT_COLORS[asp.type] ?? '#5C4530'} strokeWidth={asp.orb < 2 ? 1.4 : 0.7} opacity={0.55} />
       })}
 
       <circle cx={cx} cy={cy} r={14} fill="#171512" />
@@ -94,7 +94,7 @@ export function NatalWheel({ placements, aspects, onSelectPoint, selected }: Nat
         const isSelected = selected === p.point
         return (
           <g key={p.point} onClick={() => onSelectPoint?.(p.point)} style={{ cursor: onSelectPoint ? 'pointer' : 'default' }}>
-            <circle cx={pos.x} cy={pos.y} r={isSelected ? 13 : 11} fill={isSelected ? '#C58D32' : '#FFFFFF'} stroke="#C58D32" strokeWidth={1.2} />
+            <circle cx={pos.x} cy={pos.y} r={isSelected ? 13 : 11} fill={isSelected ? '#5C4530' : '#FFFFFF'} stroke="#5C4530" strokeWidth={1.2} />
             <text x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="middle" fontSize={11} fill={isSelected ? '#FFFFFF' : '#171512'}>{POINT_GLYPHS[p.point] ?? p.point[0]}</text>
           </g>
         )

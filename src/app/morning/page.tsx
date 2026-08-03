@@ -216,7 +216,7 @@ export default function MorningCheckIn() {
   return (
     <div
       style={{
-        '--violet': '#C9A96E',
+        '--violet': '#5C4530',
         '--violet-deep': '#B08D52',
         '--violet-pale': '#F5EBD3',
         '--depth': '#100C1E',

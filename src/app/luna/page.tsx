@@ -1,19 +1,22 @@
 'use client'
 import { useState, useRef, useEffect, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { CategoryPager } from '@/components/ui/CategoryPager'
+import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
+import { TilePager } from '@/components/ui/TilePager'
+import { RoomTileCard } from '@/components/ui/RoomTileCard'
 import { sendChatMessage } from '@/lib/chat/sendChatMessage'
-import { LunaLoadingState } from '@/components/luna'
+import { LunaLoadingState, VoiceOrb } from '@/components/luna'
 import {
   Sparkles, Mic, MessageCircle, BookOpen, Star, Archive,
-  Send, ChevronRight, ArrowRight, RotateCcw, Pause
+  Send, ChevronRight, ArrowRight, RotateCcw
 } from 'lucide-react'
 import Link from 'next/link'
+import styles from './luna-page.module.css'
 
 // ─── Shared glass card style (matches Home) ─────────────────────────────────
 const G: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.6)',
+  background: 'var(--glass-bg)',
   border: '1px solid rgba(180,150,100,0.18)',
   borderRadius: 22,
   backdropFilter: 'blur(18px)',
@@ -24,24 +27,24 @@ const G: React.CSSProperties = {
 // ─── Section label inside cards ─────────────────────────────────────────────
 const LBL: React.CSSProperties = {
   fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#C9A96E',
+  textTransform: 'uppercase', color: '#5C4530',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10, flexShrink: 0,
 }
 
 // ─── Text input style ────────────────────────────────────────────────────────
 const INPUT: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.5)',
+  background: 'var(--input-bg)',
   border: '1px solid rgba(180,150,100,0.2)',
-  color: '#100C1E',
+  color: 'var(--ink-1)',
   borderRadius: 18,
 }
 
 // ─── Primary gradient CTA — send / save actions ─────────────────────────────
 const CTA_PRIMARY: React.CSSProperties = {
-  background: 'linear-gradient(135deg, #C9A96E 0%, #B8974F 100%)',
+  background: 'linear-gradient(135deg, #5C4530 0%, #B8974F 100%)',
   boxShadow: '0 0 18px rgba(201,169,110,0.35)',
-  color: '#100C1E',
+  color: 'var(--ink-1)',
   border: 'none',
 }
 
@@ -49,18 +52,18 @@ const CTA_PRIMARY: React.CSSProperties = {
 const CTA_SECONDARY: React.CSSProperties = {
   background: 'rgba(201,169,110,0.12)',
   border: '1px solid rgba(201,169,110,0.3)',
-  color: '#C9A96E',
+  color: '#5C4530',
 }
 
 type LunaPage = 'chat' | 'dictate' | 'messages' | 'journal' | 'self' | 'vault'
 
-const PAGES: { id: LunaPage; label: string; emoji: string }[] = [
-  { id: 'chat',     label: 'Chat',       emoji: '✦'  },
-  { id: 'dictate',  label: 'Dictate',    emoji: '🎙' },
-  { id: 'messages', label: 'Messages',   emoji: '💬' },
-  { id: 'journal',  label: 'Journal',    emoji: '📓' },
-  { id: 'self',     label: 'Highest Self', emoji: '🌟' },
-  { id: 'vault',    label: 'Vault',      emoji: '🗄' },
+const LUNA_TILES = [
+  { id: 'chat', href: '/luna?tab=chat', label: 'Chat', tagline: 'Talk it through with LUNA.', icon: MessageCircle, accent: 'rgba(201,169,110,0.32)', image: '/images/luna/chat.jpg' },
+  { id: 'dictate', href: '/luna?tab=dictate', label: 'Dictate', tagline: 'Brain dump, sorted for you.', icon: Mic, accent: 'rgba(210,150,150,0.32)', image: '/images/luna/dictate.jpg' },
+  { id: 'messages', href: '/messages', label: 'Messages', tagline: 'Rewrite a draft, 3 ways.', icon: Sparkles, accent: 'rgba(150,175,160,0.32)', image: '/images/luna/messages.jpg' },
+  { id: 'journal', href: '/luna?tab=journal', label: 'Journal', tagline: "Today's prompt, just for you.", icon: BookOpen, accent: 'rgba(180,165,140,0.35)', image: '/images/luna/journal.jpg' },
+  { id: 'self', href: '/luna?tab=self', label: 'Highest Self', tagline: 'Your aligned next move.', icon: Star, accent: 'rgba(150,160,200,0.32)', image: '/images/luna/self.jpg' },
+  { id: 'vault', href: '/luna?tab=vault', label: 'Vault', tagline: 'Park ideas, loops, dreams.', icon: Archive, accent: 'rgba(190,175,140,0.35)', image: '/images/luna/vault.jpg' },
 ]
 
 const STARTERS = [
@@ -72,7 +75,7 @@ const STARTERS = [
 ]
 
 const REWRITES = [
-  { label: 'Soft', color: '#C9A96E',  desc: 'Vulnerable, open, non-attacking' },
+  { label: 'Soft', color: '#5C4530',  desc: 'Vulnerable, open, non-attacking' },
   { label: 'Clear', color: '#A8C4DA', desc: 'Direct, needs-forward' },
   { label: 'Boundary', color: '#B8C9B4', desc: 'Firm, self-protecting' },
 ]
@@ -105,10 +108,11 @@ function getTodayIndex<T>(arr: T[]) { return new Date().getDate() % arr.length }
 const VALID_LUNA_TABS: LunaPage[] = ['chat', 'dictate', 'messages', 'journal', 'self', 'vault']
 
 function LunaPageInner() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const requestedTab = searchParams.get('tab') as LunaPage | null
-  const initialTab = (requestedTab && VALID_LUNA_TABS.includes(requestedTab)) ? requestedTab : 'chat'
-  const [page, setPage] = useState<LunaPage>(initialTab)
+  const activeTab = (requestedTab && VALID_LUNA_TABS.includes(requestedTab)) ? requestedTab : null
+  const { now, weather, weatherError } = useTodayContext()
   const [chatInput, setChatInput]     = useState('')
   const [messages, setMessages]       = useState<{ role: 'user' | 'luna'; text: string }[]>([
     { role: 'luna', text: 'Hey Zoe ✦ I\'m here. What do you need right now?' }
@@ -118,7 +122,6 @@ function LunaPageInner() {
   const [vaultInput, setVaultInput]   = useState('')
   const [vaultTag, setVaultTag]       = useState<'Idea' | 'Loop' | 'Dream' | 'Future'>('Idea')
   const [vault, setVault]             = useState(VAULT_ITEMS)
-  const [dictating, setDictating]     = useState(false)
   const [sending, setSending]         = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
@@ -150,9 +153,6 @@ function LunaPageInner() {
   const prompt = JOURNAL_PROMPTS[getTodayIndex(JOURNAL_PROMPTS)]
   const highestSelf = HIGHEST_SELF_MOVES[getTodayIndex(HIGHEST_SELF_MOVES)]
 
-  const PAGE_IDS: LunaPage[] = ['chat', 'dictate', 'messages', 'journal', 'self', 'vault']
-  const lunaPageIndex = PAGE_IDS.indexOf(page)
-
   const lunaPages = [
     { id: 'chat', label: 'Chat', icon: MessageCircle, content: (
       <div className="flex flex-col h-full">
@@ -162,7 +162,7 @@ function LunaPageInner() {
                     {STARTERS.map(s => (
                       <button key={s} onClick={() => { setChatInput(s); }}
                         className="text-xs font-semibold px-3.5 py-2 rounded-full cursor-pointer"
-                        style={{ background: 'rgba(201,169,110,0.12)', color: '#C9A96E', border: '1px solid rgba(201,169,110,0.3)' }}>
+                        style={{ background: 'rgba(201,169,110,0.12)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.3)' }}>
                         {s}
                       </button>
                     ))}
@@ -175,8 +175,8 @@ function LunaPageInner() {
                     <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className="max-w-[80%] px-4 py-3 text-sm leading-relaxed"
                         style={msg.role === 'user'
-                          ? { borderRadius: 20, background: 'linear-gradient(135deg, #C9A96E 0%, #B8974F 100%)', color: '#100C1E' }
-                          : { ...G, borderRadius: 20, color: '#100C1E' }
+                          ? { borderRadius: 20, background: 'linear-gradient(135deg, #5C4530 0%, #B8974F 100%)', color: 'var(--ink-1)' }
+                          : { ...G, borderRadius: 20, color: 'var(--ink-1)' }
                         }>
                         {msg.text}
                       </div>
@@ -200,46 +200,29 @@ function LunaPageInner() {
                   <button onClick={() => void sendMessage()} disabled={sending}
                     className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer"
                     style={{ ...CTA_PRIMARY, borderRadius: 16 }}>
-                    <Send className="h-4 w-4" style={{ color: '#100C1E' }} />
+                    <Send className="h-4 w-4" style={{ color: 'var(--ink-1)' }} />
                   </button>
                 </div>
               </div>
     ) },
     { id: 'dictate', label: 'Dictate', icon: Mic, content: (
       <div className="space-y-3.5">
-                <div className="p-5 text-center" style={{ ...G, borderRadius: 24 }}>
-                  <button onClick={() => setDictating(d => !d)}
-                    className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 transition-all cursor-pointer"
-                    style={{
-                      background: dictating ? 'rgba(224,94,94,0.15)' : 'rgba(201,169,110,0.15)',
-                      border: `2px solid ${dictating ? '#E05E5E' : 'rgba(201,169,110,0.35)'}`,
-                      boxShadow: dictating ? '0 0 0 8px rgba(224,94,94,0.08)' : 'none',
-                    }}>
-                    {dictating
-                      ? <Pause className="h-8 w-8" style={{ color: '#E05E5E' }} />
-                      : <Mic className="h-8 w-8" style={{ color: '#C9A96E' }} />
-                    }
-                  </button>
-                  <p className="text-sm font-semibold mb-1" style={{ color: '#100C1E' }}>
-                    {dictating ? 'Recording...' : 'Tap to start'}
-                  </p>
-                  <p className="text-xs" style={{ color: '#8A8098' }}>
-                    Brain dump anything. LUNA will sort it into tasks, journal entries, ideas, or work items.
-                  </p>
+                <div className="p-2" style={{ ...G, borderRadius: 24 }}>
+                  <VoiceOrb />
                 </div>
 
                 <div className="p-4" style={{ ...G, borderRadius: 22 }}>
                   <div style={LBL}>Or type it</div>
                   <Link href="/brain-dump" style={{ textDecoration: 'none' }}>
                     <div className="flex items-center justify-between py-2.5">
-                      <p className="text-sm font-medium" style={{ color: '#100C1E' }}>Brain Dump</p>
-                      <ChevronRight className="h-4 w-4" style={{ color: '#C9A96E' }} />
+                      <p className="text-sm font-medium" style={{ color: 'var(--ink-1)' }}>Brain Dump</p>
+                      <ChevronRight className="h-4 w-4" style={{ color: '#5C4530' }} />
                     </div>
                   </Link>
                   <Link href="/dictation" style={{ textDecoration: 'none' }}>
                     <div className="flex items-center justify-between py-2.5" style={{ borderTop: '1px solid rgba(180,150,100,0.15)' }}>
-                      <p className="text-sm font-medium" style={{ color: '#100C1E' }}>Dictation Studio</p>
-                      <ChevronRight className="h-4 w-4" style={{ color: '#C9A96E' }} />
+                      <p className="text-sm font-medium" style={{ color: 'var(--ink-1)' }}>Dictation Studio</p>
+                      <ChevronRight className="h-4 w-4" style={{ color: '#5C4530' }} />
                     </div>
                   </Link>
                 </div>
@@ -249,8 +232,8 @@ function LunaPageInner() {
       <div className="space-y-3.5">
                 <div className="p-4"
                   style={{ ...G, borderRadius: 22, background: 'linear-gradient(135deg, #5E5474, rgba(250,244,232,0.7))', border: '1px solid rgba(201,169,110,0.25)' }}>
-                  <p className="text-xs font-bold mb-2" style={{ color: '#C9A96E' }}>Communication Coach</p>
-                  <p className="text-sm" style={{ color: '#32284A' }}>
+                  <p className="text-xs font-bold mb-2" style={{ color: '#5C4530' }}>Communication Coach</p>
+                  <p className="text-sm" style={{ color: 'var(--ink-2)' }}>
                     Paste a draft. LUNA rewrites it in 3 versions — soft, clear, and boundary-setting.
                   </p>
                 </div>
@@ -268,7 +251,7 @@ function LunaPageInner() {
                   <div className="p-3 mb-2"
                     style={{ borderRadius: 18, background: 'rgba(230,184,74,0.10)', border: '1px solid rgba(230,184,74,0.22)' }}>
                     <p className="text-xs font-bold mb-1" style={{ color: '#E6B84A' }}>Pause before sending.</p>
-                    <p className="text-xs" style={{ color: '#5E5474' }}>What are you actually needing? Are you trying to be understood, or get relief?</p>
+                    <p className="text-xs" style={{ color: 'var(--ink-3)' }}>What are you actually needing? Are you trying to be understood, or get relief?</p>
                   </div>
                 )}
 
@@ -278,9 +261,9 @@ function LunaPageInner() {
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-2 h-2 rounded-full" style={{ background: r.color }} />
                         <p className="text-xs font-bold" style={{ color: r.color }}>{r.label} version</p>
-                        <p className="text-xs" style={{ color: '#8A8098' }}>· {r.desc}</p>
+                        <p className="text-xs" style={{ color: 'var(--ink-4)' }}>· {r.desc}</p>
                       </div>
-                      <p className="text-sm italic" style={{ color: '#8A8098' }}>
+                      <p className="text-sm italic" style={{ color: 'var(--ink-4)' }}>
                         {draftText ? '(Rewrite will appear here when connected to AI)' : 'Paste a draft above to generate this version.'}
                       </p>
                     </div>
@@ -299,7 +282,7 @@ function LunaPageInner() {
       <div className="space-y-3.5">
                 <div className="p-4" style={{ ...G, borderRadius: 22 }}>
                   <div style={LBL}>Today&apos;s prompt</div>
-                  <p className="text-sm font-display italic leading-relaxed" style={{ color: '#100C1E' }}>
+                  <p className="text-sm font-display italic leading-relaxed" style={{ color: 'var(--ink-1)' }}>
                     &ldquo;{prompt}&rdquo;
                   </p>
                 </div>
@@ -336,11 +319,11 @@ function LunaPageInner() {
                     border: '1px solid rgba(201,169,110,0.3)',
                   }}>
                   <div className="text-xl mb-3">🌟</div>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#C9A96E' }}>Current Pattern</p>
-                  <p className="text-sm mb-4" style={{ color: '#5E5474' }}>{highestSelf.current}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#5C4530' }}>Current Pattern</p>
+                  <p className="text-sm mb-4" style={{ color: 'var(--ink-3)' }}>{highestSelf.current}</p>
                   <div className="w-full h-px mb-4" style={{ background: 'rgba(201,169,110,0.25)' }} />
                   <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#B8C9B4' }}>Aligned Move</p>
-                  <p className="text-base font-semibold leading-snug" style={{ color: '#100C1E' }}>{highestSelf.aligned}</p>
+                  <p className="text-base font-semibold leading-snug" style={{ color: 'var(--ink-1)' }}>{highestSelf.aligned}</p>
                 </div>
 
                 <div className="p-4" style={{ ...G, borderRadius: 22 }}>
@@ -351,11 +334,11 @@ function LunaPageInner() {
                     'What is the most aligned next move in my relationship?',
                     'Am I operating from fear or clarity?',
                   ].map((q, i, arr) => (
-                    <button key={q} onClick={() => { setPage('chat'); setChatInput(q) }}
+                    <button key={q} onClick={() => { setChatInput(q); router.push('/luna?tab=chat') }}
                       className="w-full text-left py-3 text-sm flex items-center justify-between cursor-pointer"
-                      style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(180,150,100,0.15)' : 'none', color: '#100C1E' }}>
+                      style={{ borderBottom: i < arr.length - 1 ? '1px solid rgba(180,150,100,0.15)' : 'none', color: 'var(--ink-1)' }}>
                       {q}
-                      <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 ml-2" style={{ color: '#C9A96E' }} />
+                      <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 ml-2" style={{ color: '#5C4530' }} />
                     </button>
                   ))}
                 </div>
@@ -377,8 +360,8 @@ function LunaPageInner() {
                       <button key={t} onClick={() => setVaultTag(t)}
                         className="px-3.5 py-1.5 rounded-full text-xs font-semibold cursor-pointer"
                         style={vaultTag === t
-                          ? { background: 'rgba(201,169,110,0.3)', border: '1px solid rgba(201,169,110,0.5)', color: '#C9A96E' }
-                          : { background: 'rgba(255,255,255,0.4)', border: '1px solid rgba(180,150,100,0.15)', color: '#8A8098' }
+                          ? { background: 'rgba(201,169,110,0.3)', border: '1px solid rgba(201,169,110,0.5)', color: '#5C4530' }
+                          : { background: 'var(--surface-inactive)', border: '1px solid rgba(180,150,100,0.15)', color: 'var(--ink-4)' }
                         }>
                         {t}
                       </button>
@@ -405,10 +388,10 @@ function LunaPageInner() {
                   {vault.map(item => (
                     <div key={item.id} className="p-4 flex items-start gap-3" style={{ ...G, borderRadius: 20 }}>
                       <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-semibold"
-                        style={{ background: 'rgba(201,169,110,0.18)', color: '#C9A96E' }}>
+                        style={{ background: 'rgba(201,169,110,0.18)', color: '#5C4530' }}>
                         {item.tag}
                       </span>
-                      <p className="text-sm flex-1" style={{ color: '#32284A' }}>{item.text}</p>
+                      <p className="text-sm flex-1" style={{ color: 'var(--ink-2)' }}>{item.text}</p>
                     </div>
                   ))}
                 </div>
@@ -423,25 +406,25 @@ function LunaPageInner() {
     ) },
   ]
 
+  if (!activeTab) {
+    return (
+      <AppLayout>
+        <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
+        <div style={{ marginTop: 14 }}>
+          <TilePager items={LUNA_TILES} keyFor={t => t.id} renderItem={t => <RoomTileCard {...t} />} />
+        </div>
+      </AppLayout>
+    )
+  }
+
+  const activeContent = lunaPages.find(p => p.id === activeTab)?.content
+
   return (
     <AppLayout noScroll>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, paddingTop: 8, flexShrink: 0 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.25)' }}>
-          <Sparkles className="h-5 w-5" style={{ color: '#C9A96E' }} strokeWidth={1.6} />
-        </div>
-        <div>
-          <h1 className="font-display text-2xl font-bold" style={{ color: '#100C1E' }}>LUNA</h1>
-          <p style={{ fontSize: 11, color: '#8A8098' }}>Talk. Process. Decide.</p>
-        </div>
+      <GreetingHeader now={now} weather={weather} weatherError={weatherError} backHref="/luna" />
+      <div className={styles.page} style={{ marginTop: 10, flex: 1, minHeight: 0, overflowY: 'auto' }}>
+        {activeContent}
       </div>
-
-      <CategoryPager
-        pages={lunaPages}
-        activeIndex={lunaPageIndex}
-        onChangeIndex={(i) => setPage(PAGE_IDS[i])}
-        hidePills
-      />
     </AppLayout>
   )
 }

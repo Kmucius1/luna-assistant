@@ -3,7 +3,7 @@ import { AstrologyConnections } from '@/components/astrology/AstrologyConnection
 
 export default function AstrologyConnectionsPage() {
   return (
-    <AstrologyShell>
+    <AstrologyShell backHref="/home">
       <AstrologyConnections />
     </AstrologyShell>
   )

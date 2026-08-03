@@ -5,7 +5,7 @@
 create table if not exists public.journal_page_entries (
   id          uuid default uuid_generate_v4() primary key,
   user_id     uuid references auth.users(id) on delete cascade not null,
-  entry_type  text not null default 'journal' check (entry_type in ('journal','dream','gratitude','shadow','lesson')),
+  entry_type  text not null default 'journal' check (entry_type in ('journal','dream','gratitude','shadow','lesson','wellness','astrology','daily_reflection')),
   mood        text,
   content     text not null,
   tags        text[] default '{}',

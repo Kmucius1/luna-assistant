@@ -6,9 +6,10 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { LoadingPage } from '@/components/ui/loading'
 import { createClient } from '@/lib/supabase/client'
 import { AssistantProfile } from '@/types'
-import { Sparkles, Save, User, Brain, Sun, Moon, Mail, Calendar, Plug, LogOut, Check, RefreshCw, AlertTriangle, X, ExternalLink, DollarSign } from 'lucide-react'
+import { Sparkles, Save, User, Brain, Sun, Moon, Mail, Calendar, Plug, LogOut, Check, RefreshCw, AlertTriangle, X, ExternalLink, DollarSign, Bell } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from '@/lib/theme'
+import { PushNotificationSettings } from '@/components/settings/PushNotificationSettings'
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const CARD: React.CSSProperties = {
@@ -289,6 +290,12 @@ export default function SettingsPage() {
             <OAuthBanner />
           </Suspense>
 
+          {/* ── NOTIFICATIONS ─────────────────────────────────────── */}
+          <div style={CARD}>
+            <SectionLabel icon={<Bell className="h-4 w-4" style={{ color: '#5C4530' }} />} text="Notifications" sub="Push alerts on your phone" />
+            <PushNotificationSettings />
+          </div>
+
           {/* ── FINANCE & BANKING ────────────────────────────────── */}
           <div style={CARD}>
             <SectionLabel icon={<DollarSign className="h-4 w-4" style={{ color: 'rgba(201,169,110,0.7)' }} />} text="Finance & Banking" sub="CSV import" />
@@ -296,7 +303,7 @@ export default function SettingsPage() {
               Import your bank statements to track spending, bills, and subscriptions. Download a CSV from your bank and drag it into LUNA.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
-              <Link href="/money/import" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.1)', color: '#C9A96E', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+              <Link href="/money/import" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.1)', color: '#5C4530', fontSize: 12, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                 Import CSV
               </Link>
               <Link href="/money" style={{ flex: 1, height: 38, borderRadius: 12, border: '1px solid rgba(180,150,100,0.18)', background: 'rgba(255,255,255,0.6)', color: '#32284A', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
@@ -307,7 +314,7 @@ export default function SettingsPage() {
 
           {/* ── CONNECTIONS ───────────────────────────────────────── */}
           <div style={CARD}>
-            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: '#C9A96E' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
+            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: '#5C4530' }} />} text="Connections" sub="Gmail + Calendar — both sync together" />
 
             {/* Gmail accounts */}
             <p style={{ fontSize: 10, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 10 }}>Gmail Accounts</p>
@@ -324,7 +331,7 @@ export default function SettingsPage() {
                   </p>
                 </div>
                 <div style={{ marginTop: 10, padding: '12px 14px', borderRadius: 12, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)' }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', marginBottom: 8 }}>If connection fails — most common fix:</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5C4530', marginBottom: 8 }}>If connection fails — most common fix:</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {[
                       'Go to console.cloud.google.com → APIs & Services → OAuth consent screen',
@@ -332,7 +339,7 @@ export default function SettingsPage() {
                       'If your drypdigital.com Workspace blocks third-party apps: admin.google.com → Security → API Controls → allow third-party apps',
                     ].map((s, i) => (
                       <div key={i} style={{ display: 'flex', gap: 8 }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', flexShrink: 0 }}>{i + 1}.</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#5C4530', flexShrink: 0 }}>{i + 1}.</span>
                         <p style={{ fontSize: 11, color: '#32284A', lineHeight: 1.5 }}>{s}</p>
                       </div>
                     ))}
@@ -369,7 +376,7 @@ export default function SettingsPage() {
               </div>
               {calendarCount === null && connStatus.connected && (
                 <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
-                  <p style={{ fontSize: 12, color: '#C9A96E' }}>
+                  <p style={{ fontSize: 12, color: '#5C4530' }}>
                     ⚡ Reconnect your Google account above to add Calendar access — click "Connect with Google" on a connected account to re-authorize with calendar scope.
                   </p>
                 </div>
@@ -386,7 +393,7 @@ export default function SettingsPage() {
                 <p style={{ fontSize: 11, color: '#5E5474' }}>Currently {theme === 'dark' ? 'dark' : 'light'} mode</p>
               </div>
               <button onClick={toggle} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 16px', borderRadius: 14, border: '1px solid rgba(201,169,110,0.35)', background: 'rgba(201,169,110,0.12)', cursor: 'pointer', color: '#100C1E', fontSize: 13, fontWeight: 600 }}>
-                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#C9A96E' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#C9A96E' }} /> Dark mode</>}
+                {theme === 'dark' ? <><Sun className="h-4 w-4" style={{ color: '#5C4530' }} /> Light mode</> : <><Moon className="h-4 w-4" style={{ color: '#5C4530' }} /> Dark mode</>}
               </button>
             </div>
           </div>
@@ -396,7 +403,7 @@ export default function SettingsPage() {
             <SectionLabel icon={<User className="h-4 w-4" style={{ color: '#5E5474' }} />} text="Account" />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(201,169,110,0.4)' }}>Z</div>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #5C4530, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: 'white', border: '2px solid rgba(201,169,110,0.4)' }}>Z</div>
                 <div>
                   <p style={{ fontSize: 15, fontWeight: 700, color: '#100C1E' }}>Zoe Taylor</p>
                   <p style={{ fontSize: 12, color: '#5E5474' }}>Owner · DRYP Digital</p>
@@ -411,7 +418,7 @@ export default function SettingsPage() {
           {/* ── AI PROFILE ───────────────────────────────────────── */}
           <form onSubmit={handleSave}>
             <div style={CARD}>
-              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: '#C9A96E' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
+              <SectionLabel icon={<Brain className="h-4 w-4" style={{ color: '#5C4530' }} />} text="AI Profile" sub="LUNA reads this to write in your voice" />
 
               <div style={{ marginBottom: 14 }}>
                 <FieldLabel text="Your preferred tone" />
@@ -473,7 +480,7 @@ export default function SettingsPage() {
             {/* Save */}
             <button type="submit" disabled={saving} style={{
               width: '100%', padding: '14px 0', borderRadius: 16, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
-              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #C9A96E, #B08D52)',
+              background: saved ? 'rgba(90,138,90,0.3)' : 'linear-gradient(135deg, #5C4530, #B08D52)',
               color: saved ? '#8AB88A' : 'white',
               boxShadow: saved ? 'none' : '0 6px 24px rgba(201,169,110,0.35)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,

@@ -74,12 +74,12 @@ export function MobileTopBar() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, justifyContent: 'flex-end' }}>
         <div style={{ position: 'relative' }}>
           <Bell style={{ width: 19, height: 19, color: 'var(--text-2)' }} strokeWidth={1.5} />
-          <div style={{ position: 'absolute', top: -2, right: -2, width: 6, height: 6, borderRadius: '50%', background: '#4A90FF', border: '1.5px solid #0a0618' }} />
+          <div style={{ position: 'absolute', top: -2, right: -2, width: 6, height: 6, borderRadius: '50%', background: 'var(--luna-purple)', border: '1.5px solid var(--luna-bg)' }} />
         </div>
         <div style={{
           width: 34, height: 34, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #7C4DCC, #4A20A0)',
-          border: '2px solid rgba(185,139,255,0.35)',
+          background: 'linear-gradient(135deg, #8A6B4A, #5C4530)',
+          border: '2px solid rgba(140,107,74,0.35)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
           <span style={{ fontSize: 13, fontWeight: 800, color: 'white' }}>Z</span>

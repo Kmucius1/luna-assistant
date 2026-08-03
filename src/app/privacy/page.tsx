@@ -25,7 +25,7 @@ export default function PrivacyPage() {
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: 'linear-gradient(135deg, #5C4530, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 14 }}>☽</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 15, letterSpacing: '0.18em', color: '#100C1E' }}>LUNA</span>
@@ -54,13 +54,13 @@ export default function PrivacyPage() {
         <Section title="3. Data We Collect">
           <p style={{ marginBottom: 12 }}>When you use LUNA, we may collect and process the following categories of data:</p>
           <ul style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <li><strong style={{ color: '#C9A96E' }}>Google Account Data</strong> — When you connect your Gmail account via Google OAuth, LUNA accesses your email messages, labels, and Google Calendar events. This is used solely to surface your emails and calendar in the LUNA interface.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Email Content</strong> — LUNA reads email subjects, senders, snippets, and body text to categorize and prioritize your inbox using AI. Email content is processed in-memory and stored only in your private Supabase database.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Calendar Events</strong> — Event titles, times, and descriptions are read to show your schedule and surface time-sensitive tasks.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Financial Data</strong> — If you import bank CSV files, transaction data (amounts, dates, merchant names) is stored in your private database for budgeting insights.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Conversation History</strong> — Messages between you and LUNA are stored to maintain conversational context across sessions.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Check-In Data</strong> — Morning routine responses, mood logs, and daily intentions are stored to help LUNA personalize guidance over time.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Authentication Data</strong> — Email address and session tokens used to log you in securely via Supabase Auth.</li>
+            <li><strong style={{ color: '#5C4530' }}>Google Account Data</strong> — When you connect your Gmail account via Google OAuth, LUNA accesses your email messages, labels, and Google Calendar events. This is used solely to surface your emails and calendar in the LUNA interface.</li>
+            <li><strong style={{ color: '#5C4530' }}>Email Content</strong> — LUNA reads email subjects, senders, snippets, and body text to categorize and prioritize your inbox using AI. Email content is processed in-memory and stored only in your private Supabase database.</li>
+            <li><strong style={{ color: '#5C4530' }}>Calendar Events</strong> — Event titles, times, and descriptions are read to show your schedule and surface time-sensitive tasks.</li>
+            <li><strong style={{ color: '#5C4530' }}>Financial Data</strong> — If you import bank CSV files, transaction data (amounts, dates, merchant names) is stored in your private database for budgeting insights.</li>
+            <li><strong style={{ color: '#5C4530' }}>Conversation History</strong> — Messages between you and LUNA are stored to maintain conversational context across sessions.</li>
+            <li><strong style={{ color: '#5C4530' }}>Check-In Data</strong> — Morning routine responses, mood logs, and daily intentions are stored to help LUNA personalize guidance over time.</li>
+            <li><strong style={{ color: '#5C4530' }}>Authentication Data</strong> — Email address and session tokens used to log you in securely via Supabase Auth.</li>
           </ul>
         </Section>
 
@@ -78,10 +78,10 @@ export default function PrivacyPage() {
         <Section title="5. Third-Party Services">
           <p style={{ marginBottom: 12 }}>LUNA integrates with the following third-party services:</p>
           <ul style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <li><strong style={{ color: '#C9A96E' }}>Google (Gmail &amp; Calendar API)</strong> — Used to read and display your emails and calendar events. Governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Google&apos;s Privacy Policy</a>.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Supabase</strong> — Used as the database and authentication provider. Your data is stored in a private, encrypted Supabase project. Governed by <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Supabase&apos;s Privacy Policy</a>.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Groq</strong> — Used for AI language model inference (Llama 3.3-70B). Email content and personal messages may be sent to Groq for processing. Groq does not retain prompts for training. Governed by <a href="https://groq.com/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Groq&apos;s Privacy Policy</a>.</li>
-            <li><strong style={{ color: '#C9A96E' }}>Vercel</strong> — Used to host and serve the application. Request logs may be retained per Vercel&apos;s standard logging practices.</li>
+            <li><strong style={{ color: '#5C4530' }}>Google (Gmail &amp; Calendar API)</strong> — Used to read and display your emails and calendar events. Governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Google&apos;s Privacy Policy</a>.</li>
+            <li><strong style={{ color: '#5C4530' }}>Supabase</strong> — Used as the database and authentication provider. Your data is stored in a private, encrypted Supabase project. Governed by <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Supabase&apos;s Privacy Policy</a>.</li>
+            <li><strong style={{ color: '#5C4530' }}>Groq</strong> — Used for AI language model inference (Llama 3.3-70B). Email content and personal messages may be sent to Groq for processing. Groq does not retain prompts for training. Governed by <a href="https://groq.com/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#8B9FD4' }}>Groq&apos;s Privacy Policy</a>.</li>
+            <li><strong style={{ color: '#5C4530' }}>Vercel</strong> — Used to host and serve the application. Request logs may be retained per Vercel&apos;s standard logging practices.</li>
           </ul>
         </Section>
 
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 40 }}>
-      <h2 style={{ fontSize: 17, fontWeight: 700, color: '#C9A96E', marginBottom: 14, letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 17, fontWeight: 700, color: '#5C4530', marginBottom: 14, letterSpacing: '-0.01em' }}>
         {title}
       </h2>
       <div style={{ fontSize: 14, lineHeight: 1.75, color: '#32284A' }}>

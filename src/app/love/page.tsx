@@ -161,11 +161,11 @@ export default function LovePage() {
                     {/* Love energy + Venus */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
                       <div style={{ ...GLASS, padding: 16 }}>
-                        <Label text="Your Energy" color="#C9A96E" />
+                        <Label text="Your Energy" color="#5C4530" />
                         <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.6 }}>{data.love_energy}</p>
                       </div>
                       <div style={{ ...GLASS, padding: 16 }}>
-                        <Label text="Venus Influence" color="#C9A96E" />
+                        <Label text="Venus Influence" color="#5C4530" />
                         <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.6 }}>{data.venus_influence}</p>
                       </div>
                     </div>
@@ -173,8 +173,8 @@ export default function LovePage() {
                     {/* How you attract */}
                     <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
-                        <Star className="h-4 w-4" style={{ color: '#C9A96E' }} fill="#C9A96E" />
-                        <Label text="What You're Attracting" color="#C9A96E" />
+                        <Star className="h-4 w-4" style={{ color: '#5C4530' }} fill="#5C4530" />
+                        <Label text="What You're Attracting" color="#5C4530" />
                       </div>
                       <p style={{ fontSize: 13, color: '#100C1E', lineHeight: 1.65 }}>{data.attract_energy}</p>
                     </div>
@@ -197,13 +197,13 @@ export default function LovePage() {
                     {/* Navigate now */}
                     <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-                        <Eye className="h-4 w-4" style={{ color: '#C9A96E' }} />
-                        <Label text="Navigate Love Right Now" color="#C9A96E" />
+                        <Eye className="h-4 w-4" style={{ color: '#5C4530' }} />
+                        <Label text="Navigate Love Right Now" color="#5C4530" />
                       </div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {(data.navigate_now ?? []).map((tip, i) => (
                           <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                            <div style={{ width: 22, height: 22, borderRadius: 11, background: 'rgba(201,169,110,0.2)', border: '1px solid rgba(201,169,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#C9A96E', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
+                            <div style={{ width: 22, height: 22, borderRadius: 11, background: 'rgba(201,169,110,0.2)', border: '1px solid rgba(201,169,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, color: '#5C4530', flexShrink: 0, marginTop: 1 }}>{i + 1}</div>
                             <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.6 }}>{tip}</p>
                           </div>
                         ))}
@@ -269,7 +269,7 @@ export default function LovePage() {
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                             <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E' }}>{c.signs}</p>
-                            <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 700, background: c.match === 'High' ? 'rgba(90,138,90,0.25)' : c.match === 'Deep' ? 'rgba(190,90,150,0.22)' : c.match === 'Good' ? 'rgba(90,138,164,0.25)' : 'rgba(180,120,60,0.25)', color: c.match === 'High' ? '#8AB88A' : c.match === 'Deep' ? '#B9508F' : c.match === 'Good' ? '#7BAEC8' : '#C9A96E', border: `1px solid ${c.match === 'High' ? 'rgba(90,138,90,0.4)' : c.match === 'Deep' ? 'rgba(190,90,150,0.4)' : c.match === 'Good' ? 'rgba(90,138,164,0.4)' : 'rgba(180,120,60,0.4)'}` }}>{c.match}</span>
+                            <span style={{ padding: '2px 8px', borderRadius: 10, fontSize: 10, fontWeight: 700, background: c.match === 'High' ? 'rgba(90,138,90,0.25)' : c.match === 'Deep' ? 'rgba(190,90,150,0.22)' : c.match === 'Good' ? 'rgba(90,138,164,0.25)' : 'rgba(180,120,60,0.25)', color: c.match === 'High' ? '#8AB88A' : c.match === 'Deep' ? '#B9508F' : c.match === 'Good' ? '#7BAEC8' : '#5C4530', border: `1px solid ${c.match === 'High' ? 'rgba(90,138,90,0.4)' : c.match === 'Deep' ? 'rgba(190,90,150,0.4)' : c.match === 'Good' ? 'rgba(90,138,164,0.4)' : 'rgba(180,120,60,0.4)'}` }}>{c.match}</span>
                           </div>
                           <p style={{ fontSize: 12, color: '#5E5474', lineHeight: 1.55 }}>{c.why}</p>
                         </div>
@@ -312,7 +312,7 @@ export default function LovePage() {
 
                 {/* Projector in love */}
                 <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
-                  <Label text="Your HD Love Strategy" color="#C9A96E" />
+                  <Label text="Your HD Love Strategy" color="#5C4530" />
                   <p style={{ fontSize: 14, fontWeight: 600, color: '#100C1E', marginBottom: 10 }}>Self-Projected Projector · 4/6 Profile</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                     {[
@@ -324,7 +324,7 @@ export default function LovePage() {
                       <div key={item.title} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: 12, borderRadius: 14, background: 'rgba(255,255,255,0.5)' }}>
                         <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
                         <div>
-                          <p style={{ fontSize: 12, fontWeight: 700, color: '#C9A96E', marginBottom: 4 }}>{item.title}</p>
+                          <p style={{ fontSize: 12, fontWeight: 700, color: '#5C4530', marginBottom: 4 }}>{item.title}</p>
                           <p style={{ fontSize: 12, color: '#5E5474', lineHeight: 1.55 }}>{item.body}</p>
                         </div>
                       </div>
@@ -342,7 +342,7 @@ export default function LovePage() {
 
                 {/* Chiron */}
                 <div style={{ ...GLASS, padding: 18, marginBottom: 14, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
-                  <Label text="Chiron in Sagittarius · The Love Wound" color="#C9A96E" />
+                  <Label text="Chiron in Sagittarius · The Love Wound" color="#5C4530" />
                   <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.65 }}>
                     Your Chiron in Sagittarius (15°) carries a wound around: freedom, belief, and the fear that loving deeply means losing yourself. You may have learned that love comes with strings attached, that staying free means staying alone, or that you have to teach and give before you can receive. The healing: you CAN have both — love and freedom. The right partner expands you, not shrinks you.
                   </p>
@@ -350,7 +350,7 @@ export default function LovePage() {
 
                 {/* Signs right now */}
                 <div style={{ ...GLASS, padding: 18, marginBottom: 14 }}>
-                  <Label text="Signs You're Ready for Real Love" color="#C9A96E" />
+                  <Label text="Signs You're Ready for Real Love" color="#5C4530" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[
                       'When being with them feels like home AND adventure — both at once',

@@ -152,18 +152,31 @@ export async function GET(req: NextRequest) {
               console.error('[style-pool] generateFashionImage failed:', e instanceof Error ? e.message : e)
             }
           }
+          // Track what actually landed in the DB, not just what this run
+          // attempted — a constraint violation or other insert error used to
+          // get logged and then silently reported/cached as a full success,
+          // which is exactly how this pool went weeks without growing (every
+          // Pinterest-sourced insert was failing a check constraint) while
+          // daily_generation_cache kept saying "generated: 4" and never
+          // retried. Reporting the real inserted rows means a future
+          // failure shows up honestly as generated: 0 instead of lying.
+          let insertedRows: { id: string; image_url: string; label: string | null }[] = []
           if (inserted.length) {
             const { data: newRows, error: insertErr } = await db
               .from('style_pool_images')
               .insert(inserted.map(i => ({ ...i, user_id: ZOE_USER_ID })))
               .select('id, image_url, label')
             if (insertErr) console.error('[style-pool] insert failed:', insertErr.message)
-            if (newRows) pool = [...pool, ...newRows]
+            if (newRows) {
+              insertedRows = newRows
+              pool = [...pool, ...newRows]
+            }
           }
-          const fromPinterest = inserted.filter(i => i.added_by === 'pinterest').length
+          const insertedByUrl = new Map(inserted.map(i => [i.image_url, i]))
+          const fromPinterest = insertedRows.filter(r => insertedByUrl.get(r.image_url)?.added_by === 'pinterest').length
           return {
-            payload: { generated: inserted.length, fromPinterest, fromAi: inserted.length - fromPinterest },
-            source: inserted.length ? 'ai' as const : 'fallback' as const,
+            payload: { generated: insertedRows.length, fromPinterest, fromAi: insertedRows.length - fromPinterest },
+            source: insertedRows.length ? 'ai' as const : 'fallback' as const,
           }
         } catch (err) {
           console.error('[style-pool] daily generation error:', err)

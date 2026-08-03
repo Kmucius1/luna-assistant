@@ -20,7 +20,7 @@
   background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 16px;
   box-shadow: var(--astro-shadow); padding: 14px;
 }
-.saveButton { width: 100%; margin-top: 10px; min-height: 42px; border-radius: 14px; border: none; background: #C58D32; color: #fff; font-weight: 700; font-size: 13px; }
+.saveButton { width: 100%; margin-top: 10px; min-height: 42px; border-radius: 14px; border: none; background: var(--astro-gold, #5C4530); color: #fff; font-weight: 700; font-size: 13px; }
 .saveButton:disabled { opacity: 0.5; }
 
 .contextChip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; color: var(--astro-gold); background: var(--astro-gold-soft); padding: 3px 9px; border-radius: 999px; margin: 0 6px 6px 0; }

@@ -34,7 +34,7 @@ PLANNING RULES
 - Generate a complete timed schedule from wake-up through sleep.
 - Her standard morning sequence is wake at 5:00 AM, shower, gym clothes, oatmeal, hot tea, leave by 5:35 AM, gym by 5:45 AM.
 - Include the correct named gym focus for the weekday and list the workout under the gym block.
-- Protect work from 10:30 AM to 5:30 PM every day unless a real fixed event says otherwise.
+- Protect work from 10:00 AM to 6:00 PM every day unless a real fixed event says otherwise.
 - Breakfast, lunch, and dinner are mandatory anchors. Never omit them or schedule over them.
 - Include one personal, creative, outdoor, beauty, social, or restorative action when realistic.
 - Do not punish a changed or low-energy day. Scale optional tasks and keep anchors.
@@ -49,10 +49,10 @@ Return ONLY valid JSON:
     "wake": "5:00 AM",
     "breakfast": "5:20 AM",
     "gym": "5:45 AM",
-    "at_work": "10:30 AM",
+    "at_work": "10:00 AM",
     "lunch": "12:30 PM",
-    "leave_work": "5:30 PM",
-    "dinner": "6:00 PM",
+    "leave_work": "6:00 PM",
+    "dinner": "6:30 PM",
     "wind_down": "9:00 PM",
     "lights_out": "10:30 PM"
   },
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       location = 'home',
       morningPlans = '',
       workPlans = '',
-      workEndTime = '5:30 PM',
+      workEndTime = '6:00 PM',
       hairWashDay = false,
       eveningPlans = '',
       tz = 'America/New_York',
@@ -155,14 +155,14 @@ Wake time: ${wakeTime}
 Gym arrival: ${gymTime || '5:45 AM'}
 Location: ${location === 'home' ? 'Working from home' : 'Going into the DRYP office'}
 ${morningPlans ? `Morning plans: ${morningPlans}` : ''}
-Protected work window: 10:30 AM to ${workEndTime || '5:30 PM'}
+Protected work window: 10:00 AM to ${workEndTime || '6:00 PM'}
 ${workPlans ? `Work plans: ${workPlans}` : ''}
 Hair today: ${hairWashDay ? 'Wash day, add 20 minutes for perm care' : 'Refresh day, add about 5 minutes'}
 ${eveningPlans ? `Evening plans: ${eveningPlans}` : 'No fixed evening plans'}
 
 ${taskList}
 
-Build the full day. Include the exact weekday gym focus and exercises under the gym block. Protect breakfast, lunch, and dinner. Protect the 10:30 AM to 5:30 PM workday. Keep the plan flexible, include buffers, and add one happiness or restoration block when realistic.`
+Build the full day. Include the exact weekday gym focus and exercises under the gym block. Protect breakfast, lunch, and dinner. Protect the 10:00 AM to 6:00 PM workday. Keep the plan flexible, include buffers, and add one happiness or restoration block when realistic.`
 
     const raw = await callAI(SYSTEM, userPrompt, 3200)
     const parsed = parseAIJson(raw)

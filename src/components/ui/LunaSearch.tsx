@@ -131,7 +131,7 @@ export function LunaSearchOverlay({ onClose }: LunaSearchProps) {
         </div>
         <button onClick={onClose}
           className="text-sm font-semibold flex-shrink-0"
-          style={{ color: 'rgba(185,139,255,0.9)' }}>
+          style={{ color: 'rgba(196,164,124,0.9)' }}>
           Cancel
         </button>
       </div>
@@ -148,7 +148,7 @@ export function LunaSearchOverlay({ onClose }: LunaSearchProps) {
             items.length > 0 && (
               <div key={cat} className="mb-5">
                 <p className="text-xs font-bold uppercase tracking-widest mb-2"
-                  style={{ color: 'rgba(185,139,255,0.45)' }}>
+                  style={{ color: 'rgba(196,164,124,0.45)' }}>
                   {cat}
                 </p>
                 <div className="space-y-1">
@@ -192,7 +192,7 @@ export function LunaSearchBar({ className }: { className?: string }) {
         <Search className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--text-4)' }} />
         <span className="text-sm" style={{ color: 'var(--text-4)' }}>Search LUNA...</span>
         <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-lg"
-          style={{ background: 'rgba(155,92,255,0.1)', color: 'var(--violet)' }}>
+          style={{ background: 'rgba(92,69,48,0.1)', color: 'var(--violet)' }}>
           ✦ All
         </span>
       </button>

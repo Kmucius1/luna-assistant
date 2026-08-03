@@ -59,7 +59,7 @@ const THEME_VARS = {
   '--text-2': '#32284A',
   '--text-3': '#5E5474',
   '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
+  '--violet': '#5C4530',
   '--surface': 'rgba(255,255,255,0.6)',
   '--surface-border': 'rgba(180,150,100,0.2)',
   background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
@@ -109,11 +109,11 @@ export default function MoonPortal() {
                 <p className="text-sm mb-3" style={{ color: 'rgba(16,12,30,0.6)' }}>
                   {moon.phase.illumination}% illuminated · {moon.phase.angle}° phase angle
                 </p>
-                <p className="text-sm leading-relaxed italic" style={{ color: '#C9A96E' }}>{moon.phase.description}</p>
+                <p className="text-sm leading-relaxed italic" style={{ color: '#5C4530' }}>{moon.phase.description}</p>
                 {moon.phase.next_exact && (
                   <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
                     style={{ background: 'rgba(201,169,110,0.2)', border: '1px solid rgba(201,169,110,0.3)' }}>
-                    <span className="text-xs font-semibold" style={{ color: '#C9A96E' }}>
+                    <span className="text-xs font-semibold" style={{ color: '#5C4530' }}>
                       ✦ {moon.phase.next_exact.name} · {moon.phase.next_exact.time}
                     </span>
                   </div>

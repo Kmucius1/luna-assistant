@@ -80,7 +80,7 @@ export function LunaCard({ children, className, variant = 'glass', onClick, as, 
       className={cn(className)}
       style={{
         width: 56, height: 56, borderRadius: 18,
-        background: 'linear-gradient(145deg, rgba(155,92,255,0.20), rgba(17,12,42,0.65))',
+        background: 'linear-gradient(145deg, rgba(92,69,48,0.20), rgba(17,12,42,0.65))',
         border: '1px solid var(--luna-border-soft)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         cursor: onClick ? 'pointer' : undefined,

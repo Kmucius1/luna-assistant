@@ -28,6 +28,7 @@ export function FitnessWorkoutSession() {
   const [checked, setChecked] = useState<Record<string, boolean>>({})
   const [completed, setCompleted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [saveError, setSaveError] = useState(false)
 
   useEffect(() => {
     setWeekday(new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()))
@@ -46,8 +47,9 @@ export function FitnessWorkoutSession() {
 
   async function completeWorkout() {
     setSubmitting(true)
+    setSaveError(false)
     try {
-      await fetch('/api/fitness/workouts', {
+      const res = await fetch('/api/fitness/workouts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -57,8 +59,9 @@ export function FitnessWorkoutSession() {
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
+      if (!res.ok) { setSaveError(true); setSubmitting(false); return }
       setCompleted(true)
-    } catch { /* ignore, keep the button available to retry */ }
+    } catch { setSaveError(true) }
     setSubmitting(false)
   }
 
@@ -115,6 +118,7 @@ export function FitnessWorkoutSession() {
         <button type="button" className={styles.completeButton} onClick={completeWorkout} disabled={submitting}>
           {submitting ? 'Saving…' : 'Complete Workout'}
         </button>
+        {saveError && <p className={styles.saveError}>Couldn&apos;t save that — check your connection and try again.</p>}
       </div>
     </AppLayout>
   )

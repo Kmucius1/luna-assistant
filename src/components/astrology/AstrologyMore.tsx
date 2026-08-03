@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronRight, ChevronLeft, Moon, MapPin, BookOpen, GraduationCap, Sun, Archive, Settings, Check } from 'lucide-react'
 
 import { SmartInput } from '@/components/ui/SmartInput'
+import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyMore.module.css'
 
 interface MoonData { phase: { name: string }; sign: { name: string } }
@@ -92,6 +93,8 @@ export function AstrologyMore() {
 
   return (
     <>
+      <AstrologyHero image="/images/astrology/more.jpg" label="Explore" title="Every Tool, One Place" subtitle="Moon room, journal, deep dives, and the sky right now." />
+
       <div className={styles.sectionHeader}>Explore</div>
       <Link href="/astrology/moon" className={styles.row}>
         <span className={styles.rowMeta}><Moon size={16} /> Moon Room</span>
@@ -109,7 +112,7 @@ export function AstrologyMore() {
         <span className={styles.rowMeta}><Sun size={16} /> Current Sky</span>
         <ChevronRight size={16} className={styles.rowArrow} />
       </Link>
-      <Link href="/astrology/daily" className={styles.row}>
+      <Link href="/astrology/saved-readings" className={styles.row}>
         <span className={styles.rowMeta}><Archive size={16} /> Saved Readings</span>
         <ChevronRight size={16} className={styles.rowArrow} />
       </Link>

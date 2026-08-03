@@ -21,8 +21,8 @@ export default function VaultScreen() {
       '--text-2': '#32284A',
       '--text-3': '#5E5474',
       '--text-4': '#8A8098',
-      '--violet': '#C9A96E',
-      '--golden': '#C9A96E',
+      '--violet': '#5C4530',
+      '--golden': '#5C4530',
     } as React.CSSProperties}>
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">

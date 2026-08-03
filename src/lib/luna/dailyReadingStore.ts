@@ -68,6 +68,29 @@ export async function getReadingWindow(
   return result
 }
 
+/** Every reading through and including `throughDateKey`, newest first — the
+    full saved/past archive, not the forward-looking window used by the
+    daily-readings route. */
+export async function getReadingHistory(
+  userId: string,
+  timezone: string,
+  throughDateKey: string,
+): Promise<StoredReading[]> {
+  try {
+    const db = createAdminClient()
+    const { data } = await db
+      .from('daily_readings')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('timezone', timezone)
+      .lte('reading_date', throughDateKey)
+      .order('reading_date', { ascending: false })
+    return (data as StoredReading[] | null) ?? []
+  } catch {
+    return []
+  }
+}
+
 export async function upsertReading(userId: string, row: StoredReading): Promise<void> {
   try {
     const db = createAdminClient()

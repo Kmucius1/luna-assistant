@@ -1,0 +1,54 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.pager {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.pager::-webkit-scrollbar { display: none; }
+
+.page {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 0 1px;
+}
+
+/* Matches the default desktopPageSize=4 / DESKTOP_BREAKPOINT in TilePager.tsx. */
+@media (min-width: 1024px) {
+  .page { grid-template-columns: repeat(4, 1fr); }
+}
+
+.dots {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  padding-top: 2px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(180, 150, 100, 0.3);
+  border: none;
+  padding: 0;
+}
+
+.dotActive {
+  background: var(--gold, #5C4530);
+  width: 20px;
+  border-radius: 4px;
+}

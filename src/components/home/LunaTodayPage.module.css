@@ -4,7 +4,7 @@
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
-  --gold: #C9A96E;
+  --gold: #5C4530;
   --card-bg: rgba(255, 255, 255, 0.6);
   --card-border: rgba(180, 150, 100, 0.14);
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
@@ -24,6 +24,7 @@
 }
 
 :global([data-theme='dark']) .page {
+  --gold: #C4A47C;
   --ivory-1: #211C14;
   --ivory-2: #17130D;
   --ink-1: #F5EFE3;
@@ -40,7 +41,7 @@
 
 .hero {
   position: relative;
-  flex: 0.85 1 0;
+  flex: 0.75 1 0;
   min-height: 0;
   border-radius: 16px;
   overflow: hidden;
@@ -96,7 +97,7 @@
 /* ── Today pager — one category at a time, swipe horizontally ───── */
 
 .todayPager {
-  flex: 4.2 1 0;
+  flex: 4.4 1 0;
   min-height: 0;
   display: flex;
   overflow-x: auto;
@@ -167,6 +168,171 @@
   background: var(--gold);
   width: 20px;
   border-radius: 4px;
+}
+
+/* ── Right Now block card ─────────────────────────────────── */
+
+.blockCard {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: var(--soft-shadow);
+  padding: 9px;
+}
+
+.blockRow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+.blockRowReverse { flex-direction: row-reverse; text-align: right; }
+.blockRowReverse .blockRowText { align-items: flex-end; }
+
+.blockRowPhoto { position: relative; width: 90px; height: 68px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
+.blockRowPhoto :global(img) { object-fit: cover; }
+
+.blockRowText { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.blockRowLabel { display: flex; align-items: center; gap: 4px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold); }
+.blockRowLabel svg { color: var(--gold); }
+.blockRowTitle { margin: 2px 0 0; font-size: 13px; font-weight: 700; color: var(--ink-1); line-height: 1.25; }
+.blockRowSub { margin: 2px 0 0; font-size: 10.5px; color: var(--ink-2); line-height: 1.3; }
+
+.collapseBar {
+  flex-shrink: 0;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gold);
+  padding: 2px 0 4px;
+}
+
+.rightNowMessage {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-2);
+}
+.rightNowMessage svg { color: var(--gold); flex-shrink: 0; }
+
+.rightNowSummaryLink {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--gold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* ── Reflect on the Day (night block) ─────────────────────── */
+
+.reflectWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reflectHeader {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-1);
+}
+.reflectHeader svg { color: var(--gold); flex-shrink: 0; }
+
+.reflectHint {
+  margin: -3px 0 0;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: var(--ink-3);
+}
+
+.reflectChecklist {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.reflectItem {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: none;
+  border: none;
+  padding: 5px 0;
+  text-align: left;
+  width: 100%;
+}
+
+.reflectCheck, .reflectCheckDone {
+  flex-shrink: 0;
+  width: 17px; height: 17px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1.5px solid rgba(180,150,100,0.4);
+  color: #fff;
+}
+.reflectCheckDone { background: var(--gold); border-color: var(--gold); }
+
+.reflectItemText { display: flex; flex-direction: column; min-width: 0; }
+.reflectItemText strong { font-size: 12px; font-weight: 700; color: var(--ink-1); line-height: 1.3; }
+.reflectItemText span { font-size: 10px; color: var(--ink-3); line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.reflectSaveButton {
+  flex-shrink: 0;
+  align-self: stretch;
+  background: var(--gold);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: 12px;
+  border: none;
+  min-height: 40px;
+}
+.reflectSaveButton:disabled { opacity: 0.5; }
+
+.reflectSavedMsg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+.reflectSavedMsg svg { color: var(--gold); flex-shrink: 0; }
+
+.reflectErrorMsg {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #C96B5A;
 }
 
 /* ── Shared card innards ──────────────────────────────────── */

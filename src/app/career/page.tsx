@@ -75,7 +75,7 @@ function dueDaysLabel(dateStr?: string) {
   const diff = Math.round((d.getTime() - now.getTime()) / 86_400_000)
   if (diff < 0)   return { text: 'Overdue', color: '#E05E5E' }
   if (diff === 0) return { text: 'Due today', color: '#E08B4A' }
-  if (diff === 1) return { text: 'Tomorrow',  color: '#C9A96E' }
+  if (diff === 1) return { text: 'Tomorrow',  color: '#5C4530' }
   if (diff <= 7)  return { text: `${diff}d`,  color: '#5E5474' }
   return null
 }
@@ -98,7 +98,7 @@ function ClientCard({ account, tasks }: { account: DryphubAccount; tasks: Dryphu
             <span style={{ fontSize: 10, fontWeight: 700, color: h.color, background: `${h.color}18`, padding: '2px 8px', borderRadius: 8 }}>{h.label}</span>
             {stage && <span style={{ fontSize: 10, color: '#5E5474', fontWeight: 600 }}>{stage}</span>}
             {account.monthly_retainer && account.monthly_retainer > 0 && (
-              <span style={{ fontSize: 10, color: '#C9A96E', fontWeight: 700 }}>${account.monthly_retainer.toLocaleString()}/mo</span>
+              <span style={{ fontSize: 10, color: '#5C4530', fontWeight: 700 }}>${account.monthly_retainer.toLocaleString()}/mo</span>
             )}
           </div>
         </div>
@@ -253,8 +253,8 @@ export default function CareerCompassScreen() {
             </div>
             {totalMRR > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.18)' }}>
-                <TrendingUp className="h-3 w-3" style={{ color: '#C9A96E' }} />
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#C9A96E' }}>${totalMRR.toLocaleString()}/mo retainer</span>
+                <TrendingUp className="h-3 w-3" style={{ color: '#5C4530' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#5C4530' }}>${totalMRR.toLocaleString()}/mo retainer</span>
               </div>
             )}
             {tasks.length > 0 && (
@@ -341,7 +341,7 @@ export default function CareerCompassScreen() {
 
                 {compassResult.recognition_check && (
                   <div style={CARD}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 8 }}>Recognition check</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 8 }}>Recognition check</p>
                     <p style={{ fontSize: 14, fontStyle: 'italic', color: '#100C1E' }}>{compassResult.recognition_check}</p>
                     <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 5 }}>
                       {RECOGNITION_QUESTIONS.map((q, i) => (
@@ -412,7 +412,7 @@ export default function CareerCompassScreen() {
                 {/* Retainer clients first */}
                 {retainerAccounts.length > 0 && (
                   <>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 4 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 4 }}>
                       Retainer clients — ${totalMRR.toLocaleString()}/mo
                     </p>
                     {retainerAccounts.map(a => (
@@ -454,7 +454,7 @@ export default function CareerCompassScreen() {
                 live: accounts.length > 0,
               },
               { label: 'DRYP Growth',       color: '#B79A5C',           items: ['DRYP Digital', 'DRYPHub CRM', 'Newsletter Studio', 'DRYP Studio', 'Social content'],   live: false },
-              { label: 'Money Moves',        color: '#C9A96E',           items: ['TikTok Shop', 'Dropshipping', 'Trading', 'Passive income streams'],                    live: false },
+              { label: 'Money Moves',        color: '#5C4530',           items: ['TikTok Shop', 'Dropshipping', 'Trading', 'Passive income streams'],                    live: false },
               { label: 'Creative Identity',  color: 'var(--blush)',      items: ['Content creation', 'Sewing + clothing brand', 'Painting', 'Dance', 'Tattoo art'],      live: false },
               { label: 'Future Projects',    color: 'var(--herb)',       items: ['Nurturly', 'LINK\'d UP', 'Bikini brand', 'Books', '144-client prep'],                  live: false },
               { label: 'Parked',             color: '#8A8098', items: ['Ideas waiting for the right moment — safe here'],                               live: false },
@@ -543,7 +543,7 @@ export default function CareerCompassScreen() {
                 )}
                 {weekResult.next_week_intention && (
                   <div style={CARD}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 8 }}>Next week intention</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 8 }}>Next week intention</p>
                     <p style={{ fontSize: 14, color: '#100C1E', lineHeight: 1.65 }}>{weekResult.next_week_intention}</p>
                   </div>
                 )}

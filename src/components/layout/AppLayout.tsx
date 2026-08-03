@@ -17,6 +17,9 @@ interface AppLayoutProps {
   /** Rooms with their own internal 5-tab bottom nav (e.g. Astrology) render
       that instead of the main app dock, rather than stacking two bottom bars. */
   hideBottomNav?: boolean
+  /** Ordered hrefs for that room's own sub-tabs — when set, a horizontal
+      swipe moves between them instead of the global top-level rooms. */
+  swipeTabs?: string[]
 }
 
 const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
@@ -28,7 +31,7 @@ const DOCK_CLEAR = 'calc(max(34px, env(safe-area-inset-bottom, 0px)) + 78px)'
 // so it doesn't get this bar on top of that.
 const TOP_BAR_ROUTES = ['/explore']
 
-export function AppLayout({ children, noScroll, noPad, className, wide, hideBottomNav }: AppLayoutProps) {
+export function AppLayout({ children, noScroll, noPad, className, wide, hideBottomNav, swipeTabs }: AppLayoutProps) {
   const pathname = usePathname()
   const showTopBar = TOP_BAR_ROUTES.includes(pathname)
 
@@ -36,6 +39,7 @@ export function AppLayout({ children, noScroll, noPad, className, wide, hideBott
     <SwipeContainer
       style={{ height: '100dvh', maxHeight: '100dvh', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}
       className="bg-app"
+      tabs={swipeTabs}
     >
       <EnergyReadUpdater />
       {/* Desktop fixed header */}

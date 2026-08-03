@@ -1,92 +1,46 @@
 .page {
+  --ink-1: #100C1E;
+  --ink-3: rgba(50,40,74,.62);
+  --ink-4: rgba(50,40,74,.55);
+
   height: 100%;
   min-height: 0;
   padding: 6px 4px 0;
   background:
     radial-gradient(circle at 50% -10%, rgba(201,169,110,.18), transparent 34%),
     linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%);
-  color: #100C1E;
+  color: var(--ink-1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
-.hero {
-  position: relative;
+
+:global([data-theme='dark']) .page {
+  --ink-1: #F5EFE3;
+  --ink-3: rgba(245, 239, 227, 0.65);
+  --ink-4: rgba(245, 239, 227, 0.5);
+}
+
+.subheading {
   flex-shrink: 0;
   max-width: 1180px;
   width: 100%;
-  margin: 0 auto 10px;
-  padding: 14px 18px 12px;
-  border-radius: 22px;
-  border: 1px solid rgba(180,150,100,.18);
-  background: linear-gradient(145deg, rgba(255,255,255,.7), rgba(255,255,255,.55));
-  box-shadow: 0 16px 40px rgba(60,46,24,.10);
-  overflow: hidden;
+  margin: 2px auto 8px;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .02em;
 }
-.heroGlow {
-  position: absolute;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  right: -80px;
-  top: -140px;
-  background: radial-gradient(circle, rgba(201,169,110,.30), transparent 70%);
-}
-.heroIcon {
-  width: 38px;
-  height: 38px;
-  border-radius: 14px;
-  display: grid;
-  place-items: center;
-  background: rgba(201,169,110,.14);
-  border: 1px solid rgba(180,150,100,.22);
-  color: #8A6A2E;
-}
-.hero p {
-  position: relative;
-  margin: 10px 0 4px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: #9C7A3D;
-}
-.hero h1 {
-  position: relative;
-  margin: 0;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(22px, 2.6vw, 32px);
-  line-height: 1.05;
-}
-.hero span {
-  position: relative;
-  display: block;
-  max-width: 680px;
-  margin-top: 6px;
-  color: rgba(50,40,74,.68);
-  font-size: 12px;
-  line-height: 1.45;
-}
-.scroller {
+.pagerWrap {
   flex: 1;
   min-height: 0;
   max-width: 1180px;
   width: 100%;
   margin: 0 auto;
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(240px, 31%);
-  gap: 14px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 2px 2px 6px;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
+  overflow-y: auto;
 }
-.scroller::-webkit-scrollbar { display: none; }
 .card {
   position: relative;
-  height: 100%;
   border-radius: 24px;
   overflow: hidden;
   text-decoration: none;
@@ -104,8 +58,8 @@
   border-color: rgba(201,169,110,.55);
 }
 .cardArt {
-  flex: 0 0 38%;
-  min-height: 0;
+  flex-shrink: 0;
+  height: 120px;
   position: relative;
   display: grid;
   place-items: center;
@@ -170,7 +124,7 @@
   font-size: 12px;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #C9A96E, #8C6530);
+  background: linear-gradient(135deg, #8A6B4A, #5C4530);
   box-shadow: 0 10px 22px rgba(120,90,40,.32);
 }
 .hint {
@@ -178,12 +132,11 @@
   max-width: 1180px;
   margin: 4px auto 0;
   text-align: center;
-  color: rgba(50,40,74,.55);
+  color: var(--ink-4);
   font-size: 10px;
 }
 
 /* ─── Theme variants — kept visually distinct via hue, still warm/light ─── */
-.work .hero { background: linear-gradient(145deg, rgba(255,255,255,.7), rgba(250,246,238,.55)); }
 .work .card { background: linear-gradient(160deg, rgba(255,255,255,.65), rgba(250,246,238,.52)); }
 .work .cardArt {
   background:
@@ -192,7 +145,6 @@
 }
 .work .appIcon { color: #3D6E9C; }
 
-.astrology .hero { background: linear-gradient(145deg, rgba(255,255,255,.7), rgba(250,242,225,.55)); }
 .astrology .card { background: linear-gradient(160deg, rgba(255,255,255,.65), rgba(248,238,218,.52)); }
 .astrology .cardArt {
   background:
@@ -266,13 +218,8 @@
 
 @media (max-width: 900px) {
   .page { padding: 4px 10px 0; }
-  .hero { padding: 14px 16px; border-radius: 18px; margin-bottom: 8px; }
-  .heroIcon { width: 36px; height: 36px; }
-  .hero h1 { font-size: 26px; }
-  .hero span { font-size: 11px; }
-  .scroller { grid-auto-columns: 78%; gap: 10px; }
-  .card { height: 100%; border-radius: 20px; }
-  .cardArt { flex-basis: 34%; }
+  .card { border-radius: 20px; }
+  .cardArt { height: 100px; }
   .cardCopy { padding: 12px 14px 6px; }
   .openButton { margin: 0 12px 10px; height: 34px; }
 }

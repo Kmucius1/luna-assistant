@@ -12,18 +12,18 @@ const SOURCE_CONFIG: Record<string, { label: string; emoji: string; color: strin
   gmail:     { label: 'Email',    emoji: '📧', color: '#5A8A5A', bg: 'rgba(90,138,90,0.1)' },
   calendar:  { label: 'Calendar', emoji: '📅', color: '#4A7FB8', bg: 'rgba(74,127,184,0.1)' },
   messages:  { label: 'Message',  emoji: '💬', color: '#C87B7B', bg: 'rgba(200,123,123,0.1)' },
-  crm:       { label: 'DRYPHub', emoji: '🏢', color: '#9b5cff', bg: 'rgba(155,92,255,0.1)' },
-  slack:     { label: 'Slack',   emoji: '💼', color: '#C9A96E', bg: 'rgba(201,169,110,0.1)' },
+  crm:       { label: 'DRYPHub', emoji: '🏢', color: '#5C4530', bg: 'rgba(92,69,48,0.1)' },
+  slack:     { label: 'Slack',   emoji: '💼', color: '#5C4530', bg: 'rgba(201,169,110,0.1)' },
   manual:    { label: 'Manual',  emoji: '✏️', color: '#9E95AC', bg: 'rgba(158,149,172,0.1)' },
-  dictation: { label: 'Dictation',emoji: '🎙', color: '#9b5cff', bg: 'rgba(155,92,255,0.08)' },
-  brain_dump:{ label: 'Brain dump',emoji: '⚡',color: '#C9A96E', bg: 'rgba(201,169,110,0.1)' },
+  dictation: { label: 'Dictation',emoji: '🎙', color: '#5C4530', bg: 'rgba(92,69,48,0.08)' },
+  brain_dump:{ label: 'Brain dump',emoji: '⚡',color: '#5C4530', bg: 'rgba(201,169,110,0.1)' },
   email:     { label: 'Email',   emoji: '📧', color: '#5A8A5A', bg: 'rgba(90,138,90,0.1)' },
 }
 
 const URGENCY_COLORS: Record<string, string> = {
   critical: '#E05E5E',
   high:     '#E08B4A',
-  medium:   '#9b5cff',
+  medium:   '#5C4530',
   low:      '#9E95AC',
 }
 
@@ -69,8 +69,8 @@ export function OSTaskCard({ task, onComplete, onSnooze, onPin, onAddNote, compa
     <div className="rounded-2xl overflow-hidden transition-all"
       style={{
         background: done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.82)',
-        border: `1px solid ${done ? 'rgba(155,92,255,0.05)' : 'rgba(155,92,255,0.1)'}`,
-        boxShadow: done ? 'none' : '0 2px 16px rgba(155,92,255,0.06)',
+        border: `1px solid ${done ? 'rgba(92,69,48,0.05)' : 'rgba(92,69,48,0.1)'}`,
+        boxShadow: done ? 'none' : '0 2px 16px rgba(92,69,48,0.06)',
         opacity: done ? 0.6 : 1,
       }}>
 
@@ -151,7 +151,7 @@ export function OSTaskCard({ task, onComplete, onSnooze, onPin, onAddNote, compa
             {replyUrl && (
               <a href={replyUrl}
                 className="flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(92,69,48,0.08)', color: 'var(--violet)' }}>
                 <MessageSquare className="h-3 w-3" />
                 Reply →
               </a>
@@ -169,7 +169,7 @@ export function OSTaskCard({ task, onComplete, onSnooze, onPin, onAddNote, compa
         {expanded && (
           <div className="mt-3 ml-8 space-y-3">
             {task.next_action && (
-              <div className="px-3 py-2 rounded-xl text-xs" style={{ background: 'rgba(155,92,255,0.06)' }}>
+              <div className="px-3 py-2 rounded-xl text-xs" style={{ background: 'rgba(92,69,48,0.06)' }}>
                 <span className="font-semibold" style={{ color: 'var(--violet)' }}>Next: </span>
                 <span style={{ color: 'var(--depth)' }}>{task.next_action}</span>
               </div>
@@ -184,7 +184,7 @@ export function OSTaskCard({ task, onComplete, onSnooze, onPin, onAddNote, compa
 
             {/* Note input */}
             {showNote && (
-              <div className="rounded-xl p-3" style={{ background: 'rgba(155,92,255,0.04)', border: '1px solid rgba(155,92,255,0.1)' }}>
+              <div className="rounded-xl p-3" style={{ background: 'rgba(92,69,48,0.04)', border: '1px solid rgba(92,69,48,0.1)' }}>
                 <textarea
                   value={note}
                   onChange={e => setNote(e.target.value)}
@@ -230,7 +230,7 @@ export function OSTaskCard({ task, onComplete, onSnooze, onPin, onAddNote, compa
               </button>
               <button onClick={() => onPin?.(task.id)}
                 className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg font-medium"
-                style={{ background: 'rgba(155,92,255,0.08)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(92,69,48,0.08)', color: 'var(--violet)' }}>
                 <Pin className="h-3 w-3" />
                 Pin
               </button>

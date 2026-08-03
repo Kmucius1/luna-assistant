@@ -29,7 +29,7 @@
 .journalArt{ position:absolute; inset:0; z-index:0; background-position:68% center; background-size:cover; background-repeat:no-repeat; }
 .primaryButton{ display: inline-flex; align-items: center; justify-content: center; gap: 9px; width: fit-content; padding: 13px 22px; border: 0; border-radius: 15px; color: white !important; text-decoration: none; font-size: 15px; font-weight: 800; background: linear-gradient(135deg,#6334e8,#8b4eff); box-shadow: 0 12px 30px rgba(92,40,205,.36); cursor: pointer; }
 .energySlide{ display:grid; grid-template-rows:minmax(0,.92fr) minmax(0,1.08fr); gap:12px; }
-.energyReadCard{ min-height:0; background-image:linear-gradient(90deg,rgba(11,8,38,.92) 0%,rgba(12,8,38,.66) 46%,rgba(13,8,38,.12) 100%); background-size:cover; background-position:center; border-color:rgba(155,92,255,.52); }
+.energyReadCard{ min-height:0; background-image:linear-gradient(90deg,rgba(11,8,38,.92) 0%,rgba(12,8,38,.66) 46%,rgba(13,8,38,.12) 100%); background-size:cover; background-position:center; border-color:rgba(92,69,48,.52); }
 .energyReadOverlay{ height:100%; display:flex; flex-direction:column; justify-content:center; padding:22px 30px; }
 .energyReadOverlay h2{ color:white; font-size:clamp(24px,2.4vw,38px); line-height:1.05; margin:14px 0 9px; }
 .energyReadOverlay > p{ max-width:720px; color:rgba(255,255,255,.84); font-size:14px; line-height:1.42; margin:0; }

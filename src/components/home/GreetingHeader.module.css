@@ -11,6 +11,7 @@
   align-items: flex-start;
   gap: 8px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .backButton {
@@ -32,6 +33,10 @@
   color: rgba(245, 239, 227, 0.80);
 }
 
+.greetingText {
+  min-width: 0;
+}
+
 .greetingText h1 {
   font-family: var(--font-display-var, serif);
   font-size: 18px;
@@ -41,10 +46,13 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 :global([data-theme='dark']) .greetingText h1 { color: #F5EFE3; }
 
-.greetingText h1 svg { color: #C9A96E; width: 14px; height: 14px; }
+.greetingText h1 svg { color: var(--gold, #5C4530); width: 14px; height: 14px; }
 
 .dateLine { margin: 0; font-size: 12.5px; font-weight: 600; color: #32284A; }
 :global([data-theme='dark']) .dateLine { color: rgba(245, 239, 227, 0.80); }
@@ -57,10 +65,10 @@
   gap: 3px;
 }
 
-.bellButton { position: relative; color: #C9A96E; display: flex; }
+.bellButton { position: relative; color: var(--gold, #5C4530); display: flex; }
 .bellButton i {
   position: absolute; top: -1px; right: -1px;
-  width: 5px; height: 5px; border-radius: 50%; background: #C9A96E;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--gold, #5C4530);
 }
 
 .weatherCard {
@@ -71,6 +79,8 @@
   padding: 4px 9px;
   text-align: right;
   min-width: 78px;
+  max-width: 150px;
+  flex-shrink: 0;
 }
 :global([data-theme='dark']) .weatherCard {
   background: rgba(255, 255, 255, 0.07);
@@ -87,10 +97,10 @@
 }
 :global([data-theme='dark']) .weatherCard strong { color: #F5EFE3; }
 
-.weatherIcon { color: #C9A96E; float: left; width: 13px; height: 13px; }
+.weatherIcon { color: var(--gold, #5C4530); float: left; width: 13px; height: 13px; }
 
-.weatherCard p { margin: 0; font-size: 11px; color: #5E5474; white-space: nowrap; }
-:global([data-theme='dark']) .weatherCard p { color: rgba(245, 239, 227, 0.58); }
+.weatherCard p { margin: 0; font-size: 11px; color: #5E5474; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+:global([data-theme='dark']) .weatherCard p { color: rgba(245, 239, 227, 0.68); }
 
 .quoteLine {
   flex: 0 0 auto;
@@ -107,4 +117,4 @@
 }
 :global([data-theme='dark']) .quoteLine { color: rgba(245, 239, 227, 0.80); }
 
-.quoteLine svg { color: #C9A96E; flex-shrink: 0; width: 11px; height: 11px; }
+.quoteLine svg { color: var(--gold, #5C4530); flex-shrink: 0; width: 11px; height: 11px; }

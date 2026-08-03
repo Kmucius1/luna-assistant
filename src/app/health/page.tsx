@@ -15,7 +15,7 @@ const G: React.CSSProperties = {
 }
 const LBL: React.CSSProperties = {
   fontSize: 10, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#C9A96E',
+  textTransform: 'uppercase', color: '#5C4530',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10,
 }
@@ -43,7 +43,7 @@ function EnergyGauge({ pct = 78, size = 128 }: { pct?: number; size?: number }) 
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
         <circle cx={c} cy={c} r={r} fill="none" stroke="rgba(201,169,110,0.18)" strokeWidth={stroke} />
         <circle
-          cx={c} cy={c} r={r} fill="none" stroke="#C9A96E" strokeWidth={stroke}
+          cx={c} cy={c} r={r} fill="none" stroke="#5C4530" strokeWidth={stroke}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
           style={{ filter: 'drop-shadow(0 0 6px rgba(201,169,110,0.5))' }}
         />
@@ -75,7 +75,7 @@ export default function HealthPage() {
               {STATS.map(({ icon: Icon, label, value, status, delta, color }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 14, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.14)' }}>
                   <div style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(201,169,110,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon style={{ width: 15, height: 15, color: '#C9A96E' }} strokeWidth={1.8} />
+                    <Icon style={{ width: 15, height: 15, color: '#5C4530' }} strokeWidth={1.8} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E', margin: 0 }}>{label}</p>
@@ -99,7 +99,7 @@ export default function HealthPage() {
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                 <div style={{
                   width: '100%', maxWidth: 28, height: `${pct}%`, borderRadius: 8,
-                  background: 'linear-gradient(180deg, #C9A96E 0%, rgba(201,169,110,0.35) 100%)',
+                  background: 'linear-gradient(180deg, #5C4530 0%, rgba(201,169,110,0.35) 100%)',
                 }} />
                 <span style={{ fontSize: 10, color: '#5E5474', fontWeight: 600 }}>{day}</span>
               </div>
@@ -129,7 +129,7 @@ export default function HealthPage() {
             <Link href="/journal" style={{ textDecoration: 'none' }}>
               <div style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 16px', borderRadius: 12, marginTop: 12,
-                background: 'linear-gradient(135deg, #C9A96E 0%, #B08D52 100%)', boxShadow: '0 0 18px rgba(201,169,110,0.35)',
+                background: 'linear-gradient(135deg, #5C4530 0%, #B08D52 100%)', boxShadow: '0 0 18px rgba(201,169,110,0.35)',
               }}>
                 <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>Open Journal →</span>
               </div>

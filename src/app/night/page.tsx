@@ -199,10 +199,10 @@ export default function NightScreen() {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
               style={{ background: 'rgba(201,169,110,0.18)' }}>
-              <Moon className="h-5 w-5" style={{ color: '#C9A96E' }} />
+              <Moon className="h-5 w-5" style={{ color: '#5C4530' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#C9A96E' }}>Night Mode</p>
+              <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5C4530' }}>Night Mode</p>
             </div>
           </div>
 
@@ -215,7 +215,7 @@ export default function NightScreen() {
 
           {/* Today's reminders */}
           <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.16)' }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#C9A96E' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#5C4530' }}>
               Tonight's Reminders
             </p>
             <div className="space-y-2">
@@ -246,7 +246,7 @@ export default function NightScreen() {
 
               <div style={card} className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Clock className="h-4 w-4" style={{ color: '#C9A96E' }} />
+                  <Clock className="h-4 w-4" style={{ color: '#5C4530' }} />
                   <p className="text-sm font-semibold" style={{ color: '#100C1E' }}>What time do you want to wake up?</p>
                 </div>
                 <input type="time" value={wakeGoal} onChange={e => setWakeGoal(e.target.value)}
@@ -256,7 +256,7 @@ export default function NightScreen() {
 
               <div style={card} className="p-5">
                 <p className="text-sm font-semibold mb-3" style={{ color: '#100C1E' }}>
-                  Sleep goal: <span style={{ color: '#C9A96E' }}>{clampedSleepHours}h</span>
+                  Sleep goal: <span style={{ color: '#5C4530' }}>{clampedSleepHours}h</span>
                   {clampedSleepHours < sleepHours && (
                     <span style={{ fontSize: 11, color: '#5E5474', marginLeft: 6 }}>
                       (max available before {minutesToTime(rawWakeMin)})
@@ -275,7 +275,7 @@ export default function NightScreen() {
               {wakeGoal && (
                 <div style={{ borderRadius: 20, overflow: 'hidden', background: 'linear-gradient(145deg, rgba(201,169,110,0.18) 0%, rgba(201,169,110,0.08) 100%)', border: '1.5px solid rgba(201,169,110,0.35)' }}>
                   <div style={{ padding: '18px 20px', textAlign: 'center' }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 6 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 6 }}>
                       Asleep by — for {clampedSleepHours}h
                     </p>
                     {minsUntilBed <= 0 ? (
@@ -334,7 +334,7 @@ export default function NightScreen() {
 
               <div style={card} className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Home className="h-4 w-4" style={{ color: '#C9A96E' }} />
+                  <Home className="h-4 w-4" style={{ color: '#5C4530' }} />
                   <p className="text-sm font-semibold" style={{ color: '#100C1E' }}>Where are you right now?</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -348,7 +348,7 @@ export default function NightScreen() {
 
               <div style={card} className="p-5">
                 <p className="text-sm font-semibold mb-3" style={{ color: '#100C1E' }}>
-                  Bedtime prep time: <span style={{ color: '#C9A96E' }}>{prepMinutes} min</span>
+                  Bedtime prep time: <span style={{ color: '#5C4530' }}>{prepMinutes} min</span>
                 </p>
                 <input type="range" min={15} max={90} step={5} value={prepMinutes}
                   onChange={e => setPrepMinutes(Number(e.target.value))} />
@@ -364,7 +364,7 @@ export default function NightScreen() {
 
               <button onClick={calculate}
                 className="w-full py-4 rounded-2xl font-bold text-white transition-all active:scale-95"
-                style={{ background: 'linear-gradient(135deg, #C9A96E 0%, #B08D52 100%)', fontSize: '1rem' }}>
+                style={{ background: 'linear-gradient(135deg, #5C4530 0%, #B08D52 100%)', fontSize: '1rem' }}>
                 <Sparkles className="inline h-4 w-4 mr-2" />
                 Calculate my night
               </button>
@@ -477,8 +477,8 @@ export default function NightScreen() {
                       <div className="flex items-center gap-3 flex-1 py-4 pr-4">
                         <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center"
                           style={{
-                            background: done ? '#C9A96E' : 'rgba(255,255,255,0.6)',
-                            border: `1.5px solid ${done ? '#C9A96E' : 'rgba(180,150,100,0.25)'}`,
+                            background: done ? '#5C4530' : 'rgba(255,255,255,0.6)',
+                            border: `1.5px solid ${done ? '#5C4530' : 'rgba(180,150,100,0.25)'}`,
                           }}>
                           {done && <span className="text-white font-bold" style={{ fontSize: 10 }}>✓</span>}
                         </div>

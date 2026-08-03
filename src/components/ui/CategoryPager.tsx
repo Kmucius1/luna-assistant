@@ -20,7 +20,7 @@ interface Props {
   pageNoScroll?: boolean
 }
 
-export function CategoryPager({ pages, accentColor = '#C9A96E', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
+export function CategoryPager({ pages, accentColor = '#5C4530', activeIndex, onChangeIndex, hidePills, pageNoScroll }: Props) {
   const [internalActive, setInternalActive] = useState(0)
   const [animClass, setAnimClass] = useState('')
   const [animKey, setAnimKey] = useState(0)

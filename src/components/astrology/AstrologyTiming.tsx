@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, Calendar, Moon } from 'lucide-react'
+import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyTiming.module.css'
 
 interface TransitAspect {
@@ -23,8 +24,10 @@ export function AstrologyTiming() {
 
   return (
     <>
+      <AstrologyHero image="/images/astrology/timing.jpg" label="Timing" title="What the Sky Favors Now" subtitle="Transits, retrogrades, and the moments worth planning around." />
+
       <div className={styles.sectionHeader}>Transit Timeline — This Week</div>
-      {!transits && <p style={{ fontSize: 12, color: '#716B63', textAlign: 'center', padding: 20 }}>Reading the sky…</p>}
+      {!transits && <p style={{ fontSize: 12, color: 'var(--astro-muted)', textAlign: 'center', padding: 20 }}>Reading the sky…</p>}
       {transits?.aspects.slice(0, 6).map(a => (
         <div key={`${a.transiting}-${a.natal}`} className={styles.timelineRow}>
           <div className={styles.timelineHeader}>

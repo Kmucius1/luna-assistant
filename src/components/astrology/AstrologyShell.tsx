@@ -29,7 +29,7 @@ export function AstrologyShell({ children, backHref }: AstrologyShellProps) {
   const pathname = usePathname()
 
   return (
-    <AppLayout noPad noScroll hideBottomNav>
+    <AppLayout noPad noScroll hideBottomNav swipeTabs={TABS.map(t => t.href)}>
       <div className={styles.shell}>
         <div className={styles.topBar}>
           {backHref ? (

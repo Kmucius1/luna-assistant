@@ -1,0 +1,122 @@
+.shell {
+  --fitness-background: #FBF8F2;
+  --fitness-surface: #FFFDFA;
+  --fitness-card: #FFFFFF;
+  --fitness-text: #171512;
+  --fitness-muted: #716B63;
+  --fitness-gold: #5C4530;
+  --fitness-gold-soft: #EAD9C0;
+  --fitness-border: rgba(67, 51, 34, 0.09);
+  --fitness-shadow: 0 14px 38px rgba(72, 54, 31, 0.07);
+
+  background: var(--fitness-background);
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+:global([data-theme='dark']) .shell {
+  --fitness-background: #211C14;
+  --fitness-surface: #17130D;
+  --fitness-card: #17130D;
+  --fitness-text: #F5EFE3;
+  --fitness-muted: rgba(245, 239, 227, 0.62);
+  --fitness-gold: #C4A47C;
+  --fitness-gold-soft: rgba(196, 164, 124, 0.18);
+  --fitness-border: rgba(201, 169, 110, 0.18);
+  --fitness-shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Top bar ──────────────────────────────────────────── */
+
+.topBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+}
+
+.topBarTitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-display-var, serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fitness-text);
+}
+.topBarTitle svg { color: var(--fitness-gold); width: 13px; height: 13px; }
+
+.iconButton {
+  flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--fitness-card);
+  border: 1px solid var(--fitness-border);
+  color: var(--fitness-text);
+  box-shadow: var(--fitness-shadow);
+}
+
+/* ── Content ──────────────────────────────────────────── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Fitness sub-nav (5 tabs) ─────────────────────────── */
+
+.subNav {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 8px 10px;
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+  background: var(--fitness-surface);
+  border-top: 1px solid var(--fitness-border);
+  order: 2;
+}
+
+@media (min-width: 1024px) {
+  .subNav {
+    order: 0;
+    border-top: none;
+    border-bottom: 1px solid var(--fitness-border);
+    border-radius: 0;
+    max-width: 480px;
+    margin: 0 auto 4px;
+    padding: 6px;
+  }
+  .content { order: 1; }
+}
+
+.subNavTab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px;
+  padding: 6px 2px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--fitness-muted);
+  min-height: 48px;
+}
+
+.subNavTab svg { width: 20px; height: 20px; }
+
+.subNavTabActive {
+  color: var(--fitness-text);
+  background: var(--fitness-gold-soft);
+}
+.subNavTabActive svg { color: var(--fitness-gold); }
+
+.subNavLabel { font-size: 9.5px; font-weight: 600; }
+.subNavTabActive .subNavLabel { font-weight: 700; }

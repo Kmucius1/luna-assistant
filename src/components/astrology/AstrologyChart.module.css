@@ -41,5 +41,5 @@
 .aspectOrb { margin-left: auto; font-size: 10px; color: var(--astro-muted); flex-shrink: 0; }
 
 .sheetSection { margin-bottom: 14px; }
-.sheetSection h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--astro-gold, #C58D32); margin: 0 0 4px; }
-.sheetSection p { margin: 0; font-size: 13px; line-height: 1.5; color: #32284A; }
+.sheetSection h4 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--astro-gold, #5C4530); margin: 0 0 4px; }
+.sheetSection p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--astro-text); }

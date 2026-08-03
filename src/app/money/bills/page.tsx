@@ -5,7 +5,7 @@ import { RefreshCw, Check, AlertTriangle } from 'lucide-react'
 import { formatCurrency } from '@/lib/money/format'
 
 const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const CARD: React.CSSProperties = {
   background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.16)',
   borderRadius: 18, backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
@@ -35,7 +35,7 @@ function getBillStyle(bill: Bill): BillStyle {
   if (days === 0) return { bg: 'rgba(201,107,90,0.13)', border: '#C96B5A', badge: 'DUE TODAY', badgeColor: '#C96B5A' }
   if (days <= 2) return { bg: 'rgba(224,94,34,0.13)', border: '#E05E22', badge: `Due in ${days}d`, badgeColor: '#E05E22' }
   if (days <= 6) return { bg: 'rgba(201,146,58,0.13)', border: '#C9923A', badge: `Due in ${days}d`, badgeColor: '#C9923A' }
-  if (days <= 13) return { bg: 'rgba(201,169,110,0.13)', border: '#C9A96E', badge: `Due in ${days}d`, badgeColor: '#C9A96E' }
+  if (days <= 13) return { bg: 'rgba(201,169,110,0.13)', border: '#5C4530', badge: `Due in ${days}d`, badgeColor: '#5C4530' }
   return { bg: 'rgba(180,150,100,0.08)', border: 'rgba(180,150,100,0.16)', badge: `${days} days`, badgeColor: '#5E5474' }
 }
 

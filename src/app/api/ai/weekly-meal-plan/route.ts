@@ -1,21 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { ZOE_LIFESTYLE_PROFILE } from '@/lib/luna/zoeLifestyleProfile'
+import { createClient } from '@/lib/supabase/server'
+import { FoodProfile, formatFoodProfileForPrompt, mergedNeverFoods } from '@/lib/luna/foodProfile'
 
-const SYSTEM = `You are Luna, Zoe's personal meal planner and grocery assistant.
+function buildSystem(foodProfileText: string, neverFoods: string[]): string {
+  return `You are Luna, Zoe's personal meal planner and grocery assistant.
 
 ${ZOE_LIFESTYLE_PROFILE}
 
-Create realistic meals Zoe will actually eat. Never include anything on her NEVER RECOMMEND list.
+${foodProfileText ? `Zoe's Food Profile — her real favorites, brand preferences, and cooking notes:\n${foodProfileText}\n` : ''}
+
+Create realistic meals Zoe will actually eat. NEVER include anything from this never-suggest list: ${neverFoods.join(', ')}.
 Do not silently replace her preferences with generic fitness foods.
-Keep meals practical for a 5:00 AM wake-up, 5:45 AM gym arrival, and protected work hours from 10:30 AM to 5:30 PM.
+Write every recipe/prep_note at real restaurant/chef quality — actual seasonings, actual technique (searing, dredging, sauce-building steps), not vague instructions like "season to taste" or "cook until done." Use the cooking technique notes above whenever a dish matches one of them.
+Keep meals practical for a 5:00 AM wake-up, 5:45 AM gym arrival, and protected work hours from 10:00 AM to 6:00 PM.
 
 Return ONLY valid JSON in this shape:
 {
   "week_summary": "short explanation of the plan",
-  "breakfasts": [{ "day": "Monday", "meal": "...", "prep_note": "..." }],
-  "lunches": [{ "day": "Monday", "meal": "...", "prep_note": "..." }],
-  "dinners": [{ "day": "Monday", "meal": "...", "prep_note": "..." }],
+  "breakfasts": [{ "day": "Monday", "meal": "...", "prep_note": "...", "calories": 420, "protein_g": 32 }],
+  "lunches": [{ "day": "Monday", "meal": "...", "prep_note": "...", "calories": 550, "protein_g": 45 }],
+  "dinners": [{ "day": "Monday", "meal": "...", "prep_note": "...", "calories": 650, "protein_g": 50 }],
   "snacks": [{ "name": "...", "pairing_note": "..." }],
   "grocery_list": {
     "produce": [{ "item": "...", "quantity": "...", "used_for": ["..."] }],
@@ -29,9 +35,22 @@ Return ONLY valid JSON in this shape:
   "estimated_waste_savers": ["ingredient reuse note"],
   "meals_out": [{ "day": "...", "plan": "..." }]
 }`
+}
+
+function mondayOf(date: Date): string {
+  const d = new Date(date)
+  const day = d.getDay() // 0 = Sunday
+  const diff = day === 0 ? -6 : 1 - day
+  d.setDate(d.getDate() + diff)
+  return d.toISOString().split('T')[0]
+}
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
     const body = await req.json().catch(() => ({}))
     const {
       breakfastsAtHome = 7,
@@ -45,6 +64,28 @@ export async function POST(req: NextRequest) {
       notes = '',
     } = body
 
+    const [{ data: pantryRows }, { data: recentPlans }, { data: foodProfileRow }] = await Promise.all([
+      supabase.from('food_pantry_items').select('name, expires_on').eq('user_id', user.id).is('consumed_at', null),
+      supabase.from('food_weekly_plans').select('plan_json').eq('user_id', user.id).order('week_start', { ascending: false }).limit(2),
+      supabase.from('food_profile').select('*').eq('user_id', user.id).maybeSingle(),
+    ])
+
+    const foodProfile = (foodProfileRow ?? null) as FoodProfile | null
+    const foodProfileText = formatFoodProfileForPrompt(foodProfile)
+    const neverFoods = mergedNeverFoods(foodProfile)
+
+    const pantry = (pantryRows ?? []) as { name: string; expires_on: string | null }[]
+    const pantryItems = pantry.map(r => r.name)
+    const expiringSoon = pantry
+      .filter(r => r.expires_on && new Date(r.expires_on).getTime() - Date.now() < 4 * 86_400_000)
+      .map(r => r.name)
+
+    const recentMealTitles = ((recentPlans ?? []) as { plan_json: unknown }[]).flatMap((row) => {
+      const plan = row.plan_json as { breakfasts?: { meal: string }[]; lunches?: { meal: string }[]; dinners?: { meal: string }[] } | null
+      if (!plan) return []
+      return [...(plan.breakfasts ?? []), ...(plan.lunches ?? []), ...(plan.dinners ?? [])].map(m => m.meal)
+    })
+
     const prompt = `Build Zoe's meal plan for this week.
 
 Breakfasts at home: ${breakfastsAtHome}
@@ -57,18 +98,33 @@ Current cravings: ${cravings || 'Use her stored favorites'}
 Temporary dislikes or foods to skip this week: ${temporaryDislikes || 'None'}
 Other notes: ${notes || 'None'}
 
+Currently in her fridge/pantry: ${pantryItems.length ? pantryItems.join(', ') : 'Nothing logged yet'}
+${expiringSoon.length ? `Expiring soon — strongly prefer recipes that use these up: ${expiringSoon.join(', ')}` : ''}
+${recentMealTitles.length ? `Do not repeat any of these recent meals: ${recentMealTitles.join(', ')}` : ''}
+
 Rules:
 - Return exactly the requested number of breakfasts, lunches, and dinners.
+- Favor recipes that use what's already in her fridge/pantry before adding new grocery items — this reduces waste and cost.
 - Use repeated ingredients intelligently so the grocery list is not wasteful.
+- The grocery list should only include items not already sufficiently in her pantry.
+- Whenever chicken appears on the grocery list, name the brand from her Food Profile if one is set.
+- Always include her daily tea (per her Food Profile behavior rules) as a recurring grocery/staple check if she's low on it.
+- Give a realistic calories and protein_g estimate for every breakfast/lunch/dinner.
 - Keep breakfast realistic before or after her early gym session.
-- Lunch must fit inside her 10:30 AM to 5:30 PM workday.
-- Do not include ranch, mayonnaise, eggs, pork, shrimp, ground beef, burgers, cottage cheese, black beans, hummus, feta, lunch meat, turkey sausage, turkey taco bowls, mahi-mahi, cod, beef jerky, or tuna with crackers.
+- Lunch must fit inside her 10:00 AM to 6:00 PM workday.
 - Greek yogurt must be paired with granola, not berries.
 - Frozen blueberries with peanut butter and PB&J sandwiches are welcome options.
-- Chicken, salmon, steak, rice, buffalo, Caesar, chicken Alfredo, chicken parmesan, chicken-only sushi, Mexican chicken or steak, BBQ chicken pizza, Margherita pizza, chicken tenders, and crispy chicken sandwiches are preferred directions.`
+- Favor her Food Profile favorites and real chef technique/seasoning notes over generic suggestions.`
 
-    const raw = await callAI(SYSTEM, prompt, 3500)
+    const raw = await callAI(buildSystem(foodProfileText, neverFoods), prompt, 3800)
     const parsed = parseAIJson(raw)
+
+    const weekStart = mondayOf(new Date())
+    const { error: upsertError } = await supabase
+      .from('food_weekly_plans')
+      .upsert({ user_id: user.id, week_start: weekStart, plan_json: parsed, checked_items: [] }, { onConflict: 'user_id,week_start' })
+    if (upsertError) throw upsertError
+
     return NextResponse.json(parsed)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

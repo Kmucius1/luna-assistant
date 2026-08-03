@@ -48,24 +48,48 @@ function isValidResult(v: unknown): v is CoachResult {
   )
 }
 
-// Screenshot -> the message text inside it. Same Groq vision model already
-// used for wardrobe photo detection — no new provider, just a different prompt.
-async function extractTextFromImage(image: string): Promise<string | null> {
+// Screenshot -> the full back-and-forth thread inside it, who said what, and
+// the real emotional tone evident from the image (not just the words). A
+// flat OCR transcription can't tell "them" from "me" or read tone from bubble
+// color/punctuation/pacing, which is exactly what made LUNA's read of a
+// screenshot feel like it didn't understand the conversation. Same Groq
+// vision model already used for wardrobe photo detection — no new provider.
+interface ThreadTurn { sender: 'them' | 'me' | 'unclear'; text: string }
+interface ScreenshotAnalysis { thread: ThreadTurn[]; emotional_read: string; latest_incoming_message: string | null }
+
+async function analyzeScreenshotThread(image: string): Promise<ScreenshotAnalysis | null> {
   try {
     const completion = await getGroq().chat.completions.create({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
-      max_tokens: 800,
+      max_tokens: 1000,
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: 'This is a screenshot of a text/DM/email conversation. Transcribe only the message text visible in it — the actual words sent, not UI chrome, timestamps, or names, unless a name is part of the message content. Return plain text only, no commentary.' },
+          {
+            type: 'text',
+            text: `This is a screenshot of a text/DM/email conversation thread. Read every message bubble in it, in order top to bottom.
+
+Use bubble color/alignment to tell who sent each message — the device owner's own messages are usually right-aligned and one color (e.g. blue or green), the other person's are usually left-aligned and a different color (e.g. gray). If it's genuinely unclear who sent a message, mark that turn "unclear".
+
+Also read the real EMOTIONAL tone of the thread from actual visual/textual cues — punctuation intensity, capitalization, emoji, one-word replies, apology language, excitement, coldness, distance. Don't invent emotion that isn't actually evidenced in the screenshot.
+
+Return ONLY valid JSON, no commentary:
+{
+  "thread": [{"sender": "them" | "me" | "unclear", "text": "exact message text"}],
+  "emotional_read": "2-3 sentences on the real emotional tone/dynamic visible in this thread",
+  "latest_incoming_message": "the exact text of the LAST message sent by \\"them\\" (not by the device owner) — null if the thread ends on the device owner's own message or there's no incoming message at all"
+}`,
+          },
           { type: 'image_url', image_url: { url: image } },
         ],
       }],
     })
-    return completion.choices[0]?.message?.content?.trim() || null
+    const raw = completion.choices[0]?.message?.content ?? ''
+    const match = raw.match(/\{[\s\S]*\}/)
+    if (!match) return null
+    return JSON.parse(match[0]) as ScreenshotAnalysis
   } catch (err) {
-    console.error('[communication-coach] screenshot extraction failed:', err instanceof Error ? err.message : err)
+    console.error('[communication-coach] screenshot thread analysis failed:', err instanceof Error ? err.message : err)
     return null
   }
 }
@@ -114,9 +138,11 @@ export async function POST(req: NextRequest) {
     let message = (body.message ?? '').trim()
     const { direction = 'received', relationship, goal, contact_id, contact_name, adjust, previous_response_id } = body
 
+    let screenshotAnalysis: ScreenshotAnalysis | null = null
     if (!message && body.image) {
-      const extracted = await extractTextFromImage(body.image)
-      if (extracted) message = extracted
+      screenshotAnalysis = await analyzeScreenshotThread(body.image)
+      const lastText = screenshotAnalysis?.thread?.filter(t => t.text?.trim()).slice(-1)[0]?.text
+      message = screenshotAnalysis?.latest_incoming_message?.trim() || lastText?.trim() || ''
     }
     if (!message) {
       return NextResponse.json({ error: "Couldn't read a message — paste it, speak it, or try a clearer screenshot." }, { status: 400 })
@@ -186,6 +212,8 @@ export async function POST(req: NextRequest) {
       goal ? `Zoe's stated goal for this reply: ${goal}` : "Zoe didn't pick a specific goal — infer the best approach.",
       contact_name ? `This is about: ${contact_name}` : '',
       contactNotes ? `What Zoe has saved about this person:\n${contactNotes}` : '',
+      screenshotAnalysis?.thread?.length ? `Full recent thread from the screenshot, in order:\n${screenshotAnalysis.thread.map(t => `${t.sender === 'them' ? 'Them' : t.sender === 'me' ? 'Zoe' : '?'}: ${t.text}`).join('\n')}` : '',
+      screenshotAnalysis?.emotional_read ? `Emotional read of the screenshot (from tone/visual cues, not just the words): ${screenshotAnalysis.emotional_read}` : '',
       profile?.learned_notes ? `Learned preferences about Zoe's communication style (from her own feedback over time):\n${profile.learned_notes}` : '',
       recentHistory.length ? `recent_response_history (do not repeat these, use genuinely different phrasing/strategy):\n${recentHistory.map(t => `- ${t}`).join('\n')}` : '',
       isRegenerate ? 'Zoe asked to regenerate — give meaningfully different options than recent_response_history above, not a light rewording.' : '',
@@ -204,6 +232,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(result)
     }
 
+    // Fold the screenshot's thread + emotional read into the same jsonb
+    // `analysis` column (no schema change needed) — this is what makes a
+    // saved conversation genuinely useful the NEXT time Zoe asks about this
+    // contact: recentHistory above already re-reads coach_responses for
+    // context, so a richer analysis here directly improves future replies.
+    const analysisToSave = screenshotAnalysis
+      ? { ...result.analysis, thread: screenshotAnalysis.thread, emotional_read: screenshotAnalysis.emotional_read }
+      : result.analysis
+
     let responseId: string | null = null
     try {
       const { data } = await db.from('coach_responses').insert({
@@ -214,7 +251,7 @@ export async function POST(req: NextRequest) {
         relationship_type: relationship || null,
         goal: goal || null,
         original_message: message,
-        analysis: result.analysis,
+        analysis: analysisToSave,
         best_response: result.best_response,
         alternatives: result.alternatives,
       }).select('id').single()
@@ -223,7 +260,28 @@ export async function POST(req: NextRequest) {
       console.error('[communication-coach] persist failed:', err)
     }
 
-    return NextResponse.json({ ...result, response_id: responseId })
+    // A screenshot she handed LUNA is exactly the kind of thing she wants
+    // "always noted" for later — drop it into her general knowledge base too,
+    // not just the coach's own per-contact history.
+    if (body.image && screenshotAnalysis) {
+      try {
+        await db.from('brain_dump_entries').insert({
+          user_id: userId,
+          raw_content: message,
+          entry_type: 'image',
+          category: 'people',
+          title: contact_name ? `Conversation with ${contact_name}` : 'A conversation LUNA read',
+          ai_summary: screenshotAnalysis.emotional_read || null,
+          ai_analysis_enabled: false,
+          analysis_status: 'done',
+          status: 'kept',
+        })
+      } catch (err) {
+        console.error('[communication-coach] brain-dump note failed:', err)
+      }
+    }
+
+    return NextResponse.json({ ...result, response_id: responseId, emotional_read: screenshotAnalysis?.emotional_read ?? null })
   } catch (err) {
     console.error('[communication-coach] error:', err)
     return NextResponse.json({ error: 'Something went wrong. Try again.' }, { status: 500 })

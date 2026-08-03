@@ -26,9 +26,9 @@ interface AppDef { label: string; emoji: string; href: string; desc: string; col
  */
 const ALL_APPS: AppDef[] = [
   // ── Daily ──────────────────────────────────────────────────────────
-  { label: 'Morning',        emoji: '🌅', href: '/morning',              color: '#C9A96E', desc: 'Morning check-in routine'     },
+  { label: 'Morning',        emoji: '🌅', href: '/morning',              color: '#5C4530', desc: 'Morning check-in routine'     },
   { label: 'Plan My Day',    emoji: '🗓️', href: '/plan-my-day',         color: '#A8C4DA', desc: 'Daily structure with LUNA'    },
-  { label: 'Midday',         emoji: '☀️', href: '/midday',               color: '#C9A96E', desc: 'Midday check-in'              },
+  { label: 'Midday',         emoji: '☀️', href: '/midday',               color: '#5C4530', desc: 'Midday check-in'              },
   { label: 'Night Mode',     emoji: '🌙', href: '/night',                color: '#A890D0', desc: 'Wind down & tomorrow prep'   },
   { label: 'Home Reset',     emoji: '😮‍💨', href: '/late-mode',           color: '#8AB88A', desc: 'Running-late recovery reset'  },
   { label: 'Rush Mode',      emoji: '⚡', href: '/rush-mode',            color: '#8AB88A', desc: 'Quick simplified morning'     },
@@ -39,11 +39,11 @@ const ALL_APPS: AppDef[] = [
   // ── Work ───────────────────────────────────────────────────────────
   { label: 'Work Overview',  emoji: '💼', href: '/work',                 color: '#A8C4DA', desc: 'Dashboard & projects'         },
   { label: 'Calendar',       emoji: '📅', href: '/calendar',             color: '#A8C4DA', desc: 'Events & scheduling'          },
-  { label: 'Email',          emoji: '📬', href: '/email',                color: '#C9A96E', desc: 'Gmail inbox triage'           },
+  { label: 'Email',          emoji: '📬', href: '/email',                color: '#5C4530', desc: 'Gmail inbox triage'           },
   { label: 'Tasks',          emoji: '✅', href: '/tasks',                color: '#8AB88A', desc: 'Priorities & task tracking'   },
   { label: 'Projects',       emoji: '📁', href: '/projects',             color: '#A8C4DA', desc: 'Project tracker'              },
-  { label: 'DRYP Hub',       emoji: '🏢', href: '/dryp-hub',             color: '#C9A96E', desc: 'CRM & client outreach'        },
-  { label: 'Career',         emoji: '🧭', href: '/career',               color: '#C9A96E', desc: 'Career path compass'          },
+  { label: 'DRYP Hub',       emoji: '🏢', href: '/dryp-hub',             color: '#5C4530', desc: 'CRM & client outreach'        },
+  { label: 'Career',         emoji: '🧭', href: '/career',               color: '#5C4530', desc: 'Career path compass'          },
   { label: 'Money',          emoji: '💰', href: '/money',                color: '#8AB88A', desc: 'Track + grow'                 },
   { label: 'Transactions',   emoji: '💳', href: '/money/transactions',   color: '#8AB88A', desc: 'Transactions'                 },
   { label: 'Bills',          emoji: '🧾', href: '/money/bills',          color: '#8AB88A', desc: 'Bill tracker'                 },
@@ -51,18 +51,18 @@ const ALL_APPS: AppDef[] = [
   { label: 'Business Exp.',  emoji: '📊', href: '/money/business-expenses', color: '#8AB88A', desc: 'Business expense tracker'  },
   { label: 'Money Insights', emoji: '📈', href: '/money/insights',       color: '#8AB88A', desc: 'AI spending insights'         },
   { label: 'Budget Planning',emoji: '🗂️', href: '/money/planning',      color: '#8AB88A', desc: 'Budget planning'              },
-  { label: 'EHM Strategies', emoji: '🏠', href: 'https://ehmstrategies.com', color: '#C9A96E', desc: 'Mortgage & real estate', external: true },
+  { label: 'EHM Strategies', emoji: '🏠', href: 'https://ehmstrategies.com', color: '#5C4530', desc: 'Mortgage & real estate', external: true },
 
   // ── LUNA Tools ─────────────────────────────────────────────────────
-  { label: 'LUNA Chat',      emoji: '💬', href: '/luna',                 color: '#C9A96E', desc: 'Talk to your AI guide'        },
-  { label: 'Dictate',        emoji: '🎙️', href: '/luna?tab=dictate',    color: '#C9A96E', desc: 'Voice memo to LUNA'           },
-  { label: 'Dictation',      emoji: '🎤', href: '/dictation',            color: '#C9A96E', desc: 'Voice dictation → tasks'      },
-  { label: 'Brain Dump',     emoji: '🧠', href: '/brain-dump',           color: '#C9A96E', desc: 'Clear your mind'              },
-  { label: 'Messages',       emoji: '✉️', href: '/messages',             color: '#C9A96E', desc: 'Communication coach'          },
-  { label: 'Journal',        emoji: '📓', href: '/journal',              color: '#C9A96E', desc: 'Brain dumps & reflections'    },
-  { label: 'Highest Self',   emoji: '✨', href: '/highest-self',         color: '#C9A96E', desc: 'Mirror + patterns'            },
-  { label: 'Vault',          emoji: '🗄️', href: '/vault',                color: '#C9A96E', desc: 'Parked ideas & projects'     },
-  { label: 'Memory',         emoji: '📖', href: '/memory',               color: '#C9A96E', desc: 'Past check-ins & patterns'    },
+  { label: 'LUNA Chat',      emoji: '💬', href: '/luna',                 color: '#5C4530', desc: 'Talk to your AI guide'        },
+  { label: 'Dictate',        emoji: '🎙️', href: '/luna?tab=dictate',    color: '#5C4530', desc: 'Voice memo to LUNA'           },
+  { label: 'Dictation',      emoji: '🎤', href: '/dictation',            color: '#5C4530', desc: 'Voice dictation → tasks'      },
+  { label: 'Brain Dump',     emoji: '🧠', href: '/brain-dump',           color: '#5C4530', desc: 'Clear your mind'              },
+  { label: 'Messages',       emoji: '✉️', href: '/messages',             color: '#5C4530', desc: 'Communication coach'          },
+  { label: 'Journal',        emoji: '📓', href: '/journal',              color: '#5C4530', desc: 'Brain dumps & reflections'    },
+  { label: 'Highest Self',   emoji: '✨', href: '/highest-self',         color: '#5C4530', desc: 'Mirror + patterns'            },
+  { label: 'Vault',          emoji: '🗄️', href: '/vault',                color: '#5C4530', desc: 'Parked ideas & projects'     },
+  { label: 'Memory',         emoji: '📖', href: '/memory',               color: '#5C4530', desc: 'Past check-ins & patterns'    },
   { label: 'Growth',         emoji: '🌿', href: '/growth',               color: '#8AB88A', desc: 'Pattern & growth analytics'   },
   { label: 'Check-in',       emoji: '⚡', href: '/?tab=energy',          color: '#8AB88A', desc: 'Daily energy check-in'        },
 
@@ -81,19 +81,19 @@ const ALL_APPS: AppDef[] = [
   { label: 'Tarot',          emoji: '🃏', href: '/tarot',                color: '#A890D0', desc: 'Tarot card draw + history'    },
   { label: 'Love',           emoji: '💗', href: '/love',                 color: '#D4A8C4', desc: 'Relationship guidance'        },
   { label: 'Relationships',  emoji: '💜', href: '/relationships',        color: '#D4A8C4', desc: 'People + synastry'            },
-  { label: 'Manifestation',  emoji: '✨', href: '/manifestation',        color: '#C9A96E', desc: 'Intentions & vision board'    },
+  { label: 'Manifestation',  emoji: '✨', href: '/manifestation',        color: '#5C4530', desc: 'Intentions & vision board'    },
   { label: 'Health',         emoji: '🌿', href: '/health',               color: '#8AB88A', desc: 'Body + wellness tracking'     },
 
   // ── Atelier + Style ────────────────────────────────────────────────
   { label: 'Atelier',        emoji: '🪡', href: '/creative',             color: '#D4A8C4', desc: 'Style oracle + closet'        },
 
   // ── Settings + Connections ─────────────────────────────────────────
-  { label: 'Settings',       emoji: '⚙️', href: '/settings',             color: '#C9A96E', desc: 'Profile + AI preferences'     },
-  { label: 'Profile',        emoji: '👤', href: '/profile',              color: '#C9A96E', desc: 'Who I Am'                     },
+  { label: 'Settings',       emoji: '⚙️', href: '/settings',             color: '#5C4530', desc: 'Profile + AI preferences'     },
+  { label: 'Profile',        emoji: '👤', href: '/profile',              color: '#5C4530', desc: 'Who I Am'                     },
   { label: 'Bank Accounts',  emoji: '🏦', href: '/money/accounts',       color: '#8AB88A', desc: 'Linked bank accounts'         },
   { label: 'Connect a Bank', emoji: '🔗', href: '/money/connect',        color: '#8AB88A', desc: 'Securely link your accounts via Plaid'       },
-  { label: 'Privacy Policy', emoji: '📜', href: '/privacy',              color: '#C9A96E', desc: 'Privacy policy'               },
-  { label: 'Terms',          emoji: '📄', href: '/terms',                color: '#C9A96E', desc: 'Terms of service'             },
+  { label: 'Privacy Policy', emoji: '📜', href: '/privacy',              color: '#5C4530', desc: 'Privacy policy'               },
+  { label: 'Terms',          emoji: '📄', href: '/terms',                color: '#5C4530', desc: 'Terms of service'             },
 ]
 
 const CATEGORIES = [
@@ -193,7 +193,7 @@ export default function ExplorePage() {
     >
       <AppLayout noScroll wide>
         <div style={{ flex: 1, minHeight: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <CategoryPager pages={pages} accentColor="#C9A96E" hidePills />
+          <CategoryPager pages={pages} accentColor="#5C4530" hidePills />
         </div>
       </AppLayout>
     </div>

@@ -56,7 +56,7 @@ export default function LoginPage() {
           <div
             className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-breathe"
             style={{
-              background: 'linear-gradient(135deg, #C9A96E, #B08D52)',
+              background: 'linear-gradient(135deg, #5C4530, #B08D52)',
               boxShadow: '0 8px 40px rgba(201,169,110,0.35)',
             }}
           >
@@ -175,7 +175,7 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 disabled:opacity-60"
               style={{
-                background: 'linear-gradient(135deg, #C9A96E, #B08D52)',
+                background: 'linear-gradient(135deg, #5C4530, #B08D52)',
                 boxShadow: '0 4px 28px rgba(201,169,110,0.4)',
                 fontSize: 15,
                 letterSpacing: '0.02em',

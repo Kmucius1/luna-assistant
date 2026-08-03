@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Mic, MicOff, Send, RotateCcw, Volume2, Loader2 } from 'lucide-react'
 
 const BG     = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const VIOLET = '#B8974F'
 
 interface Message {

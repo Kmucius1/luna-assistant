@@ -7,7 +7,7 @@ import { formatCurrency, CATEGORY_ICONS } from '@/lib/money/format'
 import { CATEGORIES } from '@/lib/money/categories'
 
 const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const GREEN = '#5A8A6A'
 const RED = '#C96B5A'
 const CARD: React.CSSProperties = {

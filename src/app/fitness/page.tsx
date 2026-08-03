@@ -1,12 +1,12 @@
-import { Suspense } from 'react'
-import { LunaFitnessPage } from '@/components/home/LunaFitnessPage'
+import { FitnessShell } from '@/components/fitness/FitnessShell'
+import { FitnessTodayView } from '@/components/fitness/FitnessTodayView'
 
 export const dynamic = 'force-dynamic'
 
 export default function FitnessPage() {
   return (
-    <Suspense fallback={null}>
-      <LunaFitnessPage />
-    </Suspense>
+    <FitnessShell title="Today">
+      <FitnessTodayView />
+    </FitnessShell>
   )
 }

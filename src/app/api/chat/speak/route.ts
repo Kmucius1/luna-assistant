@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// LUNA's voice — locked to "Sarah" (ElevenLabs premade voice: mature,
-// reassuring, confident) for a soft, soothing read-aloud tone. Keep these
-// settings in sync if the voice is ever intentionally changed.
-const LUNA_VOICE_ID = 'EXAVITQu4vr4xnSDxMaL'
+// LUNA's voice — locked to "Alesha" (ElevenLabs shared voice: laid-back,
+// young Black/African American woman, warm chill energy) for a vibing,
+// good-energy read-aloud tone. Keep these settings in sync if the voice is
+// ever intentionally changed.
+const LUNA_VOICE_ID = 'g2ojWlDmz1i80BHVnl6v'
 const LUNA_VOICE_SETTINGS = {
-  stability: 0.6,
+  stability: 0.4,
   similarity_boost: 0.85,
-  style: 0.25,
+  style: 0.55,
   use_speaker_boost: true,
 }
 

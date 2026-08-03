@@ -1,33 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
-import { generateFashionImage } from '@/lib/higgsfield'
 import { getCurrentPlanets } from '@/lib/astrology'
 import { callAI, parseAIJson } from '@/lib/ai'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
-const OUTFIT_FALLBACK_IMAGE = 'https://i.pinimg.com/736x/43/c1/04/43c10408dafe7a122c4bfbff3b2a2f99.jpg'
+
+// Curated streetwear/Y2K photos, hosted locally — HIGGSFIELD_API_KEY isn't
+// configured server-side, so live per-day image generation always failed
+// and fell back to an external Pinterest hotlink that didn't reliably load.
+// Rotates deterministically by date so the look still changes day to day.
+const OUTFIT_IMAGES = [
+  '/images/outfits/streetwear-01.jpg',
+  '/images/outfits/streetwear-02.jpg',
+  '/images/outfits/streetwear-03.jpg',
+  '/images/outfits/streetwear-04.jpg',
+]
+
+function outfitImageForDate(dateKey: string): string {
+  let hash = 0
+  for (let i = 0; i < dateKey.length; i++) hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0
+  return OUTFIT_IMAGES[hash % OUTFIT_IMAGES.length]
+}
 
 interface DayPlanAnchors { at_work?: string; gym?: string }
 interface DayPlan { key_anchors?: DayPlanAnchors }
 interface WeatherNow { tempF: number; forecast: string }
-
-async function isUsableImage(url: string | null | undefined): Promise<boolean> {
-  if (!url || !/^https:\/\//i.test(url)) return false
-  try {
-    const response = await fetch(url, {
-      method: 'HEAD',
-      redirect: 'follow',
-      cache: 'no-store',
-      signal: AbortSignal.timeout(5000),
-      headers: { 'User-Agent': 'Mozilla/5.0 LunaAssistant/1.0' },
-    })
-    const type = response.headers.get('content-type') ?? ''
-    return response.ok && (type.startsWith('image/') || type === '')
-  } catch {
-    return false
-  }
-}
 
 async function getWeather(lat: number, lon: number): Promise<WeatherNow | null> {
   try {
@@ -113,18 +111,9 @@ export async function GET(req: NextRequest) {
           const raw = await callAI(OUTFIT_SYSTEM, contextLines, 400)
           const parsed = parseAIJson<{ occasion: string; why: string; outfit_caption: string; image_prompt: string }>(raw)
 
-          let image_url: string | null = null
-          try {
-            const generated = await generateFashionImage(parsed.image_prompt)
-            image_url = await isUsableImage(generated) ? generated : OUTFIT_FALLBACK_IMAGE
-          } catch (imgErr) {
-            console.error('[daily-outfit] image generation failed:', imgErr instanceof Error ? imgErr.message : imgErr)
-            image_url = OUTFIT_FALLBACK_IMAGE
-          }
-
           return {
-            payload: { occasion: parsed.occasion, why: parsed.why, outfit_caption: parsed.outfit_caption, image_url },
-            source: image_url === OUTFIT_FALLBACK_IMAGE ? 'fallback' as const : 'ai' as const,
+            payload: { occasion: parsed.occasion, why: parsed.why, outfit_caption: parsed.outfit_caption, image_url: outfitImageForDate(dateKey) },
+            source: 'ai' as const,
           }
         } catch (err) {
           console.error('[daily-outfit] generation error:', err)
@@ -133,7 +122,7 @@ export async function GET(req: NextRequest) {
               occasion: isWorkDay ? 'Work day' : 'Day off',
               why: 'Dress true to your style today.',
               outfit_caption: 'A confident, easy street-style look',
-              image_url: OUTFIT_FALLBACK_IMAGE,
+              image_url: outfitImageForDate(dateKey),
             },
             source: 'fallback' as const,
           }
@@ -141,18 +130,14 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const image_url = await isUsableImage(result.payload.image_url)
-      ? result.payload.image_url
-      : OUTFIT_FALLBACK_IMAGE
-
-    return NextResponse.json({ ...result.payload, image_url }, { headers: { 'Cache-Control': 'no-store, must-revalidate' } })
+    return NextResponse.json(result.payload, { headers: { 'Cache-Control': 'no-store, must-revalidate' } })
   } catch (err) {
     console.error('[atelier/daily-outfit] error:', err)
     return NextResponse.json({
       occasion: '',
       why: '',
       outfit_caption: '',
-      image_url: OUTFIT_FALLBACK_IMAGE,
+      image_url: OUTFIT_IMAGES[0],
     })
   }
 }

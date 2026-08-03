@@ -1,12 +1,12 @@
-import { Suspense } from 'react'
-import { LunaFoodPage } from '@/components/home/LunaFoodPage'
+import { FoodShell } from '@/components/food/FoodShell'
+import { MealPlanView } from '@/components/food/MealPlanView'
 
 export const dynamic = 'force-dynamic'
 
 export default function FoodPage() {
   return (
-    <Suspense fallback={null}>
-      <LunaFoodPage />
-    </Suspense>
+    <FoodShell title="Meal Plan">
+      <MealPlanView />
+    </FoodShell>
   )
 }

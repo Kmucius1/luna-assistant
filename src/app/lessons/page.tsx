@@ -75,8 +75,8 @@ export default function LessonsScreen() {
       '--depth': '#100C1E',
       '--mid': '#5E5474',
       '--mist': '#8A8098',
-      '--violet': '#C9A96E',
-      '--golden': '#C9A96E',
+      '--violet': '#5C4530',
+      '--golden': '#5C4530',
       '--herb': '#B8C9B4',
     } as React.CSSProperties}>
       <AppLayout noPad className="pt-16">

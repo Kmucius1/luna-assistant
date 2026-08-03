@@ -79,7 +79,7 @@ const PEOPLE: Person[] = [
     lastContact: '3 days ago',
     health: 'good',
     note: 'CRM launch call this week',
-    color: '#C9A96E',
+    color: '#5C4530',
   },
   {
     id: '6',
@@ -110,7 +110,7 @@ const PEOPLE: Person[] = [
 const HEALTH_COLORS: Record<string, string> = {
   strong:  '#5A9E5A',
   good:    '#6A9FB8',
-  nurture: '#C9A96E',
+  nurture: '#5C4530',
   overdue: '#B85A5A',
 }
 
@@ -161,7 +161,7 @@ function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
             {person.needsAttention && (
-              <AlertCircle className="h-3.5 w-3.5" style={{ color: '#C9A96E' }} />
+              <AlertCircle className="h-3.5 w-3.5" style={{ color: '#5C4530' }} />
             )}
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
               style={{
@@ -182,7 +182,7 @@ function PersonCard({ person, dark = false }: { person: Person; dark?: boolean }
             <button className="flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-lg transition-all"
               style={{
                 background: dark ? 'rgba(201,169,110,0.15)' : 'rgba(201,169,110,0.1)',
-                color: '#C9A96E',
+                color: '#5C4530',
               }}>
               <MessageCircle className="h-3 w-3" />
               Message
@@ -238,7 +238,7 @@ export default function RelationshipsPage() {
           '--depth': '#100C1E',
           '--mid': '#5E5474',
           '--mist': '#8A8098',
-          '--violet': '#C9A96E',
+          '--violet': '#5C4530',
           '--violet-deep': '#B8974F',
           '--surface': 'rgba(255,255,255,0.6)',
           '--surface-strong': 'rgba(255,255,255,0.75)',
@@ -252,7 +252,7 @@ export default function RelationshipsPage() {
               <p className="text-base font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-3)' }}>Your Circle</p>
               <h1 className="font-display text-3xl font-bold" style={{ color: 'var(--text-1)' }}>Relationships</h1>
               {needsAttention > 0 && (
-                <p className="text-sm mt-1" style={{ color: '#C9A96E' }}>
+                <p className="text-sm mt-1" style={{ color: '#5C4530' }}>
                   {needsAttention} connection{needsAttention > 1 ? 's' : ''} need your attention
                 </p>
               )}
@@ -345,7 +345,7 @@ export default function RelationshipsPage() {
                 <p className="text-base font-semibold uppercase tracking-widest mb-1" style={{ color: '#8A8098' }}>Your Circle</p>
                 <h1 className="font-display text-4xl font-bold text-[#100C1E]">Relationships</h1>
                 {needsAttention > 0 && (
-                  <p className="text-base mt-1" style={{ color: '#C9A96E' }}>
+                  <p className="text-base mt-1" style={{ color: '#5C4530' }}>
                     {needsAttention} connection{needsAttention > 1 ? 's' : ''} need your attention
                   </p>
                 )}
@@ -387,7 +387,7 @@ export default function RelationshipsPage() {
             <div className="rounded-2xl p-6"
               style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-5 w-5" style={{ color: '#C9A96E' }} />
+                <Sparkles className="h-5 w-5" style={{ color: '#5C4530' }} />
                 <p className="text-base font-semibold text-[#100C1E]">Relationship Coach</p>
               </div>
               <p className="text-sm mb-4" style={{ color: '#5E5474' }}>
@@ -397,7 +397,7 @@ export default function RelationshipsPage() {
                 {AI_PROMPTS.map(p => (
                   <button key={p} onClick={() => setAiInput(p)}
                     className="text-sm px-4 py-2 rounded-xl transition-all"
-                    style={{ background: 'rgba(201,169,110,0.15)', color: '#C9A96E', border: '1px solid rgba(201,169,110,0.25)' }}>
+                    style={{ background: 'rgba(201,169,110,0.15)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.25)' }}>
                     {p}
                   </button>
                 ))}

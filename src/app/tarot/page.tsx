@@ -13,9 +13,9 @@ const glass = {
   boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 } as const
 
-const VIOLET = '#C9A96E'
+const VIOLET = '#5C4530'
 const LUNAR = '#A8C4DA'
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 const BLUSH = '#E8C0C2'
 
 interface Spread {

@@ -4,7 +4,7 @@
   --ink-1: #100C1E;
   --ink-2: #32284A;
   --ink-3: #5E5474;
-  --gold: #C9A96E;
+  --gold: #5C4530;
   --soft-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
 
   flex: 1;
@@ -17,6 +17,7 @@
 }
 
 :global([data-theme='dark']) .page {
+  --gold: #C4A47C;
   --ivory-1: #211C14;
   --ivory-2: #17130D;
   --ink-1: #F5EFE3;
@@ -142,6 +143,14 @@
   border: none;
 }
 .completeButton:disabled { opacity: 0.6; }
+
+.saveError {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #C96B5A;
+  text-align: center;
+}
 
 .doneCard {
   margin: auto;

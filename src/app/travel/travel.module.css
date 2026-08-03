@@ -1,7 +1,7 @@
 .page {
   --travel-bg: #FBF8F2; --travel-surface: #FFFDFA; --travel-card: #FFFFFF;
-  --travel-text: #171512; --travel-muted: #6E6860; --travel-gold: #C58D32;
-  --travel-gold-soft: #F2E4CE; --travel-border: rgba(67, 51, 34, 0.09);
+  --travel-text: #171512; --travel-muted: #6E6860; --travel-gold: #5C4530;
+  --travel-gold-soft: #EAD9C0; --travel-border: rgba(67, 51, 34, 0.09);
   --travel-shadow: 0 14px 38px rgba(72, 54, 31, 0.07);
   background: var(--travel-bg); padding: 12px 14px 28px;
   display: flex; flex-direction: column; gap: 14px; min-height: 100%;
@@ -9,8 +9,8 @@
 
 :global([data-theme='dark']) .page {
   --travel-bg: #211C14; --travel-surface: #17130D; --travel-card: #17130D;
-  --travel-text: #F5EFE3; --travel-muted: rgba(245, 239, 227, 0.62); --travel-gold: #C58D32;
-  --travel-gold-soft: rgba(197, 141, 50, 0.18); --travel-border: rgba(201, 169, 110, 0.18);
+  --travel-text: #F5EFE3; --travel-muted: rgba(245, 239, 227, 0.62); --travel-gold: #C4A47C;
+  --travel-gold-soft: rgba(196, 164, 124, 0.18); --travel-border: rgba(201, 169, 110, 0.18);
   --travel-shadow: 0 14px 38px rgba(0, 0, 0, 0.45);
 }
 :global([data-theme='dark']) .searchBar {

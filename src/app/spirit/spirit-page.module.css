@@ -1,0 +1,29 @@
+.page {
+  --text-1: #100C1E;
+  --text-2: #32284A;
+  --text-3: #5E5474;
+  --text-4: #8A8098;
+  --violet: #5C4530;
+  --golden: #5C4530;
+  --herb: #B8C9B4;
+  --lunar: #A8C4DA;
+  --mid: #6B6080;
+  --card-bg: rgba(255, 255, 255, 0.6);
+  --card-border: rgba(180, 150, 100, 0.18);
+  --surface-inactive: rgba(255, 255, 255, 0.45);
+}
+
+:global([data-theme='dark']) .page {
+  --text-1: #F5EFE3;
+  --text-2: rgba(245, 239, 227, 0.85);
+  --text-3: rgba(245, 239, 227, 0.65);
+  --text-4: rgba(245, 239, 227, 0.5);
+  --violet: #C4A47C;
+  --golden: #C4A47C;
+  --herb: #A9C4A2;
+  --lunar: #8FB3D6;
+  --mid: #A79BC4;
+  --card-bg: rgba(255, 255, 255, 0.07);
+  --card-border: rgba(201, 169, 110, 0.2);
+  --surface-inactive: rgba(255, 255, 255, 0.08);
+}

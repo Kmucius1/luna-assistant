@@ -2,14 +2,22 @@
 
 /* ─── LUNA locked theme tokens (luna-final-theme-kit v1.0.0) ─── */
 :root {
-  --luna-bg:          #03040d;
-  --luna-bg-2:        #07071a;
+  --luna-bg:          #14100a;
+  --luna-bg-2:        #0c0906;
   --luna-panel:       rgba(255,255,255,0.045);
   --luna-panel-strong: rgba(17,12,42,0.82);
-  --luna-border:      rgba(185,139,255,0.28);
+  --luna-border:      rgba(140,107,74,0.28);
   --luna-border-soft: rgba(255,255,255,0.10);
-  --luna-purple:      #9b5cff;
-  --luna-purple-2:    #b98bff;
+  /* Unified brand accent — was purple (#9b5cff/#b98bff) until 2026-08,
+     replaced app-wide with a warm brown to match the nude/gold room
+     palette instead of clashing with it. Names kept as -purple/-purple-2
+     since every existing var(--luna-purple) consumer picks up the new
+     color with zero file touches — same pattern as the original purple
+     migration. */
+  --luna-purple:      #5C4530;
+  --luna-purple-2:    #8A6B4A;
+  --luna-nude:         #F3E7D6;
+  --luna-nude-2:       #EAD9BF;
   --luna-text:        #f4efff;
   --luna-muted:       rgba(244,239,255,0.68);
   --luna-dim:         rgba(244,239,255,0.44);
@@ -39,32 +47,37 @@
 
   /* surface / card */
   --surface:        rgba(255,255,255,0.88);
-  --surface-border: rgba(139,111,184,0.15);
+  --surface-border: rgba(140,107,74,0.16);
   --surface-strong: rgba(255,255,255,0.96);
   --surface-subtle: rgba(255,255,255,0.55);
 
-  /* app background */
-  --app-bg-from: #EDE8F5;
-  --app-bg-mid:  #F3EEFB;
+  /* app background — nude, not lavender */
+  --app-bg-from: #F6ECDC;
+  --app-bg-mid:  #F1E4CE;
   --app-bg-to:   #FBF7F0;
 
   /* nav / header / dock */
-  --nav-bg:        rgba(255,252,248,0.97);
-  --nav-border:    rgba(139,111,184,0.14);
-  --header-bg:     rgba(255,252,248,0.92);
-  --header-border: rgba(139,111,184,0.12);
-  --dock-bg:       rgba(255,252,248,0.96);
-  --dock-border:   rgba(139,111,184,0.14);
+  --nav-bg:        rgba(243,231,214,0.97);
+  --nav-border:    rgba(140,107,74,0.16);
+  --header-bg:     rgba(243,231,214,0.92);
+  --header-border: rgba(140,107,74,0.14);
+  --dock-bg:       rgba(243,231,214,0.96);
+  --dock-border:   rgba(140,107,74,0.16);
 
   /* tab states */
-  --tab-active-bg:     rgba(139,111,184,0.90);
-  --tab-active-text:   #ffffff;
+  --tab-active-bg:     rgba(92,69,48,0.14);
+  --tab-active-text:   #5C4530;
   --tab-inactive-text: #5E5474;
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────── */
 [data-theme="dark"] {
   color-scheme: dark;
+
+  /* Brand accent lightens in dark mode — the deep light-mode brown
+     (#5C4530) would vanish against near-black surfaces. */
+  --luna-purple:   #C4A47C;
+  --luna-purple-2: #C4A47C;
 
   /* override legacy tokens so old var(--depth/mid/mist) calls auto-adapt */
   --depth: #FFFFFF;
@@ -84,17 +97,17 @@
   --surface-strong: rgba(255,255,255,0.18);
   --surface-subtle: rgba(255,255,255,0.06);
 
-  /* app background — LUNA locked moonlit near-black */
+  /* app background — warm near-black, not navy */
   --app-bg-from: var(--luna-bg-2);
-  --app-bg-mid:  #050512;
+  --app-bg-mid:  #100c08;
   --app-bg-to:   var(--luna-bg);
 
   /* nav / header / dock */
-  --nav-bg:        rgba(8,10,24,0.90);
+  --nav-bg:        rgba(20,16,10,0.90);
   --nav-border:    var(--luna-border-soft);
-  --header-bg:     rgba(8,10,24,0.85);
+  --header-bg:     rgba(20,16,10,0.85);
   --header-border: var(--luna-border-soft);
-  --dock-bg:       rgba(8,10,24,0.80);
+  --dock-bg:       rgba(20,16,10,0.80);
   --dock-border:   rgba(255,255,255,0.12);
 
   /* tab states */
@@ -115,7 +128,7 @@
    UI already assumes. */
 [data-theme="dark"] .bg-app {
   background-image:
-    linear-gradient(180deg, rgba(5,5,18,0.55) 0%, rgba(3,4,13,0.72) 55%, rgba(3,4,13,0.92) 100%),
+    linear-gradient(180deg, rgba(20,15,8,0.6) 0%, rgba(14,10,6,0.76) 55%, rgba(14,10,6,0.94) 100%),
     url('/images/backgrounds/moon-goddess.jpg');
   background-size: cover;
   background-position: center top;
@@ -135,12 +148,12 @@
   --lunar:       #A8C4DA;
   --blush:       #E8C0C2;
   --herb:        #B8C9B4;
-  --golden:      #C9A96E;
+  --golden:      #5C4530;
 
   --glass-bg:     rgba(255,255,255,0.72);
   --glass-border: rgba(255,255,255,0.60);
-  --card-shadow:  0 4px 32px rgba(139,111,184,0.09);
-  --float-shadow: 0 8px 48px rgba(139,111,184,0.22);
+  --card-shadow:  0 4px 32px rgba(92,69,48,0.09);
+  --float-shadow: 0 8px 48px rgba(92,69,48,0.22);
 
   --nav-h: 80px;
   --font-display: var(--font-display-var, Georgia, serif);
@@ -180,7 +193,7 @@ body {
 
 /* ─── Dark inputs (SmartInput, journal write) ───────────────── */
 .luna-input::placeholder { color: rgba(255,255,255,0.3); }
-.luna-input:focus { border-color: rgba(139,111,184,0.5) !important; outline: none; }
+.luna-input:focus { border-color: rgba(92,69,48,0.5) !important; outline: none; }
 
 /* ─── Typography helpers ────────────────────────────────────── */
 .font-display { font-family: var(--font-display); }
@@ -223,8 +236,8 @@ body {
 
 /* ─── Violet glow card ──────────────────────────────────────── */
 .soul-card {
-  background: linear-gradient(135deg, rgba(139,111,184,0.12) 0%, rgba(184,159,216,0.08) 100%);
-  border: 1px solid rgba(139,111,184,0.18);
+  background: linear-gradient(135deg, rgba(92,69,48,0.12) 0%, rgba(184,159,216,0.08) 100%);
+  border: 1px solid rgba(92,69,48,0.18);
   border-radius: 20px;
 }
 
@@ -250,10 +263,10 @@ body {
 }
 .luna-hero-card {
   border-radius: var(--luna-radius-card);
-  border: 1px solid rgba(185,139,255,0.38);
+  border: 1px solid rgba(196,164,124,0.38);
   background-size: cover;
   background-position: center;
-  box-shadow: 0 0 42px rgba(155,92,255,0.20), inset 0 1px 0 rgba(255,255,255,0.08);
+  box-shadow: 0 0 42px rgba(92,69,48,0.20), inset 0 1px 0 rgba(255,255,255,0.08);
   overflow: hidden;
   position: relative;
 }
@@ -272,6 +285,10 @@ body {
 
 .bg-spirit {
   background: linear-gradient(160deg, #F4F0FA 0%, #EDE5F5 50%, #E8E0F0 100%);
+}
+
+[data-theme='dark'] .bg-spirit {
+  background: linear-gradient(160deg, #231A3A 0%, #1A1228 60%, #0D0A1A 100%);
 }
 
 .bg-night {
@@ -318,8 +335,8 @@ body {
 }
 
 @keyframes pulseGlow {
-  0%,100% { box-shadow: 0 0 0 0 rgba(139,111,184,0); }
-  50%     { box-shadow: 0 0 0 12px rgba(139,111,184,0.15); }
+  0%,100% { box-shadow: 0 0 0 0 rgba(92,69,48,0); }
+  50%     { box-shadow: 0 0 0 12px rgba(92,69,48,0.15); }
 }
 
 @keyframes ripple {
@@ -386,8 +403,8 @@ body {
 [data-theme="dark"] .bg-zinc-100      { background-color: var(--surface) !important; }
 [data-theme="dark"] .bg-slate-200,
 [data-theme="dark"] .bg-gray-200      { background-color: var(--surface-strong) !important; }
-[data-theme="dark"] .bg-violet-50     { background-color: rgba(139,111,184,0.12) !important; }
-[data-theme="dark"] .bg-violet-100    { background-color: rgba(139,111,184,0.18) !important; }
+[data-theme="dark"] .bg-violet-50     { background-color: rgba(92,69,48,0.12) !important; }
+[data-theme="dark"] .bg-violet-100    { background-color: rgba(92,69,48,0.18) !important; }
 
 /* Borders */
 [data-theme="dark"] .border-slate-100,
@@ -526,8 +543,8 @@ nav .text-xs, nav .text-sm { font-size: 11px !important; }
 }
 
 .checklist-item.checked {
-  background: rgba(139,111,184,0.08);
-  border-color: rgba(139,111,184,0.2);
+  background: rgba(92,69,48,0.08);
+  border-color: rgba(92,69,48,0.2);
   opacity: 0.6;
 }
 
@@ -557,7 +574,7 @@ input[type="range"] {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: rgba(139,111,184,0.15);
+  background: rgba(92,69,48,0.15);
   outline: none;
 }
 
@@ -568,7 +585,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--violet);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(139,111,184,0.35);
+  box-shadow: 0 2px 8px rgba(92,69,48,0.35);
 }
 
 /* ─── Tab pill ──────────────────────────────────────────────── */
@@ -583,7 +600,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .tab-pill.active {
-  background: rgba(139,111,184,0.12);
+  background: rgba(92,69,48,0.12);
   color: var(--violet);
   font-weight: 600;
 }
@@ -626,8 +643,8 @@ input[type="range"]::-webkit-slider-thumb {
   100% { background-position:  200% 0; }
 }
 @keyframes glowPulse {
-  0%,100% { box-shadow: 0 0 0   0 rgba(139,111,184,0); }
-  50%     { box-shadow: 0 0 24px 6px rgba(139,111,184,0.28); }
+  0%,100% { box-shadow: 0 0 0   0 rgba(92,69,48,0); }
+  50%     { box-shadow: 0 0 24px 6px rgba(92,69,48,0.28); }
 }
 @keyframes softBounce {
   0%   { transform: scale(1); }
@@ -671,7 +688,7 @@ html, body {
 }
 .hover-lift:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(139,111,184,0.20);
+  box-shadow: 0 12px 40px rgba(92,69,48,0.20);
 }
 
 /* Shimmer loading */

@@ -1,7 +1,12 @@
-import { LunaStylePage } from '@/components/home/LunaStylePage'
+import { StyleShell } from '@/components/style/StyleShell'
+import { StyleTodayView } from '@/components/style/StyleTodayView'
 
 export const dynamic = 'force-dynamic'
 
 export default function StylePage() {
-  return <LunaStylePage />
+  return (
+    <StyleShell title="Today">
+      <StyleTodayView />
+    </StyleShell>
+  )
 }

@@ -191,10 +191,10 @@ export default function HighestSelfPage() {
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
               <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.25)' }}>
-                <Zap className="h-5 w-5" style={{ color: '#C9A96E' }} />
+                <Zap className="h-5 w-5" style={{ color: '#5C4530' }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E' }}>Highest Self Mirror</p>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530' }}>Highest Self Mirror</p>
                 <p style={{ fontSize: 11, color: '#8A8098' }}>Current You → Highest You</p>
               </div>
             </div>
@@ -232,14 +232,14 @@ export default function HighestSelfPage() {
                         <div style={{
                           width: 20, height: 20, borderRadius: 6, flexShrink: 0, marginTop: 1,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: isSelected ? '#C9A96E' : 'rgba(255,255,255,0.5)',
+                          background: isSelected ? '#5C4530' : 'rgba(255,255,255,0.5)',
                           border: isSelected ? 'none' : '1.5px solid rgba(180,150,100,0.25)',
                           transition: 'all 0.15s',
                         }}>
                           {isSelected && <span style={{ color: '#100C1E', fontSize: 11, fontWeight: 800 }}>✓</span>}
                         </div>
                         <div>
-                          <p style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C9A96E' : '#E05E5E', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>Pattern</p>
+                          <p style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#5C4530' : '#E05E5E', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 3 }}>Pattern</p>
                           <p style={{ fontSize: 13, color: '#100C1E', lineHeight: 1.5 }}>{p}</p>
                         </div>
                       </button>
@@ -266,7 +266,7 @@ export default function HighestSelfPage() {
                   <button onClick={selected.size > 0 ? startElaborate : () => generateReading({})}
                     style={{
                       width: '100%', padding: '15px 0', borderRadius: 18, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
-                      background: 'linear-gradient(135deg, #C9A96E, #A88040)',
+                      background: 'linear-gradient(135deg, #5C4530, #A88040)',
                       color: '#100C1E', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8,
                     }}>
                     {selected.size > 0
@@ -290,7 +290,7 @@ export default function HighestSelfPage() {
 
                 {/* Progress bar */}
                 <div style={{ height: 3, borderRadius: 2, background: 'rgba(180,150,100,0.18)', marginBottom: 4 }}>
-                  <div style={{ height: '100%', borderRadius: 2, background: '#C9A96E', width: `${((eStep + 1) / selectedArr.length) * 100}%`, transition: 'width 0.4s ease' }} />
+                  <div style={{ height: '100%', borderRadius: 2, background: '#5C4530', width: `${((eStep + 1) / selectedArr.length) * 100}%`, transition: 'width 0.4s ease' }} />
                 </div>
 
                 {/* Current pattern being elaborated */}
@@ -305,7 +305,7 @@ export default function HighestSelfPage() {
                     <span style={{ fontSize: 14 }}>🌙</span>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', marginBottom: 4 }}>LUNA</p>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#5C4530', marginBottom: 4 }}>LUNA</p>
                     <p style={{ fontSize: 15, color: '#100C1E', lineHeight: 1.65, fontStyle: 'italic' }}>
                       {ELABORATIONS[PATTERNS[selectedArr[eStep]]] ?? 'Tell me more about what\'s really going on with this.'}
                     </p>
@@ -337,7 +337,7 @@ export default function HighestSelfPage() {
                   </button>
                   <button onClick={nextStep}
                     style={{ flex: 2, padding: '12px', borderRadius: 14, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
-                      background: currentAns.trim() ? 'linear-gradient(135deg, #C9A96E, #A88040)' : 'rgba(255,255,255,0.5)',
+                      background: currentAns.trim() ? 'linear-gradient(135deg, #5C4530, #A88040)' : 'rgba(255,255,255,0.5)',
                       color: currentAns.trim() ? '#100C1E' : '#8A8098',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                     }}>
@@ -355,7 +355,7 @@ export default function HighestSelfPage() {
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#8A8098', marginBottom: 8 }}>Already shared</p>
                     {selectedArr.slice(0, eStep).map((idx, j) => (
                       <div key={j} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, opacity: 0.5 }}>
-                        <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#C9A96E' }} />
+                        <CheckCircle className="h-3.5 w-3.5 flex-shrink-0" style={{ color: '#5C4530' }} />
                         <p style={{ fontSize: 12, color: '#32284A' }}>{PATTERNS[idx]}</p>
                       </div>
                     ))}
@@ -371,7 +371,7 @@ export default function HighestSelfPage() {
                 {loading && (
                   <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                     <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'rgba(201,169,110,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', border: '1px solid rgba(201,169,110,0.25)' }}>
-                      <RefreshCw className="h-5 w-5 animate-spin" style={{ color: '#C9A96E' }} />
+                      <RefreshCw className="h-5 w-5 animate-spin" style={{ color: '#5C4530' }} />
                     </div>
                     <p style={{ fontSize: 14, color: '#5E5474' }}>Seeing you clearly…</p>
                   </div>
@@ -389,7 +389,7 @@ export default function HighestSelfPage() {
                     {/* Tasks extracted */}
                     {result.tasks && result.tasks.length > 0 && (
                       <div>
-                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: 10 }}>
+                        <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 10 }}>
                           I heard these in what you shared
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -402,7 +402,7 @@ export default function HighestSelfPage() {
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E', marginBottom: 3 }}>{task.title}</p>
                                     {task.how_long && (
-                                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#C9A96E', fontWeight: 600 }}>
+                                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, color: '#5C4530', fontWeight: 600 }}>
                                         <Clock className="h-3 w-3" /> {task.how_long}
                                       </span>
                                     )}
@@ -412,7 +412,7 @@ export default function HighestSelfPage() {
                                     padding: '7px 12px', borderRadius: 12, fontSize: 11, fontWeight: 700, cursor: isAdded ? 'default' : 'pointer',
                                     border: isAdded ? '1px solid rgba(90,138,90,0.4)' : '1px solid rgba(201,169,110,0.4)',
                                     background: isAdded ? 'rgba(90,138,90,0.12)' : 'rgba(201,169,110,0.15)',
-                                    color: isAdded ? '#8AB88A' : '#C9A96E',
+                                    color: isAdded ? '#8AB88A' : '#5C4530',
                                   }}>
                                     {isAdded ? <><CheckCircle className="h-3.5 w-3.5" /> Added</> : isAdding ? <>…</> : <><Plus className="h-3.5 w-3.5" /> Add to board</>}
                                   </button>
@@ -431,7 +431,7 @@ export default function HighestSelfPage() {
                         <Link href="/tasks" style={{ textDecoration: 'none' }}>
                           <div style={{ marginTop: 10, padding: '10px 16px', borderRadius: 14, border: '1px solid rgba(201,169,110,0.2)', background: 'rgba(201,169,110,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <p style={{ fontSize: 12, color: '#8A8098' }}>View task board</p>
-                            <span style={{ fontSize: 12, color: '#C9A96E' }}>→</span>
+                            <span style={{ fontSize: 12, color: '#5C4530' }}>→</span>
                           </div>
                         </Link>
                       </div>
@@ -450,17 +450,17 @@ export default function HighestSelfPage() {
                     </div>
 
                     <div style={{ ...GLASS, padding: 18 }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, color: '#C9A96E', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bridge Step</p>
+                      <p style={{ fontSize: 10, fontWeight: 700, color: '#5C4530', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Bridge Step</p>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#100C1E', lineHeight: 1.6 }}>{result.bridge_step}</p>
                     </div>
 
                     <div style={{ ...GLASS, padding: 18 }}>
-                      <p style={{ fontSize: 10, fontWeight: 700, color: '#C9A96E', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Design + Chart Insight</p>
+                      <p style={{ fontSize: 10, fontWeight: 700, color: '#5C4530', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Design + Chart Insight</p>
                       <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.65 }}>{result.chart_connection}</p>
                     </div>
 
                     <div style={{ padding: 20, borderRadius: 20, background: 'linear-gradient(135deg, rgba(201,169,110,0.15), rgba(250,244,232,0.5))', border: '1px solid rgba(201,169,110,0.2)', textAlign: 'center' }}>
-                      <Sparkles className="h-5 w-5" style={{ color: '#C9A96E', margin: '0 auto 10px' }} />
+                      <Sparkles className="h-5 w-5" style={{ color: '#5C4530', margin: '0 auto 10px' }} />
                       <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: '#100C1E', lineHeight: 1.6, fontStyle: 'italic' }}>
                         &ldquo;{result.affirmation}&rdquo;
                       </p>
@@ -470,7 +470,7 @@ export default function HighestSelfPage() {
                       <p style={{ fontSize: 13, color: '#8A8098', textAlign: 'center', fontStyle: 'italic', padding: '0 20px' }}>{result.closing}</p>
                     )}
 
-                    <button onClick={reset} style={{ width: '100%', padding: '14px 0', borderRadius: 18, border: '1px solid rgba(201,169,110,0.25)', cursor: 'pointer', background: 'rgba(201,169,110,0.08)', color: '#C9A96E', fontSize: 14, fontWeight: 600 }}>
+                    <button onClick={reset} style={{ width: '100%', padding: '14px 0', borderRadius: 18, border: '1px solid rgba(201,169,110,0.25)', cursor: 'pointer', background: 'rgba(201,169,110,0.08)', color: '#5C4530', fontSize: 14, fontWeight: 600 }}>
                       Reflect again
                     </button>
                   </>
@@ -479,7 +479,7 @@ export default function HighestSelfPage() {
                 {!loading && !result && (
                   <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                     <p style={{ fontSize: 14, color: '#8A8098', marginBottom: 14 }}>Something went wrong. Try again.</p>
-                    <button onClick={reset} style={{ padding: '12px 24px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', color: '#C9A96E', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Start over</button>
+                    <button onClick={reset} style={{ padding: '12px 24px', borderRadius: 14, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', color: '#5C4530', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Start over</button>
                   </div>
                 )}
               </div>

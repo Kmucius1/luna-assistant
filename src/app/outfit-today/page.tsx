@@ -140,7 +140,7 @@ export default function OutfitTodayPage() {
               style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.2), rgba(184,147,74,0.2))', border: '1.5px solid rgba(201,169,110,0.4)', color: '#8A6F2A', opacity: uploading ? 0.7 : 1 }}>
               {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
               {uploading ? 'Saving your outfit…' : 'Upload outfit of the day'}
-              <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} disabled={uploading} className="hidden" />
             </label>
             {uploadMsg && <p style={{ fontSize: 12, color: '#5E5474', textAlign: 'center', margin: '10px 0 0' }}>{uploadMsg}</p>}
           </div>

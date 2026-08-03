@@ -226,7 +226,7 @@ function StylePoolBoard() {
               aria-label="Like"
               style={{
                 width: 64, height: 64, borderRadius: '50%', border: 'none', cursor: 'pointer',
-                background: 'linear-gradient(135deg, #C9A96E, #A67C46)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: 'linear-gradient(135deg, #5C4530, #A67C46)', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '0 4px 18px rgba(201,169,110,0.45)',
               }}>
               <Heart size={26} color="#100C1E" fill="#100C1E" />
@@ -373,7 +373,7 @@ function OracleSection() {
         disabled={loading || (!selectedMood && !desiredFeel)}
         className="w-full rounded-2xl py-4 font-bold text-base transition-all flex items-center justify-center gap-2"
         style={{
-          background: (!selectedMood && !desiredFeel) ? 'var(--surface)' : 'linear-gradient(135deg, #C9A96E, #A67C46)',
+          background: (!selectedMood && !desiredFeel) ? 'var(--surface)' : 'linear-gradient(135deg, #5C4530, #A67C46)',
           color: (!selectedMood && !desiredFeel) ? 'var(--text-3)' : 'var(--text-1)',
           opacity: loading ? 0.7 : 1,
         }}>
@@ -539,7 +539,7 @@ function ClosetSection() {
 
       <label
         className="w-full rounded-2xl py-3.5 flex items-center justify-center gap-2 font-semibold text-sm transition-all cursor-pointer"
-        style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.16), rgba(166,124,70,0.16))', border: '1.5px solid rgba(201,169,110,0.3)', color: 'var(--luna-purple-2, #C9A96E)', opacity: detecting ? 0.7 : 1 }}>
+        style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.16), rgba(166,124,70,0.16))', border: '1.5px solid rgba(201,169,110,0.3)', color: 'var(--luna-purple-2, #5C4530)', opacity: detecting ? 0.7 : 1 }}>
         {detecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4" />}
         {detecting ? 'Reading your outfit…' : 'Upload today\'s outfit — auto-sort into pieces'}
         <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} disabled={detecting} className="hidden" />
@@ -599,7 +599,7 @@ function ClosetSection() {
               onClick={addItem}
               disabled={saving || !newItem.name}
               className="w-full rounded-2xl py-3 font-bold text-sm transition-all"
-              style={{ background: 'linear-gradient(135deg, #C9A96E, #A67C46)', color: 'var(--text-1)', opacity: saving ? 0.7 : 1 }}>
+              style={{ background: 'linear-gradient(135deg, #5C4530, #A67C46)', color: 'var(--text-1)', opacity: saving ? 0.7 : 1 }}>
               {saving ? 'Saving...' : 'Add to Closet'}
             </button>
           </div>
@@ -628,7 +628,7 @@ function ClosetSection() {
                   {item.clean_status === 'clean' ? (
                     <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(184,201,180,0.2)', color: '#8BAB87' }}>Clean</span>
                   ) : (
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,169,110,0.2)', color: '#C9A96E' }}>Worn</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'rgba(201,169,110,0.2)', color: '#5C4530' }}>Worn</span>
                   )}
                 </div>
               </div>
@@ -693,7 +693,7 @@ function ProjectsSection() {
   const stageColor = (status: string) => {
     const idx = PROJECT_STAGES.indexOf(status)
     if (idx < 3) return '#9E95AC'
-    if (idx < 7) return '#C9A96E'
+    if (idx < 7) return '#5C4530'
     return '#B8C9B4'
   }
 
@@ -707,7 +707,7 @@ function ProjectsSection() {
           <p className="text-3xl mb-3">🧵</p>
           <p className="font-semibold text-base mb-1" style={{ color: 'var(--text-1)' }}>No projects yet</p>
           <p className="text-sm mb-5" style={{ color: 'var(--text-3)' }}>Load the 7 beginner starter projects built for your style</p>
-          <button onClick={seedProjects} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #C9A96E, #A67C46)', color: 'var(--text-1)', opacity: seeding ? 0.7 : 1 }}>
+          <button onClick={seedProjects} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #5C4530, #A67C46)', color: 'var(--text-1)', opacity: seeding ? 0.7 : 1 }}>
             {seeding ? 'Loading...' : 'Load Starter Projects'}
           </button>
         </ACard>
@@ -841,7 +841,7 @@ function StudioSection() {
         <SLabel>Notes & vision</SLabel>
         <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe the vision — fabrics, fit, details, inspiration..." rows={4} className="w-full rounded-2xl px-4 py-3 text-sm outline-none resize-none mb-4" style={{ background: 'var(--surface-subtle)', border: '1px solid var(--surface-border)', color: 'var(--text-1)' }} />
         <button onClick={createProject} disabled={saving || !projectTitle || !styleLane} className="w-full rounded-2xl py-3.5 font-bold text-sm transition-all flex items-center justify-center gap-2"
-          style={{ background: !projectTitle || !styleLane ? 'var(--surface)' : 'linear-gradient(135deg, #C9A96E, #A67C46)', color: !projectTitle || !styleLane ? 'var(--text-3)' : 'var(--text-1)', opacity: saving ? 0.7 : 1 }}>
+          style={{ background: !projectTitle || !styleLane ? 'var(--surface)' : 'linear-gradient(135deg, #5C4530, #A67C46)', color: !projectTitle || !styleLane ? 'var(--text-3)' : 'var(--text-1)', opacity: saving ? 0.7 : 1 }}>
           {saved ? <><Check className="w-4 h-4" /> Saved to Projects</> : saving ? 'Saving...' : <><Scissors className="w-4 h-4" /> Create Project</>}
         </button>
       </ACard>
@@ -892,7 +892,7 @@ function VaultSection() {
           <p className="text-3xl mb-3">💎</p>
           <p className="font-semibold text-base mb-1" style={{ color: 'var(--text-1)' }}>Vault is empty</p>
           <p className="text-sm mb-5" style={{ color: 'var(--text-3)' }}>Load your 5 pre-seeded brand concepts</p>
-          <button onClick={seedVault} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #C9A96E, #A67C46)', color: 'var(--text-1)', opacity: seeding ? 0.7 : 1 }}>
+          <button onClick={seedVault} disabled={seeding} className="rounded-2xl px-6 py-3 font-bold text-sm transition-all" style={{ background: 'linear-gradient(135deg, #5C4530, #A67C46)', color: 'var(--text-1)', opacity: seeding ? 0.7 : 1 }}>
             {seeding ? 'Loading...' : 'Open the Vault'}
           </button>
         </ACard>
@@ -1074,8 +1074,8 @@ const LIGHT_PALETTE_VARS = {
   '--text-2': '#32284A',
   '--text-3': '#5E5474',
   '--text-4': '#8A8098',
-  '--violet': '#C9A96E',
-  '--luna-purple-2': '#C9A96E',
+  '--violet': '#5C4530',
+  '--luna-purple-2': '#5C4530',
   '--surface': 'rgba(255,255,255,0.6)',
   '--surface-border': 'rgba(180,150,100,0.2)',
   '--surface-subtle': 'rgba(255,255,255,0.45)',
@@ -1116,7 +1116,7 @@ function CreativePageInner() {
             </div>
           </div>
 
-          <CategoryPager pages={creativePages} accentColor="#C9A96E" activeIndex={activeIndex} onChangeIndex={setActiveIndex} />
+          <CategoryPager pages={creativePages} accentColor="#5C4530" activeIndex={activeIndex} onChangeIndex={setActiveIndex} />
         </div>
       </AppLayout>
     </div>

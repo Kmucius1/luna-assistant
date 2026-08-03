@@ -40,7 +40,22 @@ function getGroq() {
   return _groq
 }
 
-const DETECT_PROMPT = `This is a full-body outfit photo. Identify each distinct garment/accessory piece clearly visible (top, bottom, dress, jacket/outerwear, shoes, bag, accessories). For each, estimate a bounding box as percentages of the full image (x, y = top-left corner, width, height — all 0-100). Only include pieces you can see clearly. Return ONLY valid JSON, an array like: [{"category":"top","x":10,"y":15,"width":40,"height":30}]. No markdown, no prose, no explanation.`
+function detectPrompt(width: number, height: number): string {
+  return `This is a ${width}x${height} pixel outfit photo of a person. Identify each distinct garment/accessory piece they are wearing or carrying (top, bottom, dress, jacket/outerwear, shoes, bag, accessories).
+
+For each piece, be precise and specific about what it actually is — e.g. write "sneakers" not "shoes" if they are clearly sneakers, "ankle boots" not "shoes" if they are boots, "heels" only if they are actually heels. Never guess a subtype you can't see.
+
+For each piece, give a tight bounding box in PIXEL coordinates (not percentages) for that ${width}x${height} image — x, y = top-left corner, width, height, all in pixels.
+
+Critical rules for the bounding box:
+- The box must contain ONLY that garment's visible fabric/material — no skin, no face, no hair, no background.
+- A "top" box must start at or below the collarbone/shoulder line and must NOT include the person's head, neck, or face.
+- A "bottom" or pants/skirt box must start at the waist and NOT include the top garment above it.
+- A "shoes" box must be tightly cropped to just the footwear, not the legs above the ankle.
+- Before finalizing, double-check each box's top edge — if it would include the person's head or face, move it down.
+
+Only include pieces clearly visible. Return ONLY valid JSON, an array like: [{"category":"sneakers","x":120,"y":900,"width":200,"height":180}]. No markdown, no prose, no explanation.`
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -82,7 +97,7 @@ export async function POST(req: NextRequest) {
         messages: [{
           role: 'user',
           content: [
-            { type: 'text', text: DETECT_PROMPT },
+            { type: 'text', text: detectPrompt(fullWidth, fullHeight) },
             { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${normalized.toString('base64')}` } },
           ],
         }],
@@ -108,10 +123,10 @@ export async function POST(req: NextRequest) {
 
     for (const region of regions.slice(0, 6)) {
       try {
-        const left = Math.max(0, Math.round((region.x / 100) * fullWidth))
-        const top = Math.max(0, Math.round((region.y / 100) * fullHeight))
-        const width = Math.min(fullWidth - left, Math.round((region.width / 100) * fullWidth))
-        const height = Math.min(fullHeight - top, Math.round((region.height / 100) * fullHeight))
+        const left = Math.max(0, Math.min(fullWidth - 1, Math.round(region.x)))
+        const top = Math.max(0, Math.min(fullHeight - 1, Math.round(region.y)))
+        const width = Math.min(fullWidth - left, Math.round(region.width))
+        const height = Math.min(fullHeight - top, Math.round(region.height))
         if (width < 20 || height < 20) continue
 
         const cropBuffer = await sharp(normalized)

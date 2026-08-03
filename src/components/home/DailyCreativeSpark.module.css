@@ -1,11 +1,26 @@
 .sparkCard {
+  /* Self-contained tokens — reused across pages that don't all define
+     --ink-1/--ink-3/--gold-text themselves (e.g. /create), and must stay
+     readable against AppLayout's dark nebula backdrop in dark mode. */
+  --ink-1: #100C1E;
+  --ink-3: #5E5474;
+  --gold-text: #5C4530;
+
   display: flex;
   gap: 12px;
   background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(180, 150, 100, 0.14);
-  border-radius: 18px;
+  border: 1px solid rgba(180, 150, 100, 0.16);
+  border-radius: 16px;
   box-shadow: 0 6px 24px rgba(60, 46, 24, 0.09);
   padding: 10px;
+}
+
+:global([data-theme='dark']) .sparkCard {
+  --ink-1: #F5EFE3;
+  --ink-3: rgba(245, 239, 227, 0.68);
+  --gold-text: #C4A47C;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
 }
 
 .sparkPhoto { position: relative; width: 84px; border-radius: 12px; overflow: hidden; flex-shrink: 0; }
@@ -19,15 +34,62 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8A6A3A;
+  color: var(--gold-text);
   margin-bottom: 4px;
 }
-.sparkHeader svg { color: #C9A96E; width: 11px; height: 11px; }
+.sparkHeader svg { color: var(--gold-text); width: 11px; height: 11px; }
 
 .sparkBody { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.sparkText { font-family: var(--font-display-var, serif); font-size: 13.5px; font-weight: 700; color: #100C1E; margin: 0 0 3px; line-height: 1.25; }
-.sparkTip { font-size: 10.5px; color: #5E5474; margin: 0 0 8px; }
+.sparkText { font-family: var(--font-display-var, serif); font-size: 13.5px; font-weight: 700; color: var(--ink-1); margin: 0 0 3px; line-height: 1.25; }
+.sparkTip { font-size: 10.5px; color: var(--ink-3); margin: 0 0 8px; }
 .sparkActions { display: flex; gap: 12px; margin-top: auto; }
-.sparkActions button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; font-weight: 600; color: #5E5474; background: none; border: none; min-height: 32px; }
-.sparkActions svg { width: 16px; height: 16px; color: #C9A96E; }
-.sparkActionDone { color: #C9A96E !important; }
+.sparkActions button { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; font-weight: 600; color: var(--ink-3); background: none; border: none; min-height: 32px; }
+.sparkActions svg { width: 16px; height: 16px; color: var(--gold-text); }
+.sparkActionDone { color: var(--gold-text) !important; }
+
+/* ── Compact (Home) ───────────────────────────────────── */
+
+.sparkCompact {
+  --ink-1: #100C1E;
+  --gold-text: #5C4530;
+
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.16);
+  border-radius: 999px;
+  box-shadow: 0 6px 24px rgba(60, 46, 24, 0.09);
+  padding: 8px 8px 8px 14px;
+}
+
+:global([data-theme='dark']) .sparkCompact {
+  --ink-1: #F5EFE3;
+  --gold-text: #C4A47C;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.18);
+}
+
+.sparkCompactIcon { flex-shrink: 0; color: var(--gold-text); }
+
+.sparkCompactText {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sparkCompactActions { flex-shrink: 0; display: flex; gap: 2px; }
+.sparkCompactActions button {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: none; border: none;
+  color: var(--gold-text);
+}

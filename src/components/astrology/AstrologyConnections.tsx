@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, ChevronLeft } from 'lucide-react'
 
 import { getSavedPeople, addSavedPerson, type SavedPerson } from '@/lib/luna/savedPeople'
+import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyConnections.module.css'
 
 const RELATIONSHIPS: SavedPerson['relationship'][] = ['Romantic', 'Friendship', 'Family', 'Business partner', 'Creative collaborator', 'Parent and child']
@@ -112,6 +113,8 @@ export function AstrologyConnections() {
 
   return (
     <>
+      <AstrologyHero image="/images/astrology/connections.jpg" label="Connections" title="Compatibility & Synastry" subtitle="See how your chart moves with the people in your life." />
+
       {people.length === 0 ? (
         <div className={styles.emptyState}>
           <p>The people you explore will appear here.</p>

@@ -1,5 +1,5 @@
 interface ExerciseSubstitution {
-  /** Must exactly match one of LunaFitnessPage's EQUIPMENT strings. */
+  /** Must exactly match one of FitnessSetupView's EQUIPMENT strings. */
   requiresEquipment: string
   substitute: string
 }

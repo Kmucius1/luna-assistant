@@ -71,7 +71,7 @@ function AccordionSection({ title, body }: { title: string; body: string }) {
           textAlign: 'left', gap: 10,
         }}
       >
-        <span style={{ fontSize: 13, fontWeight: 700, color: '#C9A96E', lineHeight: 1.3 }}>{title}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#5C4530', lineHeight: 1.3 }}>{title}</span>
         {open
           ? <ChevronUp style={{ width: 14, height: 14, color: '#5E5474', flexShrink: 0 }} />
           : <ChevronDown style={{ width: 14, height: 14, color: '#5E5474', flexShrink: 0 }} />
@@ -114,7 +114,7 @@ export default function TermsPage() {
         position: 'sticky', top: 0, zIndex: 10,
       }}>
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 7 }}>
-          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #C9A96E, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 24, height: 24, borderRadius: 7, background: 'linear-gradient(135deg, #5C4530, #B08D52)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ color: 'white', fontSize: 12 }}>☽</span>
           </div>
           <span style={{ fontWeight: 800, fontSize: 14, letterSpacing: '0.16em', color: '#100C1E' }}>LUNA</span>
@@ -170,7 +170,7 @@ export default function TermsPage() {
             width: '100%', padding: '14px', borderRadius: 16, border: 'none',
             background: accepted
               ? 'rgba(90,180,90,0.25)'
-              : 'linear-gradient(135deg, #C9A96E, #B08D52)',
+              : 'linear-gradient(135deg, #5C4530, #B08D52)',
             color: accepted ? '#2F6B2F' : 'white', fontSize: 15, fontWeight: 700, cursor: accepted ? 'default' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             boxShadow: accepted ? 'none' : '0 4px 24px rgba(201,169,110,0.40)',

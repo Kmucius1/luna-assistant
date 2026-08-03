@@ -29,7 +29,7 @@ interface DashboardData {
   savings_total: number
 }
 
-const SEVERITY_COLOR: Record<string, string> = { high: '#C96B5A', medium: '#C9A96E', low: '#8A8098' }
+const SEVERITY_COLOR: Record<string, string> = { high: '#C96B5A', medium: '#5C4530', low: '#8A8098' }
 
 function daysUntil(dateStr: string): number {
   const today = new Date(); today.setHours(0, 0, 0, 0)
@@ -109,7 +109,7 @@ export default function MoneyDashboard() {
                 <div className={styles.ring}>
                   <svg viewBox="0 0 72 72" style={{ transform: 'rotate(-90deg)' }}>
                     <circle cx={36} cy={36} r={32} fill="none" stroke="rgba(180,150,100,0.16)" strokeWidth={6} />
-                    <circle cx={36} cy={36} r={32} fill="none" stroke="#C9A96E" strokeWidth={6} strokeLinecap="round"
+                    <circle cx={36} cy={36} r={32} fill="none" stroke="#5C4530" strokeWidth={6} strokeLinecap="round"
                       strokeDasharray={ringCircumference} strokeDashoffset={ringCircumference * (1 - percentAvailable / 100)} />
                   </svg>
                   <div className={styles.ringLabel}><strong>{percentAvailable}%</strong><span>of available funds</span></div>
@@ -118,8 +118,8 @@ export default function MoneyDashboard() {
 
               <div className={styles.breakdown}>
                 <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#5A8A6A' }} /><span>Available Cash</span><strong>{formatCurrency(sts.postedBalances)}</strong></div>
-                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C9A96E' }} /><span>Bills Reserved</span><strong>-{formatCurrency(sts.billsDue)}</strong></div>
-                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C9A96E' }} /><span>Subscriptions Reserved</span><strong>-{formatCurrency(sts.subscriptionsDue)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#5C4530' }} /><span>Bills Reserved</span><strong>-{formatCurrency(sts.billsDue)}</strong></div>
+                <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#5C4530' }} /><span>Subscriptions Reserved</span><strong>-{formatCurrency(sts.subscriptionsDue)}</strong></div>
                 <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#D9A85C' }} /><span>Gas &amp; Groceries Reserved</span><strong>-{formatCurrency(sts.groceryReserve + sts.gasReserve)}</strong></div>
                 <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#C96B5A' }} /><span>Debt Minimums Reserved</span><strong>-{formatCurrency(sts.minimumDebtPayments)}</strong></div>
                 <div className={styles.breakdownRow}><span className={styles.dot} style={{ background: '#8A8098' }} /><span>Required Savings</span><strong>-{formatCurrency(sts.plannedSavings)}</strong></div>

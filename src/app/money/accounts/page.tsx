@@ -11,7 +11,7 @@ const CARD: React.CSSProperties = {
   boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
   padding: 18, marginBottom: 12,
 }
-const GOLDEN = '#C9A96E'
+const GOLDEN = '#5C4530'
 
 const ACCOUNT_TYPES = ['checking', 'savings', 'credit_card', 'cash', 'business_checking', 'business_credit_card', 'loan']
 const TYPE_ICONS: Record<string, string> = {
@@ -159,7 +159,7 @@ export default function AccountsPage() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={addAccount} disabled={saving || !form.nickname.trim()}
-                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #C9A96E, #B8903A)', color: '#100C1E', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8903A)', color: '#100C1E', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                   {saving ? 'Saving…' : 'Save account'}
                 </button>
                 <button onClick={() => setShowAdd(false)} style={{ padding: '11px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.5)', color: '#32284A', border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', fontSize: 13 }}>Cancel</button>

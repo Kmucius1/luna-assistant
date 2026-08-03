@@ -48,7 +48,7 @@ const MOODS = [
 ]
 
 const TYPE_LABELS: Record<string, { label: string; emoji: string; color: string }> = {
-  journal:   { label: 'Journal',   emoji: '📓', color: '#C9A96E' },
+  journal:   { label: 'Journal',   emoji: '📓', color: '#5C4530' },
   dream:     { label: 'Dream',     emoji: '🌙', color: '#6A9FB8' },
   gratitude: { label: 'Gratitude', emoji: '🌸', color: '#B88A8A' },
   shadow:    { label: 'Shadow',    emoji: '🪞', color: '#6B6080' },
@@ -146,7 +146,7 @@ export default function JournalPage() {
                   style={{
                     background: selectedMood === m.label ? 'rgba(201,169,110,0.2)' : 'var(--surface)',
                     border: `1.5px solid ${selectedMood === m.label ? 'var(--violet)' : 'rgba(180,150,100,0.18)'}`,
-                    color: selectedMood === m.label ? '#C9A96E' : 'var(--text-2)',
+                    color: selectedMood === m.label ? '#5C4530' : 'var(--text-2)',
                   }}>
                   {m.emoji} {m.label}
                 </button>

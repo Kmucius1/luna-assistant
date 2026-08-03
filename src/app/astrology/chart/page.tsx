@@ -3,7 +3,7 @@ import { AstrologyChart } from '@/components/astrology/AstrologyChart'
 
 export default function AstrologyChartPage() {
   return (
-    <AstrologyShell>
+    <AstrologyShell backHref="/home">
       <AstrologyChart />
     </AstrologyShell>
   )

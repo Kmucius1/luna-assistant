@@ -7,7 +7,7 @@ create table if not exists public.style_pool_images (
   user_id     uuid references auth.users(id) on delete cascade not null,
   image_url   text not null,
   label       text,
-  added_by    text not null default 'seed' check (added_by in ('seed','zoe','ai_generated')),
+  added_by    text not null default 'seed' check (added_by in ('seed','zoe','ai_generated','pinterest')),
   created_at  timestamptz default now()
 );
 

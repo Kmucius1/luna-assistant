@@ -18,6 +18,7 @@ import {
   Sparkles,
   Sun,
   UtensilsCrossed,
+  Waves,
 } from 'lucide-react'
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
@@ -49,7 +50,7 @@ const ROOMS: Room[] = [
   { slug: 'money', label: 'Money', tagline: ['Manage money.', 'Build wealth.'], image: '/images/rooms/money.jpg', href: '/money', icon: DollarSign, accent: 'rgba(190,175,140,0.35)' },
   { slug: 'brain', label: 'Brain Dump', tagline: ['Capture thoughts.', 'Clear your mind.'], image: '/images/rooms/brain.jpg', href: '/brain-dump', icon: Brain, accent: 'rgba(180,170,190,0.32)' },
   { slug: 'travel', label: 'Travel', tagline: ['Explore more.', 'Live fully.'], image: '/images/rooms/travel.jpg', href: '/travel', icon: Plane, accent: 'rgba(150,185,195,0.32)' },
-  { slug: 'spiritual', label: 'Spiritual', tagline: ['Tarot, crystals,', 'rituals & more.'], image: '/images/rooms/wellness.jpg', href: '/spirit', icon: Sparkles, accent: 'rgba(200,180,220,0.32)' },
+  { slug: 'spiritual', label: 'Spiritual', tagline: ['Tarot, crystals,', 'rituals & more.'], image: '/images/rooms/spiritual.jpg', href: '/spirit', icon: Sparkles, accent: 'rgba(200,180,220,0.32)' },
 ]
 
 // Mobile: 2 rooms per page (bigger cards, easier to read on a small screen).
@@ -113,11 +114,18 @@ export function LunaHomeGridPage() {
         <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
 
         <Link href="/plan-my-day" className={styles.hero}>
-          <Image src="/images/rooms/hero-gym-focus.jpg" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />
+          <Image
+            src={focus.image}
+            alt={focus.title}
+            fill
+            sizes="(max-width: 640px) 100vw, 640px"
+            style={focus.imagePosition ? { objectPosition: focus.imagePosition } : undefined}
+            priority
+          />
           <div className={styles.heroOverlay} />
           <div className={styles.heroContent}>
             <div className={styles.heroLabel}>Today&apos;s Focus</div>
-            <h2>{focus.title} {focus.emoji}</h2>
+            <h2>{focus.title} {focus.title === 'Recovery Sunday' ? <Waves size={13} strokeWidth={2} style={{ display: 'inline', verticalAlign: -2, color: '#5C4530' }} /> : focus.emoji}</h2>
             <p>{focus.subtitle}</p>
             <span className={styles.heroButton}>View Plan <ArrowRight size={11} /></span>
           </div>
@@ -161,7 +169,7 @@ export function LunaHomeGridPage() {
           </div>
         </div>
 
-        <div className={styles.sparkSection}><DailyCreativeSpark /></div>
+        <div className={styles.sparkSection}><DailyCreativeSpark compact /></div>
       </div>
     </AppLayout>
   )

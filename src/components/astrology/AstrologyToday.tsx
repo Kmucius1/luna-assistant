@@ -4,10 +4,21 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   Heart, Briefcase, Palette, MessageCircle, Sparkles as SparklesIcon, Star,
-  Check, Moon, Sun, Sparkles, Calendar,
+  Check, Moon, Sun, Sparkles, Calendar, PieChart, Clock, Grid3x3,
 } from 'lucide-react'
 
+import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
+import { TilePager } from '@/components/ui/TilePager'
+import { RoomTileCard } from '@/components/ui/RoomTileCard'
 import styles from './AstrologyToday.module.css'
+
+const ASTROLOGY_TILES = [
+  { id: 'chart', href: '/astrology/chart', label: 'My Chart', tagline: 'Your full natal placements.', icon: PieChart, accent: 'rgba(201,169,110,0.32)', image: '/images/astrology/chart.jpg' },
+  { id: 'timing', href: '/astrology/timing', label: 'Timing', tagline: 'What the sky favors right now.', icon: Clock, accent: 'rgba(150,160,200,0.32)', image: '/images/astrology/timing.jpg' },
+  { id: 'connections', href: '/astrology/connections', label: 'Connections', tagline: 'Compatibility and synastry.', icon: Heart, accent: 'rgba(210,150,150,0.32)', image: '/images/astrology/connections.jpg' },
+  { id: 'spirit', href: '/spirit', label: 'Spirit', tagline: 'Tarot, crystals, and rituals.', icon: Sparkles, accent: 'rgba(200,180,220,0.32)', image: '/images/astrology/spirit.jpg' },
+  { id: 'more', href: '/astrology/more', label: 'More', tagline: 'Every astrology tool in one place.', icon: Grid3x3, accent: 'rgba(150,175,160,0.32)', image: '/images/astrology/more.jpg' },
+]
 
 interface MoonData {
   phase: { name: string; emoji: string; illumination: number; description: string; next_exact: { name: string; time: string } | null }
@@ -62,10 +73,9 @@ export function AstrologyToday() {
   const [transits, setTransits] = useState<TransitData | null>(null)
   const [guidance, setGuidance] = useState<DailyGuidance | null>(null)
   const [eclipses, setEclipses] = useState<EclipseEvent[]>([])
-  const [greetingHour, setGreetingHour] = useState<number | null>(null)
+  const { now, weather, weatherError } = useTodayContext()
 
   useEffect(() => {
-    setGreetingHour(new Date().getHours())
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
 
     fetch(`/api/astrology/moon?tz=${encodeURIComponent(tz)}`).then(r => r.json()).then(setMoon).catch(() => {})
@@ -78,15 +88,15 @@ export function AstrologyToday() {
       .then(r => r.json()).then(setGuidance).catch(() => {})
   }, [])
 
-  const greeting = greetingHour == null ? 'Hello' : greetingHour < 12 ? 'Good Morning' : greetingHour < 17 ? 'Good Afternoon' : 'Good Evening'
   const topTransit = transits?.aspects?.[0]
   const categories = topTransit ? (NATAL_CATEGORIES[topTransit.natal] ?? []) : []
 
   return (
     <>
-      <div className={styles.greeting}>
-        <h1>{greeting}, Zoe</h1>
-        <p>The stars are aligning in your favor.</p>
+      <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
+
+      <div className={styles.tileSection}>
+        <TilePager items={ASTROLOGY_TILES} keyFor={t => t.id} renderItem={t => <RoomTileCard {...t} />} />
       </div>
 
       <Link href="/astrology/moon" className={styles.cardLink}>

@@ -64,13 +64,13 @@ type TabKey = 'priority' | 'urgent' | 'dryp_client' | 'personal' | 'meetings' | 
   | 'tracking' | 'bills_medical' | 'admin_tools' | 'needs_review' | 'promo' | 'all'
 
 const TABS: { key: TabKey; label: string; emoji: string; color: string }[] = [
-  { key: 'priority',      label: 'Priority',       emoji: '⭐', color: '#C9A96E' },
+  { key: 'priority',      label: 'Priority',       emoji: '⭐', color: '#5C4530' },
   { key: 'urgent',        label: 'Urgent',          emoji: '🔴', color: '#E05E5E' },
   { key: 'dryp_client',   label: 'DRYP Clients',    emoji: '💼', color: '#A890D0' },
   { key: 'personal',      label: 'Zoe Personal',    emoji: '🌸', color: '#D4A8C4' },
   { key: 'meetings',      label: 'Meetings',        emoji: '📅', color: '#8AAEC8' },
-  { key: 'recap',         label: 'Recap',           emoji: '📋', color: '#C9A96E' },
-  { key: 'tracking',      label: 'Tracking',        emoji: '📦', color: '#C9A96E' },
+  { key: 'recap',         label: 'Recap',           emoji: '📋', color: '#5C4530' },
+  { key: 'tracking',      label: 'Tracking',        emoji: '📦', color: '#5C4530' },
   { key: 'bills_medical', label: 'Bills / Medical', emoji: '🏥', color: '#E08B4A' },
   { key: 'admin_tools',   label: 'Admin / Tools',   emoji: '⚙️', color: '#5E5474' },
   { key: 'needs_review',  label: 'Needs Review',    emoji: '❓', color: '#E6B84A' },
@@ -79,7 +79,7 @@ const TABS: { key: TabKey; label: string; emoji: string; color: string }[] = [
 ]
 
 function tabColorFor(email: GmailEmail): { color: string; label: string } {
-  if (email.isPriority) return { color: '#C9A96E', label: 'Priority' }
+  if (email.isPriority) return { color: '#5C4530', label: 'Priority' }
   const meta = TABS.find(t => t.key === email.category)
   return meta ? { color: meta.color, label: meta.label } : { color: '#5E5474', label: 'Mail' }
 }
@@ -109,7 +109,7 @@ function PriorityBadge({ name }: { name: string }) {
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: 4,
       padding: '2px 8px', borderRadius: 6, fontSize: 10, fontWeight: 700,
-      background: 'rgba(201,169,110,0.18)', color: '#C9A96E',
+      background: 'rgba(201,169,110,0.18)', color: '#5C4530',
       border: '1px solid rgba(201,169,110,0.35)',
     }}>
       ⭐ {name}
@@ -151,7 +151,7 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
             {email.from}
           </span>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
-            {email.isStarred && <Star className="h-3 w-3" style={{ color: '#C9A96E', fill: '#C9A96E' }} />}
+            {email.isStarred && <Star className="h-3 w-3" style={{ color: '#5C4530', fill: '#5C4530' }} />}
             {email.hasAttachment && <Paperclip className="h-3 w-3" style={{ color: '#8A8098' }} />}
             <span style={{ fontSize: 10, color: '#8A8098' }}>{timeAgo(email.timestamp)}</span>
           </div>
@@ -172,7 +172,7 @@ function EmailRow({ email, onClick }: { email: GmailEmail; onClick: () => void }
           </span>
         </div>
         {email.action && (
-          <p style={{ fontSize: 10, color: '#C9A96E', marginTop: 3, fontWeight: 600 }}>⚡ {email.action}</p>
+          <p style={{ fontSize: 10, color: '#5C4530', marginTop: 3, fontWeight: 600 }}>⚡ {email.action}</p>
         )}
       </div>
     </button>
@@ -291,8 +291,8 @@ function PriorityContactsManager({ contacts, onUpdate }: { contacts: PriorityCon
   return (
     <div style={{ ...G, padding: 16, border: '1px solid rgba(201,169,110,0.25)', marginBottom: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-        <UserCheck className="h-4 w-4" style={{ color: '#C9A96E' }} />
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#C9A96E', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Priority Contacts</p>
+        <UserCheck className="h-4 w-4" style={{ color: '#5C4530' }} />
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#5C4530', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Priority Contacts</p>
         <span style={{ fontSize: 10, color: '#8A8098', marginLeft: 'auto' }}>Always surfaced first</span>
       </div>
 
@@ -344,7 +344,7 @@ function ConnectGmail({ accounts, error }: { accounts: ConnectedAccount[]; error
           ))}
         </div>
       )}
-      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 32px rgba(201,169,110,0.3)' }}>
+      <div style={{ width: 64, height: 64, borderRadius: 18, background: 'linear-gradient(135deg, #5C4530, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 8px 32px rgba(201,169,110,0.3)' }}>
         <Mail className="h-7 w-7 text-white" />
       </div>
       <h2 style={{ fontSize: 20, fontWeight: 700, color: '#100C1E', marginBottom: 6, fontFamily: 'var(--font-display)' }}>
@@ -360,7 +360,7 @@ function ConnectGmail({ accounts, error }: { accounts: ConnectedAccount[]; error
           </p>
         </div>
       )}
-      <a href="/api/gmail/auth" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 28px', borderRadius: 16, background: 'linear-gradient(135deg, #C9A96E 0%, #B8934A 100%)', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 24px rgba(201,169,110,0.35)' }}>
+      <a href="/api/gmail/auth" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '14px 28px', borderRadius: 16, background: 'linear-gradient(135deg, #5C4530 0%, #B8934A 100%)', color: 'white', textDecoration: 'none', fontSize: 14, fontWeight: 700, boxShadow: '0 6px 24px rgba(201,169,110,0.35)' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Sign in with Google
       </a>
@@ -443,23 +443,23 @@ function EmailInner() {
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, #C9A96E, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: 'linear-gradient(135deg, #5C4530, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                 <Inbox className="h-5 w-5 text-white" />
                 {priorityCount > 0 && (
-                  <div style={{ position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: '#C9A96E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#000', boxShadow: '0 0 8px rgba(201,169,110,0.6)' }}>
+                  <div style={{ position: 'absolute', top: -4, right: -4, width: 16, height: 16, borderRadius: '50%', background: '#5C4530', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#000', boxShadow: '0 0 8px rgba(201,169,110,0.6)' }}>
                     {priorityCount}
                   </div>
                 )}
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C9A96E' }}>Mail</p>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5C4530' }}>Mail</p>
                 <p style={{ fontSize: 10, color: '#5E5474' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
               <button onClick={() => setShowContacts(v => !v)} title="Priority contacts"
                 style={{ width: 33, height: 33, borderRadius: 10, background: showContacts ? 'rgba(201,169,110,0.25)' : 'rgba(255,255,255,0.5)', border: `1px solid ${showContacts ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                <UserCheck className="h-3.5 w-3.5" style={{ color: showContacts ? '#C9A96E' : '#5E5474' }} />
+                <UserCheck className="h-3.5 w-3.5" style={{ color: showContacts ? '#5C4530' : '#5E5474' }} />
               </button>
               <a href="/api/gmail/auth" style={{ width: 33, height: 33, borderRadius: 10, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }} title="Add account">
                 <Plus className="h-3.5 w-3.5" style={{ color: '#5E5474' }} />
@@ -495,7 +495,7 @@ function EmailInner() {
           {sync && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 14 }}>
               {[
-                { label: 'Priority',    count: priorityCount,                          color: '#C9A96E', glow: true  },
+                { label: 'Priority',    count: priorityCount,                          color: '#5C4530', glow: true  },
                 { label: 'Urgent',      count: allEmails.filter(e => e.isUrgent).length, color: '#E05E5E', glow: false },
                 { label: 'Unread',      count: sync.unread_count,                       color: '#8A6F2A', glow: false },
                 { label: 'Tasks found', count: sync.extracted_tasks.length,             color: '#8AAEC8', glow: false },

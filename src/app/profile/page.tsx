@@ -320,7 +320,7 @@ export default function ProfilePage() {
           <TagEditor items={profile.boundaries} onChange={v => set('boundaries', v)}
             placeholder="Add a boundary..." color="#4A7FB8" bg="rgba(74,127,184,0.1)" />
 
-          <SectionHeader title="Relationship Patterns" icon="🔄" color="#C9A96E" />
+          <SectionHeader title="Relationship Patterns" icon="🔄" color="#5C4530" />
           <p className="text-xs mb-2" style={{ color: 'var(--mist)' }}>Patterns you repeat. LUNA will gently flag them when she sees them.</p>
           <TagEditor items={profile.relationship_patterns} onChange={v => set('relationship_patterns', v)}
             placeholder="Add a pattern..." color="var(--golden)" bg="rgba(201,169,110,0.1)" />
