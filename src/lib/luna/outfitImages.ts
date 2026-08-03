@@ -8,6 +8,11 @@ export const OUTFIT_IMAGES = [
   '/images/outfits/streetwear-02.jpg',
   '/images/outfits/streetwear-03.jpg',
   '/images/outfits/streetwear-04.jpg',
+  '/images/outfits/streetwear-05.jpg',
+  '/images/outfits/streetwear-06.jpg',
+  '/images/outfits/streetwear-07.jpg',
+  '/images/outfits/streetwear-08.jpg',
+  '/images/outfits/streetwear-09.jpg',
 ]
 
 function seededShuffle<T>(items: T[], seed: string): T[] {
