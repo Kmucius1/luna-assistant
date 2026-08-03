@@ -289,3 +289,37 @@ export async function postTeamUpdate(message: string, accountId?: string): Promi
     })
   if (error) throw error
 }
+
+// ─── Real client/contact roster ─────────────────────────────────────────────
+// Grounds email categorization (and anything else that needs to know "is
+// this actually a DRYP client") in the real DRYP Hub data instead of an AI
+// guess from subject-line vibes — an account's own listed email plus every
+// individual contact linked to it (e.g. EHM Strategies' account email is
+// Shannon's; Nurturly's is Ben's).
+export interface ClientRosterEntry { email: string; contactName: string; accountName: string }
+
+const ROSTER_CACHE_TTL_MS = 5 * 60_000
+let rosterCache: { data: ClientRosterEntry[]; expiresAt: number } | null = null
+
+export async function getClientRoster(): Promise<ClientRosterEntry[]> {
+  if (rosterCache && rosterCache.expiresAt > Date.now()) return rosterCache.data
+
+  const [{ data: accounts }, { data: contacts }] = await Promise.all([
+    db().from('accounts').select('business_name, email').eq('is_active', true),
+    db().from('contacts').select('full_name, email, account:accounts(business_name)'),
+  ])
+
+  const entries: ClientRosterEntry[] = []
+  for (const a of (accounts ?? []) as { business_name: string; email: string | null }[]) {
+    if (a.email) entries.push({ email: a.email.toLowerCase(), contactName: a.business_name, accountName: a.business_name })
+  }
+  for (const c of (contacts ?? []) as unknown as { full_name: string; email: string | null; account: { business_name: string } | null }[]) {
+    if (c.email) entries.push({ email: c.email.toLowerCase(), contactName: c.full_name, accountName: c.account?.business_name ?? c.full_name })
+  }
+
+  const seen = new Set<string>()
+  const deduped = entries.filter(e => { if (seen.has(e.email)) return false; seen.add(e.email); return true })
+
+  rosterCache = { data: deduped, expiresAt: Date.now() + ROSTER_CACHE_TTL_MS }
+  return deduped
+}

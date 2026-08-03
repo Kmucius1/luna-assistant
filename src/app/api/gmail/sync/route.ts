@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getAllValidGmailTokens, listGmailMessages, type GmailMessage } from '@/lib/gmail'
 import { callAI } from '@/lib/ai'
+import { isConnected as drypConnected, getClientRoster, type ClientRosterEntry } from '@/lib/dryp-crm'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -30,6 +31,24 @@ function matchesPriority(email: GmailMessage, contacts: { name: string; email: s
     if (parts.length >= 2 && parts.every(p => fromLower.includes(p))) return c.name
   }
   return null
+}
+
+// Shared inbox providers — matching on these as a whole domain would wrongly
+// flag every other gmail/outlook user as the same client.
+const GENERIC_EMAIL_DOMAINS = new Set(['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com', 'icloud.com', 'aol.com', 'live.com', 'me.com'])
+
+// Deterministic match against DRYP Hub's real client/contact emails — this
+// is what actually fixes emails from Shannon, Ben, Juan, etc. landing in
+// the right category, instead of leaving it to an AI guess that has no idea
+// who Zoe's real clients are.
+function matchesClientRoster(email: GmailMessage, roster: ClientRosterEntry[]): ClientRosterEntry | null {
+  const emailLower = email.fromEmail.toLowerCase()
+  return roster.find(r => {
+    if (emailLower === r.email) return true
+    const domain = r.email.split('@')[1]
+    if (domain && !GENERIC_EMAIL_DOMAINS.has(domain) && emailLower.endsWith(`@${domain}`)) return true
+    return false
+  }) ?? null
 }
 
 // ─── Classification cache — avoids re-spending AI tokens on emails we've
@@ -90,11 +109,15 @@ interface CategorizedEmail {
   tasks?: string[]
 }
 
-async function categorizeEmails(emails: (GmailMessage & { account: string })[]) {
+async function categorizeEmails(emails: (GmailMessage & { account: string })[], clientRoster: ClientRosterEntry[]) {
   if (!emails.length) return []
   const summaries = emails.slice(0, 40).map((e, i) =>
     `[${i}] Account: ${e.account}\nFrom: ${e.from} <${e.fromEmail}>\nSubject: ${e.subject}\nSnippet: ${e.snippet}`
   ).join('\n---\n')
+
+  const rosterLines = clientRoster.length
+    ? `\n\nKnown real DRYP clients (from the actual DRYP Hub CRM — anyone emailing from one of these addresses or their company domain is DEFINITELY dryp_client, not a guess):\n${clientRoster.map(r => `- ${r.contactName} <${r.email}> (${r.accountName})`).join('\n')}`
+    : ''
 
   try {
     const SYSTEM = "You are LUNA, Zoe Taylor's personal AI assistant and command center. Zoe is Founder/CMO of DRYP Digital, but LUNA serves her whole life, not just her business role -- personal mail matters just as much as client work. Categorize emails accurately, don't default everything to business just because it's plausible. Return ONLY valid JSON arrays, no markdown."
@@ -103,7 +126,7 @@ async function categorizeEmails(emails: (GmailMessage & { account: string })[]) 
 - zoe@drypdigital.com: her DRYP Digital business inbox (as Founder/CMO -- clients, proposals, meetings, CRM)
 - info@drypdigital.com: the DRYP Digital team inbox (shared team communication)
 
-The account an email arrived in is a HINT, not a rule -- a personal bill or medical appointment can land in any inbox and must still be recognized as personal/bills_medical, not forced into business just because of which account received it.
+The account an email arrived in is a HINT, not a rule -- a personal bill or medical appointment can land in any inbox and must still be recognized as personal/bills_medical, not forced into business just because of which account received it.${rosterLines}
 
 For each email below, determine:
 
@@ -157,7 +180,10 @@ export async function GET() {
   const allTokens = await getAllValidGmailTokens()
   if (!allTokens.length) return NextResponse.json({ error: 'not_connected' }, { status: 401 })
 
-  const priorityContacts = await getPriorityContacts()
+  const [priorityContacts, clientRoster] = await Promise.all([
+    getPriorityContacts(),
+    drypConnected() ? getClientRoster().catch(() => [] as ClientRosterEntry[]) : Promise.resolve([] as ClientRosterEntry[]),
+  ])
 
   try {
     // Fetch from all accounts in parallel
@@ -202,15 +228,21 @@ export async function GET() {
     //            haven't seen before (shared Groq daily token budget) ──
     const cached = await getCachedClassifications(priorityFlagged.map(e => e.id))
     const uncached = priorityFlagged.filter(e => !cached.has(e.id))
-    const freshlyClassified = await categorizeEmails(uncached)
+    const freshlyClassified = await categorizeEmails(uncached, clientRoster)
     void cacheClassifications(freshlyClassified)
 
     // ── Step 3: Merge results (cache takes priority since it's already classified) ──
     const merged = priorityFlagged.map(e => {
       const cat = cached.get(e.id) ?? freshlyClassified.find(c => c.id === e.id)
+      // A real DRYP Hub client/contact match always wins, overriding
+      // whatever the AI (or a stale cached run before this existed) guessed
+      // — this is what actually fixes Shannon/Ben/Juan/etc. landing in the
+      // right category instead of it being an AI guess with no real data.
+      const clientMatch = matchesClientRoster(e, clientRoster)
       return {
         ...e,
-        category:    cat?.category ?? 'admin_tools' as MailCategory,
+        category:    clientMatch ? 'dryp_client' as MailCategory : (cat?.category ?? 'admin_tools' as MailCategory),
+        clientAccount: clientMatch?.accountName,
         isMeeting:   cat?.isMeeting ?? false,
         // Priority contacts always surface as urgent, on top of whatever the AI found
         isUrgent:    e.isPriority || (cat?.isUrgent ?? false),
