@@ -9,7 +9,7 @@ import { sendChatMessage } from '@/lib/chat/sendChatMessage'
 import { LunaLoadingState, VoiceOrb } from '@/components/luna'
 import {
   Sparkles, Mic, MessageCircle, BookOpen, Star, Archive,
-  Send, ChevronRight, ArrowRight, RotateCcw
+  Send, ChevronRight, ArrowRight, RotateCcw, Volume2, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import styles from './luna-page.module.css'
@@ -123,11 +123,65 @@ function LunaPageInner() {
   const [vaultTag, setVaultTag]       = useState<'Idea' | 'Loop' | 'Dream' | 'Future'>('Idea')
   const [vault, setVault]             = useState(VAULT_ITEMS)
   const [sending, setSending]         = useState(false)
+  const [speakingIdx, setSpeakingIdx]     = useState<number | null>(null)
+  const [speakLoadingIdx, setSpeakLoadingIdx] = useState<number | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const audioRef  = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, sending])
+
+  useEffect(() => () => { audioRef.current?.pause() }, [])
+
+  // Read a LUNA message back out loud — always available under every LUNA
+  // bubble, so she can re-hear a reply she missed or is mid-dictation for.
+  async function speak(idx: number, text: string) {
+    if (speakingIdx === idx) {
+      audioRef.current?.pause()
+      setSpeakingIdx(null)
+      return
+    }
+    audioRef.current?.pause()
+    setSpeakingIdx(null)
+    setSpeakLoadingIdx(idx)
+    try {
+      const res = await fetch('/api/chat/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      if (!res.ok) throw new Error()
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      audioRef.current = audio
+      audio.onended = () => { setSpeakingIdx(null); URL.revokeObjectURL(url) }
+      audio.onerror = () => { setSpeakingIdx(null); URL.revokeObjectURL(url) }
+      await audio.play()
+      setSpeakingIdx(idx)
+    } catch {
+      /* voice unavailable — fail silently, text is already on screen */
+    } finally {
+      setSpeakLoadingIdx(null)
+    }
+  }
+
+  // Real conversation history was already being saved server-side on every
+  // message — this page just never read it back on mount, so navigating
+  // away and back (or reloading) always showed only the hardcoded opener
+  // above, making it look like the conversation vanished.
+  useEffect(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    fetch(`/api/chat/history?tz=${encodeURIComponent(tz)}`, { cache: 'no-store' })
+      .then(r => r.json())
+      .then((data: { messages?: { role: string; content: string }[] }) => {
+        if (data.messages?.length) {
+          setMessages(data.messages.map(m => ({ role: m.role === 'user' ? 'user' as const : 'luna' as const, text: m.content })))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   async function sendMessage() {
     if (!chatInput.trim() || sending) return
@@ -172,7 +226,7 @@ function LunaPageInner() {
                 {/* Messages */}
                 <div className="space-y-3 mb-3.5" style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
                   {messages.map((msg, i) => (
-                    <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                       <div className="max-w-[80%] px-4 py-3 text-sm leading-relaxed"
                         style={msg.role === 'user'
                           ? { borderRadius: 20, background: 'linear-gradient(135deg, #5C4530 0%, #B8974F 100%)', color: 'var(--ink-1)' }
@@ -180,6 +234,20 @@ function LunaPageInner() {
                         }>
                         {msg.text}
                       </div>
+                      {msg.role === 'luna' && (
+                        <button
+                          type="button"
+                          onClick={() => speak(i, msg.text)}
+                          className="flex items-center gap-1.5 mt-1 px-2 py-1 cursor-pointer"
+                          style={{ color: speakingIdx === i ? '#5C4530' : 'var(--ink-4)', fontSize: 10.5, fontWeight: 600, background: 'none', border: 'none' }}
+                          aria-label={speakingIdx === i ? 'Stop reading aloud' : 'Read this message aloud'}
+                        >
+                          {speakLoadingIdx === i
+                            ? <Loader2 className="h-3 w-3 animate-spin" />
+                            : <Volume2 className="h-3 w-3" />}
+                          {speakingIdx === i ? 'Stop' : 'Listen'}
+                        </button>
+                      )}
                     </div>
                   ))}
                   {sending && <LunaLoadingState compact />}

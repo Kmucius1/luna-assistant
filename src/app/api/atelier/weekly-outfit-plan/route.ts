@@ -3,24 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
 import { getUpcomingEvents } from '@/lib/calendar'
 import { callAI, parseAIJson } from '@/lib/ai'
+import { outfitImageForDate } from '@/lib/luna/outfitImages'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
-
-// Same locally-hosted rotation daily-outfit uses — Pinterest/Higgsfield
-// hotlinks aren't reliable image sources (see daily-outfit/route.ts), so a
-// 7-day plan reuses these 4 real photos rather than inventing new URLs.
-const OUTFIT_IMAGES = [
-  '/images/outfits/streetwear-01.jpg',
-  '/images/outfits/streetwear-02.jpg',
-  '/images/outfits/streetwear-03.jpg',
-  '/images/outfits/streetwear-04.jpg',
-]
-
-function outfitImageForDate(dateKey: string): string {
-  let hash = 0
-  for (let i = 0; i < dateKey.length; i++) hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0
-  return OUTFIT_IMAGES[hash % OUTFIT_IMAGES.length]
-}
 
 // WMO weather codes (Open-Meteo) collapsed to a short human phrase — no
 // existing lookup for this in the repo, so it's scoped locally here.
@@ -87,10 +72,15 @@ on her calendar that day, if anything. For EACH day, pick ONE specific outfit th
   rain or snow.
 - Fits what's actually happening — dress up a bit for a real calendar event (meeting, dinner, date),
   keep it comfortable and easy for an ordinary work-from-home or errand day.
-- Varies across the week — avoid suggesting the exact same outfit on back-to-back days when the
-  weather/schedule doesn't force a repeat.
 - When a list of clothes she actually owns is given, prefer pulling specific real pieces from it over
   inventing generic ones, especially her higher-rated favorites.
+
+HARD RULE — she has been explicit about this: NEVER repeat the same outfit twice in the same week.
+Every single "outfit_caption" across all 7 days must describe a genuinely different combination —
+different top, different bottom, or different silhouette/footwear, not just reworded text for the same
+pieces. Even on two days with identical weather and no calendar events, choose different pieces. Before
+you finalize, check your own 7 outfit_captions against each other and change any that are the same or
+too similar.
 
 Return ONLY valid JSON, with exactly one entry per date given, in the same order:
 {

@@ -120,6 +120,8 @@ export async function POST(req: NextRequest) {
 
     const label = sourceLabel || new Date().toLocaleDateString()
     const created: unknown[] = []
+    const fullArea = fullWidth * fullHeight
+    let rejectedAsWholePhoto = 0
 
     for (const region of regions.slice(0, 6)) {
       try {
@@ -128,6 +130,16 @@ export async function POST(req: NextRequest) {
         const width = Math.min(fullWidth - left, Math.round(region.width))
         const height = Math.min(fullHeight - top, Math.round(region.height))
         if (width < 20 || height < 20) continue
+
+        // The model occasionally returns a box that's basically the whole
+        // photo instead of a single garment — a real single-piece crop on a
+        // full-body shot essentially never covers this much of the frame.
+        // Saving that as an "item" is how a full mirror selfie ends up
+        // stored as one closet piece instead of being properly isolated.
+        if ((width * height) / fullArea > 0.7) {
+          rejectedAsWholePhoto++
+          continue
+        }
 
         const cropBuffer = await sharp(normalized)
           .extract({ left, top, width, height })
@@ -149,6 +161,10 @@ export async function POST(req: NextRequest) {
       } catch (cropErr) {
         console.error('[wardrobe/detect] crop failed for region:', region, cropErr)
       }
+    }
+
+    if (!created.length && rejectedAsWholePhoto > 0) {
+      return NextResponse.json({ items: [], error: "LUNA couldn't crop individual pieces tightly enough from that photo — try a full-body shot with a bit more space around you." })
     }
 
     return NextResponse.json({ items: created })

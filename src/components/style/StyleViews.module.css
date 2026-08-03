@@ -96,6 +96,7 @@
 .closetFullGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
 .closetFullItem { position: relative; aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: var(--style-gold-soft); }
 .closetFullItem :global(img) { object-fit: cover; }
+.uploadErrorText { margin: 0 0 4px; font-size: 11px; font-weight: 600; color: #C0574F; line-height: 1.4; }
 
 /* ── Explorer: swipe deck ─────────────────────────────── */
 

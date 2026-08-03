@@ -3,25 +3,9 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
 import { getCurrentPlanets } from '@/lib/astrology'
 import { callAI, parseAIJson } from '@/lib/ai'
+import { OUTFIT_IMAGES, outfitImageForDate } from '@/lib/luna/outfitImages'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
-
-// Curated streetwear/Y2K photos, hosted locally — HIGGSFIELD_API_KEY isn't
-// configured server-side, so live per-day image generation always failed
-// and fell back to an external Pinterest hotlink that didn't reliably load.
-// Rotates deterministically by date so the look still changes day to day.
-const OUTFIT_IMAGES = [
-  '/images/outfits/streetwear-01.jpg',
-  '/images/outfits/streetwear-02.jpg',
-  '/images/outfits/streetwear-03.jpg',
-  '/images/outfits/streetwear-04.jpg',
-]
-
-function outfitImageForDate(dateKey: string): string {
-  let hash = 0
-  for (let i = 0; i < dateKey.length; i++) hash = (hash * 31 + dateKey.charCodeAt(i)) >>> 0
-  return OUTFIT_IMAGES[hash % OUTFIT_IMAGES.length]
-}
 
 interface DayPlanAnchors { at_work?: string; gym?: string }
 interface DayPlan { key_anchors?: DayPlanAnchors }

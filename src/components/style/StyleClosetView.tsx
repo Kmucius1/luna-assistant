@@ -37,9 +37,43 @@ function specificFootwearLabel(items: WardrobeItem[]): string {
   return 'Shoes'
 }
 
+// Camera-roll photos on a modern phone are routinely 3000-4000px+ and
+// several MB — sent raw as base64 JSON, that's a multi-MB request that can
+// silently fail (timeout/size limit) with no error ever surfacing to the
+// upload flow's catch block. Downscaling client-side before it ever leaves
+// the browser fixes that at the source, for every upload source alike.
+async function resizeImageForUpload(file: File, maxDim = 1600, quality = 0.85): Promise<string> {
+  const dataUrl: string = await new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = () => reject(new Error('Could not read that file'))
+    reader.readAsDataURL(file)
+  })
+  return new Promise(resolve => {
+    const img = new window.Image()
+    img.onload = () => {
+      let { width, height } = img
+      if (width <= maxDim && height <= maxDim) { resolve(dataUrl); return }
+      const scale = maxDim / Math.max(width, height)
+      width = Math.round(width * scale)
+      height = Math.round(height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { resolve(dataUrl); return }
+      ctx.drawImage(img, 0, 0, width, height)
+      resolve(canvas.toDataURL('image/jpeg', quality))
+    }
+    img.onerror = () => resolve(dataUrl)
+    img.src = dataUrl
+  })
+}
+
 export function StyleClosetView() {
   const [wardrobe, setWardrobe] = useState<WardrobeItem[] | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const loadWardrobe = useCallback(() => {
@@ -54,25 +88,40 @@ export function StyleClosetView() {
     const files = Array.from(e.target.files ?? [])
     if (files.length === 0) return
     setUploading(true)
-    try {
-      for (const file of files) {
-        const dataUrl: string = await new Promise((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(file)
-        })
-        await fetch('/api/atelier/wardrobe/detect', {
+    setUploadError(null)
+    let succeeded = 0
+    let itemsFound = 0
+    const failed: string[] = []
+    for (const file of files) {
+      try {
+        const dataUrl = await resizeImageForUpload(file)
+        const res = await fetch('/api/atelier/wardrobe/detect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: dataUrl, sourceLabel: 'style-page-upload' }),
         })
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data = await res.json() as { items?: unknown[]; error?: string }
+        if (data.error && !data.items?.length) throw new Error(data.error)
+        succeeded++
+        itemsFound += data.items?.length ?? 0
+      } catch (err) {
+        failed.push(file.name)
+        console.error('[StyleClosetView] upload failed for', file.name, err)
       }
-      loadWardrobe()
-    } catch { /* wardrobe/detect never hard-errors to the client anyway */ } finally {
-      setUploading(false)
-      if (fileInputRef.current) fileInputRef.current.value = ''
     }
+    if (failed.length) {
+      setUploadError(
+        succeeded > 0
+          ? `Saved ${succeeded} photo${succeeded === 1 ? '' : 's'}, but ${failed.length} couldn't be uploaded (${failed.join(', ')}). Try those again.`
+          : `Couldn't upload ${failed.length === 1 ? 'that photo' : 'those photos'} — try again, or a clearer/smaller shot.`
+      )
+    } else if (succeeded > 0 && itemsFound === 0) {
+      setUploadError("Saved, but LUNA couldn't pick out individual pieces from that shot — try a clearer, well-lit full-body photo.")
+    }
+    if (succeeded > 0) loadWardrobe()
+    setUploading(false)
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }, [loadWardrobe])
 
   const bucketData = useMemo(() => {
@@ -91,11 +140,13 @@ export function StyleClosetView() {
       {closetEmpty ? (
         <div className={styles.emptyState}>
           <p>Your closet is waiting. Upload an outfit and Luna will organize the pieces for you.</p>
-          <button type="button" className={styles.emptyButton} onClick={() => fileInputRef.current?.click()}>Upload First Outfit <Upload size={13} /></button>
+          <button type="button" className={styles.emptyButton} onClick={() => fileInputRef.current?.click()} disabled={uploading}>{uploading ? 'Organizing…' : 'Upload First Outfit'} <Upload size={13} /></button>
           <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleUpload} />
+          {uploadError && <p className={styles.uploadErrorText}>{uploadError}</p>}
         </div>
       ) : (
         <>
+          {uploadError && <p className={styles.uploadErrorText}>{uploadError}</p>}
           <div className={styles.closetRow}>
             {bucketData.map(bucket => (
               <div key={bucket.id} className={styles.closetCard}>
