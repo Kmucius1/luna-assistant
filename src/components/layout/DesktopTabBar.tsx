@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Utensils, MessageCircle, Moon, LayoutGrid } from 'lucide-react'
+import { Home, Briefcase, MessageCircle, Moon, LayoutGrid } from 'lucide-react'
 
 // Home is the 12-room app grid at /home — also where "/" redirects to,
 // so this tab matches the app's real landing page (see
@@ -10,7 +10,7 @@ import { Home, Utensils, MessageCircle, Moon, LayoutGrid } from 'lucide-react'
 // from here, not a separate top-level destination.
 const TABS = [
   { href: '/home',           label: 'Home',      icon: Home          },
-  { href: '/food',           label: 'Food',      icon: Utensils      },
+  { href: '/work',           label: 'Work',      icon: Briefcase     },
   { href: '/luna',           label: 'LUNA',      icon: MessageCircle },
   { href: '/astrology',      label: 'Astrology', icon: Moon          },
   { href: '/explore',        label: 'Explore',   icon: LayoutGrid    },
@@ -21,7 +21,7 @@ export function DesktopTabBar() {
 
   function isActive(href: string) {
     if (href === '/home') return pathname === '/home'
-    if (href === '/food') return pathname.startsWith('/food')
+    if (href === '/work') return pathname.startsWith('/work')
     if (href === '/astrology') return pathname.startsWith('/astrology') || pathname.startsWith('/manifest')
     return pathname.startsWith(href)
   }

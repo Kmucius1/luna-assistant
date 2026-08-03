@@ -1,11 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Search, ShirtIcon } from 'lucide-react'
 
+import { FindSimilarSheet } from './FindSimilarSheet'
 import styles from './StyleViews.module.css'
 
 export function StyleFindView() {
+  const [findSimilarOpen, setFindSimilarOpen] = useState(false)
+
   return (
     <>
       <div className={styles.sectionHeader}><Search size={13} /> Find Clothes</div>
@@ -13,8 +17,8 @@ export function StyleFindView() {
         <Link href="/style/find/week" className={styles.findCard}>
           <Calendar size={22} strokeWidth={1.6} />
           <div className={styles.findCardText}>
-            <strong>Plan a Look</strong>
-            <span>Build outfits for your week</span>
+            <strong>Plan My Looks</strong>
+            <span>Build outfits for your whole week</span>
           </div>
         </Link>
         <div className={styles.findCard}>
@@ -25,15 +29,16 @@ export function StyleFindView() {
             <span>Create new looks with what you already own</span>
           </div>
         </div>
-        <div className={styles.findCard}>
-          <span className={styles.findBadge}>Soon</span>
+        <button type="button" className={styles.findCard} onClick={() => setFindSimilarOpen(true)}>
           <Search size={22} strokeWidth={1.6} />
           <div className={styles.findCardText}>
             <strong>Find Similar</strong>
-            <span>Discover new pieces that match your taste</span>
+            <span>Build an outfit around a piece you own</span>
           </div>
-        </div>
+        </button>
       </div>
+
+      <FindSimilarSheet isOpen={findSimilarOpen} onClose={() => setFindSimilarOpen(false)} />
     </>
   )
 }

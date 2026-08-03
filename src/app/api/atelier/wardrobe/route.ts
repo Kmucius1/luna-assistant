@@ -1,18 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { callAI, WARDROBE_ITEM_ANALYSIS_PROMPT, parseAIJson } from '@/lib/ai'
+
+const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+
+// Same session-with-fallback resolution as wardrobe/detect (the route that
+// actually inserts items from an outfit-photo upload) — this route was
+// requiring a real session and reading/writing strictly by auth.uid(), which
+// silently diverged from wardrobe/detect's ZOE_USER_ID fallback whenever
+// there wasn't an active session: uploads landed under one user id, this
+// GET only ever looked under another, so newly added items never appeared.
+async function resolveUserId(): Promise<string> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.id) return user.id
+  } catch { /* fall through */ }
+  return ZOE_USER_ID
+}
 
 // GET — list wardrobe items
 export async function GET() {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-    const { data, error } = await supabase
+    const userId = await resolveUserId()
+    const db = createAdminClient()
+    const { data, error } = await db
       .from('wardrobe_items')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
     if (error) throw error
@@ -26,10 +42,8 @@ export async function GET() {
 // POST — add item (optionally run AI analysis)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
+    const userId = await resolveUserId()
+    const db = createAdminClient()
     const body = await request.json()
     const { analyze, description, ...item } = body
 
@@ -44,7 +58,7 @@ export async function POST(request: NextRequest) {
     }
 
     const toInsert = {
-      user_id: user.id,
+      user_id: userId,
       name: item.name,
       category: item.category,
       color: aiAnalysis ? (aiAnalysis as { color?: string }).color ?? item.color : item.color,
@@ -61,7 +75,7 @@ export async function POST(request: NextRequest) {
       repair_notes: item.repair_notes,
     }
 
-    const { data, error } = await supabase.from('wardrobe_items').insert(toInsert).select().single()
+    const { data, error } = await db.from('wardrobe_items').insert(toInsert).select().single()
     if (error) throw error
 
     return NextResponse.json({ item: data, analysis: aiAnalysis })
@@ -74,18 +88,16 @@ export async function POST(request: NextRequest) {
 // PATCH — update item
 export async function PATCH(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
+    const userId = await resolveUserId()
+    const db = createAdminClient()
     const { id, ...updates } = await request.json()
     if (!id) return NextResponse.json({ error: 'Item ID required' }, { status: 400 })
 
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('wardrobe_items')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .select()
       .single()
 
