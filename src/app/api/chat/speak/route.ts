@@ -34,7 +34,11 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           text: text.slice(0, 2000),
-          model_id: 'eleven_v3',
+          // eleven_v3 is built for expressive quality, not latency — it was
+          // making every LUNA reply (live voice call and text read-aloud)
+          // feel slow to start. Flash v2.5 is ElevenLabs' low-latency model
+          // built for conversational agents.
+          model_id: 'eleven_flash_v2_5',
           voice_settings: LUNA_VOICE_SETTINGS,
         }),
       }

@@ -153,6 +153,29 @@
   background: rgba(201, 169, 110, 0.12);
   border: 1px solid rgba(201, 169, 110, 0.25);
   color: var(--ink-1, #100C1E);
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.replayBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ink-4, #8A8098);
+  padding: 0;
+}
+.replayBtnActive {
+  color: #5C4530;
+}
+.replayBtnFailed {
+  color: #C25050;
 }
 
 @media (prefers-reduced-motion: reduce) {

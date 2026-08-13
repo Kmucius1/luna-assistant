@@ -136,12 +136,10 @@ function LunaPageInner() {
 
   // Read a LUNA message back out loud — always available under every LUNA
   // bubble, so she can re-hear a reply she missed or is mid-dictation for.
+  // Tapping again while she's already speaking restarts this message from
+  // the top — always stop whatever's currently playing first so she's never
+  // heard saying two things at once.
   async function speak(idx: number, text: string) {
-    if (speakingIdx === idx) {
-      audioRef.current?.pause()
-      setSpeakingIdx(null)
-      return
-    }
     audioRef.current?.pause()
     setSpeakingIdx(null)
     setSpeakLoadingIdx(idx)
@@ -240,12 +238,12 @@ function LunaPageInner() {
                           onClick={() => speak(i, msg.text)}
                           className="flex items-center gap-1.5 mt-1 px-2 py-1 cursor-pointer"
                           style={{ color: speakingIdx === i ? '#5C4530' : 'var(--ink-4)', fontSize: 10.5, fontWeight: 600, background: 'none', border: 'none' }}
-                          aria-label={speakingIdx === i ? 'Stop reading aloud' : 'Read this message aloud'}
+                          aria-label={speakingIdx === i ? 'Restart reading aloud' : 'Read this message aloud'}
                         >
                           {speakLoadingIdx === i
                             ? <Loader2 className="h-3 w-3 animate-spin" />
                             : <Volume2 className="h-3 w-3" />}
-                          {speakingIdx === i ? 'Stop' : 'Listen'}
+                          {speakingIdx === i ? 'Restart' : 'Listen'}
                         </button>
                       )}
                     </div>

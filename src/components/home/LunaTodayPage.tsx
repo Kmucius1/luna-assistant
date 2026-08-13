@@ -183,6 +183,12 @@ export function LunaTodayPage() {
   const dinnerTitle = plannedDinner ?? TODAY_MEALS.find(m => m.mealType === 'dinner')?.title ?? 'Dinner'
   const dinnerImage = plannedDinner ? imageForMeal(plannedDinner) : (TODAY_MEALS.find(m => m.mealType === 'dinner')?.image ?? '/images/rooms/food.jpg')
 
+  const todaySlideMeals = TODAY_MEALS.map(meal => {
+    if (meal.mealType === 'breakfast' && plannedBreakfast) return { ...meal, title: breakfastTitle, image: breakfastImage }
+    if (meal.mealType === 'dinner' && plannedDinner) return { ...meal, title: dinnerTitle, image: dinnerImage }
+    return meal
+  })
+
   const block = blockForHour(now?.hour ?? 7)
 
   const reflectItems = [
@@ -398,7 +404,7 @@ export function LunaTodayPage() {
               <div className={styles.slideBody}>
                 <div className={styles.cardHeader}><Utensils size={15} /><span>Meals</span></div>
                 <div className={styles.mealsList}>
-                  {TODAY_MEALS.map(meal => (
+                  {todaySlideMeals.map(meal => (
                     <div key={meal.id} className={styles.mealsRow}>
                       <div className={styles.mealThumb}><Image src={meal.image} alt={meal.title} fill sizes="34px" /></div>
                       <div>

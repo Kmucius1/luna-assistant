@@ -51,12 +51,10 @@ export default function ChatPage() {
   const recogRef    = useRef<any>(null)
 
   // ─── Read aloud ────────────────────────────────────────────────
+  // Tapping again while she's already speaking restarts this message from
+  // the top — always stop whatever's currently playing first so she's never
+  // heard saying two things at once.
   async function speak(msg: Message) {
-    if (speakingId === msg.id) {
-      audioRef.current?.pause()
-      setSpeakingId(null)
-      return
-    }
     audioRef.current?.pause()
     setSpeakingId(null)
     setSpeakLoadingId(msg.id)
@@ -338,7 +336,7 @@ export default function ChatPage() {
                         {isLuna && (
                           <button
                             onClick={() => void speak(msg)}
-                            title={speakingId === msg.id ? 'Stop' : 'Read aloud'}
+                            title={speakingId === msg.id ? 'Restart' : 'Read aloud'}
                             style={{
                               display: 'flex', alignItems: 'center', gap: 5, marginTop: 8,
                               background: 'none', border: 'none', cursor: 'pointer', padding: 0,
@@ -349,7 +347,7 @@ export default function ChatPage() {
                               ? <Loader2 style={{ width: 13, height: 13 }} className="animate-spin" />
                               : <Volume2 style={{ width: 13, height: 13 }} />}
                             <span style={{ fontSize: 10.5, fontWeight: 600 }}>
-                              {speakingId === msg.id ? 'Stop' : 'Read aloud'}
+                              {speakingId === msg.id ? 'Restart' : 'Read aloud'}
                             </span>
                           </button>
                         )}
