@@ -84,10 +84,13 @@ export default function RushModeScreen() {
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(201,169,110,0.15)' }}>
-              <Zap className="h-5 w-5" style={{ color: 'var(--golden)' }} />
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(240,228,200,0.92)' }}>
+              <Zap className="h-5 w-5" style={{ color: '#8A6F2A' }} />
             </div>
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--golden)' }}>Rush Mode</p>
+            {/* Bare on the dark app shell (no card behind it) — var(--golden) has
+                no [data-theme="dark"] override, so it stays #5C4530 and disappears;
+                use a lighter, still-on-brand gold here instead. */}
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: '#D4B876' }}>Rush Mode</p>
           </div>
 
           <h1 className="font-display text-3xl font-semibold mb-2" style={{ color: 'var(--text-1)' }}>

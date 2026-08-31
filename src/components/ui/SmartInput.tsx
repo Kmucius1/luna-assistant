@@ -230,8 +230,8 @@ export function SmartInput({
             rows={rows}
             className="w-full rounded-[16px] px-4 py-3 text-sm resize-none focus:outline-none transition-all luna-input"
             style={{
-              background: 'rgba(255,255,255,0.5)',
-              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.2)'}`,
+              background: 'rgba(255,255,255,0.85)',
+              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.3)'}`,
               color: '#100C1E',
               paddingRight: 48,
               fontFamily: 'inherit',
@@ -249,8 +249,8 @@ export function SmartInput({
             placeholder={listening ? '🎙 Listening...' : (placeholder ?? `Or speak / type...`)}
             className="w-full rounded-[16px] px-4 py-3 text-sm focus:outline-none transition-all luna-input"
             style={{
-              background: 'rgba(255,255,255,0.5)',
-              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.2)'}`,
+              background: 'rgba(255,255,255,0.85)',
+              border: `1px solid ${listening ? 'rgba(201,169,110,0.55)' : 'rgba(180,150,100,0.3)'}`,
               color: '#100C1E',
               paddingRight: 48,
               fontFamily: 'inherit',
@@ -264,14 +264,14 @@ export function SmartInput({
           onClick={listening ? stopListening : startListening}
           className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center transition-all"
           style={{
-            background: listening ? 'var(--violet)' : 'rgba(201,169,110,0.12)',
-            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(201,169,110,0.25)'}`,
+            background: listening ? 'var(--violet)' : 'rgba(240,228,200,0.92)',
+            border: `1px solid ${listening ? 'var(--violet)' : 'rgba(201,169,110,0.4)'}`,
             boxShadow: listening ? '0 0 0 4px rgba(201,169,110,0.2)' : undefined,
           }}
           title={listening ? 'Stop recording' : 'Tap to dictate'}>
           {listening
-            ? <MicOff className="h-3.5 w-3.5" style={{ color: '#100C1E' }} />
-            : <Mic className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />}
+            ? <MicOff className="h-3.5 w-3.5" style={{ color: '#FDF8F3' }} />
+            : <Mic className="h-3.5 w-3.5" style={{ color: '#8A6F2A' }} />}
         </button>
       </div>
 

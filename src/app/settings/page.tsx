@@ -119,7 +119,7 @@ function OAuthBanner() {
   if (!show || (!error && !connected)) return null
 
   if (connected) return (
-    <div style={{ padding: '14px 16px', borderRadius: 16, background: 'rgba(90,138,90,0.12)', border: '1px solid rgba(90,138,90,0.3)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+    <div style={{ padding: '14px 16px', borderRadius: 16, background: 'rgba(224,236,224,0.92)', border: '1px solid rgba(90,138,90,0.4)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
       <Check className="h-4 w-4 flex-shrink-0" style={{ color: '#8AB88A' }} />
       <p style={{ fontSize: 13, color: '#8AB88A', flex: 1 }}>Connected: {decodeURIComponent(connected)}</p>
       <button onClick={() => setShow(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E5474' }}><X className="h-4 w-4" /></button>
@@ -127,7 +127,7 @@ function OAuthBanner() {
   )
 
   return (
-    <div style={{ borderRadius: 16, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.25)', marginBottom: 16, overflow: 'hidden' }}>
+    <div style={{ borderRadius: 16, background: 'rgba(250,225,225,0.92)', border: '1px solid rgba(224,94,94,0.35)', marginBottom: 16, overflow: 'hidden' }}>
       <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#E05E5E' }} />
         <div style={{ flex: 1 }}>
@@ -281,8 +281,8 @@ export default function SettingsPage() {
 
           {/* Page title */}
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 3 }}>Settings</h1>
-            <p style={{ fontSize: 13, color: '#5E5474' }}>Connect your accounts and customize LUNA</p>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--text-1)', marginBottom: 3 }}>Settings</h1>
+            <p style={{ fontSize: 13, color: 'var(--text-3)' }}>Connect your accounts and customize LUNA</p>
           </div>
 
           {/* OAuth result banner */}

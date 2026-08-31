@@ -252,7 +252,7 @@ export default function RelationshipsPage() {
               <p className="text-base font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-3)' }}>Your Circle</p>
               <h1 className="font-display text-3xl font-bold" style={{ color: 'var(--text-1)' }}>Relationships</h1>
               {needsAttention > 0 && (
-                <p className="text-sm mt-1" style={{ color: '#5C4530' }}>
+                <p className="text-sm mt-1" style={{ color: 'var(--violet)' }}>
                   {needsAttention} connection{needsAttention > 1 ? 's' : ''} need your attention
                 </p>
               )}
@@ -316,7 +316,7 @@ export default function RelationshipsPage() {
               <button
                 onClick={askAI}
                 disabled={aiLoading || !aiInput.trim()}
-                className="w-full py-3 rounded-xl text-sm font-semibold text-[#100C1E] transition-all disabled:opacity-50"
+                className="w-full py-3 rounded-xl text-sm font-semibold text-[#FDF8F3] transition-all disabled:opacity-50"
                 style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                 {aiLoading ? 'Thinking...' : 'Get guidance'}
               </button>
@@ -342,18 +342,18 @@ export default function RelationshipsPage() {
             {/* Header */}
             <div className="flex items-end justify-between mb-6">
               <div>
-                <p className="text-base font-semibold uppercase tracking-widest mb-1" style={{ color: '#8A8098' }}>Your Circle</p>
-                <h1 className="font-display text-4xl font-bold text-[#100C1E]">Relationships</h1>
+                <p className="text-base font-semibold uppercase tracking-widest mb-1" style={{ color: 'var(--text-4)' }}>Your Circle</p>
+                <h1 className="font-display text-4xl font-bold" style={{ color: 'var(--text-1)' }}>Relationships</h1>
                 {needsAttention > 0 && (
-                  <p className="text-base mt-1" style={{ color: '#5C4530' }}>
+                  <p className="text-base mt-1" style={{ color: 'var(--text-2)' }}>
                     {needsAttention} connection{needsAttention > 1 ? 's' : ''} need your attention
                   </p>
                 )}
               </div>
               <button className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all hover:scale-105"
                 style={{
-                  background: 'rgba(255,255,255,0.5)',
-                  border: '1px solid rgba(180,150,100,0.18)',
+                  background: 'rgba(255,255,255,0.85)',
+                  border: '1px solid rgba(180,150,100,0.25)',
                   color: '#32284A',
                 }}>
                 <Plus className="h-4 w-4" />
@@ -367,8 +367,8 @@ export default function RelationshipsPage() {
                 <button key={f.key} onClick={() => setFilter(f.key)}
                   className="px-5 py-2 rounded-full text-sm font-medium transition-all"
                   style={{
-                    background: filter === f.key ? 'rgba(201,169,110,0.85)' : 'rgba(255,255,255,0.5)',
-                    color: filter === f.key ? '#100C1E' : '#8A8098',
+                    background: filter === f.key ? 'rgba(201,169,110,0.85)' : 'rgba(255,255,255,0.85)',
+                    color: filter === f.key ? '#100C1E' : '#5E5474',
                     border: `1px solid ${filter === f.key ? 'transparent' : 'rgba(180,150,100,0.18)'}`,
                   }}>
                   {f.label}
@@ -385,7 +385,7 @@ export default function RelationshipsPage() {
 
             {/* AI Coach — desktop */}
             <div className="rounded-2xl p-6"
-              style={{ background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.18)' }}>
+              style={{ background: 'rgba(255,255,255,0.8)', border: '1px solid rgba(180,150,100,0.25)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-5 w-5" style={{ color: '#5C4530' }} />
                 <p className="text-base font-semibold text-[#100C1E]">Relationship Coach</p>
@@ -414,7 +414,7 @@ export default function RelationshipsPage() {
                 />
               </div>
               {aiReply && (
-                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.18)' }}>
+                <div className="mt-4 p-4 rounded-xl" style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                   <p className="text-sm leading-relaxed" style={{ color: '#32284A' }}>{aiReply}</p>
                 </div>
               )}

@@ -27,7 +27,7 @@ const G: React.CSSProperties = {
 // ─── Section label inside cards ─────────────────────────────────────────────
 const LBL: React.CSSProperties = {
   fontSize: 9.5, fontWeight: 800, letterSpacing: '0.12em',
-  textTransform: 'uppercase', color: '#5C4530',
+  textTransform: 'uppercase', color: 'var(--violet)',
   display: 'flex', alignItems: 'center', gap: 6,
   marginBottom: 10, flexShrink: 0,
 }
@@ -52,7 +52,7 @@ const CTA_PRIMARY: React.CSSProperties = {
 const CTA_SECONDARY: React.CSSProperties = {
   background: 'rgba(201,169,110,0.12)',
   border: '1px solid rgba(201,169,110,0.3)',
-  color: '#5C4530',
+  color: 'var(--violet)',
 }
 
 type LunaPage = 'chat' | 'dictate' | 'messages' | 'journal' | 'self' | 'vault'
@@ -214,7 +214,7 @@ function LunaPageInner() {
                     {STARTERS.map(s => (
                       <button key={s} onClick={() => { setChatInput(s); }}
                         className="text-xs font-semibold px-3.5 py-2 rounded-full cursor-pointer"
-                        style={{ background: 'rgba(201,169,110,0.12)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.3)' }}>
+                        style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.3)' }}>
                         {s}
                       </button>
                     ))}
@@ -454,7 +454,7 @@ function LunaPageInner() {
                   {vault.map(item => (
                     <div key={item.id} className="p-4 flex items-start gap-3" style={{ ...G, borderRadius: 20 }}>
                       <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-semibold"
-                        style={{ background: 'rgba(201,169,110,0.18)', color: '#5C4530' }}>
+                        style={{ background: 'rgba(201,169,110,0.18)', color: 'var(--violet)' }}>
                         {item.tag}
                       </span>
                       <p className="text-sm flex-1" style={{ color: 'var(--ink-2)' }}>{item.text}</p>

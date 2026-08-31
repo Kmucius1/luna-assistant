@@ -66,8 +66,8 @@ export default function DailyGlancePage() {
       } as React.CSSProperties}>
 
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: '0 0 3px' }}>Today&apos;s Glance</h1>
-          <p style={{ fontSize: 13, color: '#32284A', margin: 0 }}>Astrology, money, and tonight — all at once.</p>
+          <h1 style={{ fontSize: 24, fontWeight: 900, color: '#F5EFE3', margin: '0 0 3px' }}>Today&apos;s Glance</h1>
+          <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', margin: 0 }}>Astrology, money, and tonight — all at once.</p>
         </div>
 
         <Row label="Astrology Preview" icon={<Moon style={{ width: 9, height: 9 }} />} href="/astrology" linkText="Open Astrology">

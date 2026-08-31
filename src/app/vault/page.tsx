@@ -29,10 +29,10 @@ export default function VaultScreen() {
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(201,169,110,0.12)' }}>
-              <Archive className="h-5 w-5" style={{ color: 'var(--golden)' }} />
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(240,228,200,0.92)' }}>
+              <Archive className="h-5 w-5" style={{ color: '#8A6F2A' }} />
             </div>
-            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--golden)' }}>The Vault</p>
+            <p className="text-sm font-medium uppercase tracking-wider" style={{ color: '#8A6F2A' }}>The Vault</p>
           </div>
 
           <h1 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--text-1)' }}>
@@ -43,7 +43,7 @@ export default function VaultScreen() {
           </p>
 
           {/* Weekly selection reminder */}
-          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
+          <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--violet)' }}>Weekly selection</p>
             <p className="text-sm" style={{ color: 'var(--text-2)' }}>
               Each week, choose one from each lane: work · creative · money · personal. Everything else rests.

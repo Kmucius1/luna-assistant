@@ -124,13 +124,13 @@ export default function ProjectsPage() {
 
           {/* Header */}
           <div style={{ padding: '20px 20px 16px' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#5E5474', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-3)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Projects</h1>
-                <p style={{ fontSize: 12, color: '#5E5474', marginTop: 2 }}>{activeCount} active</p>
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--text-1)' }}>Projects</h1>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>{activeCount} active</p>
               </div>
               <button onClick={() => setShowForm(!showForm)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 12, border: 'none', background: '#5C4530', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                 <Plus className="h-4 w-4" /> Add project

@@ -110,19 +110,19 @@ export default function WeeklyResetPage() {
 
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(201,169,110,0.1)' }}>
-              <RefreshCw className="h-5 w-5" style={{ color: 'var(--violet)' }} />
+              style={{ background: 'rgba(240,228,200,0.92)' }}>
+              <RefreshCw className="h-5 w-5" style={{ color: '#8A6F2A' }} />
             </div>
             <div>
-              <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Weekly Reset</p>
-              <p className="text-xs" style={{ color: 'var(--text-3)' }}>Sunday sanctuary ritual.</p>
+              <p className="text-sm font-medium uppercase tracking-wider" style={{ color: '#C4A47C' }}>Weekly Reset</p>
+              <p className="text-xs" style={{ color: 'rgba(245,239,227,0.65)' }}>Sunday sanctuary ritual.</p>
             </div>
           </div>
 
-          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>
+          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: '#F5EFE3' }}>
             Close one week. Open the next.
           </h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--text-2)' }}>
+          <p className="text-sm mb-6" style={{ color: 'rgba(245,239,227,0.85)' }}>
             You do not need to do all of this. Do what you can. Each check is a small act of love for future Zoe.
           </p>
 
@@ -132,8 +132,8 @@ export default function WeeklyResetPage() {
               <button key={v} onClick={() => setActiveView(v)}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
                 style={{
-                  background: activeView === v ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
-                  color: activeView === v ? '#100C1E' : 'var(--mid)',
+                  background: activeView === v ? 'var(--violet)' : 'rgba(240,228,200,0.9)',
+                  color: activeView === v ? '#F5EFE3' : '#5C4530',
                 }}>
                 {v === 'reset' ? '✅ Ritual Checklist' : '💜 Weekly Reflection'}
               </button>
@@ -260,7 +260,7 @@ export default function WeeklyResetPage() {
               )}
 
               <div className="rounded-2xl p-5 text-center"
-                style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
+                style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
                 <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>
                   &ldquo;{result.affirmation}&rdquo;
                 </p>
@@ -272,7 +272,7 @@ export default function WeeklyResetPage() {
 
               <button onClick={() => setResult(null)}
                 className="w-full py-3.5 rounded-2xl font-semibold"
-                style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                 Edit reflection
               </button>
             </div>

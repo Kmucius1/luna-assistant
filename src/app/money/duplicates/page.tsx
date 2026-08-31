@@ -47,11 +47,11 @@ export default function DuplicatesPage() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px' }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Duplicate Charges</h1>
-          <p style={{ fontSize: 13, color: '#32284A', marginBottom: 18 }}>{alerts.length} open alert{alerts.length !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F5EFE3', marginBottom: 4 }}>Duplicate Charges</h1>
+          <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', marginBottom: 18 }}>{alerts.length} open alert{alerts.length !== 1 ? 's' : ''}</p>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 40 }}><RefreshCw className="h-5 w-5 animate-spin mx-auto" style={{ color: '#5E5474' }} /></div>
+            <div style={{ textAlign: 'center', padding: 40 }}><RefreshCw className="h-5 w-5 animate-spin mx-auto" style={{ color: 'rgba(245,239,227,0.72)' }} /></div>
           ) : alerts.length === 0 ? (
             <div style={{ ...CARD, padding: 32, textAlign: 'center' }}>
               <DuplicateIcon style={{ width: 26, height: 26, color: '#5E5474', margin: '0 auto 10px' }} />

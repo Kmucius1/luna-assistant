@@ -72,10 +72,10 @@ export default function LateModeScreen() {
             <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Recovery Mode</p>
           </div>
 
-          <h1 className="font-display text-3xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>
+          <h1 className="font-display text-3xl font-semibold mb-2" style={{ color: '#F5EFE3' }}>
             You are not behind.
           </h1>
-          <p className="text-base mb-8 leading-relaxed" style={{ color: 'var(--mid)' }}>
+          <p className="text-base mb-8 leading-relaxed" style={{ color: 'rgba(245,239,227,0.75)' }}>
             We are recalibrating. Nothing is ruined. We are meeting the day where it is.
           </p>
 

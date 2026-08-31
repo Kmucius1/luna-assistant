@@ -150,8 +150,8 @@
 }
 .turnAssistant {
   align-self: flex-start;
-  background: rgba(201, 169, 110, 0.12);
-  border: 1px solid rgba(201, 169, 110, 0.25);
+  background: rgba(244, 235, 212, 0.92);
+  border: 1px solid rgba(201, 169, 110, 0.4);
   color: var(--ink-1, #100C1E);
   display: flex;
   align-items: flex-end;

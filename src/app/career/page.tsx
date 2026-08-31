@@ -103,7 +103,7 @@ function ClientCard({ account, tasks }: { account: DryphubAccount; tasks: Dryphu
           </div>
         </div>
         {tasks.length > 0 && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: '#8A6F2A', background: 'rgba(201,169,110,0.15)', padding: '4px 8px', borderRadius: 8 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#8A6F2A', background: 'rgba(240,228,200,0.92)', padding: '4px 8px', borderRadius: 8 }}>
             {tasks.length} task{tasks.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -328,7 +328,7 @@ export default function CareerCompassScreen() {
                 </div>
 
                 {compassResult.highest_use_work && compassResult.highest_use_work.length > 0 && (
-                  <div style={{ ...CARD, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                  <div style={{ ...CARD, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 10 }}>Highest-use work today</p>
                     {compassResult.highest_use_work.map((w, i) => (
                       <div key={i} style={{ display: 'flex', gap: 10, paddingTop: 8, paddingBottom: 8, borderBottom: i < compassResult.highest_use_work!.length - 1 ? '1px solid rgba(201,169,110,0.15)' : 'none' }}>
@@ -352,7 +352,7 @@ export default function CareerCompassScreen() {
                 )}
 
                 {compassResult.voice_clarity_prompt && (
-                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(201,169,110,0.08)' }}>
+                  <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(244,235,212,0.9)' }}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 8 }}>Voice clarity</p>
                     <p style={{ fontSize: 14, fontStyle: 'italic', color: '#100C1E', lineHeight: 1.6 }}>{compassResult.voice_clarity_prompt}</p>
                     <Link href="/dictation">

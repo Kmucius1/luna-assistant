@@ -245,15 +245,15 @@ export default function TarotPage() {
                   🔮
                 </div>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: VIOLET, marginBottom: 1 }}>Tarot</p>
-                  <p style={{ fontSize: 12, color: '#8A8098' }}>{timeOfDay}</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text-2)' }}>Tarot</p>
+                  <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)' }}>{timeOfDay}</p>
                 </div>
               </div>
 
-              <h1 style={{ fontSize: 24, fontWeight: 700, color: '#100C1E', marginTop: 16, marginBottom: 6, fontFamily: 'Georgia, serif' }}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text-1)', marginTop: 16, marginBottom: 6, fontFamily: 'Georgia, serif' }}>
                 What do you need to see right now?
               </h1>
-              <p style={{ fontSize: 14, color: '#8A8098', marginBottom: 24 }}>Choose your reading.</p>
+              <p style={{ fontSize: 14, color: 'rgba(245,239,227,0.72)', marginBottom: 24 }}>Choose your reading.</p>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 24 }}>
                 {SPREADS.map(spread => (
@@ -303,7 +303,7 @@ export default function TarotPage() {
               {history.length > 0 && (
                 <button
                   onClick={() => setView('history')}
-                  style={{ width: '100%', padding: '12px 0', borderRadius: 14, border: '1px solid rgba(180,150,100,0.18)', background: 'rgba(255,255,255,0.5)', color: '#5E5474', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                  style={{ width: '100%', padding: '12px 0', borderRadius: 14, border: '1px solid rgba(180,150,100,0.25)', background: 'rgba(255,255,255,0.85)', color: '#5E5474', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
                 >
                   Past readings →
                 </button>
@@ -314,14 +314,14 @@ export default function TarotPage() {
           {/* ── DRAWING ───────────────────────────────────── */}
           {view === 'drawing' && selectedSpread && (
             <div>
-              <button onClick={resetToHome} style={{ fontSize: 12, color: '#8A8098', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
+              <button onClick={resetToHome} style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
                 ← Back
               </button>
 
               <div style={{ textAlign: 'center', marginBottom: 28 }}>
                 <p style={{ fontSize: 22, marginBottom: 6 }}>{selectedSpread.emoji}</p>
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#100C1E', fontFamily: 'Georgia, serif' }}>{selectedSpread.name}</h2>
-                <p style={{ fontSize: 13, color: '#8A8098', marginTop: 6 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-1)', fontFamily: 'Georgia, serif' }}>{selectedSpread.name}</h2>
+                <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', marginTop: 6 }}>
                   {allFlipped() ? 'Cards revealed — ready for your reading.' : 'Tap each card to reveal it.'}
                 </p>
               </div>
@@ -335,7 +335,7 @@ export default function TarotPage() {
                       onClick={() => !isFlipped && flipCard(i)}
                       style={{ cursor: isFlipped ? 'default' : 'pointer' }}
                     >
-                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#8A8098', marginBottom: 6 }}>
+                      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(245,239,227,0.6)', marginBottom: 6 }}>
                         {selectedSpread.positions[i]}
                       </p>
                       <div style={{
@@ -408,7 +408,7 @@ export default function TarotPage() {
                     padding: '15px 0',
                     borderRadius: 18,
                     background: `linear-gradient(135deg, ${VIOLET}, #B8974F)`,
-                    color: '#100C1E',
+                    color: '#FDF8F3',
                     fontSize: 15,
                     fontWeight: 700,
                     cursor: 'pointer',
@@ -425,7 +425,7 @@ export default function TarotPage() {
           {/* ── READING ───────────────────────────────────── */}
           {view === 'reading' && (
             <div>
-              <button onClick={() => setView('drawing')} style={{ fontSize: 12, color: '#8A8098', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
+              <button onClick={() => setView('drawing')} style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
                 ← Back to cards
               </button>
 
@@ -439,10 +439,10 @@ export default function TarotPage() {
                     background: 'radial-gradient(circle, rgba(201,169,110,0.3), transparent)',
                     animation: 'pulse 2s ease-in-out infinite',
                   }} />
-                  <p style={{ fontSize: 15, color: '#5E5474', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 15, color: 'rgba(245,239,227,0.85)', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
                     Reading your cards...
                   </p>
-                  <p style={{ fontSize: 12, color: '#8A8098', marginTop: 8 }}>
+                  <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)', marginTop: 8 }}>
                     Connecting to your chart and your energy
                   </p>
                 </div>
@@ -451,10 +451,10 @@ export default function TarotPage() {
               {readingError && !loadingReading && (
                 <div style={{ textAlign: 'center', paddingTop: 40 }}>
                   <p style={{ fontSize: 32, marginBottom: 16 }}>🌙</p>
-                  <p style={{ fontSize: 16, color: '#32284A', marginBottom: 8, fontFamily: 'Georgia, serif' }}>
+                  <p style={{ fontSize: 16, color: 'var(--text-1)', marginBottom: 8, fontFamily: 'Georgia, serif' }}>
                     The connection dropped.
                   </p>
-                  <p style={{ fontSize: 13, color: '#8A8098', marginBottom: 28 }}>
+                  <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', marginBottom: 28 }}>
                     Your cards are still drawn. Try again.
                   </p>
                   <button
@@ -462,12 +462,12 @@ export default function TarotPage() {
                     style={{
                       padding: '12px 28px',
                       borderRadius: 14,
-                      background: 'rgba(201,169,110,0.15)',
+                      background: 'rgba(240,228,200,0.92)',
                       color: VIOLET,
                       fontSize: 14,
                       fontWeight: 700,
                       cursor: 'pointer',
-                      border: `1px solid rgba(201,169,110,0.25)`,
+                      border: `1px solid rgba(201,169,110,0.4)`,
                     }}
                   >
                     Try again
@@ -482,8 +482,8 @@ export default function TarotPage() {
                     ...glass,
                     padding: 24,
                     marginBottom: 20,
-                    background: 'rgba(201,169,110,0.09)',
-                    border: '1px solid rgba(201,169,110,0.18)',
+                    background: 'rgba(247,238,220,0.95)',
+                    border: '1px solid rgba(201,169,110,0.4)',
                     textAlign: 'center',
                   }}>
                     <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: VIOLET, marginBottom: 10 }}>
@@ -543,7 +543,7 @@ export default function TarotPage() {
                   </div>
 
                   {/* Overall message */}
-                  <div style={{ ...glass, padding: 22, marginBottom: 14, background: 'rgba(201,169,110,0.05)', border: '1px solid rgba(201,169,110,0.12)' }}>
+                  <div style={{ ...glass, padding: 22, marginBottom: 14, background: 'rgba(244,235,212,0.92)', border: '1px solid rgba(201,169,110,0.35)' }}>
                     <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: GOLDEN, marginBottom: 10 }}>Overall message</p>
                     <p style={{ fontSize: 14, color: '#32284A', lineHeight: 1.7 }}>{reading.overall_message}</p>
                   </div>
@@ -555,7 +555,7 @@ export default function TarotPage() {
                   </div>
 
                   {/* Affirmation */}
-                  <div style={{ borderRadius: 20, padding: '20px 22px', marginBottom: 14, textAlign: 'center', background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
+                  <div style={{ borderRadius: 20, padding: '20px 22px', marginBottom: 14, textAlign: 'center', background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
                     <p style={{ fontSize: 16, fontStyle: 'italic', color: '#100C1E', lineHeight: 1.6, fontFamily: 'Georgia, serif' }}>
                       &ldquo;{reading.affirmation}&rdquo;
                     </p>
@@ -563,7 +563,7 @@ export default function TarotPage() {
 
                   {/* Time note */}
                   {reading.time_note && (
-                    <p style={{ fontSize: 12, color: '#8A8098', textAlign: 'center', lineHeight: 1.6, marginBottom: 28, fontStyle: 'italic' }}>
+                    <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)', textAlign: 'center', lineHeight: 1.6, marginBottom: 28, fontStyle: 'italic' }}>
                       {reading.time_note}
                     </p>
                   )}
@@ -610,7 +610,7 @@ export default function TarotPage() {
                               padding: '11px 20px',
                               borderRadius: 13,
                               background: `linear-gradient(135deg, ${VIOLET}, #B8974F)`,
-                              color: '#100C1E',
+                              color: '#FDF8F3',
                               fontSize: 13,
                               fontWeight: 700,
                               cursor: 'pointer',
@@ -646,18 +646,18 @@ export default function TarotPage() {
           {/* ── HISTORY ───────────────────────────────────── */}
           {view === 'history' && (
             <div>
-              <button onClick={resetToHome} style={{ fontSize: 12, color: '#8A8098', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
+              <button onClick={resetToHome} style={{ fontSize: 12, color: 'rgba(245,239,227,0.65)', marginBottom: 20, cursor: 'pointer', background: 'none', border: 'none' }}>
                 ← Back
               </button>
 
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: '#100C1E', fontFamily: 'Georgia, serif', marginBottom: 16 }}>Past Readings</h2>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-1)', fontFamily: 'Georgia, serif', marginBottom: 16 }}>Past Readings</h2>
 
               {stats.total > 0 && (
                 <div style={{ display: 'flex', gap: 10, marginBottom: 24, flexWrap: 'wrap' }}>
-                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(201,169,110,0.14)', color: VIOLET, fontSize: 12, fontWeight: 700 }}>
+                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(240,228,200,0.92)', color: VIOLET, fontSize: 12, fontWeight: 700 }}>
                     {stats.total} readings
                   </span>
-                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(201,169,110,0.12)', color: GOLDEN, fontSize: 12, fontWeight: 700 }}>
+                  <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(240,228,200,0.92)', color: GOLDEN, fontSize: 12, fontWeight: 700 }}>
                     {Math.round(stats.accuracy_pct)}% resonant
                   </span>
                   <span style={{ padding: '6px 14px', borderRadius: 20, background: 'rgba(168,196,218,0.1)', color: LUNAR, fontSize: 12, fontWeight: 700 }}>
@@ -669,7 +669,7 @@ export default function TarotPage() {
               {history.length === 0 ? (
                 <div style={{ textAlign: 'center', paddingTop: 48 }}>
                   <p style={{ fontSize: 32, marginBottom: 12 }}>🔮</p>
-                  <p style={{ fontSize: 15, color: '#8A8098', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 15, color: 'rgba(245,239,227,0.72)', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
                     No readings yet. Your first one is waiting.
                   </p>
                 </div>

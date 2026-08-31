@@ -41,7 +41,7 @@ export default function GrowthPage() {
             </div>
           </Link>
           <div className="flex-1">
-            <h1 className="font-display text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Growth</h1>
+            <h1 className="font-display text-2xl font-bold" style={{ color: '#F5EFE3' }}>Growth</h1>
             <p className="text-xs" style={{ color: 'var(--text-4)' }}>Your patterns, trends, and evolution</p>
           </div>
           <div className="flex gap-2">

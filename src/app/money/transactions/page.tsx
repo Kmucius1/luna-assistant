@@ -62,7 +62,7 @@ function TransactionsInner() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px' }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 14 }}>Transactions</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F5EFE3', marginBottom: 14 }}>Transactions</h1>
 
           <div style={{ position: 'relative', marginBottom: 10 }}>
             <Search style={{ position: 'absolute', left: 12, top: 12, width: 16, height: 16, color: '#5E5474' }} />
@@ -73,7 +73,7 @@ function TransactionsInner() {
             {['', ...OWNERSHIP_TYPES].map(o => (
               <button key={o || 'all'} onClick={() => setOwnershipFilter(o)}
                 style={{ flexShrink: 0, padding: '6px 12px', borderRadius: 10, fontSize: 11.5, fontWeight: 600, cursor: 'pointer', border: 'none',
-                  background: ownershipFilter === o ? 'rgba(201,169,110,0.3)' : 'rgba(255,255,255,0.5)', color: ownershipFilter === o ? GOLDEN : '#5E5474' }}>
+                  background: ownershipFilter === o ? 'rgba(244,235,212,0.9)' : 'rgba(255,255,255,0.5)', color: ownershipFilter === o ? GOLDEN : '#5E5474' }}>
                 {o || 'All'}
               </button>
             ))}
@@ -91,7 +91,7 @@ function TransactionsInner() {
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 40 }}><RefreshCw className="h-5 w-5 animate-spin mx-auto" style={{ color: '#5E5474' }} /></div>
+            <div style={{ textAlign: 'center', padding: 40 }}><RefreshCw className="h-5 w-5 animate-spin mx-auto" style={{ color: 'rgba(245,239,227,0.72)' }} /></div>
           ) : transactions.length === 0 ? (
             <div style={{ ...CARD, padding: 32, textAlign: 'center' }}>
               <p style={{ fontSize: 14, color: '#5E5474' }}>No transactions yet.</p>

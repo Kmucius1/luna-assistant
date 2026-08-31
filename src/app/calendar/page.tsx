@@ -184,9 +184,9 @@ export default function CalendarPage() {
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
-                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Calendar</h1>
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#F5EFE3' }}>Calendar</h1>
                 {!loading && !error && (
-                  <p style={{ fontSize: 12, color: '#5E5474', marginTop: 2 }}>
+                  <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.72)', marginTop: 2 }}>
                     {todayCount} today · {weekCount} this week{fetchedAt ? ` · synced ${fetchedAt}` : ''}
                   </p>
                 )}
@@ -235,7 +235,7 @@ export default function CalendarPage() {
           <div style={{ padding: '0 16px' }}>
 
             {error && (
-              <div style={{ ...G, padding: 16, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.25)', marginBottom: 12 }}>
+              <div style={{ ...G, padding: 16, background: 'rgba(250,225,222,0.92)', border: '1px solid rgba(224,94,94,0.4)', marginBottom: 12 }}>
                 <p style={{ fontSize: 13, color: '#B23B3B' }}>{error}</p>
               </div>
             )}

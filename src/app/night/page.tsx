@@ -175,7 +175,7 @@ export default function NightScreen() {
   }
 
   const selectedLocStyle = (val: string) => ({
-    background: location === val ? 'rgba(201,169,110,0.22)' : 'rgba(255,255,255,0.55)',
+    background: location === val ? 'rgba(244,235,212,0.9)' : 'rgba(255,255,255,0.55)',
     border: `1.5px solid ${location === val ? 'rgba(201,169,110,0.45)' : 'rgba(180,150,100,0.16)'}`,
     color: '#100C1E',
     borderRadius: 12,
@@ -198,18 +198,18 @@ export default function NightScreen() {
           {/* Header */}
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(201,169,110,0.18)' }}>
+              style={{ background: 'rgba(240,228,200,0.92)' }}>
               <Moon className="h-5 w-5" style={{ color: '#5C4530' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#5C4530' }}>Night Mode</p>
+              <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#F5EFE3' }}>Night Mode</p>
             </div>
           </div>
 
-          <h1 className="font-display text-3xl font-bold mb-1" style={{ color: '#100C1E' }}>
+          <h1 className="font-display text-3xl font-bold mb-1" style={{ color: '#F5EFE3' }}>
             Protect tomorrow.
           </h1>
-          <p className="text-base mb-6" style={{ color: '#32284A' }}>
+          <p className="text-base mb-6" style={{ color: 'rgba(245,239,227,0.72)' }}>
             Your morning starts tonight.
           </p>
 
@@ -231,7 +231,7 @@ export default function NightScreen() {
               <button key={t.value} onClick={() => setTab(t.value)}
                 className="flex-1 py-2.5 rounded-2xl text-sm font-semibold transition-all"
                 style={{
-                  background: tab === t.value ? 'rgba(201,169,110,0.25)' : 'rgba(255,255,255,0.55)',
+                  background: tab === t.value ? 'rgba(244,235,212,0.9)' : 'rgba(255,255,255,0.55)',
                   border: `1.5px solid ${tab === t.value ? 'rgba(201,169,110,0.45)' : 'rgba(180,150,100,0.16)'}`,
                   color: '#100C1E',
                 }}>
@@ -273,7 +273,7 @@ export default function NightScreen() {
 
               {/* ── Live bedtime result ── */}
               {wakeGoal && (
-                <div style={{ borderRadius: 20, overflow: 'hidden', background: 'linear-gradient(145deg, rgba(201,169,110,0.18) 0%, rgba(201,169,110,0.08) 100%)', border: '1.5px solid rgba(201,169,110,0.35)' }}>
+                <div style={{ borderRadius: 20, overflow: 'hidden', background: 'linear-gradient(145deg, rgba(247,238,220,0.95) 0%, rgba(240,228,200,0.93) 100%)', border: '1.5px solid rgba(201,169,110,0.45)' }}>
                   <div style={{ padding: '18px 20px', textAlign: 'center' }}>
                     <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', marginBottom: 6 }}>
                       Asleep by — for {clampedSleepHours}h
@@ -377,10 +377,10 @@ export default function NightScreen() {
               {!plan ? (
                 <div className="text-center py-12">
                   <span className="text-5xl block mb-4">🌙</span>
-                  <p className="text-base font-semibold mb-2" style={{ color: '#100C1E' }}>Fill in Sleep first</p>
-                  <p className="text-sm" style={{ color: '#5E5474' }}>Go to the Sleep tab and calculate your night.</p>
+                  <p className="text-base font-semibold mb-2" style={{ color: '#F5EFE3' }}>Fill in Sleep first</p>
+                  <p className="text-sm" style={{ color: 'rgba(245,239,227,0.72)' }}>Go to the Sleep tab and calculate your night.</p>
                   <button onClick={() => setTab('sleep')} className="mt-4 px-5 py-2.5 rounded-xl text-sm font-semibold"
-                    style={{ background: 'rgba(201,169,110,0.2)', color: '#100C1E', border: '1px solid rgba(201,169,110,0.35)' }}>
+                    style={{ background: 'rgba(244,235,212,0.9)', color: '#100C1E', border: '1px solid rgba(201,169,110,0.35)' }}>
                     Set up sleep
                   </button>
                 </div>
@@ -434,7 +434,7 @@ export default function NightScreen() {
                 />
               </div>
 
-              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#5E5474' }}>
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(245,239,227,0.72)' }}>
                 Night Ritual Checklist
               </p>
 
@@ -450,7 +450,7 @@ export default function NightScreen() {
                     <button key={i} onClick={() => toggleCheck(i)}
                       className="w-full text-left rounded-2xl transition-all flex items-center gap-4 overflow-hidden"
                       style={{
-                        background: done ? 'rgba(201,169,110,0.18)' : 'rgba(255,255,255,0.55)',
+                        background: done ? 'rgba(240,228,200,0.92)' : 'rgba(255,255,255,0.55)',
                         border: `1.5px solid ${done ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}`,
                         opacity: done ? 0.72 : 1,
                         transition: 'all 0.2s ease',
@@ -500,7 +500,7 @@ export default function NightScreen() {
               {/* Lights-out indicator */}
               {plan && (
                 <div className="flex items-center gap-3 px-4 py-3 rounded-2xl"
-                  style={{ background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.25)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                   <span className="text-lg">✨</span>
                   <div>
                     <p className="text-sm font-semibold" style={{ color: '#100C1E' }}>

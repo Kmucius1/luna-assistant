@@ -79,7 +79,7 @@ export default function RetrogradesPage() {
                     <div className="flex flex-wrap gap-2 mt-2">
                       {data.retrogrades.map(r => (
                         <span key={r.name} className="flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold"
-                          style={{ background: 'rgba(201,169,110,0.18)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.3)' }}>
+                          style={{ background: 'rgba(240,228,200,0.92)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.4)' }}>
                           <RotateCcw className="h-3 w-3" /> {r.name}
                         </span>
                       ))}
@@ -125,7 +125,7 @@ export default function RetrogradesPage() {
                           <div className="flex items-center gap-2">
                             <p className="font-bold" style={{ color: 'var(--text-1)' }}>{r.name} Retrograde</p>
                             <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold"
-                              style={{ background: 'rgba(201,169,110,0.15)', color: '#5C4530' }}>
+                              style={{ background: 'rgba(240,228,200,0.92)', color: '#5C4530' }}>
                               <RotateCcw className="h-2.5 w-2.5" /> ℞
                             </span>
                           </div>

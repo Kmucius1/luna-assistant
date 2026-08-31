@@ -143,7 +143,7 @@ export default function ForecastsPage() {
                   <ArrowLeft className="h-4 w-4" style={{ color: 'rgba(16,12,30,0.45)' }} />
                 </Link>
                 <div>
-                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#100C1E' }}>Forecasts</h1>
+                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#F5EFE3' }}>Forecasts</h1>
                   <p style={{ fontSize: 11, color: 'rgba(16,12,30,0.38)' }}>Your cosmic outlook — day by day</p>
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function ForecastsPage() {
 
             {/* Week overview card */}
             {!loading && forecast && (
-              <div style={{ ...GLASS, padding: 18, marginBottom: 16, background: 'linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.07))' }}>
+              <div style={{ ...GLASS, padding: 18, marginBottom: 16, background: 'linear-gradient(135deg, rgba(247,238,220,0.95), rgba(240,228,198,0.92))' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                   <Sparkles className="h-4 w-4" style={{ color: '#5C4530' }} />
                   <Label text="This Week's Theme" color="#5C4530" />
@@ -201,7 +201,7 @@ export default function ForecastsPage() {
 
             {/* Chart note */}
             {forecast && (
-              <div style={{ ...GLASS, padding: 14, marginTop: 16, background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.15)' }}>
+              <div style={{ ...GLASS, padding: 14, marginTop: 16, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#5C4530', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Reading personalized to your chart</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {[['☀️','Scorpio 22°'],['🌙','Cancer 4°'],['✨','Gemini Rising'],['♀','Sag Venus 29°'],['♂','Libra Mars 6°'],['☊','Cancer N.Node']].map(([e, v]) => (

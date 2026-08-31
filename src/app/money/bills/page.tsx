@@ -26,17 +26,17 @@ interface Bill {
 interface BillStyle { bg: string; border: string; badge: string; badgeColor: string }
 
 function getBillStyle(bill: Bill): BillStyle {
-  if (bill.status === 'paid') return { bg: 'rgba(90,138,106,0.15)', border: '#5A8A6A', badge: 'Paid', badgeColor: '#5A8A6A' }
-  if (bill.status === 'late' || bill.status === 'failed') return { bg: 'rgba(255,0,0,0.13)', border: '#FF0000', badge: bill.status.toUpperCase(), badgeColor: '#FF4444' }
-  if (bill.autopay_status === 'on') return { bg: 'rgba(65,105,225,0.15)', border: '#6A8AE8', badge: 'Autopay', badgeColor: '#6A8AE8' }
+  if (bill.status === 'paid') return { bg: 'rgba(224,236,228,0.92)', border: '#5A8A6A', badge: 'Paid', badgeColor: '#5A8A6A' }
+  if (bill.status === 'late' || bill.status === 'failed') return { bg: 'rgba(255,225,225,0.92)', border: '#FF0000', badge: bill.status.toUpperCase(), badgeColor: '#CC0000' }
+  if (bill.autopay_status === 'on') return { bg: 'rgba(222,229,250,0.92)', border: '#6A8AE8', badge: 'Autopay', badgeColor: '#4A6AC8' }
   const days = bill.days_until
-  if (days == null) return { bg: 'rgba(180,150,100,0.08)', border: 'rgba(180,150,100,0.16)', badge: 'Upcoming', badgeColor: '#5E5474' }
-  if (days < 0) return { bg: 'rgba(255,0,0,0.13)', border: '#FF0000', badge: 'OVERDUE', badgeColor: '#FF4444' }
-  if (days === 0) return { bg: 'rgba(201,107,90,0.13)', border: '#C96B5A', badge: 'DUE TODAY', badgeColor: '#C96B5A' }
-  if (days <= 2) return { bg: 'rgba(224,94,34,0.13)', border: '#E05E22', badge: `Due in ${days}d`, badgeColor: '#E05E22' }
-  if (days <= 6) return { bg: 'rgba(201,146,58,0.13)', border: '#C9923A', badge: `Due in ${days}d`, badgeColor: '#C9923A' }
-  if (days <= 13) return { bg: 'rgba(201,169,110,0.13)', border: '#5C4530', badge: `Due in ${days}d`, badgeColor: '#5C4530' }
-  return { bg: 'rgba(180,150,100,0.08)', border: 'rgba(180,150,100,0.16)', badge: `${days} days`, badgeColor: '#5E5474' }
+  if (days == null) return { bg: 'rgba(244,238,225,0.9)', border: 'rgba(180,150,100,0.3)', badge: 'Upcoming', badgeColor: '#5E5474' }
+  if (days < 0) return { bg: 'rgba(255,225,225,0.92)', border: '#FF0000', badge: 'OVERDUE', badgeColor: '#CC0000' }
+  if (days === 0) return { bg: 'rgba(250,230,224,0.92)', border: '#C96B5A', badge: 'DUE TODAY', badgeColor: '#B85640' }
+  if (days <= 2) return { bg: 'rgba(250,230,215,0.92)', border: '#E05E22', badge: `Due in ${days}d`, badgeColor: '#C04E1A' }
+  if (days <= 6) return { bg: 'rgba(248,235,210,0.92)', border: '#C9923A', badge: `Due in ${days}d`, badgeColor: '#A57626' }
+  if (days <= 13) return { bg: 'rgba(246,238,218,0.92)', border: '#5C4530', badge: `Due in ${days}d`, badgeColor: '#5C4530' }
+  return { bg: 'rgba(244,238,225,0.9)', border: 'rgba(180,150,100,0.3)', badge: `${days} days`, badgeColor: '#5E5474' }
 }
 
 export default function BillsPage() {
@@ -70,8 +70,8 @@ export default function BillsPage() {
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px' }}>
           <div style={{ marginBottom: 20 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Bills</h1>
-            <p style={{ fontSize: 13, color: '#32284A' }}>Know what&apos;s coming before it arrives</p>
+            <h1 style={{ fontSize: 24, fontWeight: 700, color: '#F5EFE3', marginBottom: 4 }}>Bills</h1>
+            <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)' }}>Know what&apos;s coming before it arrives</p>
           </div>
 
           <div style={{ display: 'flex', gap: 10, overflowX: 'auto', marginBottom: 20, paddingBottom: 4 }}>
@@ -96,7 +96,7 @@ export default function BillsPage() {
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <RefreshCw style={{ width: 20, height: 20, color: '#5E5474' }} className="animate-spin mx-auto" />
+              <RefreshCw style={{ width: 20, height: 20, color: 'rgba(245,239,227,0.72)' }} className="animate-spin mx-auto" />
             </div>
           ) : bills.length === 0 ? (
             <div style={{ ...CARD, padding: 32, textAlign: 'center' }}>
@@ -108,7 +108,7 @@ export default function BillsPage() {
             </div>
           ) : (
             <div>
-              <p style={{ ...LABEL_STYLE, marginBottom: 12 }}>All Bills</p>
+              <p style={{ ...LABEL_STYLE, marginBottom: 12, color: 'rgba(245,239,227,0.72)' }}>All Bills</p>
               {bills.map(bill => {
                 const style = getBillStyle(bill)
                 return (

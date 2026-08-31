@@ -20,8 +20,8 @@ const CARD: React.CSSProperties = {
   boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const SOUL_CARD: React.CSSProperties = {
-  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
-  border: '1px solid rgba(201,169,110,0.22)',
+  background: 'linear-gradient(135deg, rgba(247,238,220,0.95) 0%, rgba(240,228,198,0.92) 100%)',
+  border: '1px solid rgba(201,169,110,0.4)',
   borderRadius: 20,
 }
 
@@ -237,7 +237,7 @@ export default function MorningCheckIn() {
           {step !== 'result' && (
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: 'rgba(201,169,110,0.15)' }}>
+                style={{ background: 'rgba(244,235,212,0.9)' }}>
                 <span className="text-xl">{CHECK_IN_CONFIG[checkInType].emoji}</span>
               </div>
               <div>
@@ -309,7 +309,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('wake')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('energy')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -332,7 +332,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('sleep')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('mood')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -357,7 +357,7 @@ export default function MorningCheckIn() {
                   <button key={String(v)} onClick={() => update('hadDream', v)}
                     className="flex-1 py-4 rounded-2xl font-semibold transition-all"
                     style={{
-                      background: data.hadDream === v ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
+                      background: data.hadDream === v ? 'var(--violet)' : 'rgba(244,235,212,0.9)',
                       color: data.hadDream === v ? 'white' : 'var(--mid)',
                     }}>
                     {v ? 'Yes ✨' : 'Not that I remember'}
@@ -379,7 +379,7 @@ export default function MorningCheckIn() {
               )}
               <div className="flex gap-3">
                 <button onClick={() => setStep('energy')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('dream')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -424,7 +424,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('mood')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('feeling')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -466,7 +466,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('dream')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('support')} className="flex-1 py-4 rounded-2xl font-semibold text-white"
@@ -499,7 +499,7 @@ export default function MorningCheckIn() {
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('feeling')} className="flex-none px-5 py-4 rounded-2xl font-semibold"
-                  style={{ background: 'rgba(201,169,110,0.08)', color: 'var(--violet)' }}>
+                  style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={finish} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95"
@@ -603,7 +603,7 @@ export default function MorningCheckIn() {
                   </div>
 
                   {/* Affirmation */}
-                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.1)' }}>
+                  <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)' }}>
                     <p className="font-display text-lg italic" style={{ color: 'var(--depth)' }}>
                       &ldquo;{result.affirmation}&rdquo;
                     </p>

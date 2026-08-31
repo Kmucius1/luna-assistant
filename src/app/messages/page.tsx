@@ -141,7 +141,7 @@ function ReplyCard({ option, responseId, highlight, extraActions }: {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <div style={{ ...GLASS, padding: 16, background: highlight ? 'rgba(201,169,110,0.12)' : 'rgba(255,255,255,0.5)', border: `1.5px solid ${highlight ? 'rgba(201,169,110,0.35)' : 'rgba(180,150,100,0.16)'}` }}>
+    <div style={{ ...GLASS, padding: 16, background: highlight ? 'rgba(244,235,212,0.9)' : 'rgba(255,255,255,0.5)', border: `1.5px solid ${highlight ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}` }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10, gap: 8 }}>
         <div style={{ minWidth: 0 }}>
           <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: highlight ? '#8A6F2A' : '#5E5474', margin: 0 }}>
@@ -349,7 +349,7 @@ export default function CommunicationCoach() {
             </div>
             <div>
               <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#B8635E' }}>LUNA Communication Coach</p>
-              <p style={{ fontSize: 11, color: '#5E5474' }}>Paste it. Talk it out. Get the response that sounds like you.</p>
+              <p style={{ fontSize: 11, color: 'rgba(245,239,227,0.72)' }}>Paste it. Talk it out. Get the response that sounds like you.</p>
             </div>
           </div>
 
@@ -377,7 +377,7 @@ export default function CommunicationCoach() {
                     onClick={listening ? stopListening : startListening}
                     className="absolute right-3 bottom-3 w-8 h-8 rounded-full flex items-center justify-center"
                     style={{
-                      background: listening ? '#5C4530' : 'rgba(201,169,110,0.15)',
+                      background: listening ? '#5C4530' : 'rgba(244,235,212,0.9)',
                       border: `1px solid ${listening ? '#5C4530' : 'rgba(201,169,110,0.3)'}`,
                     }}
                     title={listening ? 'Stop dictation' : 'Dictate'}>
@@ -470,7 +470,7 @@ export default function CommunicationCoach() {
               </div>
 
               {error && (
-                <div style={{ ...GLASS, padding: 14, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.22)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ ...GLASS, padding: 14, background: 'rgba(250,225,222,0.92)', border: '1px solid rgba(224,94,94,0.4)', display: 'flex', alignItems: 'center', gap: 10 }}>
                   <AlertCircle style={{ width: 16, height: 16, color: '#B23B3B', flexShrink: 0 }} />
                   <p style={{ fontSize: 12.5, color: '#B23B3B' }}>{error}</p>
                 </div>
@@ -568,7 +568,7 @@ export default function CommunicationCoach() {
                   )}
 
                   {editText && (
-                    <div style={{ ...GLASS, padding: 16, background: 'rgba(90,180,90,0.08)', border: '1.5px solid rgba(90,180,90,0.25)' }}>
+                    <div style={{ ...GLASS, padding: 16, background: 'rgba(224,236,224,0.92)', border: '1.5px solid rgba(90,180,90,0.4)' }}>
                       <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#3D7A3D', marginBottom: 10 }}>Edit before sending</p>
                       <textarea value={editText} onChange={e => setEditText(e.target.value)} rows={4}
                         className="luna-input" style={{ width: '100%', background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.18)', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#100C1E', outline: 'none', fontFamily: 'inherit', resize: 'none', lineHeight: 1.6, colorScheme: 'light', boxSizing: 'border-box' }} />

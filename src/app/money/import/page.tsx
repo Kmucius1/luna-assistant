@@ -87,11 +87,11 @@ export default function ImportPage() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad>
         <div style={{ padding: '80px 20px 140px' }}>
-          <Link href="/money" style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#32284A', textDecoration: 'none', fontSize: 13, marginBottom: 16 }}>
+          <Link href="/money" style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(245,239,227,0.72)', textDecoration: 'none', fontSize: 13, marginBottom: 16 }}>
             <ArrowLeft style={{ width: 14, height: 14 }} /> Back to Money
           </Link>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#100C1E', marginBottom: 6 }}>Import Transactions</h1>
-          <p style={{ fontSize: 13, color: '#32284A', marginBottom: 20, lineHeight: 1.6 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#F5EFE3', marginBottom: 6 }}>Import Transactions</h1>
+          <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', marginBottom: 20, lineHeight: 1.6 }}>
             CSV, PDF statement, a screenshot of a statement, or type one in manually.
           </p>
 
@@ -110,7 +110,7 @@ export default function ImportPage() {
                 {([['csv', FileText, 'CSV'], ['pdf', FileText, 'PDF'], ['image', Camera, 'Screenshot'], ['manual', PenLine, 'Manual']] as const).map(([type, Icon, label]) => (
                   <button key={type} onClick={() => { setSourceType(type); setReport(null); setError(null) }}
                     style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 4px', borderRadius: 12, cursor: 'pointer',
-                      background: sourceType === type ? 'rgba(201,169,110,0.18)' : 'rgba(255,255,255,0.5)',
+                      background: sourceType === type ? 'rgba(244,235,212,0.9)' : 'rgba(255,255,255,0.5)',
                       border: `1px solid ${sourceType === type ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}`,
                       color: sourceType === type ? GOLDEN : '#5E5474' }}>
                     <Icon style={{ width: 16, height: 16 }} />
@@ -120,7 +120,7 @@ export default function ImportPage() {
               </div>
 
               {report && (
-                <div style={{ ...CARD, padding: 22, border: '1px solid rgba(90,138,106,0.4)', background: 'rgba(90,138,106,0.08)', marginBottom: 18 }}>
+                <div style={{ ...CARD, padding: 22, border: '1px solid rgba(90,138,106,0.4)', background: 'rgba(224,236,224,0.92)', marginBottom: 18 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
                     <CheckCircle style={{ width: 24, height: 24, color: GREEN }} />
                     <p style={{ fontSize: 16, fontWeight: 700, color: '#100C1E' }}>Import complete</p>
@@ -133,14 +133,14 @@ export default function ImportPage() {
                     <p>{report.transactionsNeedReview} transactions need review</p>
                     <p style={{ fontWeight: 700, color: GOLDEN, marginTop: 4 }}>{formatCurrency(report.safeToSpend)} safe to spend</p>
                   </div>
-                  <Link href="/money/transactions" style={{ display: 'inline-block', marginTop: 16, textDecoration: 'none', background: `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#100C1E', padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700 }}>
+                  <Link href="/money/transactions" style={{ display: 'inline-block', marginTop: 16, textDecoration: 'none', background: `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#F5EFE3', padding: '10px 20px', borderRadius: 10, fontSize: 13, fontWeight: 700 }}>
                     View Transactions
                   </Link>
                 </div>
               )}
 
               {error && (
-                <div style={{ ...CARD, padding: '12px 16px', border: '1px solid rgba(201,107,90,0.4)', background: 'rgba(201,107,90,0.08)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ ...CARD, padding: '12px 16px', border: '1px solid rgba(201,107,90,0.4)', background: 'rgba(247,225,218,0.92)', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
                   <AlertCircle style={{ width: 16, height: 16, color: RED, flexShrink: 0 }} />
                   <p style={{ fontSize: 13, color: RED }}>{error}</p>
                 </div>
@@ -163,7 +163,7 @@ export default function ImportPage() {
                       </select>
                     </div>
                     <button onClick={submitManual} disabled={importing || !manual.merchant.trim() || !manual.amount}
-                      style={{ width: '100%', height: 44, borderRadius: 12, border: 'none', cursor: 'pointer', background: `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#100C1E', fontSize: 14, fontWeight: 800, opacity: importing ? 0.6 : 1 }}>
+                      style={{ width: '100%', height: 44, borderRadius: 12, border: 'none', cursor: 'pointer', background: `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#F5EFE3', fontSize: 14, fontWeight: 800, opacity: importing ? 0.6 : 1 }}>
                       {importing ? 'Saving…' : 'Save transaction'}
                     </button>
                   </div>
@@ -184,8 +184,8 @@ export default function ImportPage() {
                 </div>
               )}
 
-              <p style={{ ...LABEL, marginTop: 20, marginBottom: 8 }}>Idempotent</p>
-              <p style={{ fontSize: 12, color: '#5E5474', lineHeight: 1.6 }}>
+              <p style={{ ...LABEL, marginTop: 20, marginBottom: 8, color: 'rgba(245,239,227,0.6)' }}>Idempotent</p>
+              <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.72)', lineHeight: 1.6 }}>
                 Uploading the same statement twice won&apos;t create duplicate transactions — each one is fingerprinted by account, date, merchant, and amount.
               </p>
             </>

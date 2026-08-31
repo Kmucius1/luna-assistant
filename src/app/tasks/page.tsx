@@ -119,18 +119,18 @@ export default function TasksPage() {
 
           {/* Header */}
           <div style={{ padding: '20px 20px 16px' }}>
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#5E5474', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-3)', fontSize: 12, textDecoration: 'none', marginBottom: 14 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div>
-                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: '#100C1E' }}>Tasks</h1>
-                <p style={{ fontSize: 12, color: '#5E5474', marginTop: 2 }}>
+                <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700, color: 'var(--text-1)' }}>Tasks</h1>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
                   {openCount} open · {doneCount} done
                 </p>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(201,169,110,0.12)', color: '#5C4530', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                <button onClick={handleAIRank} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: '1px solid rgba(201,169,110,0.4)', background: 'rgba(240,228,200,0.92)', color: '#5C4530', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                   {aiLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
                   AI rank
                 </button>
@@ -143,7 +143,7 @@ export default function TasksPage() {
 
           {/* DRYP CRM live tasks */}
           <div style={{ padding: '0 16px 12px' }}>
-            <div style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.2)', borderRadius: 20 }}>
+            <div style={{ background: 'rgba(244,235,212,0.92)', border: '1px solid rgba(201,169,110,0.35)', borderRadius: 20 }}>
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -249,13 +249,13 @@ export default function TasksPage() {
 
             {/* AI ranking banner */}
             {aiLoading && (
-              <div style={{ ...GLASS, padding: 14, background: 'rgba(201,169,110,0.1)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+              <div style={{ ...GLASS, padding: 14, background: 'rgba(244,235,212,0.92)', display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                 <RefreshCw className="h-4 w-4 animate-spin" style={{ color: '#5C4530' }} />
                 <p style={{ fontSize: 13, color: '#32284A' }}>AI is ranking your tasks…</p>
               </div>
             )}
             {aiRankings && !aiLoading && (
-              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(244,235,212,0.92)', border: '1px solid rgba(201,169,110,0.35)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <p style={{ fontSize: 12, color: '#8A6F2A' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
                 <button onClick={() => setAiRankings(null)} style={{ fontSize: 11, color: '#5E5474', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
               </div>
@@ -306,7 +306,7 @@ export default function TasksPage() {
                 {filtered.map((task, i) => (
                   <div key={task.id} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                     {aiRankings && (
-                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(201,169,110,0.22)', color: '#8A6F2A', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
+                      <span style={{ width: 24, height: 24, borderRadius: 12, background: 'rgba(240,228,200,0.92)', color: '#8A6F2A', fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 16 }}>{i + 1}</span>
                     )}
                     <div style={{ flex: 1 }}>
                       <TaskCard task={task} onStatusChange={handleStatusChange} />

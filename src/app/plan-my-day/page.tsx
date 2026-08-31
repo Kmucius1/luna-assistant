@@ -126,7 +126,7 @@ export default function PlanMyDayPage() {
               <ArrowLeft className="h-3.5 w-3.5" /> Home
             </Link>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(201,169,110,0.18)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: 40, height: 40, borderRadius: 14, background: 'rgba(240,228,200,0.92)', border: '1px solid rgba(201,169,110,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Clock className="h-5 w-5" style={{ color: '#8A6F2A' }} />
               </div>
               <div>
@@ -291,7 +291,7 @@ export default function PlanMyDayPage() {
             {/* Loading */}
             {loading && (
               <div style={{ ...GLASS, padding: 32, textAlign: 'center', marginBottom: 16 }}>
-                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(240,228,200,0.92)', border: '1px solid rgba(201,169,110,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                   <RefreshCw className="h-6 w-6 animate-spin" style={{ color: '#8A6F2A' }} />
                 </div>
                 <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink-1)', marginBottom: 6 }}>Building your full day…</p>
@@ -301,7 +301,7 @@ export default function PlanMyDayPage() {
 
             {/* Error */}
             {error && (
-              <div style={{ ...GLASS, padding: 18, background: 'rgba(224,94,94,0.08)', border: '1px solid rgba(224,94,94,0.22)', marginBottom: 12 }}>
+              <div style={{ ...GLASS, padding: 18, background: 'rgba(250,225,225,0.92)', border: '1px solid rgba(224,94,94,0.35)' , marginBottom: 12 }}>
                 <p style={{ fontSize: 13, color: '#B23B3B' }}>{error}</p>
                 <button onClick={generate} style={{ marginTop: 10, fontSize: 12, color: '#B23B3B', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Try again →</button>
               </div>

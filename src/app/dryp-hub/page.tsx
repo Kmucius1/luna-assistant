@@ -107,8 +107,8 @@ export default function DryphubPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8934A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 800, color: 'white' }}>D</div>
                 <div>
-                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#100C1E' }}>DRYP Hub</h1>
-                  <p style={{ fontSize: 11, color: '#5E5474', marginTop: 1 }}>
+                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#F5EFE3' }}>DRYP Hub</h1>
+                  <p style={{ fontSize: 11, color: 'rgba(245,239,227,0.72)', marginTop: 1 }}>
                     {connected === true ? `Last checked ${lastCheck ?? '—'}` : connected === false ? 'Not connected' : 'Connecting…'}
                   </p>
                 </div>
@@ -128,7 +128,7 @@ export default function DryphubPage() {
 
             {/* Not connected */}
             {connected === false && (
-              <div style={{ ...GLASS, padding: 24, marginBottom: 14, background: 'rgba(224,94,94,0.07)', border: '1px solid rgba(224,94,94,0.22)' }}>
+              <div style={{ ...GLASS, padding: 24, marginBottom: 14, background: 'rgba(250,225,222,0.92)', border: '1px solid rgba(224,94,94,0.4)' }}>
                 <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                   <AlertTriangle className="h-5 w-5 flex-shrink-0" style={{ color: '#B23B3B', marginTop: 2 }} />
                   <div>
@@ -157,7 +157,7 @@ export default function DryphubPage() {
 
             {/* Alert: new/at-risk */}
             {connected && (totalAlerts > 0 || hasAtRisk) && (
-              <div style={{ ...GLASS, padding: 14, marginBottom: 12, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ ...GLASS, padding: 14, marginBottom: 12, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)', display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Bell className="h-4 w-4 flex-shrink-0" style={{ color: '#5C4530' }} />
                 <div style={{ flex: 1 }}>
                   {totalAlerts > 0 && <p style={{ fontSize: 13, color: '#8A6F2A', fontWeight: 600 }}>{totalAlerts} CRM update{totalAlerts !== 1 ? 's' : ''} in the last 24 hours</p>}
@@ -251,7 +251,7 @@ export default function DryphubPage() {
                     <p style={{ fontSize: 10, fontWeight: 700, color: '#4A8A4A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>New clients</p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {changes.newAccounts.map((a: Change) => (
-                        <div key={a.id} style={{ ...GLASS, padding: '12px 16px', background: 'rgba(90,138,90,0.08)', border: '1px solid rgba(90,138,90,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div key={a.id} style={{ ...GLASS, padding: '12px 16px', background: 'rgba(224,236,224,0.92)', border: '1px solid rgba(90,138,90,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <div>
                             <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E' }}>{a.business_name}</p>
                             <p style={{ fontSize: 11, color: '#4A8A4A' }}>New client · {timeAgo(a.updated_at ?? a.created_at ?? '')}</p>
@@ -339,7 +339,7 @@ export default function DryphubPage() {
 
             {/* Meeting note reminder info */}
             {connected && (
-              <div style={{ ...GLASS, padding: 16, marginTop: 14, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)' }}>
+              <div style={{ ...GLASS, padding: 16, marginTop: 14, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#8A6F2A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Meeting Note Reminders</p>
                 <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.6 }}>
                   LUNA checks DRYP Hub after each calendar meeting ends. If no notes were added for that client today, you'll see an alert here and in the daily check-in. Always add notes within 30 min of your meeting.

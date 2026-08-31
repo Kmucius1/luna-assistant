@@ -78,22 +78,22 @@ export default function AccountsPage() {
         <div style={{ padding: '20px 16px 180px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 2 }}>Accounts</h1>
-              <p style={{ fontSize: 12, color: '#5E5474' }}>Checking, savings, cards, cash, and loans</p>
+              <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F5EFE3', marginBottom: 2 }}>Accounts</h1>
+              <p style={{ fontSize: 12, color: 'rgba(245,239,227,0.72)' }}>Checking, savings, cards, cash, and loans</p>
             </div>
             <button onClick={load} style={{ padding: '8px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.5)', border: '1px solid rgba(180,150,100,0.2)', color: '#32284A', cursor: 'pointer' }}>
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
 
-          <div style={{ ...CARD, background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)', textAlign: 'center', padding: 24 }}>
+          <div style={{ ...CARD, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)', textAlign: 'center', padding: 24 }}>
             <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLDEN, marginBottom: 8 }}>Total Balance</p>
             <p style={{ fontSize: 36, fontWeight: 700, color: GOLDEN }}>{formatCurrency(totalBalance)}</p>
             <p style={{ fontSize: 12, color: '#5E5474', marginTop: 4 }}>across {accounts.length} account{accounts.length !== 1 ? 's' : ''}</p>
           </div>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E5474' }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'rgba(245,239,227,0.72)' }}>
               <RefreshCw className="h-5 w-5 animate-spin mx-auto mb-2" />
             </div>
           ) : accounts.length === 0 ? (
@@ -159,7 +159,7 @@ export default function AccountsPage() {
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={addAccount} disabled={saving || !form.nickname.trim()}
-                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8903A)', color: '#100C1E', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+                  style={{ flex: 1, padding: '11px', borderRadius: 12, background: 'linear-gradient(135deg, #5C4530, #B8903A)', color: '#F5EFE3', fontSize: 13, fontWeight: 800, border: 'none', cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
                   {saving ? 'Saving…' : 'Save account'}
                 </button>
                 <button onClick={() => setShowAdd(false)} style={{ padding: '11px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.5)', color: '#32284A', border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
@@ -167,12 +167,12 @@ export default function AccountsPage() {
             </div>
           ) : (
             <button onClick={() => setShowAdd(true)}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', borderRadius: 14, background: 'transparent', border: '1.5px dashed rgba(201,169,110,0.25)', color: GOLDEN, fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', marginTop: 4 }}>
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', borderRadius: 14, background: 'transparent', border: '1.5px dashed rgba(201,169,110,0.25)', color: '#D9BD8A', fontSize: 13, fontWeight: 600, cursor: 'pointer', width: '100%', marginTop: 4 }}>
               <Plus className="h-4 w-4" /> Add account manually
             </button>
           )}
 
-          <a href="/money/connect" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', borderRadius: 14, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.2)', color: GOLDEN, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
+          <a href="/money/connect" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 0', borderRadius: 14, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)', color: GOLDEN, fontSize: 13, fontWeight: 600, textDecoration: 'none', marginTop: 10 }}>
             <LinkIcon className="h-4 w-4" /> Connect a bank via Plaid
           </a>
         </div>

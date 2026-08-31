@@ -69,7 +69,7 @@ export default function StyleBoardPage() {
             <ArrowLeft size={14} style={{ color: 'var(--luna-purple-2)' }} />
             <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--luna-purple-2)' }}>Atelier</span>
           </Link>
-          <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-1)', margin: '10px 0 4px' }}>Style Board</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 900, color: '#F5EFE3', margin: '10px 0 4px' }}>Style Board</h1>
           <p style={{ fontSize: 13, color: 'var(--text-3)', margin: 0 }}>
             Tap the ones that feel like you. {likedCount > 0 && `${likedCount} liked so far.`}
           </p>

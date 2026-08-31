@@ -171,10 +171,10 @@ export default function DictationScreen() {
             }}>Talk to LUNA →</a>
           </div>
 
-          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--depth)' }}>
+          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: '#F5EFE3' }}>
             {DICTATION_PROMPTS[promptIdx]}
           </h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>
+          <p className="text-sm mb-6" style={{ color: 'rgba(245,239,227,0.75)' }}>
             Your voice holds the answer. Say everything. I will help you hear what is true.
           </p>
 

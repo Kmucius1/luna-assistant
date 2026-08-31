@@ -88,8 +88,8 @@ export default function ManifestationPage() {
     <AppLayout>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 8 }}>
 
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: 0 }}>Manifestation</h1>
-        <p style={{ fontSize: 13, color: '#5E5474', margin: '-8px 0 0' }}>Intentions &amp; vision board</p>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#F5EFE3', margin: 0 }}>Manifestation</h1>
+        <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', margin: '-8px 0 0' }}>Intentions &amp; vision board</p>
 
         {/* Affirmation */}
         <div style={{ ...G, padding: '18px 20px', background: 'linear-gradient(140deg, rgba(255,255,255,0.6) 0%, rgba(250,244,232,0.7) 100%)' }}>

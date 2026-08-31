@@ -90,10 +90,10 @@ export default function LessonsScreen() {
             <p className="text-sm font-medium uppercase tracking-wider" style={{ color: 'var(--herb)' }}>Lesson Tracker</p>
           </div>
 
-          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--depth)' }}>
+          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: '#F5EFE3' }}>
             Every week teaches you something.
           </h1>
-          <p className="text-sm mb-2" style={{ color: 'var(--mid)' }}>
+          <p className="text-sm mb-2" style={{ color: 'rgba(245,239,227,0.75)' }}>
             Week of {weekStart}
           </p>
           <p className="text-sm mb-8 leading-relaxed" style={{ color: 'var(--mid)' }}>

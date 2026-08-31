@@ -109,7 +109,7 @@ export default function MorePage() {
     >
       <AppLayout>
         <div className="pt-5 pb-4">
-          <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-1)' }}>All Features</h1>
+          <h1 className="text-2xl font-bold mb-1" style={{ color: '#F5EFE3' }}>All Features</h1>
           <p className="text-sm mb-6" style={{ color: 'var(--text-3)' }}>Everything LUNA can do for you.</p>
 
           <div className="space-y-8">

@@ -103,8 +103,8 @@ export default function OutfitTodayPage() {
         <div className="flex flex-col gap-4" style={{ maxWidth: 720, margin: '0 auto', padding: '4px 2px 24px' }}>
 
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: '0 0 3px' }}>What To Wear Today</h1>
-            <p style={{ fontSize: 13, color: '#5E5474', margin: 0 }}>LUNA&apos;s pick, built from today&apos;s weather, mood, and energy.</p>
+            <h1 style={{ fontSize: 24, fontWeight: 900, color: '#F5EFE3', margin: '0 0 3px' }}>What To Wear Today</h1>
+            <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', margin: 0 }}>LUNA&apos;s pick, built from today&apos;s weather, mood, and energy.</p>
           </div>
 
           {/* AI daily outfit suggestion — big version */}

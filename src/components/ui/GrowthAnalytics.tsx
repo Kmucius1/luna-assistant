@@ -108,7 +108,7 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
           <h2 className="font-display text-lg font-bold" style={{ color: 'var(--text-1)' }}>Growth Analytics</h2>
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full"
-          style={{ background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.25)' }}>
+          style={{ background: 'rgba(240,228,200,0.92)', border: '1px solid rgba(201,169,110,0.4)' }}>
           <Flame className="h-3.5 w-3.5" style={{ color: '#5C4530' }} />
           <p className="text-sm font-bold" style={{ color: '#5C4530' }}>{insights.streakDays} day streak</p>
         </div>
@@ -224,7 +224,7 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
       {/* Recent wins */}
       {insights.wins.length > 0 && (
         <div className="rounded-[20px] p-4"
-          style={{ background: 'rgba(90,140,120,0.08)', border: '1px solid rgba(90,140,120,0.15)' }}>
+          style={{ background: 'rgba(224,236,230,0.92)', border: '1px solid rgba(90,140,120,0.3)' }}>
           <div className="flex items-center gap-2 mb-3">
             <Heart className="h-4 w-4" style={{ color: '#5A8A7A' }} />
             <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5A8A7A' }}>Recent Wins</p>
@@ -241,7 +241,7 @@ export function GrowthAnalytics({ compact = false }: { compact?: boolean }) {
       {/* Recurring needs */}
       {insights.recurringNeeds.length > 0 && (
         <div className="rounded-[20px] p-4"
-          style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
+          style={{ background: 'rgba(244,235,212,0.92)', border: '1px solid rgba(201,169,110,0.35)' }}>
           <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>You Often Need</p>
           <div className="flex flex-wrap gap-2">
             {insights.recurringNeeds.map(n => (

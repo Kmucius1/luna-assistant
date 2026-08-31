@@ -177,7 +177,7 @@ function TransitCard({ aspect, today }: { aspect: Aspect; today: string }) {
           {/* Existing reflection preview */}
           {saved && !justSaved && (
             <div className="mb-3 rounded-[14px] p-3"
-              style={{ background: 'rgba(90,140,120,0.08)', border: '1px solid rgba(90,140,120,0.18)' }}>
+              style={{ background: 'rgba(224,236,230,0.92)', border: '1px solid rgba(90,140,120,0.3)' }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: '#5A8A7A' }}>Your reflection</p>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{saved.reflection}</p>
             </div>
@@ -193,7 +193,7 @@ function TransitCard({ aspect, today }: { aspect: Aspect; today: string }) {
 
           {/* The reflection question + SmartInput */}
           <div className="rounded-[16px] p-3 mb-3"
-            style={{ background: `${color}0a`, border: `1px solid ${color}18` }}>
+            style={{ background: 'rgba(250,244,232,0.92)', border: `1px solid ${color}40` }}>
             <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color }}>Reflection question</p>
             <p className="text-sm leading-relaxed italic" style={{ color: 'var(--text-1)' }}>{question}</p>
           </div>
@@ -251,12 +251,12 @@ export default function TransitsPage() {
             </div>
           </Link>
           <div className="flex-1">
-            <h1 className="font-display text-xl font-bold" style={{ color: 'var(--text-1)' }}>Daily Transits</h1>
+            <h1 className="font-display text-xl font-bold" style={{ color: '#F5EFE3' }}>Daily Transits</h1>
             <p className="text-xs" style={{ color: 'var(--text-4)' }}>Current sky · tap any transit to reflect</p>
           </div>
           <Link href="/memory">
             <div className="px-3 py-1.5 rounded-full text-xs font-bold"
-              style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.25)' }}>
+              style={{ background: 'rgba(240,228,200,0.92)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.4)' }}>
               📖 Memory
             </div>
           </Link>
@@ -268,7 +268,7 @@ export default function TransitsPage() {
           <>
             {/* Daily theme */}
             <div className="relative rounded-[22px] p-5 mb-4 overflow-hidden"
-              style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
+              style={{ background: 'linear-gradient(145deg, rgba(247,238,220,0.95) 0%, rgba(242,228,198,0.96) 60%, rgba(236,219,182,0.93) 100%)', border: '1px solid rgba(201,169,110,0.45)' }}>
               <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none"
                 style={{ background: 'radial-gradient(circle at 100% 0%, rgba(201,169,110,0.18) 0%, transparent 60%)', filter: 'blur(16px)' }} />
               <div className="relative z-10">
@@ -294,7 +294,7 @@ export default function TransitsPage() {
                 <p className="text-xs font-bold uppercase tracking-wider self-center mr-1" style={{ color: 'var(--text-4)' }}>Activated today:</p>
                 {data.active_natal_points.map(pt => (
                   <span key={pt} className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                    style={{ background: 'rgba(201,169,110,0.15)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.25)' }}>
+                    style={{ background: 'rgba(240,228,200,0.92)', color: '#5C4530', border: '1px solid rgba(201,169,110,0.4)' }}>
                     {pt}
                   </span>
                 ))}
@@ -308,7 +308,7 @@ export default function TransitsPage() {
                   className="px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
                   style={{
                     background: filter === f ? 'var(--violet)' : 'var(--surface)',
-                    color:      filter === f ? '#100C1E' : 'var(--text-3)',
+                    color:      filter === f ? '#FDF8F3' : 'var(--text-3)',
                     border:     `1px solid ${filter === f ? 'var(--violet)' : 'var(--surface-border)'}`,
                   }}>
                   {f === 'all' ? `All (${data.aspects.length})` : f === 'major' ? `Tension (${data.major_aspects.length})` : `Flow (${data.supportive_aspects.length})`}
@@ -332,7 +332,7 @@ export default function TransitsPage() {
 
             {/* Prompt to go to memory */}
             <div className="mt-5 rounded-[18px] p-4 flex items-center gap-3"
-              style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.15)' }}>
+              style={{ background: 'rgba(244,235,212,0.88)', border: '1px solid rgba(201,169,110,0.35)' }}>
               <Zap className="h-4 w-4 flex-shrink-0" style={{ color: 'var(--violet)' }} />
               <div className="flex-1">
                 <p className="text-xs font-bold" style={{ color: 'var(--violet)' }}>Your reflections go to Memory</p>

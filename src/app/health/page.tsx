@@ -63,8 +63,8 @@ export default function HealthPage() {
     <AppLayout>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, paddingTop: 8 }}>
 
-        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#100C1E', margin: 0 }}>Health &amp; Wellness</h1>
-        <p style={{ fontSize: 13, color: '#5E5474', margin: '-8px 0 0' }}>Body, energy, and rest — the full day</p>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#F5EFE3', margin: 0 }}>Health &amp; Wellness</h1>
+        <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', margin: '-8px 0 0' }}>Body, energy, and rest — the full day</p>
 
         {/* Wellness & Energy */}
         <div style={{ ...G, padding: '18px 20px' }}>
@@ -119,7 +119,7 @@ export default function HealthPage() {
         {/* Journal prompt */}
         <div
           onClick={() => setJournalOpen(v => !v)}
-          style={{ ...G, padding: '16px 20px', cursor: 'pointer', background: 'linear-gradient(140deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.06) 100%)' }}
+          style={{ ...G, padding: '16px 20px', cursor: 'pointer', background: 'linear-gradient(135deg, rgba(247,238,220,0.95), rgba(240,228,198,0.92))' }}
         >
           <div style={LBL}><PenLine style={{ width: 11, height: 11 }} />Reflect on Today</div>
           <p style={{ fontSize: 13, color: '#8A6D3B', fontStyle: 'italic', margin: 0 }}>

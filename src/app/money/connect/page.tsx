@@ -51,11 +51,11 @@ export default function ConnectBankPage() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad>
         <div style={{ padding: '82px 20px 140px', maxWidth: 520, margin: '0 auto' }}>
-          <Link href="/money" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#32284A', textDecoration: 'none', fontSize: 12.5, marginBottom: 18 }}>
+          <Link href="/money" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'rgba(245,239,227,0.72)', textDecoration: 'none', fontSize: 12.5, marginBottom: 18 }}>
             <ArrowLeft style={{ width: 15, height: 15 }} /> Back to Money
           </Link>
 
-          <section style={{ ...CARD, position: 'relative', overflow: 'hidden', padding: '24px 22px', marginBottom: 14, background: 'linear-gradient(135deg, rgba(201,169,110,0.16), rgba(240,233,218,0.9))' }}>
+          <section style={{ ...CARD, position: 'relative', overflow: 'hidden', padding: '24px 22px', marginBottom: 14, background: 'linear-gradient(135deg, rgba(240,228,200,0.9), rgba(240,233,218,0.92))' }}>
             <div style={{ position: 'absolute', width: 190, height: 190, borderRadius: '50%', right: -65, top: -85, background: 'radial-gradient(circle, rgba(201,169,110,0.25), transparent 70%)' }} />
             <div style={{ position: 'relative' }}>
               <div style={{ width: 58, height: 58, borderRadius: 19, display: 'grid', placeItems: 'center', background: 'rgba(180,150,100,0.12)', border: '1px solid rgba(180,150,100,0.22)', marginBottom: 16 }}>
@@ -88,7 +88,7 @@ export default function ConnectBankPage() {
           </section>
 
           <Link href="/money" style={{ textDecoration: 'none' }}>
-            <div style={{ marginTop: 14, minHeight: 50, borderRadius: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg, #5C4530, #B8903A)', boxShadow: '0 12px 28px rgba(160,120,40,0.25)', color: '#100C1E', fontSize: 13.5, fontWeight: 800 }}>
+            <div style={{ marginTop: 14, minHeight: 50, borderRadius: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: 'linear-gradient(135deg, #5C4530, #B8903A)', boxShadow: '0 12px 28px rgba(160,120,40,0.25)', color: '#F5EFE3', fontSize: 13.5, fontWeight: 800 }}>
               <FileText style={{ width: 17, height: 17 }} /> Open Money dashboard
             </div>
           </Link>

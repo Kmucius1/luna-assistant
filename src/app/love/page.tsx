@@ -111,9 +111,9 @@ export default function LovePage() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                   <Heart className="h-5 w-5" style={{ color: 'rgb(170,70,115)' }} fill="rgb(170,70,115)" />
-                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: '#100C1E' }}>Love Energy</h1>
+                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 26, fontWeight: 700, color: '#F5EFE3' }}>Love Energy</h1>
                 </div>
-                <p style={{ fontSize: 13, color: '#5E5474', maxWidth: 280, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', maxWidth: 280, lineHeight: 1.5 }}>
                   Your love life, read through the stars — transits, compatibility, and how to navigate it all.
                 </p>
                 <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
@@ -186,7 +186,7 @@ export default function LovePage() {
                     </div>
 
                     {/* Watch out */}
-                    <div style={{ ...GLASS, padding: 16, background: 'rgba(180,80,60,0.08)', border: '1px solid rgba(180,80,60,0.2)', marginBottom: 14 }}>
+                    <div style={{ ...GLASS, padding: 16, background: 'rgba(247,225,218,0.92)', border: '1px solid rgba(180,80,60,0.35)', marginBottom: 14 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
                         <Shield className="h-4 w-4" style={{ color: '#C96B5A' }} />
                         <Label text="Watch Out For" color="#C96B5A" />
@@ -341,7 +341,7 @@ export default function LovePage() {
                 </div>
 
                 {/* Chiron */}
-                <div style={{ ...GLASS, padding: 18, marginBottom: 14, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                <div style={{ ...GLASS, padding: 18, marginBottom: 14, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                   <Label text="Chiron in Sagittarius · The Love Wound" color="#5C4530" />
                   <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.65 }}>
                     Your Chiron in Sagittarius (15°) carries a wound around: freedom, belief, and the fear that loving deeply means losing yourself. You may have learned that love comes with strings attached, that staying free means staying alone, or that you have to teach and give before you can receive. The healing: you CAN have both — love and freedom. The right partner expands you, not shrinks you.
@@ -368,7 +368,7 @@ export default function LovePage() {
                 </div>
 
                 {/* Red flags for Zoe */}
-                <div style={{ ...GLASS, padding: 18, background: 'rgba(180,60,60,0.07)', border: '1px solid rgba(180,60,60,0.18)', marginBottom: 14 }}>
+                <div style={{ ...GLASS, padding: 18, background: 'rgba(247,225,218,0.92)', border: '1px solid rgba(180,60,60,0.35)', marginBottom: 14 }}>
                   <Label text="Red Flags (Based on Your Chart)" color="#C96B5A" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {[

@@ -104,7 +104,7 @@ function CheckInCard({ checkIn }: { checkIn: CheckIn }) {
         <div className="flex items-center gap-2 flex-shrink-0">
           {checkIn.mood_rating && (
             <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-              style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--violet)' }}>
+              style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
               {checkIn.mood_rating}/10
             </span>
           )}
@@ -129,7 +129,7 @@ function CheckInCard({ checkIn }: { checkIn: CheckIn }) {
           {checkIn.pride_goal  && <div><p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-3)' }}>Proud of / working toward</p><p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{checkIn.pride_goal}</p></div>}
           {checkIn.ai_response && (
             <div className="rounded-2xl p-3 space-y-2"
-              style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.12)' }}>
+              style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)' }}>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>LUNA said</span>
@@ -197,7 +197,7 @@ function PatternChips({ patterns }: { patterns: PatternEntry[] }) {
           <div className="flex flex-wrap gap-1.5">
             {vals.slice(0, 4).map(v => (
               <span key={v} className="px-2.5 py-1 rounded-full text-xs"
-                style={{ background: 'rgba(201,169,110,0.1)', color: 'var(--text-2)', border: '1px solid rgba(201,169,110,0.18)' }}>
+                style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--text-2)', border: '1px solid rgba(201,169,110,0.4)' }}>
                 {v}
               </span>
             ))}
@@ -322,7 +322,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* What went well */}
       <div className="rounded-[20px] p-4 space-y-2"
-        style={{ background: 'rgba(90,140,120,0.08)', border: '1px solid rgba(90,140,120,0.2)' }}>
+        style={{ background: 'rgba(224,236,224,0.92)', border: '1px solid rgba(90,140,120,0.4)' }}>
         <div className="flex items-center gap-2">
           <Award className="h-4 w-4" style={{ color: '#5A8A7A' }} />
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5A8A7A' }}>What you did well</p>
@@ -332,7 +332,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Where to grow */}
       <div className="rounded-[20px] p-4 space-y-2"
-        style={{ background: 'rgba(201,107,90,0.08)', border: '1px solid rgba(201,107,90,0.2)' }}>
+        style={{ background: 'rgba(247,225,218,0.92)', border: '1px solid rgba(201,107,90,0.4)' }}>
         <div className="flex items-center gap-2">
           <TrendingUp className="h-4 w-4" style={{ color: '#C96B5A' }} />
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#C96B5A' }}>Where you can grow</p>
@@ -342,7 +342,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Highest self */}
       <div className="rounded-[20px] p-4 space-y-2"
-        style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+        style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)' }}>
         <div className="flex items-center gap-2">
           <Star className="h-4 w-4" style={{ color: 'var(--violet)' }} />
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your highest self</p>
@@ -352,7 +352,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Next time */}
       <div className="rounded-[20px] p-4 space-y-2"
-        style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
+        style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)' }}>
         <div className="flex items-center gap-2">
           <ArrowRight className="h-4 w-4" style={{ color: '#5C4530' }} />
           <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5C4530' }}>What to do next time</p>
@@ -362,7 +362,7 @@ function CoachingPanel({ date, checkIns, transitReflections, patterns }: {
 
       {/* Affirmation */}
       <div className="rounded-[20px] p-5 text-center"
-        style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.1), rgba(201,169,110,0.07))', border: '1px solid rgba(201,169,110,0.2)' }}>
+        style={{ background: 'linear-gradient(135deg, rgba(247,238,220,0.95), rgba(240,228,198,0.92))', border: '1px solid rgba(201,169,110,0.4)' }}>
         <Heart className="h-4 w-4 mx-auto mb-2" style={{ color: 'var(--violet)' }} />
         <p className="text-sm font-semibold italic leading-relaxed" style={{ color: 'var(--text-1)' }}>
           &ldquo;{coaching.affirmation}&rdquo;
@@ -426,7 +426,7 @@ function SectionHeader({ icon, label, count, open, onToggle, accent }: {
         <p className="text-sm font-bold uppercase tracking-wider" style={{ color: accent ?? 'var(--text-3)' }}>{label}</p>
         {count > 0 && (
           <span className="text-xs px-2 py-0.5 rounded-full font-bold"
-            style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)' }}>
+            style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
             {count}
           </span>
         )}
@@ -551,7 +551,7 @@ export default function MemoryPage() {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <BookHeart className="h-5 w-5" style={{ color: 'var(--violet)' }} />
-            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>Memory</h1>
+            <h1 className="text-2xl font-bold" style={{ color: '#F5EFE3' }}>Memory</h1>
           </div>
           <p className="text-sm" style={{ color: 'var(--text-3)' }}>
             Your reflections, check-ins, and daily coaching — all in one place.
@@ -617,7 +617,7 @@ export default function MemoryPage() {
           <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>{humanDate(selectedDate)}</h2>
           {cachedScore && (
             <span className="text-xs px-3 py-1 rounded-full font-bold"
-              style={{ background: 'rgba(201,169,110,0.12)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.2)' }}>
+              style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)', border: '1px solid rgba(201,169,110,0.4)' }}>
               ✦ {cachedScore}/10
             </span>
           )}

@@ -452,8 +452,8 @@ function EmailInner() {
                 )}
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5C4530' }}>Mail</p>
-                <p style={{ fontSize: 10, color: '#5E5474' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
+                <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(201,169,110,0.9)' }}>Mail</p>
+                <p style={{ fontSize: 10, color: 'rgba(245,239,227,0.72)' }}>{connectedEmails.length} account{connectedEmails.length !== 1 ? 's' : ''} · {sync?.unread_count ?? '—'} unread</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>

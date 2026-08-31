@@ -113,7 +113,7 @@ function SectionHeader({ icon: Icon, title, sub }: { icon: React.ComponentType<{
   return (
     <div className="flex items-center gap-3 mb-6">
       <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={{ background: 'rgba(201,169,110,0.15)', border: '1px solid rgba(201,169,110,0.2)' }}>
+        style={{ background: 'rgba(240,228,200,0.92)', border: '1px solid rgba(201,169,110,0.4)' }}>
         <Icon className="w-5 h-5" style={{ color: 'var(--violet)' }} />
       </div>
       <div>
@@ -384,7 +384,7 @@ function OracleSection() {
 
       {result && (
         <div className="rounded-3xl p-6 space-y-5"
-          style={{ background: 'linear-gradient(135deg, rgba(201,169,110,0.18) 0%, rgba(166,124,70,0.12) 100%)', border: '1px solid rgba(201,169,110,0.25)' }}>
+          style={{ background: 'linear-gradient(135deg, rgba(247,238,220,0.95) 0%, rgba(238,222,196,0.95) 100%)', border: '1px solid rgba(201,169,110,0.4)' }}>
           {result.style_lane && (
             <div className="flex items-center gap-2">
               <div className="rounded-full px-3 py-1 text-sm font-bold"
@@ -1107,11 +1107,11 @@ function CreativePageInner() {
             image grids feel oversized and sparse on wide viewports. */}
         <div className="w-full md:max-w-xl lg:max-w-2xl md:mx-auto" style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, paddingTop: 8, flexShrink: 0 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.2)' }}>
+            <div style={{ width: 40, height: 40, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(240,228,200,0.92)', border: '1px solid rgba(201,169,110,0.4)' }}>
               <Scissors className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.6} />
             </div>
             <div>
-              <h1 className="font-display text-xl md:text-lg font-bold" style={{ color: 'var(--text-1)' }}>Creative</h1>
+              <h1 className="font-display text-xl md:text-lg font-bold" style={{ color: '#F5EFE3' }}>Creative</h1>
               <p style={{ fontSize: 11, color: 'var(--text-3)' }}>Your fashion world, fully yours.</p>
             </div>
           </div>

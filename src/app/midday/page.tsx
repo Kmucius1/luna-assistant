@@ -16,8 +16,8 @@ const CARD: React.CSSProperties = {
   boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 const SOUL_CARD: React.CSSProperties = {
-  background: 'linear-gradient(135deg, rgba(201,169,110,0.14) 0%, rgba(201,169,110,0.06) 100%)',
-  border: '1px solid rgba(201,169,110,0.22)',
+  background: 'linear-gradient(135deg, rgba(247,238,220,0.95) 0%, rgba(240,228,198,0.92) 100%)',
+  border: '1px solid rgba(201,169,110,0.4)',
   borderRadius: 20,
 }
 
@@ -33,7 +33,7 @@ const ENERGY_CHIPS = [
 const BODY_CHECKS = [
   { icon: Droplets, label: 'Drank water', key: 'water',   color: '#A8C4DA' },
   { icon: Apple,    label: 'Ate something', key: 'food',  color: '#B8C9B4' },
-  { icon: Sun,      label: 'Got some light/air', key: 'air', color: '#5C4530' },
+  { icon: Sun,      label: 'Got some light/air', key: 'air', color: '#C4A47C' },
 ]
 
 const MIDDAY_PROMPTS = [
@@ -111,7 +111,7 @@ export default function MiddayPage() {
 
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(201,169,110,0.12)' }}>
+              style={{ background: 'rgba(244,235,212,0.9)' }}>
               <Sun className="h-5 w-5" style={{ color: 'var(--golden)' }} />
             </div>
             <div>
@@ -120,10 +120,10 @@ export default function MiddayPage() {
             </div>
           </div>
 
-          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--depth)' }}>
+          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: '#F5EFE3' }}>
             Before the world gets your energy —
           </h1>
-          <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>
+          <p className="text-sm mb-6" style={{ color: 'rgba(245,239,227,0.75)' }}>
             come back to yourself.
           </p>
 
@@ -151,7 +151,7 @@ export default function MiddayPage() {
                     <button key={e.value} onClick={() => setEnergy(energy === e.value ? '' : e.value)}
                       className="px-3 py-2 rounded-xl text-sm font-medium transition-all"
                       style={{
-                        background: energy === e.value ? 'var(--violet)' : 'rgba(201,169,110,0.08)',
+                        background: energy === e.value ? 'var(--violet)' : 'rgba(244,235,212,0.9)',
                         color: energy === e.value ? 'white' : 'var(--mid)',
                       }}>
                       {e.emoji} {e.label}
@@ -170,7 +170,7 @@ export default function MiddayPage() {
                     <button key={key} onClick={() => toggleCheck(key)}
                       className="w-full flex items-center gap-3 py-2 transition-all">
                       <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-                        style={{ background: checks[key] ? `${color}22` : 'rgba(201,169,110,0.06)' }}>
+                        style={{ background: checks[key] ? `${color}22` : 'rgba(244,235,212,0.9)' }}>
                         <Icon className="h-4 w-4" style={{ color: checks[key] ? color : 'var(--mist)' }} />
                       </div>
                       <span className="text-sm font-medium flex-1 text-left" style={{ color: checks[key] ? 'var(--depth)' : 'var(--mid)' }}>
@@ -255,7 +255,7 @@ export default function MiddayPage() {
 
               {/* Affirmation */}
               <div className="rounded-2xl p-5 text-center"
-                style={{ background: 'rgba(201,169,110,0.06)', border: '1px solid rgba(201,169,110,0.12)' }}>
+                style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.4)' }}>
                 <p className="font-display text-base italic leading-relaxed" style={{ color: 'var(--depth)' }}>
                   &ldquo;{result.afternoon_affirmation}&rdquo;
                 </p>

@@ -88,7 +88,7 @@ export default function MoonPortal() {
               <ArrowLeft className="h-4 w-4" style={{ color: 'var(--text-3)' }} />
             </div>
           </Link>
-          <h1 className="font-display text-xl font-bold" style={{ color: 'var(--text-1)' }}>Moon Portal</h1>
+          <h1 className="font-display text-xl font-bold" style={{ color: '#F5EFE3' }}>Moon Portal</h1>
         </div>
 
         {loading ? (
@@ -97,7 +97,7 @@ export default function MoonPortal() {
           <>
             {/* Phase hero */}
             <div className="relative rounded-[24px] p-6 mb-4 overflow-hidden"
-              style={{ background: 'linear-gradient(145deg, rgba(201,169,110,0.16) 0%, rgba(201,169,110,0.24) 60%, rgba(201,169,110,0.10) 100%)', border: '1px solid rgba(201,169,110,0.3)' }}>
+              style={{ background: 'linear-gradient(145deg, rgba(247,238,220,0.95) 0%, rgba(242,228,198,0.96) 60%, rgba(236,219,182,0.93) 100%)', border: '1px solid rgba(201,169,110,0.45)' }}>
               <div className="absolute right-6 top-1/2 -translate-y-1/2">
                 <MoonIllustration phase={moon.phase.name} illumination={moon.phase.illumination} size={90} />
               </div>
@@ -106,7 +106,7 @@ export default function MoonPortal() {
               <div className="relative z-10 pr-28">
                 <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: 'rgba(201,169,110,0.9)' }}>Moon Phase</p>
                 <p className="font-display text-2xl font-bold mb-1" style={{ color: '#100C1E' }}>{moon.phase.emoji} {moon.phase.name}</p>
-                <p className="text-sm mb-3" style={{ color: 'rgba(16,12,30,0.6)' }}>
+                <p className="text-sm mb-3" style={{ color: 'rgba(16,12,30,0.75)' }}>
                   {moon.phase.illumination}% illuminated · {moon.phase.angle}° phase angle
                 </p>
                 <p className="text-sm leading-relaxed italic" style={{ color: '#5C4530' }}>{moon.phase.description}</p>
@@ -163,7 +163,7 @@ export default function MoonPortal() {
 
             {/* Your natal moon context */}
             <div className="rounded-[20px] p-5"
-              style={{ background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.18)' }}>
+              style={{ background: 'rgba(244,235,212,0.88)', border: '1px solid rgba(201,169,110,0.35)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your Natal Moon</p>

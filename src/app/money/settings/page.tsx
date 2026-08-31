@@ -59,11 +59,11 @@ export default function MoneySettingsPage() {
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad className="pt-16">
         <div style={{ padding: '20px 16px 180px', maxWidth: 480 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Money Settings</h1>
-          <p style={{ fontSize: 13, color: '#32284A', marginBottom: 18 }}>What Safe to Spend reserves before showing your real number.</p>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#F5EFE3', marginBottom: 4 }}>Money Settings</h1>
+          <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.72)', marginBottom: 18 }}>What Safe to Spend reserves before showing your real number.</p>
 
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 40 }}><Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: '#5E5474' }} /></div>
+            <div style={{ textAlign: 'center', padding: 40 }}><Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'rgba(245,239,227,0.72)' }} /></div>
           ) : (
             <div style={CARD}>
               {field('checking_safety_buffer', 'Safety buffer ($) — always stays untouched')}
@@ -78,7 +78,7 @@ export default function MoneySettingsPage() {
               </div>
               <button onClick={save} disabled={saving}
                 style={{ width: '100%', height: 44, borderRadius: 12, border: 'none', cursor: 'pointer', marginTop: 14,
-                  background: saved ? '#5A8A6A' : `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#100C1E', fontSize: 14, fontWeight: 800, opacity: saving ? 0.6 : 1 }}>
+                  background: saved ? '#5A8A6A' : `linear-gradient(135deg, ${GOLDEN}, #B8903A)`, color: '#F5EFE3', fontSize: 14, fontWeight: 800, opacity: saving ? 0.6 : 1 }}>
                 {saving ? 'Saving…' : saved ? 'Saved ✓' : 'Save settings'}
               </button>
             </div>

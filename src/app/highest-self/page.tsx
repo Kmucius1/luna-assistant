@@ -186,7 +186,7 @@ export default function HighestSelfPage() {
 
           {/* Hero — always visible */}
           <div style={{ background: 'linear-gradient(160deg, rgba(201,169,110,0.25) 0%, rgba(250,244,232,0.3) 50%, transparent 100%)', padding: '20px 20px 24px' }}>
-            <button onClick={reset} style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#8A8098', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', marginBottom: 14, padding: 0 }}>
+            <button onClick={reset} style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'rgba(245,239,227,0.72)', fontSize: 12, background: 'none', border: 'none', cursor: 'pointer', marginBottom: 14, padding: 0 }}>
               <ArrowLeft className="h-3.5 w-3.5" /> {view === 'select' ? 'Home' : 'Start over'}
             </button>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -194,16 +194,16 @@ export default function HighestSelfPage() {
                 <Zap className="h-5 w-5" style={{ color: '#5C4530' }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530' }}>Highest Self Mirror</p>
-                <p style={{ fontSize: 11, color: '#8A8098' }}>Current You → Highest You</p>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.9)' }}>Highest Self Mirror</p>
+                <p style={{ fontSize: 11, color: 'rgba(245,239,227,0.72)' }}>Current You → Highest You</p>
               </div>
             </div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, color: '#100C1E', lineHeight: 1.25, marginBottom: 8 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 24, fontWeight: 700, color: '#F5EFE3', lineHeight: 1.25, marginBottom: 8 }}>
               {view === 'select'    ? 'No shame here. Only recognition.'
                : view === 'elaborate' ? `${eStep + 1} of ${selectedArr.length} — tell me more`
                : 'Your highest self sees you.'}
             </h1>
-            <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: 'rgba(245,239,227,0.75)', lineHeight: 1.6 }}>
               {view === 'select'    ? 'Choose every pattern that is true right now. You can pick as many as you need.'
                : view === 'elaborate' ? 'The more you share, the more real this becomes.'
                : 'Here is what she has to say.'}
@@ -294,7 +294,7 @@ export default function HighestSelfPage() {
                 </div>
 
                 {/* Current pattern being elaborated */}
-                <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(201,169,110,0.07)', border: '1px solid rgba(201,169,110,0.2)' }}>
+                <div style={{ ...GLASS, padding: '14px 16px', background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                   <p style={{ fontSize: 10, fontWeight: 700, color: '#E05E5E', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 5 }}>You said</p>
                   <p style={{ fontSize: 14, fontWeight: 600, color: '#100C1E', lineHeight: 1.5 }}>{PATTERNS[selectedArr[eStep]]}</p>
                 </div>
@@ -380,7 +380,7 @@ export default function HighestSelfPage() {
                 {!loading && result && (
                   <>
                     {/* Reflection */}
-                    <div style={{ ...GLASS, padding: 20, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)', textAlign: 'center' }}>
+                    <div style={{ ...GLASS, padding: 20, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)', textAlign: 'center' }}>
                       <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, color: '#100C1E', lineHeight: 1.65, fontStyle: 'italic' }}>
                         &ldquo;{result.reflection}&rdquo;
                       </p>
@@ -438,13 +438,13 @@ export default function HighestSelfPage() {
                     )}
 
                     {/* Pattern → Highest Self */}
-                    <div style={{ ...GLASS, padding: 18, background: 'rgba(224,94,94,0.06)', border: '1px solid rgba(224,94,94,0.18)' }}>
+                    <div style={{ ...GLASS, padding: 18, background: 'rgba(250,225,222,0.92)', border: '1px solid rgba(224,94,94,0.35)' }}>
                       <p style={{ fontSize: 10, fontWeight: 700, color: '#E05E5E', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Current Pattern</p>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#100C1E', marginBottom: 6 }}>{result.current_pattern}</p>
                       <p style={{ fontSize: 13, color: '#32284A', lineHeight: 1.6 }}>{result.current_description}</p>
                     </div>
 
-                    <div style={{ ...GLASS, padding: 18, background: 'rgba(90,138,90,0.07)', border: '1px solid rgba(90,138,90,0.2)' }}>
+                    <div style={{ ...GLASS, padding: 18, background: 'rgba(224,236,224,0.92)', border: '1px solid rgba(90,138,90,0.35)' }}>
                       <p style={{ fontSize: 10, fontWeight: 700, color: '#8AB88A', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 8 }}>Highest Self Action</p>
                       <p style={{ fontSize: 14, color: '#100C1E', lineHeight: 1.65 }}>{result.highest_self_action}</p>
                     </div>
