@@ -163,7 +163,13 @@ export function LunaTodayPage() {
     } catch { /* ignore */ }
   }
 
-  const idx = dayIndex()
+  // dayIndex() reads the local calendar day, which can disagree between
+  // Vercel's UTC server clock and Zoe's Eastern-time browser clock —
+  // calling it unconditionally during render caused a text-mismatch
+  // hydration error (React #418) that broke click handlers app-wide. Only
+  // use the real value once `now` exists (client-only, post-mount), same
+  // guard already used for the weekday-based values below.
+  const idx = now ? dayIndex() : 0
   const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? ZOE_HERO_FOCUS_BY_DAY.Monday
   const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
   const exercises = (now && ZOE_EXERCISES_BY_DAY[now.weekday]) ?? ZOE_EXERCISES_BY_DAY.Monday

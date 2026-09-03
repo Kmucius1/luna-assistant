@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { ArrowRight, Bookmark, Check, Sparkles } from 'lucide-react'
 
@@ -27,10 +27,20 @@ interface DailyCreativeSparkProps {
 }
 
 export function DailyCreativeSpark({ compact }: DailyCreativeSparkProps = {}) {
-  const [sparkIndex, setSparkIndex] = useState(dayIndex() % CREATIVE_SPARKS.length)
+  // dayIndex() must not run as the useState initializer — that function body
+  // executes during SSR too, and Vercel's UTC server clock disagrees with
+  // Zoe's Eastern-time browser clock on the calendar day for several hours
+  // every evening. Computing it there caused a text-mismatch hydration
+  // error (React #418) that broke click handlers app-wide. Start at a fixed
+  // index instead, then move to the real day-based one client-only.
+  const [sparkIndex, setSparkIndex] = useState(0)
   const [saved, setSaved] = useState(false)
   const [done, setDone] = useState(false)
   const spark = CREATIVE_SPARKS[sparkIndex]
+
+  useEffect(() => {
+    setSparkIndex(dayIndex() % CREATIVE_SPARKS.length)
+  }, [])
 
   if (compact) {
     return (
