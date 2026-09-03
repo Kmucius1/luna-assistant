@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Calendar, Check, Clock, FolderOpen, Inbox, PenLine, Pause, Play, Target, Trophy, Users } from 'lucide-react'
+import { Calendar, CalendarDays, Check, Clock, FolderOpen, Inbox, PenLine, Pause, Play, Target, Trophy, Users } from 'lucide-react'
 
 import { NewProjectSheet } from './NewProjectSheet'
 import { TeamUpdatesSheet } from './TeamUpdatesSheet'
@@ -123,6 +123,7 @@ export function TodayView() {
         <Link href="/brain-dump" className={styles.actionCard}><PenLine size={16} /><strong>Notes</strong><span>Capture ideas</span></Link>
         <button type="button" className={styles.actionCard} onClick={() => setSheet('goals')}><Trophy size={16} /><strong>Goals</strong><span>Track progress</span></button>
         <Link href="/email" className={styles.actionCard}><Inbox size={16} /><strong>Email</strong><span>Read & reply with AI</span></Link>
+        <Link href="/work/events" className={styles.actionCard}><CalendarDays size={16} /><strong>Events</strong><span>Paid modeling gigs</span></Link>
       </div>
 
       <NewProjectSheet isOpen={sheet === 'project'} onClose={() => setSheet(null)} />
