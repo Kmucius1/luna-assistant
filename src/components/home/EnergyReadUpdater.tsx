@@ -94,19 +94,31 @@ function updateEnergyRead() {
 
 export function EnergyReadUpdater() {
   useEffect(() => {
-    updateEnergyRead()
-    const observer = new MutationObserver(() => updateEnergyRead())
-    observer.observe(document.body, { childList: true, subtree: true })
+    const observerOptions = { childList: true, subtree: true }
+    const observer = new MutationObserver(() => run())
+
+    // updateEnergyRead() writes to the DOM (textContent, replaceChildren),
+    // which the observer above would otherwise see as a new mutation and
+    // react to again, looping forever. Disconnect while we write, then
+    // resume observing — this is what actually caused the runaway loop
+    // that was pinning the main thread on every page with this card.
+    function run() {
+      observer.disconnect()
+      updateEnergyRead()
+      observer.observe(document.body, observerOptions)
+    }
+
+    run()
 
     const now = new Date()
     const msToNextQuarter = ((15 - (now.getMinutes() % 15)) * 60 - now.getSeconds()) * 1000 - now.getMilliseconds()
     let interval: number | undefined
     const timeout = window.setTimeout(() => {
-      updateEnergyRead()
-      interval = window.setInterval(updateEnergyRead, 15 * 60 * 1000)
+      run()
+      interval = window.setInterval(run, 15 * 60 * 1000)
     }, Math.max(1000, msToNextQuarter))
 
-    const onVisibility = () => { if (document.visibilityState === 'visible') updateEnergyRead() }
+    const onVisibility = () => { if (document.visibilityState === 'visible') run() }
     document.addEventListener('visibilitychange', onVisibility)
     return () => {
       observer.disconnect()
