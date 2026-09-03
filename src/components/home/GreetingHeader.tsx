@@ -78,7 +78,13 @@ export function GreetingHeader({ now, weather, weatherError, backHref }: {
   backHref?: string
 }) {
   const greeting = now ? getGreeting(now.hour) : 'Hello'
-  const quote = QUOTES[dayIndex() % QUOTES.length]
+  // dayIndex() depends on the local calendar day, which briefly disagrees
+  // between Vercel's UTC server clock and Zoe's Eastern-time browser clock
+  // every evening — computing it during the initial (SSR-matching) render
+  // caused a text-mismatch hydration error that could break click handlers
+  // app-wide. Only compute it once `now` exists (client-only, post-mount),
+  // same guard already used for `greeting` above.
+  const quote = QUOTES[(now ? dayIndex() : 0) % QUOTES.length]
   const WeatherIcon = weather ? weatherIconFor(weather.forecast) : Sun
 
   return (
