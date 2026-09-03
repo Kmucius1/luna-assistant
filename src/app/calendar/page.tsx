@@ -214,7 +214,7 @@ export default function CalendarPage() {
                       }}
                     >
                       <span style={{ width: 8, height: 8, borderRadius: '50%', background: shown ? p.color : 'rgba(94,84,116,0.3)', flexShrink: 0 }} />
-                      Show {p.label}'s schedule
+                      Show {p.label}&apos;s schedule
                     </button>
                   )
                 })}

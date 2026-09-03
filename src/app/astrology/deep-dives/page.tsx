@@ -82,7 +82,6 @@ const ASPECTS_DATA = [
   { symbol: '☍', name: 'Opposition (180°)', orb: '8°', energy: 'Polarity', color: '#5C4530', body: 'Two planets directly across from each other create awareness through contrast. Oppositions invite integration of two opposite energies rather than choosing one over the other. Full Moons create Sun-Moon oppositions. Natal oppositions often show up as relationship tensions or life polarities that ask for balance.', example: 'Sun opposite Moon: identity and emotion pull in different directions — the work is integration, not choosing a side.' },
 ]
 
-function ExpandCard({ children }: { children: React.ReactNode }) { return <>{children}</> }
 
 export default function DeepDivesPage() {
   const [activeTab, setActiveTab] = useState<Tab>('planets')

@@ -256,7 +256,7 @@ export default function TasksPage() {
             )}
             {aiRankings && !aiLoading && (
               <div style={{ padding: '12px 16px', borderRadius: 16, background: 'rgba(244,235,212,0.92)', border: '1px solid rgba(201,169,110,0.35)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <p style={{ fontSize: 12, color: '#8A6F2A' }}>AI ranked — top priority: "{tasks.find(t => t.id === aiRankings[0]?.id)?.title}"</p>
+                <p style={{ fontSize: 12, color: '#8A6F2A' }}>AI ranked — top priority: &quot;{tasks.find(t => t.id === aiRankings[0]?.id)?.title}&quot;</p>
                 <button onClick={() => setAiRankings(null)} style={{ fontSize: 11, color: '#5E5474', background: 'none', border: 'none', cursor: 'pointer' }}>Clear</button>
               </div>
             )}

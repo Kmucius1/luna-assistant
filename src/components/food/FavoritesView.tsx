@@ -29,7 +29,7 @@ export function FavoritesView() {
       <div className={styles.comingSoon}>
         <div>
           <Heart size={22} style={{ marginBottom: 8 }} />
-          <p>No favorites saved yet — tell Luna what you love and it'll show up here.</p>
+          <p>No favorites saved yet — tell Luna what you love and it&apos;ll show up here.</p>
         </div>
       </div>
     )

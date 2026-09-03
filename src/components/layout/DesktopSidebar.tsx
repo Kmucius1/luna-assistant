@@ -58,7 +58,7 @@ export function DesktopSidebar() {
 
       {/* Today's Energy widget */}
       <div className="px-5 pb-8 pt-4">
-        <p className="text-xs font-semibold" style={{ color: 'var(--text-4)' }}>Today's Energy</p>
+        <p className="text-xs font-semibold" style={{ color: 'var(--text-4)' }}>Today&apos;s Energy</p>
         <p className="text-xs mt-0.5" style={{ color: 'var(--luna-purple)' }}>Scattered but capable</p>
         <div
           className="w-11 h-11 rounded-full mt-3"

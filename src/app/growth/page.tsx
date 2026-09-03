@@ -7,7 +7,7 @@ import { clearPatterns } from '@/lib/patterns'
 import { useState } from 'react'
 
 export default function GrowthPage() {
-  const [cleared, setCleared] = useState(false)
+  const [, setCleared] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
 
   function handleClear() {

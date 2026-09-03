@@ -77,7 +77,7 @@ export function LunaWellnessPage() {
     setEnergyAvg(getInsights(14).energyAvg)
     refreshSelfCareStatuses()
     setYesterday(yesterdayWeekday())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [])
 
   // Real sleep signal: today's morning check-in, if one was logged.

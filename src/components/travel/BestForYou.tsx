@@ -21,7 +21,7 @@ export function BestForYou() {
     setLoading(true)
     fetch(`/api/travel/recommendations?filter=${f}`).then(r => r.json()).then(d => setRecs(d.recommendations ?? [])).finally(() => setLoading(false))
   }
-  useEffect(() => { load(filter) }, [filter]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { load(filter) }, [filter])  
 
   async function react(id: string, status: 'liked' | 'rejected') {
     await fetch('/api/travel/recommendations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ destinationId: id, status }) })

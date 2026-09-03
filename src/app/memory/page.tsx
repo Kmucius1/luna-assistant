@@ -568,8 +568,8 @@ export default function MemoryPage() {
           </div>
           {lunaMemory.length === 0 ? (
             <p className="text-sm" style={{ color: 'var(--text-3)' }}>
-              Nothing yet — each night, LUNA reviews that day's chat and check-ins and keeps
-              what's worth remembering here. Chat with her today and check back tomorrow.
+              Nothing yet — each night, LUNA reviews that day&apos;s chat and check-ins and keeps
+              what&apos;s worth remembering here. Chat with her today and check back tomorrow.
             </p>
           ) : (
             <div className="space-y-3">

@@ -274,7 +274,7 @@ export default function TransitsPage() {
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="h-4 w-4" style={{ color: 'rgba(201,169,110,0.9)' }} />
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(201,169,110,0.85)' }}>Today's Theme</p>
+                  <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(201,169,110,0.85)' }}>Today&apos;s Theme</p>
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: '#100C1E' }}>{data.daily_theme}</p>
                 {data.moon_house && data.moon_house_meaning && (

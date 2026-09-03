@@ -93,7 +93,7 @@ export default function HealthPage() {
 
         {/* Weekly Energy */}
         <div style={{ ...G, padding: '18px 20px' }}>
-          <div style={LBL}><Waves style={{ width: 11, height: 11 }} />This Week's Flow</div>
+          <div style={LBL}><Waves style={{ width: 11, height: 11 }} />This Week&apos;s Flow</div>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 100 }}>
             {WEEK_ENERGY.map(({ day, pct }, i) => (
               <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
@@ -123,7 +123,7 @@ export default function HealthPage() {
         >
           <div style={LBL}><PenLine style={{ width: 11, height: 11 }} />Reflect on Today</div>
           <p style={{ fontSize: 13, color: '#8A6D3B', fontStyle: 'italic', margin: 0 }}>
-            "What did my body ask for today, and did I listen?"
+            &quot;What did my body ask for today, and did I listen?&quot;
           </p>
           {journalOpen && (
             <Link href="/journal" style={{ textDecoration: 'none' }}>

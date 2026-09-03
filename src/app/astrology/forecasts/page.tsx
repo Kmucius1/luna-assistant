@@ -98,7 +98,7 @@ function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
 
           {/* Affirmation */}
           <div style={{ padding: 14, borderRadius: 16, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.18)', textAlign: 'center' }}>
-            <p style={{ fontSize: 12, color: '#5C4530', fontStyle: 'italic', lineHeight: 1.55 }}>"{day.affirmation}"</p>
+            <p style={{ fontSize: 12, color: '#5C4530', fontStyle: 'italic', lineHeight: 1.55 }}>&quot;{day.affirmation}&quot;</p>
           </div>
         </div>
       )}
@@ -111,7 +111,6 @@ export default function ForecastsPage() {
   const location = useLocation()
   const [forecast, setForecast] = useState<WeeklyForecast | null>(null)
   const [loading,  setLoading]  = useState(true)
-  const [tab,      setTab]      = useState<'week' | 'month'>('week')
 
   const loadWeekly = useCallback(async (forceRefresh = false) => {
     setLoading(true)

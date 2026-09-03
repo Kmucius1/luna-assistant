@@ -23,7 +23,7 @@ import {
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
 import { DailyCreativeSpark } from '@/components/home/DailyCreativeSpark'
-import { ZOE_GYM_BY_DAY, ZOE_HERO_FOCUS_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { ZOE_HERO_FOCUS_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaHomeGridPage.module.css'
 
@@ -76,7 +76,6 @@ const HERO_FOCUS_FALLBACK = ZOE_HERO_FOCUS_BY_DAY.Monday
 export function LunaHomeGridPage() {
   const { now, weather, weatherError } = useTodayContext()
   const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? HERO_FOCUS_FALLBACK
-  const gymFocusName = (now && ZOE_GYM_BY_DAY[now.weekday]) ?? ZOE_GYM_BY_DAY.Monday
   const isDesktop = useIsDesktop()
   const pageSize = isDesktop ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE
 

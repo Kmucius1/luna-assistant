@@ -87,7 +87,7 @@ export function AstrologyChart() {
               <div key={label} className={styles.bigThreeCard}>
                 <div className={styles.bigThreeLabel}>{label}</div>
                 <div className={styles.bigThreeSign}>{p.sign}</div>
-                <div className={styles.bigThreeDegree}>{p.degree}°{String(p.minutes).padStart(2, '0')}' · House {p.house}</div>
+                <div className={styles.bigThreeDegree}>{p.degree}°{String(p.minutes).padStart(2, '0')}&apos; · House {p.house}</div>
               </div>
             ))}
           </div>
@@ -104,7 +104,7 @@ export function AstrologyChart() {
                 <div className={styles.placementGlyph}>{point === 'Rising' ? 'AC' : point === 'Midheaven' ? 'MC' : point[0]}</div>
                 <div className={styles.placementInfo}>
                   <strong>{point === 'NNode' ? 'North Node' : point === 'SNode' ? 'South Node' : point}{p.retrograde && <span className={styles.retroTag}> ℞</span>}</strong>
-                  <span>{p.sign} {p.degree}°{String(p.minutes).padStart(2, '0')}'</span>
+                  <span>{p.sign} {p.degree}°{String(p.minutes).padStart(2, '0')}&apos;</span>
                 </div>
                 <div className={styles.placementHouse}>House {p.house}</div>
               </button>

@@ -81,7 +81,7 @@ export default function LateModeScreen() {
 
           {/* Steps */}
           <div className="space-y-3 mb-8">
-            {STEPS.map((step, i) => {
+            {STEPS.map((step) => {
               const done = checked.has(step.id)
               return (
                 <button

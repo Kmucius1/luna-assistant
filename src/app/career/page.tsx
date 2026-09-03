@@ -403,7 +403,7 @@ export default function CareerCompassScreen() {
             {!crmLoading && crmError && (
               <div style={{ ...GLASS, padding: '20px', textAlign: 'center', background: 'rgba(224,94,94,0.08)' }}>
                 <AlertCircle className="h-8 w-8 mx-auto mb-2" style={{ color: '#E05E5E' }} />
-                <p style={{ fontSize: 13, color: '#5E5474' }}>Can't reach DRYP CRM right now.</p>
+                <p style={{ fontSize: 13, color: '#5E5474' }}>Can&apos;t reach DRYP CRM right now.</p>
               </div>
             )}
 
@@ -519,7 +519,7 @@ export default function CareerCompassScreen() {
               <>
                 {weekResult.week_theme && (
                   <div style={{ ...GLASS, padding: '18px 20px', background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)', borderRadius: 20, textAlign: 'center' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 8 }}>This week's theme</p>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#8A6F2A', marginBottom: 8 }}>This week&apos;s theme</p>
                     <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: '#100C1E' }}>{weekResult.week_theme}</p>
                   </div>
                 )}
@@ -563,7 +563,7 @@ export default function CareerCompassScreen() {
             {/* Link to work page */}
             <Link href="/work" style={{ textDecoration: 'none' }}>
               <div style={{ ...GLASS, padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#5E5474' }}>See this week's open tasks</p>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#5E5474' }}>See this week&apos;s open tasks</p>
                 <ChevronRight className="h-4 w-4" style={{ color: '#8A8098' }} />
               </div>
             </Link>

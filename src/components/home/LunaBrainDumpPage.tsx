@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ChevronLeft, MoreHorizontal, Sparkles, Mic, PenLine, Check, Pause, Play, Square, X,
+  ChevronLeft, MoreHorizontal, Sparkles, Mic, PenLine, Check, Pause, Play, X,
   Brain, ListChecks, Lightbulb, Heart, Briefcase, MoreHorizontal as OtherIcon, ChevronRight,
 } from 'lucide-react'
 

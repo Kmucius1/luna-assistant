@@ -34,16 +34,6 @@ function LoveBadge({ text }: { text: string }) {
   )
 }
 
-function IntensityBar({ value }: { value: number }) {
-  return (
-    <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-      {Array.from({ length: 10 }, (_, i) => (
-        <div key={i} style={{ width: 14, height: 4, borderRadius: 2, background: i < value ? 'rgba(200,110,150,0.8)' : 'rgba(180,150,100,0.18)' }} />
-      ))}
-    </div>
-  )
-}
-
 // ─── Shimmer ──────────────────────────────────────────────────────────────────
 function Shimmer({ h = 80 }: { h?: number }) {
   return <div style={{ height: h, borderRadius: 22, background: 'rgba(255,255,255,0.5)', marginBottom: 14 }} className="shimmer" />
@@ -222,7 +212,7 @@ export default function LovePage() {
                     {/* Affirmation */}
                     <div style={{ padding: 20, borderRadius: 22, background: 'linear-gradient(135deg, rgba(230,180,200,0.35), rgba(250,238,242,0.4))', border: '1px solid rgba(200,120,160,0.25)', textAlign: 'center', marginBottom: 14 }}>
                       <Sparkles className="h-5 w-5" style={{ color: 'rgb(160,60,105)', margin: '0 auto 10px' }} />
-                      <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: '#100C1E', lineHeight: 1.55, fontStyle: 'italic' }}>"{data.affirmation}"</p>
+                      <p style={{ fontFamily: 'var(--font-display)', fontSize: 15, fontWeight: 600, color: '#100C1E', lineHeight: 1.55, fontStyle: 'italic' }}>&quot;{data.affirmation}&quot;</p>
                     </div>
                   </>
                 ) : (

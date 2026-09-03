@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { GlassCard } from '@/components/ui/GlassCard'
-import { Archive, Plus, Check } from 'lucide-react'
+import {  } from '@/components/ui/GlassCard'
+import { Archive, Plus } from 'lucide-react'
 import VAULT_CATEGORIES from '@/data/vault/categories.json'
 
 const STATUS_STYLES: Record<string, { label: string; bg: string; color: string }> = {

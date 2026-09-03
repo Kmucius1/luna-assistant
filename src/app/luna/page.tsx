@@ -9,7 +9,7 @@ import { sendChatMessage } from '@/lib/chat/sendChatMessage'
 import { LunaLoadingState, VoiceOrb } from '@/components/luna'
 import {
   Sparkles, Mic, MessageCircle, BookOpen, Star, Archive,
-  Send, ChevronRight, ArrowRight, RotateCcw, Volume2, Loader2
+  Send, ChevronRight, Volume2, Loader2
 } from 'lucide-react'
 import Link from 'next/link'
 import styles from './luna-page.module.css'

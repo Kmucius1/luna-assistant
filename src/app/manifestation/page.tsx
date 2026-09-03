@@ -93,8 +93,8 @@ export default function ManifestationPage() {
 
         {/* Affirmation */}
         <div style={{ ...G, padding: '18px 20px', background: 'linear-gradient(140deg, rgba(255,255,255,0.6) 0%, rgba(250,244,232,0.7) 100%)' }}>
-          <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Today's Affirmation</div>
-          <p style={{ fontSize: 15, fontStyle: 'italic', color: '#32284A', margin: 0 }}>"{affirmation}"</p>
+          <div style={LBL}><Sparkles style={{ width: 11, height: 11 }} />Today&apos;s Affirmation</div>
+          <p style={{ fontSize: 15, fontStyle: 'italic', color: '#32284A', margin: 0 }}>&quot;{affirmation}&quot;</p>
         </div>
 
         {/* Add intention */}

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { RefreshCw, AlertTriangle, CheckCircle, Clock, ArrowLeft, ExternalLink, Bell, Plus, Settings, Users, Briefcase } from 'lucide-react'
+import { RefreshCw, AlertTriangle, CheckCircle, ArrowLeft, ExternalLink, Bell, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 const GLASS: React.CSSProperties = {
@@ -342,7 +342,7 @@ export default function DryphubPage() {
               <div style={{ ...GLASS, padding: 16, marginTop: 14, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#8A6F2A', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Meeting Note Reminders</p>
                 <p style={{ fontSize: 12, color: '#32284A', lineHeight: 1.6 }}>
-                  LUNA checks DRYP Hub after each calendar meeting ends. If no notes were added for that client today, you'll see an alert here and in the daily check-in. Always add notes within 30 min of your meeting.
+                  LUNA checks DRYP Hub after each calendar meeting ends. If no notes were added for that client today, you&apos;ll see an alert here and in the daily check-in. Always add notes within 30 min of your meeting.
                 </p>
                 <a href="https://www.dryphub.com/notes" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#8A6F2A', textDecoration: 'none', marginTop: 8 }}>
                   <Plus className="h-3 w-3" /> Add a note in DRYP Hub

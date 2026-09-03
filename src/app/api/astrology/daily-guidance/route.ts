@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal, ZOE_NATAL, SIGN_ENERGY_DESCRIPTIONS, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
@@ -18,7 +18,7 @@ async function resolveUserId(): Promise<string> {
 
 // ─── Transit-based fallback (works with no AI credits) ────────────────────────
 const SIGN_BODY = SIGN_ENERGY_DESCRIPTIONS
-function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dateStr: string, timeStr: string): DailyGuidance {
+function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dateStr: string, _timeStr: string): DailyGuidance {
   const sun   = planets.find(p => p.name === 'Sun')
   const moon  = planets.find(p => p.name === 'Moon')
   const venus = planets.find(p => p.name === 'Venus')

@@ -1,9 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { calculatePriorityScore } from '@/lib/priority'
 import { Task } from '@/types'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     })).sort((a, b) => b.priority_score - a.priority_score)
 
     return NextResponse.json({ tasks: scored })
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 })
   }
 }

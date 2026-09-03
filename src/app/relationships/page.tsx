@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
-  Users, Heart, MessageCircle, Star, Plus, ChevronRight,
-  Phone, Calendar, Sparkles, Clock, AlertCircle
+  MessageCircle, Plus, Sparkles, Clock, AlertCircle
 } from 'lucide-react'
 import Link from 'next/link'
 import { SmartInput } from '@/components/ui/SmartInput'

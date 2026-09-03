@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getTransitsToNatal, getCurrentPlanets, ZOE_NATAL, SIGN_KEYWORDS } from '@/lib/astrology'
+import { NextResponse } from 'next/server'
+import { getTransitsToNatal, getCurrentPlanets, ZOE_NATAL } from '@/lib/astrology'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const now = new Date()
     const aspects = getTransitsToNatal(now)

@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { BookOpen, Mic, Plus, ChevronRight, Heart, Sparkles, Moon, Star, Search } from 'lucide-react'
+import { Mic, Plus, ChevronRight, Sparkles, Search } from 'lucide-react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { SmartInput } from '@/components/ui/SmartInput'

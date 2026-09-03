@@ -229,9 +229,14 @@ export default function SettingsPage() {
 
   async function handleDisconnect(email: string) {
     // Disconnect a specific account (simplified: disconnect all for now)
-    await fetch('/api/gmail/disconnect', { method: 'POST' })
-    await checkConnections()
-    setCalendarCount(null)
+    setConnecting(email)
+    try {
+      await fetch('/api/gmail/disconnect', { method: 'POST' })
+      await checkConnections()
+      setCalendarCount(null)
+    } finally {
+      setConnecting(null)
+    }
   }
 
   async function handleLogout() {
@@ -377,7 +382,7 @@ export default function SettingsPage() {
               {calendarCount === null && connStatus.connected && (
                 <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>
                   <p style={{ fontSize: 12, color: '#5C4530' }}>
-                    ⚡ Reconnect your Google account above to add Calendar access — click "Connect with Google" on a connected account to re-authorize with calendar scope.
+                    ⚡ Reconnect your Google account above to add Calendar access — click &quot;Connect with Google&quot; on a connected account to re-authorize with calendar scope.
                   </p>
                 </div>
               )}

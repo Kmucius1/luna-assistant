@@ -51,7 +51,6 @@ const MOON_SIGN_LOVE: Record<string, string> = {
 function buildFallbackLoveGuidance(planets: PlanetPosition[], transits: TransitAspect[]): LoveGuidance {
   const venus = planets.find(p => p.name === 'Venus')
   const moon  = planets.find(p => p.name === 'Moon')
-  const mars  = planets.find(p => p.name === 'Mars')
   const sun   = planets.find(p => p.name === 'Sun')
 
   const loveTransits = transits.filter(t =>

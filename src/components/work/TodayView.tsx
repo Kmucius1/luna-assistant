@@ -38,6 +38,7 @@ export function TodayView() {
       const localTasks: LocalTask[] = local.tasks ?? []
       const drypTasks: DrypTask[] = dryp.tasks ?? []
       setTotalOpen(localTasks.filter(t => t.status !== 'done').length + drypTasks.length)
+      setCompletedToday(localTasks.filter(t => t.status === 'done').length)
     })
 
     try {
@@ -45,6 +46,16 @@ export function TodayView() {
       setFocusMinutesToday(stored[todayKey()] ?? 0)
     } catch { /* ignore */ }
   }, [])
+
+  function addFocusMinutes(minutes: number) {
+    try {
+      const stored = JSON.parse(localStorage.getItem(FOCUS_MINUTES_KEY) ?? '{}')
+      const key = todayKey()
+      stored[key] = (stored[key] ?? 0) + minutes
+      localStorage.setItem(FOCUS_MINUTES_KEY, JSON.stringify(stored))
+      setFocusMinutesToday(stored[key])
+    } catch { /* ignore */ }
+  }
 
   useEffect(() => {
     if (!timerRunning) {
@@ -62,18 +73,8 @@ export function TodayView() {
       })
     }, 1000)
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerRunning])
 
-  function addFocusMinutes(minutes: number) {
-    try {
-      const stored = JSON.parse(localStorage.getItem(FOCUS_MINUTES_KEY) ?? '{}')
-      const key = todayKey()
-      stored[key] = (stored[key] ?? 0) + minutes
-      localStorage.setItem(FOCUS_MINUTES_KEY, JSON.stringify(stored))
-      setFocusMinutesToday(stored[key])
-    } catch { /* ignore */ }
-  }
+  }, [timerRunning])
 
   function toggleTimer() {
     if (!timerRunning && timerSeconds === TIMER_PRESET_SECONDS) setTimerRunning(true)

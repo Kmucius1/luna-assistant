@@ -351,7 +351,7 @@ function ConnectGmail({ accounts, error }: { accounts: ConnectedAccount[]; error
         {hasAccounts ? 'Add Another Account' : 'Connect Your Mail'}
       </h2>
       <p style={{ fontSize: 13, color: '#5E5474', lineHeight: 1.6, marginBottom: 24, maxWidth: 320, margin: '0 auto 24px' }}>
-        Connect zoettaylor14@gmail.com (personal), zoe@drypdigital.com (business), and info@drypdigital.com (team) — LUNA reads all three together and sorts what's personal from what's DRYP client work.
+        Connect zoettaylor14@gmail.com (personal), zoe@drypdigital.com (business), and info@drypdigital.com (team) — LUNA reads all three together and sorts what&apos;s personal from what&apos;s DRYP client work.
       </p>
       {error && (
         <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 12, background: 'rgba(224,94,94,0.1)', border: '1px solid rgba(224,94,94,0.2)' }}>

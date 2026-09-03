@@ -1,7 +1,7 @@
 'use client'
-import { useState, useRef, useCallback, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Mic, Square, ChevronDown, Check, Sparkles, Archive } from 'lucide-react'
+import { Mic, Square, Check, Sparkles, Archive } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
 
 // ─── Locked light-palette card styles (bypass the shared GlassCard

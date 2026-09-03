@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { Sun, ArrowRight, Sparkles, ChevronLeft, Moon, Home, Pencil } from 'lucide-react'
+import { ArrowRight, Sparkles, ChevronLeft, Home, Pencil } from 'lucide-react'
 import { format } from 'date-fns'
 import { SmartInput, getAutosaveKey } from '@/components/ui/SmartInput'
 import { addPattern } from '@/lib/patterns'

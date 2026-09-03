@@ -101,7 +101,7 @@ export default function RetrogradesPage() {
               style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-4)' }}>What Is Retrograde?</p>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
-                A planet is retrograde when it appears to move backward from Earth's perspective. The planet itself isn't actually reversing — it's an optical illusion based on orbital speed. Astrologically, retrograde periods turn that planet's themes inward. Rather than expressing outwardly, the energy calls for review, revision, reflection, and reconnection.
+                A planet is retrograde when it appears to move backward from Earth&apos;s perspective. The planet itself isn&apos;t actually reversing — it&apos;s an optical illusion based on orbital speed. Astrologically, retrograde periods turn that planet&apos;s themes inward. Rather than expressing outwardly, the energy calls for review, revision, reflection, and reconnection.
               </p>
             </div>
 

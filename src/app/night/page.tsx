@@ -81,16 +81,6 @@ function nowMinutes(): number {
   return now.getHours() * 60 + now.getMinutes()
 }
 
-function minsUntil(targetMins: number): string {
-  const now  = nowMinutes()
-  let diff   = ((targetMins % 1440) + 1440) % 1440 - now
-  if (diff < 0) diff += 1440
-  const h = Math.floor(diff / 60)
-  const m = diff % 60
-  if (h === 0) return `${m}m`
-  return `${h}h ${m}m`
-}
-
 export default function NightScreen() {
   const [tab, setTab]                     = useState<Tab>('sleep')
   const [wakeGoal, setWakeGoal]           = useState('08:00')
@@ -216,7 +206,7 @@ export default function NightScreen() {
           {/* Today's reminders */}
           <div className="rounded-2xl p-4 mb-6" style={{ background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(180,150,100,0.16)' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#5C4530' }}>
-              Tonight's Reminders
+              Tonight&apos;s Reminders
             </p>
             <div className="space-y-2">
               {NIGHT_REMINDERS.map(r => (

@@ -4,10 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { CategoryPager, type CPage } from '@/components/ui/CategoryPager'
 import {
-  Sparkles, Star, Scissors, ShirtIcon, Image, BookOpen, Gem, Plus,
-  ChevronDown, ChevronRight, Check, RotateCcw, Wand2, Camera,
-  Layers, ArrowRight, Moon, Sun, Wind, Zap, Heart, Music,
-  Package, Hammer, Coffee, AlertCircle, Loader2, ShoppingBag
+  Sparkles, Scissors, ShirtIcon, Image, Gem, Plus,
+  ChevronDown, Check, Wand2, Camera,
+  Layers, ArrowRight, Heart, Loader2, ShoppingBag
 } from 'lucide-react'
 
 interface OracleResult {
@@ -59,16 +58,6 @@ interface WardrobeItem {
   clean_status: string
   favorite_rating: number
 }
-
-const SECTIONS = [
-  { id: 'oracle',      label: 'Today',         icon: Sparkles    },
-  { id: 'closet',      label: 'Closet',         icon: ShirtIcon   },
-  { id: 'inspiration', label: 'Inspo',          icon: Image       },
-  { id: 'projects',    label: 'Sewing',         icon: Scissors    },
-  { id: 'studio',      label: 'Generated',      icon: Layers      },
-  { id: 'vault',       label: 'Fashion Vault',  icon: Gem         },
-  { id: 'shopping',    label: 'Wishlist',       icon: ShoppingBag },
-]
 
 const MOOD_GRID = [
   { emoji: '🌙', label: 'Mysterious' },
@@ -1055,7 +1044,7 @@ function ShoppingSection() {
         )
       })}
       {!loading && !items.length && (
-        <p className="text-sm text-center py-4" style={{ color: 'var(--text-3)' }}>Nothing on your list yet — add what you're hunting for above.</p>
+        <p className="text-sm text-center py-4" style={{ color: 'var(--text-3)' }}>Nothing on your list yet — add what you&apos;re hunting for above.</p>
       )}
     </div>
   )
