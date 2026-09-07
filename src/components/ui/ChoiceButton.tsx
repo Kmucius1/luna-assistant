@@ -39,7 +39,7 @@ export function ChoiceGrid({ options, value, onChange, columns = 2 }: {
   options: ChoiceOption[]
   value: string | null
   onChange: (v: string) => void
-  columns?: 1 | 2
+  columns?: 1 | 2 | 3
 }) {
   return (
     <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}>

@@ -16,6 +16,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (body.storage === 'fridge' || body.storage === 'freezer' || body.storage === 'pantry') updates.storage = body.storage
     if (body.mark_consumed === true) updates.consumed_at = new Date().toISOString()
     if (body.mark_consumed === false) updates.consumed_at = null
+    if (body.status === 'in_stock' || body.status === 'low' || body.status === 'empty') updates.status = body.status
 
     if (Object.keys(updates).length === 0) return NextResponse.json({ error: 'Nothing to update' }, { status: 400 })
 

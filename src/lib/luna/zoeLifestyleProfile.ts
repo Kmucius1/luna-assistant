@@ -202,6 +202,20 @@ export const ZOE_KNOWN_LOCATIONS = [
   { label: 'gym', match: ['gym'] },
 ]
 
+// A suggestion pool the meal-plan AI draws from, not a rigid requirement —
+// same "reference data the model weighs against real context" treatment
+// ZOE_GYM_BY_DAY gets. Matches her explicit "don't force traditional meal
+// prep" framing: Monday/Friday/Saturday are deliberately flexible.
+export const ZOE_MEAL_ROTATION_BY_DAY: Record<string, string> = {
+  Sunday: 'Chicken, rice, and veggies — her one near-default dinner.',
+  Monday: 'Flexible — no theme.',
+  Tuesday: 'Optional Taco Tuesday.',
+  Wednesday: 'Chicken quesadilla, buffalo chicken wrap, or another chicken use.',
+  Thursday: 'Salmon, or eat out.',
+  Friday: 'Flexible — no theme.',
+  Saturday: 'Flexible — no theme.',
+}
+
 export const ZOE_NEVER_FOODS = [
   'eggs',
   'turkey sausage',

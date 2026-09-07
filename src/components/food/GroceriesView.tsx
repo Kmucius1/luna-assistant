@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Check, ShoppingCart } from 'lucide-react'
 import styles from './FoodViews.module.css'
+import { ZOE_PANTRY_STAPLES } from '@/lib/luna/pantryStaples'
 
 interface GroceryItem { item: string; quantity: string }
 interface GroceryList {
@@ -39,11 +40,22 @@ export function GroceriesView() {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ checked_items: next }),
     })
     // Checking an item off means "I have it now" — confirm it into inventory.
+    // A staple restock must update the SAME staple row the Sunday check-in
+    // reads, not insert a second untagged row (which the staples query would
+    // never see, silently leaving it marked low/empty).
     if (!wasChecked) {
-      await fetch('/api/food/pantry', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: [{ name: groceryItem.item, quantity: groceryItem.quantity, source: 'grocery_list' }] }),
-      })
+      const staple = ZOE_PANTRY_STAPLES.find(s => s.name.toLowerCase() === groceryItem.item.toLowerCase())
+      if (staple) {
+        await fetch('/api/food/pantry/staples', {
+          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ statuses: { [staple.name]: 'in_stock' } }),
+        })
+      } else {
+        await fetch('/api/food/pantry', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: [{ name: groceryItem.item, quantity: groceryItem.quantity, source: 'grocery_list' }] }),
+        })
+      }
     }
   }
 

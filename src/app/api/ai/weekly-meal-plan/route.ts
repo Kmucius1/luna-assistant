@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
-import { ZOE_LIFESTYLE_PROFILE } from '@/lib/luna/zoeLifestyleProfile'
+import { ZOE_LIFESTYLE_PROFILE, ZOE_MEAL_ROTATION_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { createClient } from '@/lib/supabase/server'
 import { FoodProfile, formatFoodProfileForPrompt, mergedNeverFoods } from '@/lib/luna/foodProfile'
+import { ZOE_PANTRY_STAPLES, type StapleDef } from '@/lib/luna/pantryStaples'
+
+const MEAL_ROTATION_PROSE = Object.entries(ZOE_MEAL_ROTATION_BY_DAY)
+  .map(([day, note]) => `- ${day}: ${note}`)
+  .join('\n')
 
 function buildSystem(foodProfileText: string, neverFoods: string[]): string {
   return `You are Luna, Zoe's personal meal planner and grocery assistant.
@@ -15,6 +20,11 @@ Create realistic meals Zoe will actually eat. NEVER include anything from this n
 Do not silently replace her preferences with generic fitness foods.
 Write every recipe/prep_note at real restaurant/chef quality — actual seasonings, actual technique (searing, dredging, sauce-building steps), not vague instructions like "season to taste" or "cook until done." Use the cooking technique notes above whenever a dish matches one of them.
 Keep meals practical for a 5:00 AM wake-up, 5:45 AM gym arrival, and protected work hours from 10:00 AM to 6:00 PM.
+
+HER WEEKLY MEAL ROTATION — a suggestion pool to draw from, not a rigid requirement. Skip a day's theme whenever real context (cravings, what's on hand, meals out) points somewhere better:
+${MEAL_ROTATION_PROSE}
+
+COOKED-LEFTOVER FOOD SAFETY: cooked chicken/protein is only safe as leftovers for 3-4 days refrigerated. Do not suggest Sunday's cooked chicken as a Thursday, Friday, or Saturday leftover unless the prep_note explicitly says a portion was frozen.
 
 Return ONLY valid JSON in this shape:
 {
@@ -70,6 +80,29 @@ export async function POST(req: NextRequest) {
       supabase.from('food_profile').select('*').eq('user_id', user.id).maybeSingle(),
     ])
 
+    // Staple status may not exist yet if the pantry-staples migration hasn't
+    // been run — fail soft to "no known statuses" rather than erroring the
+    // whole weekly plan.
+    let stapleStatusByName = new Map<string, string | null>()
+    try {
+      const { data, error } = await supabase
+        .from('food_pantry_items')
+        .select('name, status')
+        .eq('user_id', user.id)
+        .not('staple_group', 'is', null)
+        .is('consumed_at', null)
+      if (error) throw error
+      stapleStatusByName = new Map((data ?? []).map((r: { name: string; status: string | null }) => [r.name.toLowerCase(), r.status]))
+    } catch { /* migration not applied yet */ }
+
+    const requiredStaples: StapleDef[] = ZOE_PANTRY_STAPLES.filter(s => {
+      const status = stapleStatusByName.get(s.name.toLowerCase())
+      return status === 'low' || status === 'empty'
+    })
+    const wellStockedStaples = ZOE_PANTRY_STAPLES.filter(
+      s => stapleStatusByName.get(s.name.toLowerCase()) === 'in_stock',
+    )
+
     const foodProfile = (foodProfileRow ?? null) as FoodProfile | null
     const foodProfileText = formatFoodProfileForPrompt(foodProfile)
     const neverFoods = mergedNeverFoods(foodProfile)
@@ -101,6 +134,8 @@ Other notes: ${notes || 'None'}
 Currently in her fridge/pantry: ${pantryItems.length ? pantryItems.join(', ') : 'Nothing logged yet'}
 ${expiringSoon.length ? `Expiring soon — strongly prefer recipes that use these up: ${expiringSoon.join(', ')}` : ''}
 ${recentMealTitles.length ? `Do not repeat any of these recent meals: ${recentMealTitles.join(', ')}` : ''}
+${wellStockedStaples.length ? `Recurring staples she already has — don't add these to the grocery list: ${wellStockedStaples.map(s => s.name).join(', ')}` : ''}
+${requiredStaples.length ? `Recurring staples she's marked low/empty — needs restocking, factor these into meal planning: ${requiredStaples.map(s => s.name).join(', ')}` : ''}
 
 Rules:
 - Return exactly the requested number of breakfasts, lunches, and dinners.
@@ -117,7 +152,20 @@ Rules:
 - Favor her Food Profile favorites and real chef technique/seasoning notes over generic suggestions.`
 
     const raw = await callAI(buildSystem(foodProfileText, neverFoods), prompt, 3800)
-    const parsed = parseAIJson(raw)
+    const parsed = parseAIJson<{ grocery_list?: Record<string, { item: string; quantity?: string; used_for?: string[] }[]> }>(raw)
+
+    // Low/empty staples are a deterministic fact, not a judgment call — merge
+    // them into the grocery list in code rather than trusting the AI to have
+    // included every one. Dedupe case-insensitively against what it already added.
+    if (requiredStaples.length) {
+      parsed.grocery_list = parsed.grocery_list ?? {}
+      for (const staple of requiredStaples) {
+        const bucket = parsed.grocery_list[staple.category] ?? []
+        const already = bucket.some(i => i.item.toLowerCase() === staple.name.toLowerCase())
+        if (!already) bucket.push({ item: staple.name, quantity: '', used_for: ['pantry restock'] })
+        parsed.grocery_list[staple.category] = bucket
+      }
+    }
 
     const weekStart = mondayOf(new Date())
     const { error: upsertError } = await supabase

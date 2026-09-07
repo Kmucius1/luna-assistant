@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
+import { STAPLE_GROUP_LABEL, STAPLE_GROUPS_ORDER, type StapleGroup, type StapleStatus } from '@/lib/luna/pantryStaples'
+import type { FreeSlot } from '@/lib/luna/calendarGaps'
 
 const CARD: React.CSSProperties = {
   background: 'rgba(255,255,255,0.6)',
@@ -30,8 +32,17 @@ const PALETTE = {
 
 type Step =
   | 'intro' | 'gathering' | 'review_week'
-  | 'q_location' | 'q_groceries' | 'q_personal' | 'q_energy' | 'q_rhythm'
+  | 'q_location' | 'q_groceries' | 'q_pantry_confirm' | 'q_grocery_time' | 'q_prep_time'
+  | 'q_personal' | 'q_energy' | 'q_rhythm'
   | 'finalizing' | 'result' | 'closing'
+
+interface StapleWithStatus { name: string; group: string; category: string; status: StapleStatus | null }
+
+const STATUS_OPTIONS = [
+  { value: 'in_stock', label: 'In stock' },
+  { value: 'low', label: 'Low' },
+  { value: 'empty', label: 'Empty' },
+]
 
 interface ClassifiedEvent { title: string; day: string; time: string; locationType: string; rawLocation: string }
 interface DrypTaskFlagged { id: string; title: string; account_name?: string; due_date?: string; isOverdue: boolean; isDueSoon: boolean; isStuck: boolean }
@@ -93,6 +104,54 @@ export default function WeeklyResetPage() {
   const [energyLevel, setEnergyLevel] = useState(7)
   const [wantRhythmBlock, setWantRhythmBlock] = useState<boolean | null>(null)
 
+  const [pantryStaples, setPantryStaples] = useState<StapleWithStatus[] | null>(null)
+  const [pantryStatuses, setPantryStatuses] = useState<Record<string, StapleStatus>>({})
+  const [pantryLoading, setPantryLoading] = useState(false)
+  const [pantrySaving, setPantrySaving] = useState(false)
+  const [stapleNeedsGrocery, setStapleNeedsGrocery] = useState(false)
+  const [groceryTimeSlots, setGroceryTimeSlots] = useState<FreeSlot[]>([])
+  const [prepTimeSlots, setPrepTimeSlots] = useState<FreeSlot[]>([])
+  const [groceryTimeSlot, setGroceryTimeSlot] = useState<string | null>(null)
+  const [prepTimeSlot, setPrepTimeSlot] = useState<string | null>(null)
+
+  async function loadPantryAndSlots() {
+    setPantryLoading(true)
+    try {
+      const [staplesData, slotsData] = await Promise.all([
+        fetch('/api/food/pantry/staples').then(r => r.json()),
+        fetch('/api/food/pantry/free-slots').then(r => r.json()),
+      ])
+      const staples: StapleWithStatus[] = staplesData.staples ?? []
+      setPantryStaples(staples)
+      setPantryStatuses(Object.fromEntries(staples.map((s: StapleWithStatus) => [s.name, s.status ?? 'in_stock'])))
+      setGroceryTimeSlots(slotsData.groceryTimeSlots ?? [])
+      setPrepTimeSlots(slotsData.prepTimeSlots ?? [])
+    } catch {
+      setPantryStaples([])
+    } finally {
+      setPantryLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (step === 'q_pantry_confirm' && !pantryStaples) loadPantryAndSlots()
+
+  }, [step, pantryStaples])
+
+  async function confirmPantryStaples() {
+    setPantrySaving(true)
+    try {
+      await fetch('/api/food/pantry/staples', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ statuses: pantryStatuses }),
+      })
+    } catch { /* soft-fail — meal plan just won't know about this week's changes */ } finally {
+      setPantrySaving(false)
+    }
+    const needsGrocery = Object.values(pantryStatuses).some(v => v === 'low' || v === 'empty')
+    setStapleNeedsGrocery(needsGrocery)
+    setStep(needsGrocery ? 'q_grocery_time' : 'q_prep_time')
+  }
+
   const [reflections, setReflections] = useState<Record<string, string>>({})
   const [closingResult, setClosingResult] = useState<{ affirmation?: string; closing?: string; intention_for_week?: string } | null>(null)
   const [closingLoading, setClosingLoading] = useState(false)
@@ -126,6 +185,8 @@ export default function WeeklyResetPage() {
             energy_level: energyLevel,
             want_rhythm_block: wantRhythmBlock,
             unclear_confirmations: confirmedUnclear,
+            grocery_time_slot: groceryTimeSlot,
+            prep_time_slot: prepTimeSlot,
           },
         }),
       })
@@ -285,6 +346,91 @@ export default function WeeklyResetPage() {
                 <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
+                <button onClick={() => setStep(groceriesNeeded ? 'q_pantry_confirm' : 'q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_pantry_confirm' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>What&apos;s stocked at home?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pre-filled from last time — just adjust whatever&apos;s changed.</p>
+              {pantryLoading ? (
+                <div className="text-center py-16">
+                  <div className="w-12 h-12 rounded-full mx-auto mb-4 animate-breathe" style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.4), rgba(201,169,110,0.1))' }} />
+                  <p className="text-sm" style={{ color: 'var(--mist)' }}>Checking your pantry…</p>
+                </div>
+              ) : (
+                STAPLE_GROUPS_ORDER.map(group => {
+                  const items = (pantryStaples ?? []).filter(s => s.group === group)
+                  if (items.length === 0) return null
+                  return (
+                    <div key={group} className="mb-5">
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>{STAPLE_GROUP_LABEL[group as StapleGroup]}</p>
+                      <div className="space-y-3">
+                        {items.map(s => (
+                          <div key={s.name} className="p-3" style={CARD}>
+                            <p className="text-sm font-semibold mb-2" style={{ color: 'var(--depth)' }}>{s.name}</p>
+                            <ChoiceGrid
+                              columns={3}
+                              options={STATUS_OPTIONS}
+                              value={pantryStatuses[s.name] ?? 'in_stock'}
+                              onChange={v => setPantryStatuses(p => ({ ...p, [s.name]: v as StapleStatus }))}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })
+              )}
+              <div className="flex gap-3 mt-2">
+                <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={confirmPantryStaples} disabled={pantryLoading || pantrySaving}
+                  className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  {pantrySaving ? 'Saving…' : 'Looks right — Continue'} <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_grocery_time' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>When can you grab groceries?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pulled from real gaps in your calendar this week.</p>
+              {groceryTimeSlots.length > 0 ? (
+                <div className="mb-6"><ChoiceGrid columns={1} options={groceryTimeSlots.map(s => ({ value: s.label, label: s.label, desc: `${s.durationMinutes} min free` }))} value={groceryTimeSlot} onChange={setGroceryTimeSlot} /></div>
+              ) : (
+                <p className="text-sm mb-6" style={{ color: 'var(--mist)' }}>No open slots found this week — I&apos;ll keep it flexible.</p>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_prep_time')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_prep_time' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>When&apos;s a good time to meal prep?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Biased toward evenings and weekends.</p>
+              {prepTimeSlots.length > 0 ? (
+                <div className="mb-6"><ChoiceGrid columns={1} options={prepTimeSlots.map(s => ({ value: s.label, label: s.label, desc: `${s.durationMinutes} min free` }))} value={prepTimeSlot} onChange={setPrepTimeSlot} /></div>
+              ) : (
+                <p className="text-sm mb-6" style={{ color: 'var(--mist)' }}>No open slots found this week — I&apos;ll keep it flexible.</p>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => setStep(stapleNeedsGrocery ? 'q_grocery_time' : 'q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
                 <button onClick={() => setStep('q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                   Continue <ArrowRight className="inline h-4 w-4 ml-1" />
                 </button>
@@ -300,7 +446,7 @@ export default function WeeklyResetPage() {
                 <SmartInput context="anything major this week — birthday, trip, event" placeholder="Nothing, or tell me what's coming up..." value={majorThisWeek} onChange={setMajorThisWeek} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep(groceriesNeeded ? 'q_prep_time' : 'q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_energy')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -427,10 +573,10 @@ export default function WeeklyResetPage() {
                   <CheckCircle2 className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                   <span className="text-xs" style={{ color: 'var(--text-2)' }}>Laundry/cleaning: {finalResult.laundry_cleaning_day}</span>
                 </div>
-                {finalResult.grocery_day && (
+                {(groceryTimeSlot || finalResult.grocery_day) && (
                   <div className="flex items-center gap-2">
                     <ShoppingBasket className="h-4 w-4" style={{ color: 'var(--violet)' }} />
-                    <span className="text-xs" style={{ color: 'var(--text-2)' }}>Groceries: {finalResult.grocery_day}</span>
+                    <span className="text-xs" style={{ color: 'var(--text-2)' }}>Groceries: {groceryTimeSlot ?? finalResult.grocery_day}</span>
                   </div>
                 )}
               </div>

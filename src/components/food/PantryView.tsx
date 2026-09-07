@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Camera, Check, Loader2, Package, Plus, Snowflake, Refrigerator, Trash2, X } from 'lucide-react'
 import styles from './FoodViews.module.css'
 
-interface PantryItem { id: string; name: string; category: string; storage: 'fridge' | 'freezer' | 'pantry'; quantity: string | null; expires_on: string | null }
+interface PantryItem { id: string; name: string; category: string; storage: 'fridge' | 'freezer' | 'pantry'; quantity: string | null; expires_on: string | null; status?: 'in_stock' | 'low' | 'empty' | null; staple_group?: string | null }
 interface PreviewItem { name: string; quantity: string; category: string; storage: 'fridge' | 'freezer' | 'pantry' }
 
 const UNCERTAIN_ITEMS = [
@@ -89,6 +89,18 @@ export function PantryView() {
   }
 
   async function markConsumed(id: string) {
+    // A staple (staple_group set) marked "used" means it's now empty — the
+    // Sunday check-in reads this back, so it must stay a visible row with
+    // status: consumed_at would drop it from the staple query entirely and
+    // silently reset it to "in stock" next Sunday, the opposite of correct.
+    const item = pantry.find(i => i.id === id)
+    if (item?.staple_group) {
+      setPantry(p => p.map(i => (i.id === id ? { ...i, status: 'empty' } : i)))
+      await fetch(`/api/food/pantry/${id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'empty' }),
+      })
+      return
+    }
     setPantry(p => p.filter(i => i.id !== id))
     await fetch(`/api/food/pantry/${id}`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mark_consumed: true }),
@@ -299,6 +311,12 @@ export function PantryView() {
                         <div className={styles.pantryRowMain} onClick={() => startEdit(item)}>
                           <span className={styles.pantryName}>{item.name}</span>
                           {item.quantity && <span className={styles.pantryQty}>{item.quantity}</span>}
+                          {item.staple_group && item.status === 'empty' && (
+                            <span className={`${styles.pantryExpiry} ${styles.expiry_expired}`}>Empty</span>
+                          )}
+                          {item.staple_group && item.status === 'low' && (
+                            <span className={`${styles.pantryExpiry} ${styles.expiry_soon}`}>Low</span>
+                          )}
                         </div>
                         <span className={`${styles.pantryExpiry} ${styles[`expiry_${exp.urgency}`]}`}>{exp.text}</span>
                         {section.value !== 'freezer' && (
