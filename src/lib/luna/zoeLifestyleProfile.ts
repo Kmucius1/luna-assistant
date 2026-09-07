@@ -86,7 +86,10 @@ export const ZOE_GYM_BY_DAY: Record<string, string> = {
   Wednesday: 'Glute pump and core',
   Thursday: 'Shoulders, arms, and core',
   Friday: 'Heavy glutes',
-  Saturday: 'Full body, glutes, and abs',
+  // No longer an assumed default — the Weekday Planner treats Saturday
+  // movement as her choice (gym, an alternative, or an explicit rest day).
+  // This string is only used if she actually picks "gym" that week.
+  Saturday: 'Full body, glutes, and abs (optional — her choice this week)',
   Sunday: 'Recovery, outdoor walk, stretching, beach, pool, or mobility',
 }
 
@@ -102,7 +105,7 @@ export const ZOE_HERO_FOCUS_BY_DAY: Record<string, { emoji: string; title: strin
   Wednesday: { emoji: '🔥', title: 'Glute Pump Wednesday', subtitle: 'Light weight, high pump. Feel it work.', image: GYM_HERO_IMAGE },
   Thursday: { emoji: '✨', title: 'Shoulder Sculpt Thursday', subtitle: 'Definition day. Small moves, big difference.', image: GYM_HERO_IMAGE },
   Friday: { emoji: '🍑', title: 'Glute Growth Friday', subtitle: 'Heavy day. Finish the week strong.', image: GYM_HERO_IMAGE },
-  Saturday: { emoji: '⚡', title: 'Full Body Saturday', subtitle: 'One workout, everything included.', image: GYM_HERO_IMAGE },
+  Saturday: { emoji: '🌤️', title: 'Light Saturday', subtitle: 'Move if you want to — today is yours.', image: GYM_HERO_IMAGE },
   Sunday: { emoji: '🌊', title: 'Recovery Sunday', subtitle: 'Walk, stretch, and let your body reset.', image: '/images/rooms/hero-recovery-beach.jpg', imagePosition: 'center 62%' },
 }
 
@@ -134,6 +137,65 @@ export const ZOE_WORK_LOCATION_BY_DAY: Record<string, 'home' | 'office'> = {
 // Zoe's own recurring physical locations, for classifying calendar events as
 // in-person-office vs. in-person-elsewhere. Addresses are intentionally
 // approximate (city-level) rather than exact street addresses.
+export interface BusinessFocusDay {
+  theme: string
+  priorities: string[]
+  workLocationDefault: 'home' | 'office'
+  /** Documents intent only — no recurring-task data model backs this yet. */
+  absorbs?: string[]
+  note: string
+}
+
+// The Weekday Planner's day-of-week business logic — what Monday through
+// Saturday should each prioritize. Sunday is deliberately absent: its
+// business logic lives entirely in the Sunday Weekly Reset flow, not here.
+export const ZOE_BUSINESS_FOCUS_BY_DAY: Record<string, BusinessFocusDay> = {
+  Monday: {
+    theme: 'Launch & Communications',
+    priorities: ['Urgent client replies', 'Revenue-moving items', 'Deals in motion', 'Weekend follow-ups', "Set the week's frame"],
+    workLocationDefault: 'office',
+    note: 'Clear communications and re-engage revenue/deal items before new work begins.',
+  },
+  Tuesday: {
+    theme: 'Client Meetings & Sales',
+    priorities: ['Fixed client meetings', 'Sales conversations', 'In-person work', 'Travel/errands while out'],
+    workLocationDefault: 'office',
+    absorbs: ['Car maintenance'],
+    note: "Meeting-and-travel day — batch driving-adjacent errands since she's already out.",
+  },
+  Wednesday: {
+    theme: 'Deep Creative & Build Work',
+    priorities: ['Website/CRM/deck/campaign build work', 'Uninterrupted focus blocks'],
+    workLocationDefault: 'home',
+    note: 'WFH by default — protect long focus blocks, no new client meetings by default.',
+  },
+  Thursday: {
+    theme: 'Client Meetings, Proposals & Closing',
+    priorities: ['Client meetings', 'Proposals', 'Follow-ups', 'Sales / closing'],
+    workLocationDefault: 'office',
+    note: 'End with a self-care or fresh-dinner option, not another late push.',
+  },
+  Friday: {
+    theme: 'Finish, Invoice & Close Loops',
+    priorities: ['Finish deliverables', 'Invoices', 'Approvals', 'Follow-ups', 'Admin cleanup'],
+    workLocationDefault: 'office',
+    absorbs: ['Finances / personal admin (if not deferred to Sunday)'],
+    note: 'Nothing new starts today — only finishing and clearing.',
+  },
+  Saturday: {
+    theme: 'Light & Social',
+    priorities: ['Social', 'Modeling/content work', 'Beach/outdoors', 'Creative time', 'Light errands'],
+    workLocationDefault: 'home',
+    note: 'Deliberately light — no fixed workout, no forced admin.',
+  },
+}
+
+const BUSINESS_FOCUS_PROSE = Object.entries(ZOE_BUSINESS_FOCUS_BY_DAY)
+  .map(([day, d]) => `- ${day}: ${d.theme}. ${d.note} Priorities in order: ${d.priorities.join(', ')}.`)
+  .join('\n')
+
+export const ZOE_WEEKDAY_BUSINESS_FOCUS_PROSE = `WEEKDAY BUSINESS FOCUS\n${BUSINESS_FOCUS_PROSE}`
+
 export const ZOE_KNOWN_LOCATIONS = [
   { label: 'DRYP office', match: ['dryp', 'the office'] },
   { label: 'home', match: ['home'] },

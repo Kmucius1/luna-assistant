@@ -114,24 +114,29 @@ Return ONLY this JSON object — no preamble, no extra text:
   "chart_theme": "which chart placement is most active today and why (1-2 sentences)"
 }`
 
+// Compressed "minimum morning" version of the main day-planner prompt —
+// same output SHAPE as plan-my-day (day_energy/ai_message/gym_focus/
+// key_anchors/schedule), so its output can be written into the exact same
+// daily_generation_cache 'day_plan' row and rendered by the exact same
+// schedule component, just with fewer/shorter blocks. Only used on a late
+// or hard morning, but stays wired to today's real context rather than
+// being a fully generic fallback.
 export const RECOVERY_MODE_PROMPT = `${ZOE_SOUL}
 
-Zoe woke up late, slept through her alarm, or feels like her morning is ruined. She needs calm, not productivity.
+Zoe woke up late, slept through her alarm, or feels like her morning is ruined. She needs calm, not productivity — compress her morning, don't throw it away. Use the real day context given (today's weekday business focus, today's real calendar events, today's outfit occasion) to make this actually useful, not a generic checklist.
 
-Return as JSON:
+Return ONLY valid JSON, same shape as a normal day plan but shorter and gentler:
 {
-  "opening": "ultra-warm, non-shaming opening message (2-3 sentences)",
-  "steps": [
-    "Sit up",
-    "Drink water",
-    "Wash face",
-    "Put on something that makes you feel like yourself",
-    "Eat something small",
-    "Check your calendar",
-    "Choose one priority",
-    "Begin"
+  "day_energy": "1-2 sentence warm, non-shaming read of a compressed morning",
+  "ai_message": "ultra-warm opening — no guilt, no productivity pressure",
+  "gym_focus": "skip or keep movement today, her call — reflect what she chose if given",
+  "key_anchors": { "wake": "now", "gym": null, "at_work": "compressed start time", "lunch": "12:30 PM", "leave_work": "6:00 PM", "wind_down": "9:00 PM", "lights_out": "10:30 PM" },
+  "schedule": [
+    { "time": "now", "label": "Sit up, drink water", "detail": "", "type": "morning", "anchor": true, "emoji": "🤍" },
+    { "time": "+5 min", "label": "Wash face, put on something that feels like you", "detail": "Compressed getting-ready — skip anything not essential for today's real occasion.", "type": "morning", "anchor": false, "emoji": "" },
+    { "time": "+15 min", "label": "Eat something small", "detail": "", "type": "morning", "anchor": false, "emoji": "" },
+    { "time": "then", "label": "One priority", "detail": "The single most important real thing from today's context — not everything.", "type": "work", "anchor": true, "emoji": "" }
   ],
-  "one_priority": "based on context, suggest what the one priority should be",
   "affirmation": "specific affirmation for recovering from a late start",
   "closing": "closing message — calm, warm, no guilt (1-2 sentences)"
 }`

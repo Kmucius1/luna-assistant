@@ -4,11 +4,12 @@ import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
 import { getCurrentPlanets } from '@/lib/astrology'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { OUTFIT_IMAGES, outfitImageForDate } from '@/lib/luna/outfitImages'
+import { OCCASION_LABEL, type OutfitOccasion } from '@/lib/luna/outfitOccasion'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
 interface DayPlanAnchors { at_work?: string; gym?: string }
-interface DayPlan { key_anchors?: DayPlanAnchors }
+interface DayPlan { key_anchors?: DayPlanAnchors; occasion?: OutfitOccasion }
 interface WeatherNow { tempF: number; forecast: string }
 
 async function getWeather(lat: number, lon: number): Promise<WeatherNow | null> {
@@ -70,6 +71,10 @@ export async function GET(req: NextRequest) {
     const checkIn = checkInR.data as { mood_rating?: number; feeling?: string } | null
     const dayPlan = dayPlanR.data?.payload as DayPlan | undefined
     const isWorkDay = dayPlan?.key_anchors?.at_work ? true : !isWeekend
+    // Real occasion from today's Weekday Planner run, if she's already
+    // done it — falls back to the old weekday/weekend guess when she
+    // hasn't, so this route still works before that flow has run today.
+    const occasion = dayPlan?.occasion
     const planets = getCurrentPlanets(new Date())
     const sun = planets.find(p => p.name === 'Sun')
     const moon = planets.find(p => p.name === 'Moon')
@@ -85,7 +90,7 @@ export async function GET(req: NextRequest) {
         try {
           const contextLines = [
             `Today: ${dayName}, ${isWeekend ? 'weekend' : 'weekday'}`,
-            `Day type: ${isWorkDay ? 'working today' : 'day off'}`,
+            occasion ? `Occasion: ${OCCASION_LABEL[occasion]} — dress genuinely differently for this than a plain work/off-day guess.` : `Day type: ${isWorkDay ? 'working today' : 'day off'}`,
             weather ? `Weather: ${weather.tempF}°F, ${weather.forecast}` : 'Weather: unknown, dress seasonally reasonable',
             sun ? `Sun in ${sun.sign} — ${sun.formatted}` : '',
             moon ? `Moon in ${moon.sign} — ${moon.formatted}` : '',

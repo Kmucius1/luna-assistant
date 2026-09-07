@@ -11,23 +11,29 @@ export async function POST(req: NextRequest) {
   try {
     const db = createAdminClient()
     const body = await req.json()
-    const { focus, exercises, durationMinutes, tz } = body
+    const { focus, exercises, durationMinutes, tz, activityType } = body
     const now = new Date()
     const dateKey = localDateKey(now, tz)
     const dayOfWeek = new Intl.DateTimeFormat('en-US', { timeZone: tz || 'America/New_York', weekday: 'long' }).format(now)
 
-    const { data, error } = await db
-      .from('workout_logs')
-      .insert({
-        user_id: ZOE_USER_ID,
-        date_key: dateKey,
-        day_of_week: dayOfWeek,
-        focus,
-        exercises,
-        duration_minutes: durationMinutes,
-      })
-      .select()
-      .single()
+    const row = {
+      user_id: ZOE_USER_ID,
+      date_key: dateKey,
+      day_of_week: dayOfWeek,
+      focus,
+      exercises,
+      duration_minutes: durationMinutes,
+    }
+
+    // activity_type (walk/pilates_yoga/dance/beach/trail/treadmill_stretch/
+    // mobility_stretch/rest/gym) is a newer column — supabase/workout_logs_
+    // activity_type.sql adds it, but until that migration has actually been
+    // run in the live database, including it would error. Try with it first,
+    // fall back to the pre-migration shape so movement logging never breaks.
+    let { data, error } = await db.from('workout_logs').insert({ ...row, activity_type: activityType ?? 'gym' }).select().single()
+    if (error?.message?.includes('activity_type')) {
+      ({ data, error } = await db.from('workout_logs').insert(row).select().single())
+    }
 
     if (error) {
       console.error('[fitness/workouts] insert error:', error)

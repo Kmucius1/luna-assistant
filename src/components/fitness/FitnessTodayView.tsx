@@ -9,6 +9,7 @@ import { ZOE_EXERCISES_BY_DAY, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestylePro
 import { resolveExercises } from '@/lib/luna/fitnessExercises'
 import { getExerciseReference } from '@/lib/luna/exerciseLibrary'
 import { getGreeting } from '@/lib/luna/greeting'
+import { movementLabel, type MovementChoice } from '@/lib/luna/movementAlternatives'
 import styles from './FitnessViews.module.css'
 
 const STORAGE_KEY = 'luna_fitness_onboarding_v1'
@@ -27,6 +28,11 @@ export function FitnessTodayView() {
   const [hour, setHour] = useState<number | null>(null)
   const [onboarding, setOnboarding] = useState<Onboarding>(DEFAULT_ONBOARDING)
   const [completedToday, setCompletedToday] = useState(false)
+  // Today's actual movement choice from the Weekday Planner, if she's
+  // already run it — undefined means no plan yet (fall back to assuming
+  // gym, same as this component always did before). null/'gym' both mean
+  // gym; anything else means she picked an alternative or rest.
+  const [movementChoice, setMovementChoice] = useState<MovementChoice | undefined>(undefined)
 
   useEffect(() => {
     const d = new Date()
@@ -43,12 +49,17 @@ export function FitnessTodayView() {
       .then(res => res.json())
       .then(data => setCompletedToday(!!data.completedToday))
       .catch(() => {})
+    fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
+      .then(res => res.json())
+      .then(data => { if (data?.plan?.movement_choice) setMovementChoice(data.plan.movement_choice) })
+      .catch(() => {})
   }, [])
 
   const gymFocus = (weekday && ZOE_GYM_BY_DAY[weekday]) ?? ZOE_GYM_BY_DAY.Monday
   const exercises = weekday ? resolveExercises(weekday, ZOE_EXERCISES_BY_DAY, onboarding.equipment) : ZOE_EXERCISES_BY_DAY.Monday
   const estimatedMinutes = exercises.length * 8
   const previewThumbs = exercises.map(name => getExerciseReference(name)).filter((ref): ref is NonNullable<typeof ref> => !!ref).slice(0, 4)
+  const isAlternativeChoice = movementChoice && movementChoice !== 'gym'
 
   return (
     <>
@@ -62,26 +73,40 @@ export function FitnessTodayView() {
       </div>
 
       <div className={styles.sectionHeader}><Dumbbell size={13} /> Today&apos;s Workout</div>
-      <div className={styles.workoutCard}>
-        <p className={styles.workoutName}>{gymFocus}</p>
-        <div className={styles.workoutStats}>
-          <div className={styles.workoutStat}><Clock size={12} /><strong>~{estimatedMinutes} min</strong></div>
-          <div className={styles.workoutStat}><Flame size={12} /><strong>{exercises.length} exercises</strong></div>
-          <div className={styles.workoutStat}><Building2 size={12} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
-          {previewThumbs.length > 0 && (
-            <div className={styles.thumbStack}>
-              {previewThumbs.map((ref, i) => (
-                <span key={i} className={styles.thumbStackItem}><Image src={ref.image} alt="" fill sizes="24px" /></span>
-              ))}
-            </div>
+      {isAlternativeChoice ? (
+        <div className={styles.workoutCard}>
+          <p className={styles.workoutName}>{movementLabel(movementChoice!)}</p>
+          <p style={{ fontSize: 12.5, color: 'var(--ink-3)', marginTop: 2 }}>
+            {movementChoice === 'rest' ? "Today's a rest day — chosen, not skipped." : "Today's movement, your choice."}
+          </p>
+          {completedToday ? (
+            <div className={styles.completedBadge}><Sparkles size={13} /> Completed today</div>
+          ) : movementChoice !== 'rest' ? (
+            <Link href="/fitness/workout" className={styles.startButton}>Log it when done</Link>
+          ) : null}
+        </div>
+      ) : (
+        <div className={styles.workoutCard}>
+          <p className={styles.workoutName}>{gymFocus}</p>
+          <div className={styles.workoutStats}>
+            <div className={styles.workoutStat}><Clock size={12} /><strong>~{estimatedMinutes} min</strong></div>
+            <div className={styles.workoutStat}><Flame size={12} /><strong>{exercises.length} exercises</strong></div>
+            <div className={styles.workoutStat}><Building2 size={12} /><strong>{onboarding.gym ?? 'Not set'}</strong></div>
+            {previewThumbs.length > 0 && (
+              <div className={styles.thumbStack}>
+                {previewThumbs.map((ref, i) => (
+                  <span key={i} className={styles.thumbStackItem}><Image src={ref.image} alt="" fill sizes="24px" /></span>
+                ))}
+              </div>
+            )}
+          </div>
+          {completedToday ? (
+            <div className={styles.completedBadge}><Sparkles size={13} /> Completed today</div>
+          ) : (
+            <Link href="/fitness/workout" className={styles.startButton}>Start Workout</Link>
           )}
         </div>
-        {completedToday ? (
-          <div className={styles.completedBadge}><Sparkles size={13} /> Completed today</div>
-        ) : (
-          <Link href="/fitness/workout" className={styles.startButton}>Start Workout</Link>
-        )}
-      </div>
+      )}
     </>
   )
 }
