@@ -1,280 +1,488 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { RefreshCw, Sparkles, Check } from 'lucide-react'
+import {
+  ArrowRight, ChevronLeft, Home, Sparkles, CalendarClock, Briefcase,
+  ShoppingBasket, Dumbbell, HeartPulse, CheckCircle2, AlertCircle,
+} from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
+import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 
-const RESET_SECTIONS = [
-  {
-    title: '🏠 Home',
-    color: '#A8C4DA',
-    items: ['Laundry', 'Take out trash', 'Clean room', 'Dishes', 'Wipe surfaces', 'Tidy workspace'],
-  },
-  {
-    title: '🌿 Body',
-    color: '#B8C9B4',
-    items: ['Grocery run or order', 'Refill water bottle', 'Lay out vitamins/supplements', 'Plan meals for the week', 'Movement planned'],
-  },
-  {
-    title: '📅 Mind',
-    color: '#5A9E9E',
-    items: ['Review calendar for the week', 'Catch up on emails', 'Set top 3 weekly priorities', 'Review open client tasks', 'Update DRYPHub'],
-  },
-  {
-    title: '✨ Soul',
-    color: '#5C4530',
-    items: ['Journal or dictate a reflection', 'Art time (drawing, sewing, painting)', 'Personal project — even 20 min', 'Gratitude list', 'Set spiritual intention for the week'],
-  },
-  {
-    title: '👗 Personal',
-    color: '#E8B4B8',
-    items: ['Plan outfits for the week', 'Pack or prep bag', 'Phone cleanup (photos, voicemails)', 'Skin care check-in', 'Unsubscribe / digital declutter'],
-  },
-]
-
-const REFLECTION_PROMPTS = [
-  { key: 'wins', label: '💜 What went well this week?' },
-  { key: 'learned', label: '💡 What did you learn about yourself?' },
-  { key: 'release', label: '🍃 What are you releasing from this week?' },
-  { key: 'intention', label: '🌙 What is your intention for the week ahead?' },
-]
-
-interface WeeklyResult {
-  week_opening?: string
-  pattern_this_week?: string
-  chart_connection?: string
-  release?: string
-  carry_forward?: string
-  intention_for_week?: string
-  affirmation?: string
-  closing?: string
+const CARD: React.CSSProperties = {
+  background: 'rgba(255,255,255,0.6)',
+  border: '1px solid rgba(180,150,100,0.18)',
+  borderRadius: 20,
+  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
 }
 
+const PALETTE = {
+  '--violet': '#5C4530',
+  '--violet-deep': '#B08D52',
+  '--violet-pale': '#F5EBD3',
+  '--depth': '#100C1E',
+  '--mid': '#32284A',
+  '--mist': '#5E5474',
+  '--text-1': '#100C1E',
+  '--text-2': '#32284A',
+  '--text-3': '#5E5474',
+} as React.CSSProperties
+
+type Step =
+  | 'intro' | 'gathering' | 'review_week'
+  | 'q_location' | 'q_groceries' | 'q_personal' | 'q_energy' | 'q_rhythm'
+  | 'finalizing' | 'result' | 'closing'
+
+interface ClassifiedEvent { title: string; day: string; time: string; locationType: string; rawLocation: string }
+interface DrypTaskFlagged { id: string; title: string; account_name?: string; due_date?: string; isOverdue: boolean; isDueSoon: boolean; isStuck: boolean }
+interface GatherPayload {
+  week_summary?: string
+  flagged_deadlines?: string[]
+  meeting_notes?: string[]
+  dryp_load_summary?: string
+  pipeline_note?: string
+  events?: ClassifiedEvent[]
+  dryp_tasks?: DrypTaskFlagged[]
+}
+interface DayPlan {
+  work_location: 'home' | 'office' | 'off'
+  meetings: { time: string; title: string; locationType: string; detail: string }[]
+  work_blocks: { time: string; label: string; detail: string }[]
+  gym_focus: string
+  meals: { breakfast: string; lunch: string; dinner: string }
+  errands: string[]
+  self_care: string[]
+  outfit_type: string
+  personal_plans: string[]
+}
+interface FinalPayload {
+  days: Record<string, DayPlan>
+  laundry_cleaning_day: string
+  grocery_day: string | null
+  top_3_business: { title: string; reason: string; source: string }[]
+  top_3_personal: { title: string; reason: string }[]
+  ai_message: string
+}
+
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+const LOCATION_LABEL: Record<string, string> = {
+  virtual: 'Virtual',
+  in_person_office: 'DRYP office',
+  in_person_client: 'In person',
+  unclear: 'Unclear',
+}
+
+const WORK_LOCATION_OPTIONS = [
+  { value: 'mostly_home', label: 'Mostly home', icon: Home },
+  { value: 'mostly_office', label: 'Mostly office', icon: Briefcase },
+  { value: 'mixed', label: 'Mixed / usual pattern', icon: CalendarClock },
+]
+
 export default function WeeklyResetPage() {
-  const [checks, setChecks]     = useState<Record<string, boolean>>({})
+  const [step, setStep] = useState<Step>('intro')
+  const [gather, setGather] = useState<GatherPayload | null>(null)
+  const [gatherError, setGatherError] = useState(false)
+  const [finalResult, setFinalResult] = useState<FinalPayload | null>(null)
+  const [finalizeError, setFinalizeError] = useState(false)
+  const [confirmedUnclear, setConfirmedUnclear] = useState<Record<number, string>>({})
+
+  const [workLocationPattern, setWorkLocationPattern] = useState<string | null>(null)
+  const [groceriesNeeded, setGroceriesNeeded] = useState<boolean | null>(null)
+  const [majorThisWeek, setMajorThisWeek] = useState('')
+  const [energyLevel, setEnergyLevel] = useState(7)
+  const [wantRhythmBlock, setWantRhythmBlock] = useState<boolean | null>(null)
+
   const [reflections, setReflections] = useState<Record<string, string>>({})
-  const [loading, setLoading]   = useState(false)
-  const [result, setResult]     = useState<WeeklyResult | null>(null)
-  const [activeView, setActiveView] = useState<'reset' | 'reflect'>('reset')
+  const [closingResult, setClosingResult] = useState<{ affirmation?: string; closing?: string; intention_for_week?: string } | null>(null)
+  const [closingLoading, setClosingLoading] = useState(false)
 
-  const totalItems = RESET_SECTIONS.reduce((s, sec) => s + sec.items.length, 0)
-  const doneCount  = Object.values(checks).filter(Boolean).length
-  const pct        = Math.round((doneCount / totalItems) * 100)
-
-  function toggle(key: string) {
-    setChecks(c => ({ ...c, [key]: !c[key] }))
+  async function startGather() {
+    setStep('gathering')
+    setGatherError(false)
+    try {
+      const res = await fetch('/api/luna/weekly-reset', { method: 'POST' })
+      if (!res.ok) throw new Error('gather failed')
+      const data = await res.json()
+      setGather(data)
+      setStep('review_week')
+    } catch {
+      setGatherError(true)
+    }
   }
 
-  async function getReflection() {
-    setLoading(true)
-    setResult(null)
+  async function finalize() {
+    setStep('finalizing')
+    setFinalizeError(false)
+    try {
+      const res = await fetch('/api/luna/weekly-reset/finalize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: {
+            work_location_pattern: workLocationPattern,
+            groceries_needed: groceriesNeeded,
+            major_this_week: majorThisWeek,
+            energy_level: energyLevel,
+            want_rhythm_block: wantRhythmBlock,
+            unclear_confirmations: confirmedUnclear,
+          },
+        }),
+      })
+      if (!res.ok) throw new Error('finalize failed')
+      const data = await res.json()
+      setFinalResult(data)
+      setStep('result')
+      if (groceriesNeeded) {
+        fetch('/api/ai/weekly-meal-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
+      }
+    } catch {
+      setFinalizeError(true)
+    }
+  }
+
+  async function getClosingReflection() {
+    setClosingLoading(true)
     try {
       const res = await fetch('/api/ai/weekly-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reflections, checklist_pct: pct }),
+        body: JSON.stringify({ reflections }),
       })
-      setResult(await res.json())
+      setClosingResult(await res.json())
     } catch {
-      setResult({
-        week_opening: 'Every week is a full cycle. You showed up. That is everything.',
-        pattern_this_week: 'Growth through doing, then integrating — you moved, then you felt.',
-        chart_connection: 'Scorpio Sun learns by going deep first. You cannot skip that part.',
-        release: 'The weight of what did not get done.',
-        carry_forward: 'The clarity you found when you were honest with yourself.',
-        intention_for_week: 'I move with purpose, not pressure.',
-        affirmation: 'I trust my own rhythm. Each week I learn myself more deeply.',
-        closing: 'Rest tonight. A new week is waiting to receive you.',
-      })
+      setClosingResult({ affirmation: 'I trust my own rhythm.', closing: 'Rest tonight. A new week is waiting to receive you.' })
     } finally {
-      setLoading(false)
+      setClosingLoading(false)
     }
   }
 
+  const unclearEvents = (gather?.events ?? []).map((e, i) => ({ ...e, idx: i })).filter(e => e.locationType === 'unclear')
+
   return (
-    <div className="bg-sanctuary min-h-screen" style={{
-      background: 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)',
-      '--text-1': '#100C1E',
-      '--text-2': '#32284A',
-      '--text-3': '#5E5474',
-      '--violet': '#5C4530',
-      '--violet-mid': '#DDBD85',
-      '--violet-deep': '#B8974F',
-      '--mid': '#6B6080',
-      '--mist': '#9E95AC',
-      '--depth': '#231A3A',
-      '--faint': '#C4BECE',
-    } as React.CSSProperties}>
+    <div style={PALETTE}>
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-              style={{ background: 'rgba(240,228,200,0.92)' }}>
-              <RefreshCw className="h-5 w-5" style={{ color: '#8A6F2A' }} />
+          {step !== 'result' && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(244,235,212,0.9)' }}>
+                <Sparkles className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.8} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Sunday Weekly Reset</p>
+                <p className="text-xs" style={{ color: 'var(--text-3)' }}>Build the life you designed.</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium uppercase tracking-wider" style={{ color: '#C4A47C' }}>Weekly Reset</p>
-              <p className="text-xs" style={{ color: 'rgba(245,239,227,0.65)' }}>Sunday sanctuary ritual.</p>
-            </div>
-          </div>
+          )}
 
-          <h1 className="font-display text-2xl font-semibold mb-1" style={{ color: '#F5EFE3' }}>
-            Close one week. Open the next.
-          </h1>
-          <p className="text-sm mb-6" style={{ color: 'rgba(245,239,227,0.85)' }}>
-            You do not need to do all of this. Do what you can. Each check is a small act of love for future Zoe.
-          </p>
-
-          {/* Tab toggle */}
-          <div className="flex gap-2 mb-6">
-            {(['reset', 'reflect'] as const).map(v => (
-              <button key={v} onClick={() => setActiveView(v)}
-                className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                style={{
-                  background: activeView === v ? 'var(--violet)' : 'rgba(240,228,200,0.9)',
-                  color: activeView === v ? '#F5EFE3' : '#5C4530',
-                }}>
-                {v === 'reset' ? '✅ Ritual Checklist' : '💜 Weekly Reflection'}
+          {step === 'intro' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--text-1)' }}>
+                Let&apos;s build your week.
+              </h2>
+              <p className="text-base mb-8" style={{ color: 'var(--text-2)' }}>
+                I&apos;ll review your calendar, email, and DRYP CRM first — then I&apos;ll only ask you what I can&apos;t already know.
+              </p>
+              <button onClick={startGather}
+                className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                Review my week <ArrowRight className="h-4 w-4" />
               </button>
-            ))}
-          </div>
+            </div>
+          )}
 
-          {activeView === 'reset' && (
-            <>
-              {/* Progress */}
-              <div className="glass-card p-4 mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>
-                    {doneCount}/{totalItems} complete
-                  </p>
-                  <p className="text-sm font-bold" style={{ color: 'var(--violet)' }}>{pct}%</p>
+          {step === 'gathering' && (
+            <div className="text-center py-20 animate-fade-up">
+              <div className="w-16 h-16 rounded-full mx-auto mb-6 animate-breathe"
+                style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.4), rgba(201,169,110,0.1))' }} />
+              <p className="font-display text-lg" style={{ color: 'var(--violet)' }}>Reviewing your week…</p>
+              <p className="text-sm mt-2" style={{ color: 'var(--mist)' }}>Calendar, email, and DRYP CRM</p>
+              {gatherError && (
+                <div className="mt-8">
+                  <p className="text-sm mb-4" style={{ color: '#C96B5A' }}>Couldn&apos;t gather your week — check your connection.</p>
+                  <button onClick={startGather} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                    Try again
+                  </button>
                 </div>
-                <div className="h-2 rounded-full" style={{ background: 'rgba(201,169,110,0.1)' }}>
-                  <div className="h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet-mid), var(--violet))' }} />
-                </div>
-                {pct === 100 && (
-                  <p className="text-xs mt-2 text-center font-semibold" style={{ color: 'var(--violet)' }}>
-                    ✨ You did it. Future Zoe thanks you.
-                  </p>
-                )}
+              )}
+            </div>
+          )}
+
+          {step === 'review_week' && gather && (
+            <div className="animate-fade-up space-y-4">
+              <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--text-1)' }}>Here&apos;s what I found.</h2>
+
+              <div className="p-5" style={CARD}>
+                <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.week_summary}</p>
               </div>
 
-              {/* Sections */}
-              <div className="space-y-4">
-                {RESET_SECTIONS.map(section => (
-                  <div key={section.title} className="glass-card p-4">
-                    <p className="text-sm font-bold mb-3" style={{ color: 'var(--text-1)' }}>{section.title}</p>
-                    <div className="space-y-2">
-                      {section.items.map(item => {
-                        const key = `${section.title}-${item}`
-                        const done = !!checks[key]
-                        return (
-                          <button key={item} onClick={() => toggle(key)}
-                            className="w-full flex items-center gap-3 py-1.5 text-left transition-all">
-                            <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center transition-all"
-                              style={{
-                                background: done ? section.color : 'transparent',
-                                border: `1.5px solid ${done ? section.color : 'var(--faint)'}`,
-                              }}>
-                              {done && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
-                            </div>
-                            <span className="text-sm" style={{
-                              color: done ? 'var(--mist)' : 'var(--depth)',
-                              textDecoration: done ? 'line-through' : 'none',
-                            }}>
-                              {item}
-                            </span>
-                          </button>
-                        )
-                      })}
+              {!!(gather.flagged_deadlines?.length) && (
+                <div className="p-5" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Flagged deadlines</p>
+                  {gather.flagged_deadlines.map((d, i) => (
+                    <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {d}</p>
+                  ))}
+                </div>
+              )}
+
+              <div className="p-5" style={CARD}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>DRYP load</p>
+                <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.dryp_load_summary}</p>
+              </div>
+
+              {unclearEvents.length > 0 && (
+                <div className="p-5" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: '#B08D52' }}>
+                    <AlertCircle className="h-3.5 w-3.5" /> Confirm these
+                  </p>
+                  {unclearEvents.map(e => (
+                    <div key={e.idx} className="mb-3 last:mb-0">
+                      <p className="text-sm font-semibold mb-2" style={{ color: 'var(--depth)' }}>{e.day} {e.time} — {e.title}</p>
+                      <ChoiceGrid
+                        options={[
+                          { value: 'virtual', label: 'Virtual' },
+                          { value: 'in_person_office', label: 'Office' },
+                          { value: 'in_person_client', label: 'In person' },
+                        ]}
+                        value={confirmedUnclear[e.idx] ?? null}
+                        onChange={v => setConfirmedUnclear(prev => ({ ...prev, [e.idx]: v }))}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button onClick={() => setStep('q_location')}
+                className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95"
+                style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+              </button>
+            </div>
+          )}
+
+          {step === 'q_location' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--depth)' }}>How does this week look?</h2>
+              <div className="mb-6"><ChoiceGrid options={WORK_LOCATION_OPTIONS} value={workLocationPattern} onChange={setWorkLocationPattern} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('review_week')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_groceries')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_groceries' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Groceries this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>I&apos;ll build the meal plan and grocery list if so.</p>
+              <div className="mb-6"><YesNoChoice value={groceriesNeeded} onChange={setGroceriesNeeded} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_personal' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Anything major this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>A birthday, a trip, an event not yet on your calendar. Optional.</p>
+              <div className="p-5 mb-6" style={CARD}>
+                <SmartInput context="anything major this week — birthday, trip, event" placeholder="Nothing, or tell me what's coming up..." value={majorThisWeek} onChange={setMajorThisWeek} patternType="weekly" rows={3} autoSuggest={false} />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_energy')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_energy' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--depth)' }}>How&apos;s your capacity right now?</h2>
+              <div className="p-5 mb-6" style={CARD}>
+                <div className="flex justify-between mb-2">
+                  <span className="text-sm font-medium" style={{ color: 'var(--depth)' }}>Energy / capacity</span>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--violet)' }}>{energyLevel}/10</span>
+                </div>
+                <input type="range" min={1} max={10} value={energyLevel} onChange={e => setEnergyLevel(Number(e.target.value))} />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_personal')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_rhythm')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_rhythm' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Self-tan, beach, or sewing block?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Still want your usual weekly rhythm block this week?</p>
+              <div className="mb-6"><YesNoChoice value={wantRhythmBlock} onChange={setWantRhythmBlock} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_energy')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={finalize} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  <Sparkles className="h-4 w-4" /> Build my week
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'finalizing' && (
+            <div className="text-center py-20 animate-fade-up">
+              <div className="w-16 h-16 rounded-full mx-auto mb-6 animate-breathe" style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.4), rgba(201,169,110,0.1))' }} />
+              <p className="font-display text-lg" style={{ color: 'var(--violet)' }}>Building your week…</p>
+              {finalizeError && (
+                <div className="mt-8">
+                  <p className="text-sm mb-4" style={{ color: '#C96B5A' }}>Couldn&apos;t build your week — check your connection.</p>
+                  <button onClick={finalize} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                    Try again
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {step === 'result' && finalResult && (
+            <div className="animate-fade-up space-y-4">
+              <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--text-1)' }}>Your week.</h2>
+
+              <div className="p-5" style={CARD}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Top 3 business</p>
+                {finalResult.top_3_business.map((t, i) => (
+                  <div key={i} className="flex items-start gap-2 py-1.5">
+                    <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>{i + 1}</span>
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: 'var(--depth)' }}>{t.title}</p>
+                      <p className="text-xs" style={{ color: 'var(--mist)' }}>{t.reason}</p>
                     </div>
                   </div>
                 ))}
               </div>
-            </>
-          )}
 
-          {activeView === 'reflect' && !result && (
-            <div className="space-y-4">
-              {REFLECTION_PROMPTS.map(p => (
-                <div key={p.key}>
-                  <p className="text-xs font-semibold mb-2 px-1" style={{ color: 'var(--violet)' }}>{p.label}</p>
-                  <SmartInput
-                    context={p.label}
-                    placeholder="Speak or tap..."
-                    value={reflections[p.key] ?? ''}
-                    onChange={v => setReflections(r => ({ ...r, [p.key]: v }))}
-                    patternType="weekly"
-                    rows={3}
-                    autoSuggest={false}
-                  />
+              <div className="p-5" style={CARD}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--herb, #6B8E5A)' }}>
+                  <HeartPulse className="h-3.5 w-3.5" /> Top 3 personal
+                </p>
+                {finalResult.top_3_personal.map((t, i) => (
+                  <div key={i} className="py-1.5">
+                    <p className="text-sm font-medium" style={{ color: 'var(--depth)' }}>{t.title}</p>
+                    <p className="text-xs" style={{ color: 'var(--mist)' }}>{t.reason}</p>
+                  </div>
+                ))}
+              </div>
+
+              {WEEKDAYS.map(day => {
+                const d = finalResult.days[day]
+                if (!d) return null
+                return (
+                  <div key={day} className="p-5" style={CARD}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-display text-base font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>
+                        {d.work_location === 'home' ? 'Home' : d.work_location === 'office' ? 'Office' : 'Off'}
+                      </span>
+                    </div>
+                    {d.meetings?.map((m, i) => (
+                      <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-2)' }}>
+                        {m.time} — {m.title} <span style={{ color: 'var(--mist)' }}>({LOCATION_LABEL[m.locationType] ?? m.locationType})</span>
+                      </p>
+                    ))}
+                    {d.work_blocks?.map((w, i) => (
+                      <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-3)' }}>{w.time} · {w.label}</p>
+                    ))}
+                    <p className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--mist)' }}>
+                      <Dumbbell className="h-3 w-3" /> {d.gym_focus}
+                    </p>
+                    {d.meals && (
+                      <p className="text-xs mt-1" style={{ color: 'var(--mist)' }}>
+                        {d.meals.breakfast} · {d.meals.lunch} · {d.meals.dinner}
+                      </p>
+                    )}
+                  </div>
+                )
+              })}
+
+              <div className="p-5 flex items-center gap-4" style={CARD}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" style={{ color: 'var(--violet)' }} />
+                  <span className="text-xs" style={{ color: 'var(--text-2)' }}>Laundry/cleaning: {finalResult.laundry_cleaning_day}</span>
                 </div>
-              ))}
+                {finalResult.grocery_day && (
+                  <div className="flex items-center gap-2">
+                    <ShoppingBasket className="h-4 w-4" style={{ color: 'var(--violet)' }} />
+                    <span className="text-xs" style={{ color: 'var(--text-2)' }}>Groceries: {finalResult.grocery_day}</span>
+                  </div>
+                )}
+              </div>
 
-              <button onClick={getReflection} disabled={loading}
-                className="w-full py-4 rounded-2xl font-semibold text-[#100C1E] transition-all active:scale-95 disabled:opacity-40"
+              <p className="text-sm text-center py-2 italic" style={{ color: 'var(--mist)' }}>{finalResult.ai_message}</p>
+
+              <button onClick={() => setStep('closing')}
+                className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95"
                 style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
-                <Sparkles className="inline h-4 w-4 mr-2" />
-                {loading ? 'Closing the week with grace...' : 'Close the week'}
+                Continue <ArrowRight className="inline h-4 w-4 ml-1" />
               </button>
             </div>
           )}
 
-          {activeView === 'reflect' && result && (
-            <div className="space-y-4 animate-fade-up">
-              <div className="soul-card p-5">
-                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>
-                  This week
-                </p>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{result.week_opening}</p>
+          {step === 'closing' && !closingResult && (
+            <div className="animate-fade-up space-y-4">
+              <h2 className="font-display text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Close the week.</h2>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-2)' }}>Two quick prompts, then you&apos;re done.</p>
+              <div>
+                <p className="text-xs font-semibold mb-2 px-1" style={{ color: 'var(--violet)' }}>What went well this week?</p>
+                <SmartInput context="what went well this week" placeholder="Speak or tap..." value={reflections.wins ?? ''} onChange={v => setReflections(r => ({ ...r, wins: v }))} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
-
-              <div className="glass-card p-4">
-                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--text-3)' }}>Pattern</p>
-                <p className="text-sm" style={{ color: 'var(--text-1)' }}>{result.pattern_this_week}</p>
-                {result.chart_connection && (
-                  <p className="text-xs mt-2 italic" style={{ color: 'var(--text-2)' }}>{result.chart_connection}</p>
-                )}
+              <div>
+                <p className="text-xs font-semibold mb-2 px-1" style={{ color: 'var(--violet)' }}>What&apos;s your intention for the week ahead?</p>
+                <SmartInput context="intention for the week ahead" placeholder="Speak or tap..." value={reflections.intention ?? ''} onChange={v => setReflections(r => ({ ...r, intention: v }))} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="glass-card p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#C87B7B' }}>Release</p>
-                  <p className="text-sm" style={{ color: 'var(--text-2)' }}>{result.release}</p>
-                </div>
-                <div className="glass-card p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: '#5A8A5A' }}>Carry forward</p>
-                  <p className="text-sm" style={{ color: 'var(--text-2)' }}>{result.carry_forward}</p>
-                </div>
-              </div>
-
-              {result.intention_for_week && (
-                <div className="glass-card p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>
-                    Intention for next week
-                  </p>
-                  <p className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{result.intention_for_week}</p>
-                </div>
-              )}
-
-              <div className="rounded-2xl p-5 text-center"
-                style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
-                <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>
-                  &ldquo;{result.affirmation}&rdquo;
-                </p>
-              </div>
-
-              {result.closing && (
-                <p className="text-center text-sm" style={{ color: 'var(--text-3)' }}>{result.closing}</p>
-              )}
-
-              <button onClick={() => setResult(null)}
-                className="w-full py-3.5 rounded-2xl font-semibold"
-                style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
-                Edit reflection
+              <button onClick={getClosingReflection} disabled={closingLoading}
+                className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 disabled:opacity-40"
+                style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                {closingLoading ? 'Closing the week…' : 'Close the week'}
               </button>
+            </div>
+          )}
+
+          {step === 'closing' && closingResult && (
+            <div className="animate-fade-up space-y-4">
+              <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
+                <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>&ldquo;{closingResult.affirmation}&rdquo;</p>
+              </div>
+              {closingResult.intention_for_week && (
+                <div className="p-5" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Intention for next week</p>
+                  <p className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{closingResult.intention_for_week}</p>
+                </div>
+              )}
+              {closingResult.closing && <p className="text-center text-sm" style={{ color: 'var(--text-3)' }}>{closingResult.closing}</p>}
+              <Link href="/home" className="block">
+                <button className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                  style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  <Home className="h-4 w-4" /> Return to Home
+                </button>
+              </Link>
             </div>
           )}
 

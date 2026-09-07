@@ -119,6 +119,27 @@ export const ZOE_EXERCISES_BY_DAY: Record<string, string[]> = {
   Sunday: ['Outdoor Walk', 'Stretching', 'Beach or Pool', 'Mobility', 'Sauna'],
 }
 
+// Default work-location pattern, used to seed the Sunday Weekly Reset's
+// work-location step before Zoe confirms/overrides for the coming week.
+export const ZOE_WORK_LOCATION_BY_DAY: Record<string, 'home' | 'office'> = {
+  Monday: 'office',
+  Tuesday: 'office',
+  Wednesday: 'home',
+  Thursday: 'office',
+  Friday: 'office',
+  Saturday: 'home',
+  Sunday: 'home',
+}
+
+// Zoe's own recurring physical locations, for classifying calendar events as
+// in-person-office vs. in-person-elsewhere. Addresses are intentionally
+// approximate (city-level) rather than exact street addresses.
+export const ZOE_KNOWN_LOCATIONS = [
+  { label: 'DRYP office', match: ['dryp', 'the office'] },
+  { label: 'home', match: ['home'] },
+  { label: 'gym', match: ['gym'] },
+]
+
 export const ZOE_NEVER_FOODS = [
   'eggs',
   'turkey sausage',

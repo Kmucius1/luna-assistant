@@ -81,6 +81,8 @@ export interface CalendarEvent {
   description?: string
   htmlLink?: string
   colorId?: string
+  hangoutLink?: string
+  conferenceData?: { entryPoints?: { uri?: string; entryPointType?: string }[] }
   calendar: string
   calendarId: string
   account: string
@@ -142,6 +144,7 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
             start?: { dateTime?: string; date?: string }
             end?:   { dateTime?: string; date?: string }
             location?: string; description?: string; htmlLink?: string; colorId?: string
+            hangoutLink?: string; conferenceData?: { entryPoints?: { uri?: string; entryPointType?: string }[] }
             organizer?: { email?: string }; attendees?: { email?: string }[]
           }>
 
@@ -165,6 +168,8 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
               description:   ev.description,
               htmlLink:      ev.htmlLink,
               colorId:       ev.colorId,
+              hangoutLink:   ev.hangoutLink,
+              conferenceData: ev.conferenceData,
               calendar:      cal.summary,
               calendarId:    cal.id,
               account:       tok.email,
