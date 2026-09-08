@@ -91,6 +91,7 @@ export default function PlanMyDayPage() {
   const [gymYes, setGymYes] = useState<boolean | null>(null)
   const [movementChoice, setMovementChoice] = useState<MovementChoice | null>(null)
   const [gymTime, setGymTime] = useState<string | null>('6:30 AM')
+  const [saturdayType, setSaturdayType] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(false)
   const [plan, setPlan] = useState<DayPlan | null>(null)
@@ -98,6 +99,7 @@ export default function PlanMyDayPage() {
   const [checkingSaved, setCheckingSaved] = useState(true)
   const [movementLogged, setMovementLogged] = useState(false)
   const [movementLogging, setMovementLogging] = useState(false)
+  const [carCareChecked, setCarCareChecked] = useState<Set<string>>(new Set())
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   const isSaturday = weekday === 'Saturday'
@@ -113,7 +115,20 @@ export default function PlanMyDayPage() {
   useEffect(() => {
     fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
       .then(r => r.json())
-      .then(d => { if (d.plan) { setPlan(d.plan); setStep('result') } })
+      .then(d => {
+        if (d.plan) {
+          setPlan(d.plan)
+          setStep('result')
+          // Hydrate the wizard's own inputs from the saved plan so "Change
+          // setup" reflects what was actually chosen, instead of resetting
+          // to defaults — the movement choice previously vanished on reload.
+          if (d.plan.movement_choice) {
+            setMovementChoice(d.plan.movement_choice)
+            setGymYes(d.plan.movement_choice === 'gym')
+          }
+          if (d.plan.resolved_location) setLocation(d.plan.resolved_location)
+        }
+      })
       .catch(() => {})
       .finally(() => setCheckingSaved(false))
   }, [])
@@ -174,6 +189,7 @@ export default function PlanMyDayPage() {
         body: JSON.stringify({
           wakeTime, gymTime: gymYes ? (gymTime ?? '') : '', location, morningPlans, workPlans, workEndTime, hairWashDay, eveningPlans,
           movementChoice: gymYes ? 'gym' : (movementChoice ?? 'rest'),
+          saturdayType: isSaturday ? saturdayType : null,
           tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
         }),
       })
@@ -420,6 +436,25 @@ export default function PlanMyDayPage() {
                   </div>
                 )}
 
+                {isSaturday && (
+                  <div style={{ ...GLASS, padding: 16 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>What kind of Saturday?</p>
+                    <ChoiceGrid
+                      options={[
+                        { value: 'social', label: 'Social' },
+                        { value: 'modeling_content', label: 'Modeling / content' },
+                        { value: 'beach_outdoors', label: 'Beach / outdoors' },
+                        { value: 'creative', label: 'Creative' },
+                        { value: 'shopping_errands', label: 'Shopping / errands' },
+                        { value: 'rest', label: 'Rest' },
+                        { value: 'mix', label: 'Mix' },
+                      ]}
+                      value={saturdayType}
+                      onChange={setSaturdayType}
+                    />
+                  </div>
+                )}
+
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Where are you working?</p>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -625,6 +660,27 @@ export default function PlanMyDayPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+
+                {weekday === 'Tuesday' && (
+                  <div style={{ ...GLASS, padding: 16 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Car care (optional — you&apos;re already out)</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                      {['Clean car', 'Remove trash', 'Wipe interior', 'Get gas', 'Car wash', 'Clear clutter'].map(item => {
+                        const done = carCareChecked.has(item)
+                        return (
+                          <button key={item} type="button" onClick={() => setCarCareChecked(prev => {
+                            const next = new Set(prev)
+                            if (next.has(item)) next.delete(item); else next.add(item)
+                            return next
+                          })}
+                            style={{ padding: '9px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600, cursor: 'pointer', textAlign: 'left', background: done ? 'rgba(201,169,110,0.2)' : 'var(--surface-inactive)', border: done ? '1.5px solid rgba(201,169,110,0.4)' : '1px solid rgba(180,150,100,0.16)', color: done ? '#8A6F2A' : 'var(--ink-3)', textDecoration: done ? 'line-through' : 'none' }}>
+                            {item}
+                          </button>
+                        )
+                      })}
                     </div>
                   </div>
                 )}

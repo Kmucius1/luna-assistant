@@ -106,6 +106,7 @@ export async function POST(req: NextRequest) {
       wakeTime?: string; gymTime?: string; location?: 'home' | 'office' | 'split' | 'auto'
       morningPlans?: string; workPlans?: string; workEndTime?: string
       hairWashDay?: boolean; eveningPlans?: string; movementChoice?: MovementChoice; tz?: string
+      saturdayType?: string | null
     }
     const body = await req.json().catch(() => ({})) as PlanBody
     const {
@@ -118,6 +119,7 @@ export async function POST(req: NextRequest) {
       hairWashDay = false,
       eveningPlans = '',
       movementChoice = 'gym',
+      saturdayType = null,
       tz = 'America/New_York',
     } = body
 
@@ -301,6 +303,7 @@ ${routineContext}
 Wake time: ${wakeTime}
 ${movementChoice === 'gym' ? `Gym arrival: ${gymTime || '5:45 AM'}` : ''}
 Location: ${location === 'home' ? 'Working from home' : location === 'office' ? 'Going into the DRYP office' : 'A split day — partly home, partly office. Build in a real transition block between the two, not just a location label.'}
+${weekday === 'Saturday' ? `SATURDAY TYPE: ${saturdayType ?? 'not specified'} — keep today deliberately light. Only include truly necessary unfinished work (if any), movement, and dinner as real anchors. Cleaning and errands are optional, lightly suggested, never forced. Do not schedule a protected work block or business-focus theme unless she explicitly gave work plans below — no unnecessary work pressure on Saturday.` : ''}
 ${morningPlans ? `Morning plans: ${morningPlans}` : ''}
 Protected work window: 10:00 AM to ${workEndTime || '6:00 PM'}
 ${workPlans ? `Work plans: ${workPlans}` : ''}
