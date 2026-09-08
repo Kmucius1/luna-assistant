@@ -15,6 +15,15 @@ export interface StapleDef {
   group: StapleGroup
   /** food_pantry_items.category (grocery-store section) for grocery-list bucketing. */
   category: GroceryCategory
+  /**
+   * Deterministic keyword match against a logged meal's title — how
+   * automatic depletion decides a staple was likely used, without any AI
+   * guessing. Explicit per-staple, same pattern as ZOE_KNOWN_LOCATIONS'
+   * `match` arrays, chosen specifically to avoid collisions between
+   * similar staples (e.g. "chicken breast" vs "chicken tender").
+   * Omitted for staples too generic to safely match a meal title against.
+   */
+  matchKeywords?: string[]
 }
 
 export const STAPLE_GROUP_LABEL: Record<StapleGroup, string> = {
@@ -26,33 +35,33 @@ export const STAPLE_GROUP_LABEL: Record<StapleGroup, string> = {
 
 export const ZOE_PANTRY_STAPLES: StapleDef[] = [
   // Protein
-  { name: 'Chicken breasts', group: 'protein', category: 'protein' },
-  { name: 'Crispy chicken tenders', group: 'protein', category: 'frozen' },
-  { name: 'Salmon', group: 'protein', category: 'protein' },
-  { name: 'Ground beef/turkey', group: 'protein', category: 'protein' },
+  { name: 'Chicken breasts', group: 'protein', category: 'protein', matchKeywords: ['chicken breast'] },
+  { name: 'Crispy chicken tenders', group: 'protein', category: 'frozen', matchKeywords: ['chicken tender'] },
+  { name: 'Salmon', group: 'protein', category: 'protein', matchKeywords: ['salmon'] },
+  { name: 'Ground beef/turkey', group: 'protein', category: 'protein', matchKeywords: ['ground beef', 'ground turkey'] },
   // Meals
-  { name: 'Tortillas', group: 'meals', category: 'bakery_and_grains' },
-  { name: 'Rice', group: 'meals', category: 'pantry' },
-  { name: 'Pasta', group: 'meals', category: 'pantry' },
-  { name: 'Lettuce', group: 'meals', category: 'produce' },
-  { name: 'Buffalo sauce', group: 'meals', category: 'pantry' },
-  { name: 'Ranch', group: 'meals', category: 'pantry' },
-  { name: 'Shredded cheese', group: 'meals', category: 'dairy' },
-  { name: 'Salad kits', group: 'meals', category: 'produce' },
-  { name: 'Frozen vegetables', group: 'meals', category: 'frozen' },
-  { name: 'Potatoes/fries', group: 'meals', category: 'frozen' },
+  { name: 'Tortillas', group: 'meals', category: 'bakery_and_grains', matchKeywords: ['tortilla', 'wrap', 'quesadilla'] },
+  { name: 'Rice', group: 'meals', category: 'pantry', matchKeywords: ['rice'] },
+  { name: 'Pasta', group: 'meals', category: 'pantry', matchKeywords: ['pasta', 'spaghetti', 'penne', 'alfredo'] },
+  { name: 'Lettuce', group: 'meals', category: 'produce', matchKeywords: ['lettuce'] },
+  { name: 'Buffalo sauce', group: 'meals', category: 'pantry', matchKeywords: ['buffalo'] },
+  { name: 'Ranch', group: 'meals', category: 'pantry', matchKeywords: ['ranch'] },
+  { name: 'Shredded cheese', group: 'meals', category: 'dairy', matchKeywords: ['cheese'] },
+  { name: 'Salad kits', group: 'meals', category: 'produce', matchKeywords: ['salad', 'caesar'] },
+  { name: 'Frozen vegetables', group: 'meals', category: 'frozen', matchKeywords: ['vegetable', 'veggies'] },
+  { name: 'Potatoes/fries', group: 'meals', category: 'frozen', matchKeywords: ['potato', 'fries', 'sweet potato'] },
   // Breakfast
-  { name: 'Bagels', group: 'breakfast', category: 'bakery_and_grains' },
-  { name: 'Oatmeal', group: 'breakfast', category: 'pantry' },
-  { name: 'Frozen waffles', group: 'breakfast', category: 'frozen' },
-  { name: 'Yogurt', group: 'breakfast', category: 'dairy' },
-  { name: 'Fruit', group: 'breakfast', category: 'produce' },
-  { name: 'Granola', group: 'breakfast', category: 'pantry' },
+  { name: 'Bagels', group: 'breakfast', category: 'bakery_and_grains', matchKeywords: ['bagel'] },
+  { name: 'Oatmeal', group: 'breakfast', category: 'pantry', matchKeywords: ['oatmeal', 'overnight oats'] },
+  { name: 'Frozen waffles', group: 'breakfast', category: 'frozen', matchKeywords: ['waffle'] },
+  { name: 'Yogurt', group: 'breakfast', category: 'dairy', matchKeywords: ['yogurt'] },
+  { name: 'Fruit', group: 'breakfast', category: 'produce', matchKeywords: ['fruit', 'blueberries', 'berries'] },
+  { name: 'Granola', group: 'breakfast', category: 'pantry', matchKeywords: ['granola'] },
   // Easy backup food
-  { name: 'Crackers', group: 'easy_backup', category: 'pantry' },
-  { name: 'Salsa', group: 'easy_backup', category: 'pantry' },
-  { name: 'Soup', group: 'easy_backup', category: 'pantry' },
-  { name: 'Frozen pizza', group: 'easy_backup', category: 'frozen' },
+  { name: 'Crackers', group: 'easy_backup', category: 'pantry', matchKeywords: ['cracker'] },
+  { name: 'Salsa', group: 'easy_backup', category: 'pantry', matchKeywords: ['salsa'] },
+  { name: 'Soup', group: 'easy_backup', category: 'pantry', matchKeywords: ['soup'] },
+  { name: 'Frozen pizza', group: 'easy_backup', category: 'frozen', matchKeywords: ['pizza'] },
   { name: 'Frozen meals', group: 'easy_backup', category: 'frozen' },
 ]
 

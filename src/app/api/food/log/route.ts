@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { callAI, parseAIJson } from '@/lib/ai'
+import { depleteStaplesFromMealTitle } from '@/lib/luna/staplesDepletion'
 
 function todayKey(): string {
   return new Date().toISOString().split('T')[0]
@@ -99,6 +100,13 @@ export async function POST(req: NextRequest) {
       .select('id, meal_type, source, title, calories, protein_g, logged_at')
       .single()
     if (error) throw error
+
+    // Real automatic pantry depletion — a planned meal she actually ate
+    // nudges any matching staple toward low/empty, not just a bare log
+    // entry with no memory effect.
+    if (source === 'planned') {
+      await depleteStaplesFromMealTitle(supabase, user.id, title)
+    }
 
     return NextResponse.json({ entry: data })
   } catch (error) {
