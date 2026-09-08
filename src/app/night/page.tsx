@@ -22,6 +22,20 @@ const RITUAL_ITEMS = [
   { emoji: '🙏', label: 'Close the loops in your mind',    mins: 7  },
 ]
 
+// Optional, un-timed — logistics for tomorrow, not part of the wind-down
+// ritual above. Kept as a separate checklist/state so it doesn't compete
+// with the timed ritual sequence.
+const PREP_ITEMS = [
+  { emoji: '🏋️', label: 'Lay out gym clothes' },
+  { emoji: '👔', label: 'Lay out work outfit' },
+  { emoji: '🚿', label: 'Prep towel and shower items' },
+  { emoji: '🔌', label: 'Charge devices' },
+  { emoji: '👜', label: 'Pack work bag' },
+  { emoji: '🍗', label: 'Prep protein for tomorrow' },
+  { emoji: '🥣', label: 'Decide breakfast' },
+  { emoji: '🤝', label: 'Prep anything needed for an in-person meeting' },
+]
+
 function timeToMinutes(t: string): number {
   if (!t) return 0
   const [h, m] = t.split(':').map(Number)
@@ -90,6 +104,7 @@ export default function NightScreen() {
   const [firstMeeting, setFirstMeeting]   = useState('')
   const [plan, setPlan]                   = useState<Plan | null>(null)
   const [checked, setChecked]             = useState<Set<number>>(new Set())
+  const [prepChecked, setPrepChecked]     = useState<Set<number>>(new Set())
   const [manualRitual, setManualRitual]   = useState(() => {
     const now = new Date()
     return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`
@@ -151,6 +166,14 @@ export default function NightScreen() {
 
   function toggleCheck(i: number) {
     setChecked(prev => {
+      const next = new Set(prev)
+      next.has(i) ? next.delete(i) : next.add(i)
+      return next
+    })
+  }
+
+  function togglePrepCheck(i: number) {
+    setPrepChecked(prev => {
       const next = new Set(prev)
       next.has(i) ? next.delete(i) : next.add(i)
       return next
@@ -486,6 +509,36 @@ export default function NightScreen() {
                   )
                 })
               })()}
+
+              {/* Tomorrow's prep — optional, un-timed */}
+              <p className="text-xs font-bold uppercase tracking-widest mt-2" style={{ color: 'rgba(245,239,227,0.72)' }}>
+                Tomorrow&apos;s Prep <span style={{ opacity: 0.6, textTransform: 'none', letterSpacing: 'normal' }}>(optional)</span>
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {PREP_ITEMS.map((item, i) => {
+                  const done = prepChecked.has(i)
+                  return (
+                    <button key={i} onClick={() => togglePrepCheck(i)}
+                      className="text-left rounded-2xl transition-all flex items-center gap-2.5 px-3 py-3"
+                      style={{
+                        background: done ? 'rgba(240,228,200,0.92)' : 'rgba(255,255,255,0.55)',
+                        border: `1.5px solid ${done ? 'rgba(201,169,110,0.4)' : 'rgba(180,150,100,0.16)'}`,
+                        opacity: done ? 0.72 : 1,
+                      }}>
+                      <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center"
+                        style={{
+                          background: done ? '#5C4530' : 'rgba(255,255,255,0.6)',
+                          border: `1.5px solid ${done ? '#5C4530' : 'rgba(180,150,100,0.25)'}`,
+                        }}>
+                        {done && <span className="text-white font-bold" style={{ fontSize: 9 }}>✓</span>}
+                      </div>
+                      <span className="text-xs leading-snug" style={{ color: '#100C1E', textDecoration: done ? 'line-through' : 'none' }}>
+                        {item.emoji} {item.label}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
 
               {/* Lights-out indicator */}
               {plan && (
