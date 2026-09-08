@@ -33,6 +33,7 @@ interface BillingProfile {
   id: string; dryp_account_id: string; client_name: string
   billing_type: 'retainer' | 'one_time' | 'mixed'
   retainer_amount: number | null; recurring_billing_day: number | null; payment_method: string | null
+  contract_start: string | null; contract_end: string | null; next_invoice_date: string | null; renewal_date: string | null
 }
 interface Invoice {
   id: string; dryp_account_id: string; client_name: string; invoice_number: string | null
@@ -41,6 +42,15 @@ interface Invoice {
   status: Status; last_follow_up: string | null; next_follow_up: string | null
   remainingBalance: number; daysOutstanding: number | null; isOverdue: boolean
 }
+interface Opportunity {
+  id: string; dryp_account_id: string; client_name: string
+  potential_value: number | null; probability_pct: number | null; deal_stage: string | null
+  expected_close_date: string | null; expected_payment_schedule: string | null; next_action: string | null
+}
+interface RevenueSummary {
+  mrr: { current: number; new: number; lost: number; pending: number; expected_next_month: number }
+  cash_flow_this_month: { dryp_money_in: number; dryp_money_out: number; net: number }
+}
 
 export default function DrypBillingPage() {
   const [accounts, setAccounts] = useState<Account[]>([])
@@ -48,7 +58,7 @@ export default function DrypBillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [accountsReceivable, setAccountsReceivable] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'ar' | 'clients'>('ar')
+  const [tab, setTab] = useState<'ar' | 'clients' | 'pipeline'>('ar')
 
   const [showNewInvoice, setShowNewInvoice] = useState(false)
   const [newAccountId, setNewAccountId] = useState('')
@@ -57,17 +67,31 @@ export default function DrypBillingPage() {
   const [newStatus, setNewStatus] = useState<Status>('draft')
   const [creating, setCreating] = useState(false)
 
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([])
+  const [revenue, setRevenue] = useState<RevenueSummary | null>(null)
+  const [showNewOpp, setShowNewOpp] = useState(false)
+  const [newOppAccountId, setNewOppAccountId] = useState('')
+  const [newOppValue, setNewOppValue] = useState('')
+  const [newOppProbability, setNewOppProbability] = useState('50')
+  const [newOppStage, setNewOppStage] = useState('')
+  const [newOppCloseDate, setNewOppCloseDate] = useState('')
+  const [creatingOpp, setCreatingOpp] = useState(false)
+
   const load = useCallback(async () => {
     setLoading(true)
-    const [accRes, billRes, invRes] = await Promise.all([
+    const [accRes, billRes, invRes, oppRes, revRes] = await Promise.all([
       fetch('/api/dryp/accounts').then(r => r.json()).catch(() => ({ accounts: [] })),
       fetch('/api/dryp/billing').then(r => r.json()).catch(() => ({ profiles: [] })),
       fetch('/api/dryp/invoices').then(r => r.json()).catch(() => ({ invoices: [], accountsReceivable: [] })),
+      fetch('/api/dryp/opportunities').then(r => r.json()).catch(() => ({ opportunities: [] })),
+      fetch('/api/dryp/revenue-summary').then(r => r.json()).catch(() => null),
     ])
     setAccounts((accRes.accounts ?? []).map((a: { id: string; business_name: string }) => ({ id: a.id, business_name: a.business_name })))
     setProfiles(billRes.profiles ?? [])
     setInvoices(invRes.invoices ?? [])
     setAccountsReceivable(invRes.accountsReceivable ?? [])
+    setOpportunities(oppRes.opportunities ?? [])
+    setRevenue(revRes?.mrr ? revRes : null)
     setLoading(false)
   }, [])
 
@@ -110,9 +134,49 @@ export default function DrypBillingPage() {
         retainer_amount: updates.retainer_amount ?? existing?.retainer_amount ?? null,
         recurring_billing_day: updates.recurring_billing_day ?? existing?.recurring_billing_day ?? null,
         payment_method: updates.payment_method ?? existing?.payment_method ?? null,
+        contract_start: updates.contract_start ?? existing?.contract_start ?? null,
+        contract_end: updates.contract_end ?? existing?.contract_end ?? null,
+        next_invoice_date: updates.next_invoice_date ?? existing?.next_invoice_date ?? null,
+        renewal_date: updates.renewal_date ?? existing?.renewal_date ?? null,
       }),
     })
     load()
+  }
+
+  async function createOpportunity() {
+    const account = accounts.find(a => a.id === newOppAccountId)
+    if (!account) return
+    setCreatingOpp(true)
+    try {
+      await fetch('/api/dryp/opportunities', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dryp_account_id: account.id, client_name: account.business_name,
+          potential_value: newOppValue ? Number(newOppValue) : null,
+          probability_pct: newOppProbability ? Number(newOppProbability) : null,
+          deal_stage: newOppStage || null,
+          expected_close_date: newOppCloseDate || null,
+        }),
+      })
+      setNewOppAccountId(''); setNewOppValue(''); setNewOppProbability('50'); setNewOppStage(''); setNewOppCloseDate(''); setShowNewOpp(false)
+      await load()
+    } finally {
+      setCreatingOpp(false)
+    }
+  }
+
+  async function updateOpportunity(id: string, updates: Partial<Opportunity>) {
+    setOpportunities(prev => prev.map(o => (o.id === id ? { ...o, ...updates } : o)))
+    await fetch(`/api/dryp/opportunities/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updates),
+    })
+  }
+
+  async function closeOpportunity(id: string, status: 'won' | 'lost') {
+    setOpportunities(prev => prev.filter(o => o.id !== id))
+    await fetch(`/api/dryp/opportunities/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
+    })
   }
 
   const totalOutstanding = accountsReceivable.reduce((s, i) => s + i.remainingBalance, 0)
@@ -144,7 +208,7 @@ export default function DrypBillingPage() {
           </div>
 
           <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
-            {([['ar', 'Accounts Receivable'], ['clients', 'Client Billing']] as [typeof tab, string][]).map(([v, label]) => (
+            {([['ar', 'Accounts Receivable'], ['clients', 'Client Billing'], ['pipeline', 'Revenue Pipeline']] as [typeof tab, string][]).map(([v, label]) => (
               <button key={v} onClick={() => setTab(v)} style={{ padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none', background: tab === v ? '#5C4530' : 'rgba(255,255,255,0.5)', color: tab === v ? 'white' : '#5E5474' }}>
                 {label}
               </button>
@@ -234,12 +298,116 @@ export default function DrypBillingPage() {
                     <input
                       placeholder="Payment method" defaultValue={profile?.payment_method ?? ''}
                       onBlur={e => saveBillingProfile(a.id, a.business_name, { payment_method: e.target.value || null })}
-                      style={{ width: '100%', padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12 }}
+                      style={{ width: '100%', padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12, marginBottom: 8 }}
                     />
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <label style={{ flex: 1, minWidth: 130, fontSize: 10, color: '#5E5474' }}>
+                        Contract start
+                        <input type="date" defaultValue={profile?.contract_start ?? ''}
+                          onBlur={e => saveBillingProfile(a.id, a.business_name, { contract_start: e.target.value || null })}
+                          style={{ width: '100%', padding: '7px 9px', borderRadius: 9, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12, marginTop: 3 }} />
+                      </label>
+                      <label style={{ flex: 1, minWidth: 130, fontSize: 10, color: '#5E5474' }}>
+                        Contract end
+                        <input type="date" defaultValue={profile?.contract_end ?? ''}
+                          onBlur={e => saveBillingProfile(a.id, a.business_name, { contract_end: e.target.value || null })}
+                          style={{ width: '100%', padding: '7px 9px', borderRadius: 9, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12, marginTop: 3 }} />
+                      </label>
+                      <label style={{ flex: 1, minWidth: 130, fontSize: 10, color: '#5E5474' }}>
+                        Next invoice
+                        <input type="date" defaultValue={profile?.next_invoice_date ?? ''}
+                          onBlur={e => saveBillingProfile(a.id, a.business_name, { next_invoice_date: e.target.value || null })}
+                          style={{ width: '100%', padding: '7px 9px', borderRadius: 9, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12, marginTop: 3 }} />
+                      </label>
+                      <label style={{ flex: 1, minWidth: 130, fontSize: 10, color: '#5E5474' }}>
+                        Renewal date
+                        <input type="date" defaultValue={profile?.renewal_date ?? ''}
+                          onBlur={e => saveBillingProfile(a.id, a.business_name, { renewal_date: e.target.value || null })}
+                          style={{ width: '100%', padding: '7px 9px', borderRadius: 9, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12, marginTop: 3 }} />
+                      </label>
+                    </div>
                   </div>
                 )
               })}
             </div>
+          )}
+
+          {!loading && tab === 'pipeline' && (
+            <>
+              {revenue && (
+                <div style={{ ...GLASS, padding: 16, marginBottom: 14 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>MRR</p>
+                  <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginBottom: 14 }}>
+                    <div><p style={{ fontSize: 20, fontWeight: 800, color: '#100C1E' }}>${revenue.mrr.current.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Current</p></div>
+                    <div><p style={{ fontSize: 20, fontWeight: 800, color: '#4A8A4A' }}>${revenue.mrr.new.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>New this month</p></div>
+                    <div><p style={{ fontSize: 20, fontWeight: 800, color: '#B23B3B' }}>${revenue.mrr.lost.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Lost this month</p></div>
+                    <div><p style={{ fontSize: 20, fontWeight: 800, color: '#8A6F2A' }}>${revenue.mrr.pending.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Pending (weighted)</p></div>
+                    <div><p style={{ fontSize: 20, fontWeight: 800, color: '#100C1E' }}>${revenue.mrr.expected_next_month.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Expected next month</p></div>
+                  </div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E5474', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>DRYP cash flow this month</p>
+                  <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap' }}>
+                    <div><p style={{ fontSize: 18, fontWeight: 800, color: '#4A8A4A' }}>${revenue.cash_flow_this_month.dryp_money_in.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>In (paid invoices)</p></div>
+                    <div><p style={{ fontSize: 18, fontWeight: 800, color: '#B23B3B' }}>${revenue.cash_flow_this_month.dryp_money_out.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Out (business expenses)</p></div>
+                    <div><p style={{ fontSize: 18, fontWeight: 800, color: revenue.cash_flow_this_month.net >= 0 ? '#100C1E' : '#B23B3B' }}>${revenue.cash_flow_this_month.net.toFixed(0)}</p><p style={{ fontSize: 10, color: '#5E5474' }}>Net</p></div>
+                  </div>
+                </div>
+              )}
+
+              <button onClick={() => setShowNewOpp(v => !v)} style={{ width: '100%', padding: '12px 0', borderRadius: 16, border: 'none', background: 'linear-gradient(135deg, #5C4530, #B8934A)', color: 'white', fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12, cursor: 'pointer' }}>
+                <Plus className="h-4 w-4" /> New Opportunity
+              </button>
+
+              {showNewOpp && (
+                <div style={{ ...GLASS, padding: 16, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <select value={newOppAccountId} onChange={e => setNewOppAccountId(e.target.value)} style={{ padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.2)', fontSize: 13, background: 'white' }}>
+                    <option value="">Select client…</option>
+                    {accounts.map(a => <option key={a.id} value={a.id}>{a.business_name}</option>)}
+                  </select>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input type="number" placeholder="Potential value ($)" value={newOppValue} onChange={e => setNewOppValue(e.target.value)} style={{ flex: 1, padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.2)', fontSize: 13 }} />
+                    <input type="number" placeholder="Probability %" value={newOppProbability} onChange={e => setNewOppProbability(e.target.value)} min={0} max={100} style={{ flex: 1, padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.2)', fontSize: 13 }} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input placeholder="Deal stage (e.g. proposal)" value={newOppStage} onChange={e => setNewOppStage(e.target.value)} style={{ flex: 1, padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.2)', fontSize: 13 }} />
+                    <input type="date" value={newOppCloseDate} onChange={e => setNewOppCloseDate(e.target.value)} style={{ flex: 1, padding: '10px 12px', borderRadius: 12, border: '1px solid rgba(180,150,100,0.2)', fontSize: 13 }} />
+                  </div>
+                  <button onClick={createOpportunity} disabled={creatingOpp || !newOppAccountId} style={{ padding: '11px 0', borderRadius: 12, border: 'none', background: '#5C4530', color: 'white', fontSize: 13, fontWeight: 700, cursor: 'pointer', opacity: (creatingOpp || !newOppAccountId) ? 0.5 : 1 }}>
+                    {creatingOpp ? 'Creating…' : 'Create Opportunity'}
+                  </button>
+                </div>
+              )}
+
+              {opportunities.length === 0 ? (
+                <div style={{ ...GLASS, padding: 24, textAlign: 'center' }}>
+                  <p style={{ fontSize: 13, color: '#5E5474' }}>No open pipeline opportunities.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {opportunities.map(opp => (
+                    <div key={opp.id} style={{ ...GLASS, padding: 14 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#100C1E' }}>{opp.client_name}</p>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={() => closeOpportunity(opp.id, 'won')} style={{ fontSize: 11, fontWeight: 600, padding: '4px 9px', borderRadius: 9, border: '1px solid rgba(90,180,90,0.3)', color: '#4A8A4A', background: 'transparent', cursor: 'pointer' }}>Won</button>
+                          <button onClick={() => closeOpportunity(opp.id, 'lost')} style={{ fontSize: 11, fontWeight: 600, padding: '4px 9px', borderRadius: 9, border: '1px solid rgba(224,94,94,0.3)', color: '#B23B3B', background: 'transparent', cursor: 'pointer' }}>Lost</button>
+                        </div>
+                      </div>
+                      <p style={{ fontSize: 12, color: '#5E5474', marginBottom: 8 }}>
+                        {opp.potential_value ? `$${opp.potential_value.toFixed(0)}` : 'No value set'}
+                        {opp.probability_pct != null ? ` · ${opp.probability_pct}% likely` : ''}
+                        {opp.deal_stage ? ` · ${opp.deal_stage}` : ''}
+                        {opp.expected_close_date ? ` · close ~${opp.expected_close_date}` : ''}
+                      </p>
+                      <input
+                        placeholder="Next action" defaultValue={opp.next_action ?? ''}
+                        onBlur={e => updateOpportunity(opp.id, { next_action: e.target.value })}
+                        style={{ width: '100%', padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(180,150,100,0.2)', fontSize: 12 }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </AppLayout>

@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getWeekEvents, type CalendarEvent } from '@/lib/calendar'
-import { getAllValidGmailTokens, listGmailMessages } from '@/lib/gmail'
-import { getOpenTasks, getSummaryStats, getAccounts, getClientRoster, type DryphubTask } from '@/lib/dryp-crm'
+import { getAllValidGmailTokens, listGmailMessages, type GmailMessage } from '@/lib/gmail'
+import { getOpenTasks, getSummaryStats, getAccounts, getClientRoster, type DryphubTask, type ClientRosterEntry } from '@/lib/dryp-crm'
 import { classifyMeetingLocation, type MeetingLocationType } from '@/lib/luna/meetingLocation'
 import { ZOE_LIFESTYLE_PROFILE, ZOE_WORK_LOCATION_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 
@@ -43,6 +43,45 @@ function flagDrypTask(t: DryphubTask): DrypTaskFlags {
     isOverdue: !!due && due < now,
     isDueSoon: !!due && due >= now && due.getTime() - now.getTime() <= 7 * 86_400_000,
     isStuck: daysSinceUpdate > STUCK_THRESHOLD_DAYS && !['waiting_client'].includes(t.status),
+  }
+}
+
+const EMAIL_EXTRACTION_SYSTEM = `You extract concrete action items from a batch of real client emails — nothing invented.
+For each email that contains a genuinely new deadline, deliverable, change request, approval ask, or proposal need, return one item.
+Ignore newsletters, receipts, and anything with no real action attached. If nothing qualifies, return an empty array.
+Return ONLY valid JSON: {"items": [{"client": "sender name or company", "action": "short description of what's actually needed", "when": "any date/timeframe mentioned, or empty string"}]}`
+
+// A dedicated, focused extraction pass over emails already matched to a
+// real DRYP client contact — not the same call that builds the whole
+// week's narrative. Cross-checks each result against her real open DRYP
+// tasks so an item already tracked there doesn't get duplicated.
+async function extractClientEmailDeadlines(
+  messages: GmailMessage[],
+  clientRoster: ClientRosterEntry[],
+  drypTasks: DrypTaskFlags[],
+): Promise<string[]> {
+  const rosterEmails = new Set(clientRoster.map(r => r.email.toLowerCase()))
+  const clientMessages = messages.filter(m => rosterEmails.has(m.fromEmail?.toLowerCase()))
+  if (clientMessages.length === 0) return []
+
+  const prompt = clientMessages.slice(0, 20)
+    .map(m => `From: ${m.from}\nSubject: ${m.subject}\n${m.snippet}`)
+    .join('\n---\n')
+
+  try {
+    const raw = await callAI(EMAIL_EXTRACTION_SYSTEM, prompt, 800)
+    const parsed = parseAIJson<{ items?: { client: string; action: string; when: string }[] }>(raw)
+    const existingTaskText = drypTasks.map(t => `${t.title} ${t.account_name ?? ''}`.toLowerCase()).join(' | ')
+
+    return (parsed.items ?? [])
+      .filter(item => item.client && item.action)
+      .map(item => {
+        const alreadyTracked = existingTaskText.includes(item.action.toLowerCase().slice(0, 15))
+        const tag = alreadyTracked ? '' : ' [NEW — not yet in DRYP]'
+        return `${item.client} — ${item.action}${item.when ? ` (${item.when})` : ''}${tag}`
+      })
+  } catch {
+    return []
   }
 }
 
@@ -104,6 +143,7 @@ export async function POST() {
     const pipelineAccounts = drypAccounts.filter(a => ['proposal', 'prospect'].includes(a.client_pipeline_stage ?? ''))
 
     let emailSummary = ''
+    let clientEmailDeadlines: string[] = []
     try {
       const allMessages = (await Promise.all(
         gmailTokens.map(t => listGmailMessages(t.access_token, 'newer_than:7d in:inbox', 15, 'metadata').catch(() => []))
@@ -112,6 +152,13 @@ export async function POST() {
         .slice(0, 40)
         .map(m => `• ${m.subject} — from ${m.from}${m.snippet ? `: ${m.snippet.slice(0, 100)}` : ''}`)
         .join('\n')
+
+      // A dedicated, verified extraction pass over real client emails —
+      // not left to the main synthesis prompt's implicit judgment. Anything
+      // extracted here that doesn't already match an open DRYP task is
+      // deterministically tagged and guaranteed into flagged_deadlines,
+      // rather than being one option among many the big prompt might skip.
+      clientEmailDeadlines = await extractClientEmailDeadlines(allMessages, clientRoster, drypTasks)
     } catch { /* Gmail unavailable — proceed without it */ }
 
     const userPrompt = `THIS WEEK'S CALENDAR EVENTS:
@@ -132,8 +179,15 @@ Build the week's synthesis now.`
     const raw = await callAI(SYSTEM, userPrompt, 3000)
     const parsed = parseAIJson<Record<string, unknown>>(raw)
 
+    // Deterministic merge, not optional — a verified client-email deadline
+    // is guaranteed to appear here even if the main synthesis pass didn't
+    // independently surface it.
+    const aiFlagged = Array.isArray(parsed.flagged_deadlines) ? parsed.flagged_deadlines as string[] : []
+    const mergedDeadlines = [...clientEmailDeadlines, ...aiFlagged.filter(d => !clientEmailDeadlines.some(c => d.includes(c.split(' — ')[0])))]
+
     const payload = {
       ...parsed,
+      flagged_deadlines: mergedDeadlines,
       week_of: dateKey,
       events: classifiedEvents,
       dryp_tasks: drypTasks,

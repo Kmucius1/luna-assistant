@@ -41,6 +41,10 @@ export async function POST(req: NextRequest) {
       recurring_billing_day: typeof body.recurring_billing_day === 'number' ? body.recurring_billing_day : null,
       payment_method: body.payment_method || null,
       notes: body.notes || null,
+      contract_start: body.contract_start || null,
+      contract_end: body.contract_end || null,
+      next_invoice_date: body.next_invoice_date || null,
+      renewal_date: body.renewal_date || null,
       updated_at: new Date().toISOString(),
     }
 
