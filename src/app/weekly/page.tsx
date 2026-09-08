@@ -36,7 +36,7 @@ type Step =
   | 'q_personal' | 'q_energy' | 'q_rhythm' | 'q_laundry' | 'q_cleaning'
   | 'finalizing' | 'result' | 'closing'
 
-interface StapleWithStatus { name: string; group: string; category: string; status: StapleStatus | null }
+interface StapleWithStatus { id?: string; name: string; group: string; category: string; status: StapleStatus | null; custom?: boolean }
 
 const STATUS_OPTIONS = [
   { value: 'in_stock', label: 'In stock' },
@@ -131,6 +131,9 @@ export default function WeeklyResetPage() {
   const [pantryLoading, setPantryLoading] = useState(false)
   const [pantrySaving, setPantrySaving] = useState(false)
   const [stapleNeedsGrocery, setStapleNeedsGrocery] = useState(false)
+  const [newStapleName, setNewStapleName] = useState('')
+  const [newStapleGroup, setNewStapleGroup] = useState<StapleGroup>('easy_backup')
+  const [addingStaple, setAddingStaple] = useState(false)
   const [groceryTimeSlots, setGroceryTimeSlots] = useState<FreeSlot[]>([])
   const [prepTimeSlots, setPrepTimeSlots] = useState<FreeSlot[]>([])
   const [groceryTimeSlot, setGroceryTimeSlot] = useState<string | null>(null)
@@ -206,9 +209,43 @@ export default function WeeklyResetPage() {
     } catch { /* soft-fail — meal plan just won't know about this week's changes */ } finally {
       setPantrySaving(false)
     }
-    const needsGrocery = Object.values(pantryStatuses).some(v => v === 'low' || v === 'empty')
-    setStapleNeedsGrocery(needsGrocery)
-    setStep(needsGrocery ? 'q_grocery_time' : 'q_prep_time')
+    // Always offer a grocery-shopping time slot here — she already said
+    // groceries are needed to reach this step at all, and she may need to
+    // shop for perishables/produce even when every tracked staple reads
+    // in-stock. Staple status only decides what's ON the list, not whether
+    // a shopping trip happens.
+    setStapleNeedsGrocery(true)
+    setStep('q_grocery_time')
+  }
+
+  async function addCustomStaple() {
+    const name = newStapleName.trim()
+    if (!name) return
+    setAddingStaple(true)
+    try {
+      const res = await fetch('/api/food/pantry/staples', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, group: newStapleGroup }),
+      })
+      const data = await res.json()
+      if (data.staple) {
+        setPantryStaples(prev => [...(prev ?? []), data.staple])
+        setPantryStatuses(prev => ({ ...prev, [data.staple.name]: 'in_stock' }))
+        setNewStapleName('')
+      }
+    } finally {
+      setAddingStaple(false)
+    }
+  }
+
+  async function removeCustomStaple(staple: StapleWithStatus) {
+    if (!staple.id) return
+    setPantryStaples(prev => (prev ?? []).filter(s => s.name !== staple.name))
+    setPantryStatuses(prev => {
+      const next = { ...prev }
+      delete next[staple.name]
+      return next
+    })
+    await fetch(`/api/food/pantry/${staple.id}`, { method: 'DELETE' }).catch(() => {})
   }
 
   const [reflections, setReflections] = useState<Record<string, string>>({})
@@ -434,7 +471,13 @@ export default function WeeklyResetPage() {
                       <div className="space-y-3">
                         {items.map(s => (
                           <div key={s.name} className="p-3" style={CARD}>
-                            <p className="text-sm font-semibold mb-2" style={{ color: 'var(--depth)' }}>{s.name}</p>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{s.name}</p>
+                              {s.custom && (
+                                <button type="button" onClick={() => removeCustomStaple(s)} aria-label={`Remove ${s.name}`}
+                                  className="text-xs font-semibold" style={{ color: 'var(--mist)' }}>Remove</button>
+                              )}
+                            </div>
                             <ChoiceGrid
                               columns={3}
                               options={STATUS_OPTIONS}
@@ -447,6 +490,34 @@ export default function WeeklyResetPage() {
                     </div>
                   )
                 })
+              )}
+              {!pantryLoading && (
+                <div className="p-3 mb-2" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Add an item</p>
+                  <div className="flex gap-2 mb-2">
+                    <input
+                      value={newStapleName}
+                      onChange={e => setNewStapleName(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && addCustomStaple()}
+                      placeholder="e.g. Frozen shrimp"
+                      className="flex-1 px-3 py-2 rounded-xl text-sm"
+                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: 'var(--depth)' }}
+                    />
+                    <select
+                      value={newStapleGroup}
+                      onChange={e => setNewStapleGroup(e.target.value as StapleGroup)}
+                      className="px-2 py-2 rounded-xl text-xs"
+                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: 'var(--depth)' }}
+                    >
+                      {STAPLE_GROUPS_ORDER.map(g => <option key={g} value={g}>{STAPLE_GROUP_LABEL[g]}</option>)}
+                    </select>
+                    <button type="button" onClick={addCustomStaple} disabled={addingStaple || !newStapleName.trim()}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold text-white disabled:opacity-40"
+                      style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                      {addingStaple ? '…' : 'Add'}
+                    </button>
+                  </div>
+                </div>
               )}
               <div className="flex gap-3 mt-2">
                 <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
