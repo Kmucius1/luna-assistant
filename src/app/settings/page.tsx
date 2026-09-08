@@ -6,7 +6,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { LoadingPage } from '@/components/ui/loading'
 import { createClient } from '@/lib/supabase/client'
 import { AssistantProfile } from '@/types'
-import { Sparkles, Save, User, Brain, Sun, Moon, Mail, Calendar, Plug, LogOut, Check, RefreshCw, AlertTriangle, X, ExternalLink, DollarSign, Bell } from 'lucide-react'
+import { Sparkles, Save, User, Brain, Sun, Moon, Mail, Calendar, Plug, LogOut, Check, RefreshCw, AlertTriangle, X, ExternalLink, DollarSign, Bell, Utensils, MessageSquareOff } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from '@/lib/theme'
 import { PushNotificationSettings } from '@/components/settings/PushNotificationSettings'
@@ -181,6 +181,9 @@ export default function SettingsPage() {
   const [connStatus, setConnStatus] = useState<{ accounts: { email: string }[]; connected: boolean }>({ accounts: [], connected: false })
   const [calendarCount, setCalendarCount] = useState<number | null>(null)
   const [checkingCal, setCheckingCal]     = useState(false)
+  const [drypStatus, setDrypStatus] = useState<'checking' | 'connected' | 'unavailable'>('checking')
+  const [foodStatus, setFoodStatus] = useState<'checking' | 'connected' | 'unavailable'>('checking')
+  const [memoryStatus, setMemoryStatus] = useState<'checking' | 'active' | 'building' | 'unavailable'>('checking')
   const [connecting, setConnecting]       = useState<string | null>(null)
   const supabase = createClient()
 
@@ -225,6 +228,9 @@ export default function SettingsPage() {
     loadProfile()
     checkConnections()
     checkCalendar()
+    fetch('/api/dryp/stats').then(r => r.json()).then(d => setDrypStatus(d.connected ? 'connected' : 'unavailable')).catch(() => setDrypStatus('unavailable'))
+    fetch('/api/food/pantry').then(r => r.ok ? r.json() : Promise.reject()).then(() => setFoodStatus('connected')).catch(() => setFoodStatus('unavailable'))
+    fetch('/api/luna/memory').then(r => r.json()).then(d => setMemoryStatus((d.entries ?? []).length > 0 ? 'active' : 'building')).catch(() => setMemoryStatus('unavailable'))
   }, [loadProfile, checkConnections, checkCalendar])
 
   async function handleDisconnect(email: string) {
@@ -386,6 +392,50 @@ export default function SettingsPage() {
                   </p>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* ── DATA SOURCES ─────────────────────────────────────── */}
+          <div style={CARD}>
+            <SectionLabel icon={<Plug className="h-4 w-4" style={{ color: '#5E5474' }} />} text="Data Sources" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {[
+                {
+                  icon: <Plug className="h-4 w-4" />, label: 'DRYP CRM',
+                  ok: drypStatus === 'connected',
+                  title: drypStatus === 'checking' ? 'Checking…' : drypStatus === 'connected' ? 'Connected' : 'Not connected',
+                  sub: drypStatus === 'connected' ? 'Live task, account, and pipeline data' : 'Unavailable right now — planning will show fewer tasks than usual',
+                },
+                {
+                  icon: <Utensils className="h-4 w-4" />, label: 'Food Inventory',
+                  ok: foodStatus === 'connected',
+                  title: foodStatus === 'checking' ? 'Checking…' : foodStatus === 'connected' ? 'Connected' : 'Not connected',
+                  sub: foodStatus === 'connected' ? 'Pantry, staples, and grocery lists syncing' : 'Unavailable right now',
+                },
+                {
+                  icon: <Brain className="h-4 w-4" />, label: 'Personal Memory',
+                  ok: memoryStatus === 'active' || memoryStatus === 'building',
+                  title: memoryStatus === 'checking' ? 'Checking…' : memoryStatus === 'active' ? 'Active' : memoryStatus === 'building' ? 'Building' : 'Unavailable',
+                  sub: memoryStatus === 'active' ? 'Learning from your days and weeks' : memoryStatus === 'building' ? 'No entries yet — builds up as you use Luna' : 'Unavailable right now',
+                },
+                {
+                  icon: <MessageSquareOff className="h-4 w-4" />, label: 'Text / iMessage',
+                  ok: false, title: 'Not connected',
+                  sub: 'No text/SMS access exists — Luna never reads your messages',
+                },
+              ].map(row => (
+                <div key={row.label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: row.ok ? 'rgba(90,138,90,0.2)' : 'rgba(255,255,255,0.55)',
+                    border: `1px solid ${row.ok ? 'rgba(90,138,90,0.4)' : 'rgba(180,150,100,0.18)'}` }}>
+                    <span style={{ color: row.ok ? '#8AB88A' : '#5E5474' }}>{row.icon}</span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, fontWeight: 600, color: row.ok ? '#100C1E' : '#5E5474' }}>{row.label} — {row.title}</p>
+                    <p style={{ fontSize: 10, color: row.ok ? '#8AB88A' : '#5E5474' }}>{row.sub}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
