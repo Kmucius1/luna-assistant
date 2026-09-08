@@ -19,6 +19,7 @@ interface WeeklyPlanJson {
 interface WeeklyPlanRow { plan_json: WeeklyPlanJson }
 interface WhatCanIEatOption { type: string; title: string; minutes: number; steps: string[]; missing_ingredients: string[] }
 interface LogEntry { id: string; meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'; source: 'planned' | 'custom'; title: string; calories: number; protein_g: number }
+interface CookedLeftover { id: string; meal_name: string; cooked_at: string; safe_until: string; isPastSafeWindow: boolean }
 
 const MOODS = ['Just hungry', 'Tired', 'Overwhelmed', "Don't feel like cooking"] as const
 
@@ -46,11 +47,41 @@ export function MealPlanView() {
   const [loggingMeal, setLoggingMeal] = useState<string | null>(null)
   const [logSheetOpen, setLogSheetOpen] = useState(false)
 
+  const [leftovers, setLeftovers] = useState<CookedLeftover[]>([])
+  const [savingLeftover, setSavingLeftover] = useState<string | null>(null)
+
   const loadLog = () => {
     fetch('/api/food/log', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => setLogEntries(d.entries ?? []))
       .catch(() => {})
+  }
+
+  const loadLeftovers = () => {
+    fetch('/api/food/cooked-leftovers', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => setLeftovers(d.leftovers ?? []))
+      .catch(() => {})
+  }
+
+  async function saveLeftover(meal: { id: string; title: string }) {
+    setSavingLeftover(meal.id)
+    try {
+      await fetch('/api/food/cooked-leftovers', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ meal_name: meal.title, meal_type: meal.id }),
+      })
+      loadLeftovers()
+    } finally {
+      setSavingLeftover(null)
+    }
+  }
+
+  async function resolveLeftover(id: string, status: 'consumed' | 'discarded' | 'frozen') {
+    setLeftovers(prev => prev.filter(l => l.id !== id))
+    await fetch(`/api/food/cooked-leftovers/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
+    }).catch(() => loadLeftovers())
   }
 
   useEffect(() => {
@@ -59,6 +90,7 @@ export function MealPlanView() {
       .then(d => setPlan(d.plan))
       .finally(() => setPlanLoading(false))
     loadLog()
+    loadLeftovers()
   }, [])
 
   async function generatePlan() {
@@ -210,6 +242,11 @@ export function MealPlanView() {
                     <button type="button" className={styles.makeThisButton} onClick={() => setMakeThisMeal({ title: meal.title, prepNote: meal.description })}>
                       <ChefHat size={14} /> Make This
                     </button>
+                    {meal.id !== 'breakfast' && (
+                      <button type="button" className={styles.makeThisButton} onClick={() => saveLeftover(meal)} disabled={savingLeftover === meal.id}>
+                        <Soup size={14} /> {savingLeftover === meal.id ? 'Saving…' : 'Save leftovers (safe 4 days)'}
+                      </button>
+                    )}
                   </div>
                 </div>
               )
@@ -225,6 +262,27 @@ export function MealPlanView() {
                   onClick={() => goToMeal(i)}
                   aria-label={`${meal.label}`}
                 />
+              ))}
+            </div>
+          )}
+
+          {leftovers.length > 0 && (
+            <div className={styles.card}>
+              <div className={styles.sectionHeader} style={{ marginBottom: 10 }}>Cooked Leftovers</div>
+              {leftovers.map(lo => (
+                <div key={lo.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', gap: 8 }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600 }}>{lo.meal_name}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 11.5, color: lo.isPastSafeWindow ? '#B23B3B' : 'var(--ink-3, #5E5474)' }}>
+                      {lo.isPastSafeWindow ? `Past safe window (was safe until ${lo.safe_until}) — discard or confirm frozen` : `Safe until ${lo.safe_until}`}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <button type="button" onClick={() => resolveLeftover(lo.id, 'consumed')} style={{ fontSize: 11, fontWeight: 600, padding: '5px 9px', borderRadius: 10, border: '1px solid rgba(180,150,100,0.2)', background: 'transparent', cursor: 'pointer' }}>Used it</button>
+                    <button type="button" onClick={() => resolveLeftover(lo.id, 'frozen')} style={{ fontSize: 11, fontWeight: 600, padding: '5px 9px', borderRadius: 10, border: '1px solid rgba(180,150,100,0.2)', background: 'transparent', cursor: 'pointer' }}>Froze it</button>
+                    <button type="button" onClick={() => resolveLeftover(lo.id, 'discarded')} style={{ fontSize: 11, fontWeight: 600, padding: '5px 9px', borderRadius: 10, border: '1px solid rgba(224,94,94,0.3)', color: '#B23B3B', background: 'transparent', cursor: 'pointer' }}>Discard</button>
+                  </div>
+                </div>
               ))}
             </div>
           )}

@@ -24,6 +24,23 @@ const STORAGE_SECTIONS: { value: 'fridge' | 'freezer' | 'pantry'; label: string;
   { value: 'pantry', label: 'Pantry Shelf', icon: Package },
 ]
 
+// Universal 4-state stock tracking (in stock / low / empty / unknown) for
+// EVERY pantry item, not just the named staples — the same status column
+// already backs both, this just exposes it in the UI here too. "Unknown"
+// is null (no status ever set), matching the pantry-staples design.
+type StockStatus = 'in_stock' | 'low' | 'empty' | null | undefined
+function statusLabel(s: StockStatus): string {
+  return s === 'in_stock' ? 'In stock' : s === 'low' ? 'Low' : s === 'empty' ? 'Empty' : 'Unknown'
+}
+function statusClass(s: StockStatus): 'expiry_ok' | 'expiry_soon' | 'expiry_expired' | 'expiry_none' {
+  return s === 'in_stock' ? 'expiry_ok' : s === 'low' ? 'expiry_soon' : s === 'empty' ? 'expiry_expired' : 'expiry_none'
+}
+function nextStatus(s: StockStatus): 'in_stock' | 'low' | 'empty' {
+  if (s === 'in_stock') return 'low'
+  if (s === 'low') return 'empty'
+  return 'in_stock'
+}
+
 function expiryLabel(dateStr: string | null): { text: string; urgency: 'expired' | 'soon' | 'ok' | 'none' } {
   if (!dateStr) return { text: 'No date', urgency: 'none' }
   const days = Math.ceil((new Date(dateStr).getTime() - new Date(new Date().toDateString()).getTime()) / 86_400_000)
@@ -86,6 +103,14 @@ export function PantryView() {
     } finally {
       setAdding(false)
     }
+  }
+
+  async function cycleStatus(item: PantryItem) {
+    const next = nextStatus(item.status)
+    setPantry(p => p.map(i => (i.id === item.id ? { ...i, status: next } : i)))
+    await fetch(`/api/food/pantry/${item.id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: next }),
+    }).catch(() => {})
   }
 
   async function markConsumed(id: string) {
@@ -311,12 +336,15 @@ export function PantryView() {
                         <div className={styles.pantryRowMain} onClick={() => startEdit(item)}>
                           <span className={styles.pantryName}>{item.name}</span>
                           {item.quantity && <span className={styles.pantryQty}>{item.quantity}</span>}
-                          {item.staple_group && item.status === 'empty' && (
-                            <span className={`${styles.pantryExpiry} ${styles.expiry_expired}`}>Empty</span>
-                          )}
-                          {item.staple_group && item.status === 'low' && (
-                            <span className={`${styles.pantryExpiry} ${styles.expiry_soon}`}>Low</span>
-                          )}
+                          <button
+                            type="button"
+                            onClick={e => { e.stopPropagation(); cycleStatus(item) }}
+                            className={`${styles.pantryExpiry} ${styles[statusClass(item.status)]}`}
+                            style={{ border: 'none', cursor: 'pointer' }}
+                            aria-label={`${item.name} stock status — tap to change`}
+                          >
+                            {statusLabel(item.status)}
+                          </button>
                         </div>
                         <span className={`${styles.pantryExpiry} ${styles[`expiry_${exp.urgency}`]}`}>{exp.text}</span>
                         {section.value !== 'freezer' && (

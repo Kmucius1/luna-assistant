@@ -9,7 +9,7 @@ const MEAL_ROTATION_PROSE = Object.entries(ZOE_MEAL_ROTATION_BY_DAY)
   .map(([day, note]) => `- ${day}: ${note}`)
   .join('\n')
 
-function buildSystem(foodProfileText: string, neverFoods: string[]): string {
+function buildSystem(foodProfileText: string, neverFoods: string[], leftoversText: string): string {
   return `You are Luna, Zoe's personal meal planner and grocery assistant.
 
 ${ZOE_LIFESTYLE_PROFILE}
@@ -24,7 +24,8 @@ Keep meals practical for a 5:00 AM wake-up, 5:45 AM gym arrival, and protected w
 HER WEEKLY MEAL ROTATION — a suggestion pool to draw from, not a rigid requirement. Skip a day's theme whenever real context (cravings, what's on hand, meals out) points somewhere better:
 ${MEAL_ROTATION_PROSE}
 
-COOKED-LEFTOVER FOOD SAFETY: cooked chicken/protein is only safe as leftovers for 3-4 days refrigerated. Do not suggest Sunday's cooked chicken as a Thursday, Friday, or Saturday leftover unless the prep_note explicitly says a portion was frozen.
+COOKED-LEFTOVER FOOD SAFETY: cooked chicken/protein is only safe as leftovers for 3-4 days refrigerated. Do not suggest reusing a cooked dish as a leftover meal beyond that window unless the prep_note explicitly says a portion was frozen.
+${leftoversText}
 
 Return ONLY valid JSON in this shape:
 {
@@ -103,6 +104,20 @@ export async function POST(req: NextRequest) {
       s => stapleStatusByName.get(s.name.toLowerCase()) === 'in_stock',
     )
 
+    // Real cooked-leftover safety facts, not just an advisory rule — may not
+    // exist yet if that migration hasn't been run.
+    let activeLeftovers: { meal_name: string; cooked_at: string; safe_until: string }[] = []
+    try {
+      const { data, error } = await supabase
+        .from('cooked_leftovers')
+        .select('meal_name, cooked_at, safe_until')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .gte('safe_until', new Date().toISOString().split('T')[0])
+      if (error) throw error
+      activeLeftovers = data ?? []
+    } catch { /* migration not applied yet */ }
+
     const foodProfile = (foodProfileRow ?? null) as FoodProfile | null
     const foodProfileText = formatFoodProfileForPrompt(foodProfile)
     const neverFoods = mergedNeverFoods(foodProfile)
@@ -151,7 +166,10 @@ Rules:
 - Frozen blueberries with peanut butter and PB&J sandwiches are welcome options.
 - Favor her Food Profile favorites and real chef technique/seasoning notes over generic suggestions.`
 
-    const raw = await callAI(buildSystem(foodProfileText, neverFoods), prompt, 3800)
+    const leftoversText = activeLeftovers.length
+      ? `Real cooked leftovers on hand right now, safe to reuse until their listed date: ${activeLeftovers.map(l => `${l.meal_name} (safe until ${l.safe_until})`).join(', ')}. Feel free to plan a meal around using one of these up before it expires.`
+      : ''
+    const raw = await callAI(buildSystem(foodProfileText, neverFoods, leftoversText), prompt, 3800)
     const parsed = parseAIJson<{ grocery_list?: Record<string, { item: string; quantity?: string; used_for?: string[] }[]> }>(raw)
 
     // Low/empty staples are a deterministic fact, not a judgment call — merge

@@ -76,6 +76,10 @@ export async function POST(req: NextRequest) {
         quantity: i.quantity?.trim() || null,
         expires_on: expiresOn,
         source: i.source ?? 'manual',
+        // A newly added item is, by definition, something she just
+        // confirmed having — default it into the universal in-stock/low/
+        // empty tracking from day one rather than leaving it "unknown."
+        status: 'in_stock',
       }
     })
 
