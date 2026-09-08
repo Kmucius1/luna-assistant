@@ -41,7 +41,7 @@ const TYPE_STYLE: Record<string, { bg: string; color: string; dot: string }> = {
   commute:  { bg: 'rgba(94,84,116,0.1)',    color: 'var(--ink-3)',  dot: 'rgba(94,84,116,0.3)' },
 }
 
-interface ScheduleBlock { time: string; label: string; detail?: string; type: string; anchor?: boolean; emoji?: string }
+interface ScheduleBlock { time: string; label: string; detail?: string; type: string; anchor?: boolean; emoji?: string; completed?: boolean }
 interface CommsSummary { urgent: number; needsReview: number; drypClient: number; meetings: number; topAction: string }
 interface DayPlan {
   day_energy: string
@@ -143,6 +143,22 @@ export default function PlanMyDayPage() {
         energyRating: energy ?? 7, moodRating: mood ?? 7,
         onMind, hadDream: false, dreamText: '', feeling: '', supportNeed: '', prideGoal: '',
       }),
+    }).catch(() => {})
+  }
+
+  // Real-time adjustment + schedule repair: patches exactly the one block
+  // she acted on, in place, rather than regenerating the whole day.
+  async function updateScheduleBlock(index: number, action: 'complete' | 'uncomplete' | 'remove') {
+    setPlan(prev => {
+      if (!prev) return prev
+      const schedule = [...prev.schedule]
+      if (action === 'remove') schedule.splice(index, 1)
+      else schedule[index] = { ...schedule[index], completed: action === 'complete' }
+      return { ...prev, schedule }
+    })
+    await fetch('/api/home/day-plan', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ blockIndex: index, action, tz: Intl.DateTimeFormat().resolvedOptions().timeZone }),
     }).catch(() => {})
   }
 
@@ -587,7 +603,7 @@ export default function PlanMyDayPage() {
                 {plan.comms_summary && (plan.comms_summary.urgent > 0 || plan.comms_summary.needsReview > 0) && (
                   <>
                     <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>Communication</p>
-                    <Link href="/email" style={{ textDecoration: 'none' }}>
+                    <Link href="/communications" style={{ textDecoration: 'none' }}>
                       <div style={{ ...GLASS, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <Mail className="h-4 w-4" style={{ color: '#A8496E' }} />
@@ -713,16 +729,22 @@ export default function PlanMyDayPage() {
                         {plan.schedule.map((block, i) => {
                           const style = TYPE_STYLE[block.type] ?? TYPE_STYLE.work
                           const isAnchor = block.anchor
+                          const done = block.completed
                           return (
-                            <div key={i} style={{ display: 'flex', gap: 14, paddingBottom: 14 }}>
-                              <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 3 }}>
-                                <div style={{ width: isAnchor ? 14 : 10, height: isAnchor ? 14 : 10, borderRadius: '50%', background: isAnchor ? style.dot : 'rgba(94,84,116,0.25)', border: isAnchor ? `2px solid ${style.dot}` : '1.5px solid rgba(94,84,116,0.25)', flexShrink: 0, zIndex: 1, marginLeft: isAnchor ? -2 : 0 }} />
-                              </div>
+                            <div key={i} style={{ display: 'flex', gap: 14, paddingBottom: 14, opacity: done ? 0.55 : 1 }}>
+                              <button type="button" onClick={() => updateScheduleBlock(i, done ? 'uncomplete' : 'complete')} aria-label={done ? 'Mark not done' : 'Mark done'}
+                                style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 3, background: 'none', border: 'none', cursor: 'pointer' }}>
+                                <div style={{ width: isAnchor ? 14 : 10, height: isAnchor ? 14 : 10, borderRadius: '50%', background: done ? '#8AB88A' : (isAnchor ? style.dot : 'rgba(94,84,116,0.25)'), border: isAnchor ? `2px solid ${done ? '#8AB88A' : style.dot}` : '1.5px solid rgba(94,84,116,0.25)', flexShrink: 0, zIndex: 1, marginLeft: isAnchor ? -2 : 0 }} />
+                              </button>
                               <div style={{ flex: 1, paddingBottom: 2 }}>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: block.detail ? 3 : 0 }}>
                                   <span style={{ fontSize: isAnchor ? 12 : 11, fontWeight: 700, color: style.color, flexShrink: 0, minWidth: 54 }}>{block.time}</span>
                                   <span style={{ fontSize: 14, flexShrink: 0 }}>{block.emoji ?? ''}</span>
-                                  <p style={{ fontSize: isAnchor ? 14 : 13, fontWeight: isAnchor ? 700 : 500, color: isAnchor ? 'var(--ink-1)' : 'var(--ink-2)', lineHeight: 1.4 }}>{block.label}</p>
+                                  <p style={{ fontSize: isAnchor ? 14 : 13, fontWeight: isAnchor ? 700 : 500, color: isAnchor ? 'var(--ink-1)' : 'var(--ink-2)', lineHeight: 1.4, textDecoration: done ? 'line-through' : 'none', flex: 1 }}>{block.label}</p>
+                                  {!isAnchor && (
+                                    <button type="button" onClick={() => updateScheduleBlock(i, 'remove')} aria-label="Remove this block"
+                                      style={{ fontSize: 10, color: 'var(--ink-4)', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>✕</button>
+                                  )}
                                 </div>
                                 {block.detail && <p style={{ fontSize: 12, color: 'var(--ink-3)', lineHeight: 1.55, marginLeft: 62 }}>{block.detail}</p>}
                               </div>
