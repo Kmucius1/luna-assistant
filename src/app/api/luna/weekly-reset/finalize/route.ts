@@ -124,7 +124,27 @@ export async function POST(req: NextRequest) {
       source: 'dryp' as const,
     }))
 
-    const topCandidates = [...scoredLocal, ...scoredDryp]
+    // Bills due this week are a real financial urgency, not a task she's
+    // manually entered — feed them through the same objective scorer so an
+    // overdue/due-soon bill can actually compete for a top_3_business slot.
+    const scoredBills = await (async () => {
+      try {
+        const weekEnd = new Date(now); weekEnd.setDate(weekEnd.getDate() + 7)
+        const { data } = await db
+          .from('bills')
+          .select('name, due_date, expected_amount')
+          .eq('user_id', ZOE_USER_ID)
+          .in('status', ['upcoming', 'needs_review'])
+          .lte('due_date', weekEnd.toISOString().split('T')[0])
+        return ((data ?? []) as { name: string; due_date: string; expected_amount: number | null }[]).map(b => ({
+          title: `Pay ${b.name}${b.expected_amount ? ` ($${b.expected_amount.toFixed(0)})` : ''}`,
+          score: calculatePriorityScore({ urgency_level: b.due_date <= now.toISOString().split('T')[0] ? 'critical' : 'high', due_date: b.due_date }),
+          source: 'local' as const,
+        }))
+      } catch { return [] }
+    })()
+
+    const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills]
       .sort((a, b) => b.score - a.score)
       .slice(0, 8)
 

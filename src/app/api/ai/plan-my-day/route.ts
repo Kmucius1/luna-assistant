@@ -246,7 +246,28 @@ export async function POST(req: NextRequest) {
       score: calculatePriorityScore({ urgency_level: drypPriorityToUrgency(t.priority), due_date: t.due_date }),
       source: 'dryp' as const,
     }))
-    const topCandidates = [...scoredLocal, ...scoredDryp].sort((a, b) => b.score - a.score).slice(0, 6)
+
+    // A bill due today or overdue is a real financial urgency, not a task
+    // she's manually entered — feed it through the same objective scorer
+    // as everything else instead of leaving bills invisible to planning.
+    const scoredBills = await (async () => {
+      try {
+        const db = createAdminClient()
+        const { data } = await db
+          .from('bills')
+          .select('name, due_date, expected_amount')
+          .eq('user_id', ZOE_USER_ID)
+          .in('status', ['upcoming', 'needs_review'])
+          .lte('due_date', localDateKey(new Date(new Date().getTime() + 7 * 86_400_000), tz))
+        return ((data ?? []) as { name: string; due_date: string; expected_amount: number | null }[]).map(b => ({
+          title: `Pay ${b.name}${b.expected_amount ? ` ($${b.expected_amount.toFixed(0)})` : ''}`,
+          score: calculatePriorityScore({ urgency_level: b.due_date <= localDateKey(new Date(), tz) ? 'critical' : 'high', due_date: b.due_date }),
+          source: 'money' as const,
+        }))
+      } catch { return [] }
+    })()
+
+    const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills].sort((a, b) => b.score - a.score).slice(0, 6)
 
     const movementLine = movementChoice === 'gym'
       ? `Movement today: gym (${gymFocus})`
