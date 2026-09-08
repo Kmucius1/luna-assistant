@@ -55,6 +55,7 @@ interface DayPlan {
   schedule: ScheduleBlock[]
   top_3?: { title: string; reason: string }[]
   resolved_location?: 'home' | 'office' | 'split'
+  work_items?: { title: string; source: string }[]
 }
 
 const WAKE_TIMES = ['5:00 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM','7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM']
@@ -584,19 +585,37 @@ export default function PlanMyDayPage() {
                 )}
 
                 {plan.comms_summary && (plan.comms_summary.urgent > 0 || plan.comms_summary.needsReview > 0) && (
-                  <Link href="/email" style={{ textDecoration: 'none' }}>
-                    <div style={{ ...GLASS, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Mail className="h-4 w-4" style={{ color: '#A8496E' }} />
-                        <div>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>{plan.comms_summary.urgent} urgent · {plan.comms_summary.needsReview} need review</p>
-                          {plan.comms_summary.topAction && <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 1 }}>{plan.comms_summary.topAction}</p>}
+                  <>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>Communication</p>
+                    <Link href="/email" style={{ textDecoration: 'none' }}>
+                      <div style={{ ...GLASS, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <Mail className="h-4 w-4" style={{ color: '#A8496E' }} />
+                          <div>
+                            <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>{plan.comms_summary.urgent} urgent · {plan.comms_summary.needsReview} need review</p>
+                            {plan.comms_summary.topAction && <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 1 }}>{plan.comms_summary.topAction}</p>}
+                          </div>
                         </div>
+                        <ArrowRight className="h-4 w-4" style={{ color: 'var(--ink-4)' }} />
                       </div>
-                      <ArrowRight className="h-4 w-4" style={{ color: 'var(--ink-4)' }} />
-                    </div>
-                  </Link>
+                    </Link>
+                  </>
                 )}
+
+                {!!plan.work_items?.length && (
+                  <>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>Work</p>
+                    <div style={{ ...GLASS, padding: 16 }}>
+                      {plan.work_items.map((w, i) => (
+                        <p key={i} style={{ fontSize: 12.5, color: 'var(--ink-2)', marginBottom: i === plan.work_items!.length - 1 ? 0 : 6 }}>
+                          • {w.title} <span style={{ color: 'var(--ink-4)', fontSize: 10.5 }}>[{w.source}]</span>
+                        </p>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>Today</p>
 
                 {(() => {
                   const breakfastBlock = plan.schedule?.find(b => /breakfast/i.test(b.label + ' ' + (b.detail ?? '')))

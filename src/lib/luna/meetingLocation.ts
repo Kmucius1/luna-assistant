@@ -1,4 +1,4 @@
-import { ZOE_KNOWN_LOCATIONS } from './zoeLifestyleProfile'
+import { ZOE_KNOWN_LOCATIONS, DEFAULT_MEETING_DRIVE_MINUTES } from './zoeLifestyleProfile'
 import type { ClientRosterEntry } from '@/lib/dryp-crm'
 
 export type MeetingLocationType = 'virtual' | 'in_person_office' | 'in_person_client' | 'unclear'
@@ -61,4 +61,36 @@ export function classifyMeetingLocation(
   }
 
   return 'unclear'
+}
+
+export interface TravelBuffer {
+  driveMinutes: number
+  bufferBeforeMinutes: number
+  bufferAfterMinutes: number
+  locationLabel: string
+}
+
+// Estimated (not live-traffic) drive time and a getting-ready/parking
+// buffer around an in-person meeting — the deterministic piece of "drive
+// time, traffic, parking, buffer" this app can actually compute without a
+// maps integration. Returns null for virtual/unclear events, since there's
+// no real travel to buffer around.
+export function estimateTravelBuffer(
+  event: MeetingClassificationInput,
+  clientRoster: ClientRosterEntry[] = [],
+): TravelBuffer | null {
+  const locationType = classifyMeetingLocation(event, clientRoster)
+  if (locationType !== 'in_person_office' && locationType !== 'in_person_client') return null
+
+  const text = event.location || event.description || ''
+  const known = ZOE_KNOWN_LOCATIONS.find(loc => loc.match.some(m => text.toLowerCase().includes(m)))
+  const driveMinutes = known?.driveMinutes ?? DEFAULT_MEETING_DRIVE_MINUTES
+  if (driveMinutes === 0) return null // "meeting at home" — no travel to buffer
+
+  return {
+    driveMinutes,
+    bufferBeforeMinutes: driveMinutes + 15, // + parking/walk-in time
+    bufferAfterMinutes: driveMinutes + 5,   // just the drive back
+    locationLabel: known?.label ?? 'the meeting location',
+  }
 }

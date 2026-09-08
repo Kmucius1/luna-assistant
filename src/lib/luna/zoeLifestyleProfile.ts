@@ -196,11 +196,19 @@ const BUSINESS_FOCUS_PROSE = Object.entries(ZOE_BUSINESS_FOCUS_BY_DAY)
 
 export const ZOE_WEEKDAY_BUSINESS_FOCUS_PROSE = `WEEKDAY BUSINESS FOCUS\n${BUSINESS_FOCUS_PROSE}`
 
+// driveMinutes is a fixed estimate (same approximation Night Mode already
+// uses for its own location picker), not a live traffic API — no maps
+// integration exists to make this a real-time figure.
 export const ZOE_KNOWN_LOCATIONS = [
-  { label: 'DRYP office', match: ['dryp', 'the office'] },
-  { label: 'home', match: ['home'] },
-  { label: 'gym', match: ['gym'] },
+  { label: 'DRYP office', match: ['dryp', 'the office'], driveMinutes: 20 },
+  { label: 'home', match: ['home'], driveMinutes: 0 },
+  { label: 'gym', match: ['gym'], driveMinutes: 10 },
 ]
+
+// Fallback estimate for an in-person meeting at an address that doesn't
+// match a known location — a real street address is at least a real trip,
+// just of unknown length.
+export const DEFAULT_MEETING_DRIVE_MINUTES = 25
 
 // A suggestion pool the meal-plan AI draws from, not a rigid requirement —
 // same "reference data the model weighs against real context" treatment

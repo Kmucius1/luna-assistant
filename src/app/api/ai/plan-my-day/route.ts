@@ -7,7 +7,7 @@ import { ZOE_GYM_BY_DAY, ZOE_LIFESTYLE_PROFILE, ZOE_BUSINESS_FOCUS_BY_DAY, ZOE_W
 import { getTodayEvents, type CalendarEvent } from '@/lib/calendar'
 import { getAllValidGmailTokens, listGmailMessages } from '@/lib/gmail'
 import { getOpenTasks, getClientRoster, type DryphubTask } from '@/lib/dryp-crm'
-import { classifyMeetingLocation, type MeetingLocationType } from '@/lib/luna/meetingLocation'
+import { classifyMeetingLocation, estimateTravelBuffer, type MeetingLocationType } from '@/lib/luna/meetingLocation'
 import { deriveOutfitOccasion, OCCASION_PREP_MINUTES, OCCASION_LABEL } from '@/lib/luna/outfitOccasion'
 import { movementLabel, type MovementChoice } from '@/lib/luna/movementAlternatives'
 import { calculatePriorityScore } from '@/lib/priority'
@@ -33,6 +33,7 @@ interface ClassifiedEvent {
   locationType: MeetingLocationType
   rawLocation: string
   attendeeEmails: string[]
+  travelBuffer: ReturnType<typeof estimateTravelBuffer>
 }
 
 function flagTask(t: DryphubTask) {
@@ -72,6 +73,7 @@ PLANNING RULES
 - Include a "Get ready" block sized to the given prep-time-minutes budget for today's outfit occasion, positioned before any meeting it applies to.
 - Do not punish a changed or low-energy day. Scale optional tasks and keep anchors.
 - Weave real open tasks into the work blocks with realistic estimates.
+- When a calendar event lists a real in-person trip with a drive/buffer estimate, add real "leave by" and "drive back" blocks using those exact minutes — don't just show the meeting time floating with no travel around it.
 
 Return ONLY valid JSON:
 {
@@ -146,16 +148,17 @@ export async function POST(req: NextRequest) {
       getClientRoster().catch(() => []),
     ])
 
-    const classifiedEvents: ClassifiedEvent[] = events.map(ev => ({
-      title: ev.title,
-      time: ev.startTime,
-      locationType: classifyMeetingLocation(
-        { location: ev.location, description: ev.description, hangoutLink: ev.hangoutLink, conferenceData: ev.conferenceData, attendeeEmails: ev.attendeeEmails, title: ev.title },
-        clientRoster,
-      ),
-      rawLocation: ev.location ?? '',
-      attendeeEmails: ev.attendeeEmails ?? [],
-    }))
+    const classifiedEvents: ClassifiedEvent[] = events.map(ev => {
+      const eventInput = { location: ev.location, description: ev.description, hangoutLink: ev.hangoutLink, conferenceData: ev.conferenceData, attendeeEmails: ev.attendeeEmails, title: ev.title }
+      return {
+        title: ev.title,
+        time: ev.startTime,
+        locationType: classifyMeetingLocation(eventInput, clientRoster),
+        rawLocation: ev.location ?? '',
+        attendeeEmails: ev.attendeeEmails ?? [],
+        travelBuffer: estimateTravelBuffer(eventInput, clientRoster),
+      }
+    })
 
     // "Let Luna choose" resolves off today's real calendar, not a guess —
     // an in-person commitment means office, otherwise home.
@@ -244,7 +247,11 @@ export async function POST(req: NextRequest) {
       source: 'local' as const,
     }))
     const scoredDryp = drypTasks.map(t => ({
-      title: t.title + (t.account_name ? ` (${t.account_name})` : ''),
+      // A blocked task is deterministically re-labeled as a follow-up, not
+      // fresh startable work — the AI is told "isStuck" in prose elsewhere,
+      // but this makes the distinction real in the candidate list itself,
+      // so it can't quietly get rescheduled as if it were actionable.
+      title: (t.isStuck ? 'Follow up on blocked: ' : '') + t.title + (t.account_name ? ` (${t.account_name})` : ''),
       score: calculatePriorityScore({ urgency_level: drypPriorityToUrgency(t.priority), due_date: t.due_date }),
       source: 'dryp' as const,
     }))
@@ -290,9 +297,23 @@ export async function POST(req: NextRequest) {
 
     const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills, ...scoredInvoices].sort((a, b) => b.score - a.score).slice(0, 6)
 
-    const movementLine = movementChoice === 'gym'
-      ? `Movement today: gym (${gymFocus})`
-      : `Movement today: ${movementLabel(movementChoice)} — NOT the gym, do not schedule a gym block, schedule this instead.`
+    // Completion memory: if she already logged today's movement (gym or
+    // otherwise), the planner should know rather than blindly suggesting it
+    // again — the log exists precisely so this can be read back.
+    const alreadyMovedToday = await (async () => {
+      try {
+        const db = createAdminClient()
+        const todayKey = localDateKey(todayDate, tz)
+        const { data } = await db.from('workout_logs').select('activity_type').eq('user_id', ZOE_USER_ID).eq('date_key', todayKey).limit(1)
+        return data?.[0]?.activity_type ?? (data?.length ? 'gym' : null)
+      } catch { return null }
+    })()
+
+    const movementLine = alreadyMovedToday
+      ? `Movement today: already completed and logged (${movementLabel(alreadyMovedToday as MovementChoice)}) — do not schedule another movement/gym block, just acknowledge it's done.`
+      : movementChoice === 'gym'
+        ? `Movement today: gym (${gymFocus})`
+        : `Movement today: ${movementLabel(movementChoice)} — NOT the gym, do not schedule a gym block, schedule this instead.`
 
     const userPrompt = `Today: ${today} (${timeContext})
 ${businessFocus ? `Today's business focus theme: ${businessFocus.theme} — ${businessFocus.note}` : ''}
@@ -311,7 +332,8 @@ Hair today: ${hairWashDay ? 'Wash day, add 20 minutes for perm care' : 'Refresh 
 ${eveningPlans ? `Evening plans: ${eveningPlans}` : 'No fixed evening plans'}
 
 TODAY'S REAL CALENDAR EVENTS:
-${classifiedEvents.length ? classifiedEvents.map(e => `• ${e.time} — ${e.title} [${e.locationType}]`).join('\n') : 'No events on the calendar today.'}
+${classifiedEvents.length ? classifiedEvents.map(e => `• ${e.time} — ${e.title} [${e.locationType}]${e.travelBuffer ? ` — real in-person trip: ~${e.travelBuffer.driveMinutes} min drive to ${e.travelBuffer.locationLabel}, budget ${e.travelBuffer.bufferBeforeMinutes} min before (drive + park) and ${e.travelBuffer.bufferAfterMinutes} min after` : ''}`).join('\n') : 'No events on the calendar today.'}
+${classifiedEvents.filter(e => e.travelBuffer).length >= 2 ? 'Multiple in-person trips today — check whether any of them are close enough in time/place to combine, or far enough apart that going home in between and back out again would waste more time than staying out. Do not default to a home round-trip between them without checking this.' : ''}
 
 OUTFIT OCCASION TODAY: ${OCCASION_LABEL[occasion]} — budget ${prepMinutes} minutes for getting ready (hair, makeup, jewelry, outfit) as an explicit schedule block${prepMinutes === 0 ? ' (gym day — curly hair up, bangs down, no outfit decision needed)' : ''}.
 
@@ -356,6 +378,10 @@ Build the full day. Include the exact weekday gym focus and exercises under the 
       business_focus: businessFocus?.theme ?? null,
       comms_summary: commsCounts,
       resolved_location: location,
+      // The exact CRM tasks/deliverables considered for today — previously
+      // only used server-side to build the prompt, never actually shown to
+      // her as its own "Work" section distinct from the flowing schedule.
+      work_items: topCandidates.slice(0, 5).map(c => ({ title: c.title, source: c.source })),
     }
 
     try {

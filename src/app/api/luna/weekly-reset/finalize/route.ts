@@ -116,7 +116,9 @@ export async function POST(req: NextRequest) {
     }))
 
     const scoredDryp = (gather.dryp_tasks ?? []).map(t => ({
-      title: t.title + (t.account_name ? ` (${t.account_name})` : ''),
+      // Same deterministic re-label as the weekday planner — a blocked task
+      // reads as a follow-up, not fresh startable work.
+      title: (t.isStuck ? 'Follow up on blocked: ' : '') + t.title + (t.account_name ? ` (${t.account_name})` : ''),
       score: calculatePriorityScore({
         urgency_level: drypPriorityToUrgency(t.priority),
         due_date: t.due_date,
