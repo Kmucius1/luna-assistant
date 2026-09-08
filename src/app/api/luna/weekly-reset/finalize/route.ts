@@ -147,7 +147,7 @@ ${topCandidates.map(c => `• [${c.source}] ${c.title} (score ${c.score})`).join
 ZOE'S ANSWERS TO THIS WEEK'S QUESTIONNAIRE:
 ${JSON.stringify(questionnaireAnswers, null, 2)}
 
-Build the full Monday-through-Sunday plan now. Respect her stated work-location preference from the questionnaire where given, otherwise use the default pattern. If she said no groceries needed, set grocery_day to null. Keep every string value concise (one short sentence max) — this output has 7 days of nested detail, so brevity per field matters more than completeness of prose.`
+Build the full Monday-through-Sunday plan now. Respect her stated work-location preference from the questionnaire where given, otherwise use the default pattern. If she said no groceries needed, set grocery_day to null. Her laundry_choice and cleaning_choice answers (if present) are already decided and tracked separately from this response — set laundry_cleaning_day to a short one-line summary consistent with them (e.g. "Laundry moved to Monday, 30-min home reset today") rather than inventing a contradictory plan. Keep every string value concise (one short sentence max) — this output has 7 days of nested detail, so brevity per field matters more than completeness of prose.`
 
     // A 7-day nested plan is the most complex JSON shape anywhere in this
     // app — give it real headroom and a couple of self-repair passes rather

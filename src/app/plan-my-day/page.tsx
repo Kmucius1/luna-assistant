@@ -7,6 +7,7 @@ import { SmartInput } from '@/components/ui/SmartInput'
 import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 import { MOVEMENT_ALTERNATIVES, REST_OPTION, movementLabel, type MovementChoice } from '@/lib/luna/movementAlternatives'
 import { OCCASION_LABEL, type OutfitOccasion } from '@/lib/luna/outfitOccasion'
+import { ZOE_WORK_LOCATION_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import styles from './plan-my-day.module.css'
 
 const GLASS: React.CSSProperties = {
@@ -91,12 +92,16 @@ export default function PlanMyDayPage() {
   const [plan, setPlan] = useState<DayPlan | null>(null)
   const [error, setError] = useState('')
   const [checkingSaved, setCheckingSaved] = useState(true)
+  const [movementLogged, setMovementLogged] = useState(false)
+  const [movementLogging, setMovementLogging] = useState(false)
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   const isSaturday = weekday === 'Saturday'
 
   useEffect(() => {
-    setWeekday(new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date()))
+    const wd = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
+    setWeekday(wd)
+    setLocation(ZOE_WORK_LOCATION_BY_DAY[wd] ?? 'home')
   }, [])
 
   // If today's plan already exists, show it directly — this page is a
@@ -119,6 +124,24 @@ export default function PlanMyDayPage() {
         onMind, hadDream: false, dreamText: '', feeling: '', supportNeed: '', prideGoal: '',
       }),
     }).catch(() => {})
+  }
+
+  async function logNonGymMovement() {
+    if (!plan?.movement_choice || plan.movement_choice === 'gym') return
+    setMovementLogging(true)
+    try {
+      await fetch('/api/fitness/workouts', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          activityType: plan.movement_choice,
+          durationMinutes: 30,
+          tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
+      })
+      setMovementLogged(true)
+    } finally {
+      setMovementLogging(false)
+    }
   }
 
   async function submitJournal() {
@@ -462,6 +485,16 @@ export default function PlanMyDayPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <Dumbbell className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />
                         <span style={{ fontSize: 12, color: 'var(--ink-2)' }}>{movementLabel(plan.movement_choice)}</span>
+                        {plan.movement_choice !== 'gym' && plan.movement_choice !== 'rest' && (
+                          movementLogged ? (
+                            <span style={{ fontSize: 11, fontWeight: 700, color: '#4E8C6B' }}>✓ Done</span>
+                          ) : (
+                            <button type="button" onClick={logNonGymMovement} disabled={movementLogging}
+                              style={{ fontSize: 11, fontWeight: 600, color: '#8A6F2A', background: 'rgba(201,169,110,0.18)', border: 'none', borderRadius: 999, padding: '3px 10px', cursor: 'pointer' }}>
+                              {movementLogging ? '…' : 'Mark done'}
+                            </button>
+                          )
+                        )}
                       </div>
                     )}
                   </div>

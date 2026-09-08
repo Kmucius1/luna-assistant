@@ -33,7 +33,7 @@ const PALETTE = {
 type Step =
   | 'intro' | 'gathering' | 'review_week'
   | 'q_location' | 'q_groceries' | 'q_pantry_confirm' | 'q_grocery_time' | 'q_prep_time'
-  | 'q_personal' | 'q_energy' | 'q_rhythm'
+  | 'q_personal' | 'q_energy' | 'q_rhythm' | 'q_laundry' | 'q_cleaning'
   | 'finalizing' | 'result' | 'closing'
 
 interface StapleWithStatus { name: string; group: string; category: string; status: StapleStatus | null }
@@ -43,6 +43,28 @@ const STATUS_OPTIONS = [
   { value: 'low', label: 'Low' },
   { value: 'empty', label: 'Empty' },
 ]
+
+const LAUNDRY_OPTIONS = [
+  { value: 'full', label: 'Full laundry' },
+  { value: 'one_load', label: 'One load only' },
+  { value: 'move_monday', label: 'Move to Monday' },
+  { value: 'move_thursday', label: 'Move to Thursday' },
+]
+const LAUNDRY_LABEL: Record<string, string> = {
+  full: 'Full laundry', one_load: 'One load only', move_monday: 'Moved to Monday', move_thursday: 'Moved to Thursday',
+}
+
+const CLEANING_OPTIONS = [
+  { value: 'full', label: 'Full reset' },
+  { value: 'reset_30', label: '30-minute reset' },
+  { value: 'tidy_15', label: '15-minute tidy' },
+  { value: 'move_friday', label: 'Move to Friday' },
+  { value: 'move_saturday', label: 'Move to Saturday' },
+]
+const CLEANING_LABEL: Record<string, string> = {
+  full: 'Full reset', reset_30: '30-minute reset', tidy_15: '15-minute tidy', move_friday: 'Moved to Friday', move_saturday: 'Moved to Saturday',
+}
+const CLEANING_CATEGORIES = ['Bedroom', 'Bathroom', 'Kitchen', 'Floors', 'Clutter', 'Trash', 'Fridge', 'Bedding', 'Towels', 'Purse/bag cleanup']
 
 interface ClassifiedEvent { title: string; day: string; time: string; locationType: string; rawLocation: string }
 interface DrypTaskFlagged { id: string; title: string; account_name?: string; due_date?: string; isOverdue: boolean; isDueSoon: boolean; isStuck: boolean }
@@ -113,6 +135,43 @@ export default function WeeklyResetPage() {
   const [prepTimeSlots, setPrepTimeSlots] = useState<FreeSlot[]>([])
   const [groceryTimeSlot, setGroceryTimeSlot] = useState<string | null>(null)
   const [prepTimeSlot, setPrepTimeSlot] = useState<string | null>(null)
+
+  const [laundryChoice, setLaundryChoice] = useState<string | null>(null)
+  const [cleaningChoice, setCleaningChoice] = useState<string | null>(null)
+  const [cleaningCategories, setCleaningCategories] = useState<string[]>([])
+  const [laundryDone, setLaundryDone] = useState(false)
+  const [cleaningDone, setCleaningDone] = useState(false)
+  const [homeTasksSaving, setHomeTasksSaving] = useState(false)
+
+  function toggleCleaningCategory(cat: string) {
+    setCleaningCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
+  }
+
+  async function saveHomeTasksAndContinue() {
+    setHomeTasksSaving(true)
+    try {
+      await Promise.all([
+        laundryChoice ? fetch('/api/home/tasks', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'laundry', choice: laundryChoice }),
+        }) : Promise.resolve(),
+        cleaningChoice ? fetch('/api/home/tasks', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'cleaning', choice: cleaningChoice, categories: cleaningCategories }),
+        }) : Promise.resolve(),
+      ])
+    } catch { /* soft-fail — she can still finish the week */ } finally {
+      setHomeTasksSaving(false)
+    }
+    finalize()
+  }
+
+  async function markHomeTaskDone(type: 'laundry' | 'cleaning') {
+    if (type === 'laundry') setLaundryDone(true); else setCleaningDone(true)
+    await fetch('/api/home/tasks', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type, completed: true }),
+    }).catch(() => {})
+  }
 
   async function loadPantryAndSlots() {
     setPantryLoading(true)
@@ -187,6 +246,9 @@ export default function WeeklyResetPage() {
             unclear_confirmations: confirmedUnclear,
             grocery_time_slot: groceryTimeSlot,
             prep_time_slot: prepTimeSlot,
+            laundry_choice: laundryChoice,
+            cleaning_choice: cleaningChoice,
+            cleaning_categories: cleaningCategories,
           },
         }),
       })
@@ -486,8 +548,57 @@ export default function WeeklyResetPage() {
                 <button onClick={() => setStep('q_energy')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button onClick={finalize} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
-                  <Sparkles className="h-4 w-4" /> Build my week
+                <button onClick={() => setStep('q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_laundry' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Laundry this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pick what makes sense, or move it to a lighter day.</p>
+              <div className="mb-6"><ChoiceGrid options={LAUNDRY_OPTIONS} value={laundryChoice} onChange={setLaundryChoice} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_rhythm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_cleaning')} disabled={!laundryChoice} className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_cleaning' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Home reset?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>How much cleaning does this week actually need?</p>
+              <div className="mb-6"><ChoiceGrid options={CLEANING_OPTIONS} value={cleaningChoice} onChange={setCleaningChoice} /></div>
+              {(cleaningChoice === 'full' || cleaningChoice === 'reset_30') && (
+                <div className="mb-6">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>What needs it most? (optional)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {CLEANING_CATEGORIES.map(cat => {
+                      const active = cleaningCategories.includes(cat)
+                      return (
+                        <button key={cat} type="button" onClick={() => toggleCleaningCategory(cat)}
+                          className="px-3 py-2 rounded-full text-xs font-semibold transition-all"
+                          style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                          {cat}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_laundry')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={saveHomeTasksAndContinue} disabled={!cleaningChoice || homeTasksSaving} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  <Sparkles className="h-4 w-4" /> {homeTasksSaving ? 'Saving…' : 'Build my week'}
                 </button>
               </div>
             </div>
@@ -568,11 +679,35 @@ export default function WeeklyResetPage() {
                 )
               })}
 
-              <div className="p-5 flex items-center gap-4" style={CARD}>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4" style={{ color: 'var(--violet)' }} />
-                  <span className="text-xs" style={{ color: 'var(--text-2)' }}>Laundry/cleaning: {finalResult.laundry_cleaning_day}</span>
+              <div className="p-5 flex flex-col gap-3" style={CARD}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4" style={{ color: laundryDone ? '#4E8C6B' : 'var(--violet)' }} />
+                    <span className="text-xs" style={{ color: 'var(--text-2)' }}>
+                      Laundry: {laundryChoice ? LAUNDRY_LABEL[laundryChoice] : finalResult.laundry_cleaning_day}
+                    </span>
+                  </div>
+                  {laundryChoice && (laundryDone ? (
+                    <span className="text-xs font-semibold" style={{ color: '#4E8C6B' }}>Done</span>
+                  ) : (
+                    <button onClick={() => markHomeTaskDone('laundry')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>Mark done</button>
+                  ))}
                 </div>
+                {cleaningChoice && (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4" style={{ color: cleaningDone ? '#4E8C6B' : 'var(--violet)' }} />
+                      <span className="text-xs" style={{ color: 'var(--text-2)' }}>
+                        Cleaning: {CLEANING_LABEL[cleaningChoice]}{cleaningCategories.length ? ` — ${cleaningCategories.join(', ')}` : ''}
+                      </span>
+                    </div>
+                    {cleaningDone ? (
+                      <span className="text-xs font-semibold" style={{ color: '#4E8C6B' }}>Done</span>
+                    ) : (
+                      <button onClick={() => markHomeTaskDone('cleaning')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>Mark done</button>
+                    )}
+                  </div>
+                )}
                 {(groceryTimeSlot || finalResult.grocery_day) && (
                   <div className="flex items-center gap-2">
                     <ShoppingBasket className="h-4 w-4" style={{ color: 'var(--violet)' }} />
