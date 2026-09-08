@@ -10,9 +10,22 @@ import { getOpenTasks, getClientRoster, type DryphubTask } from '@/lib/dryp-crm'
 import { classifyMeetingLocation, type MeetingLocationType } from '@/lib/luna/meetingLocation'
 import { deriveOutfitOccasion, OCCASION_PREP_MINUTES, OCCASION_LABEL } from '@/lib/luna/outfitOccasion'
 import { movementLabel, type MovementChoice } from '@/lib/luna/movementAlternatives'
+import { calculatePriorityScore } from '@/lib/priority'
+import type { Task } from '@/types'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const STUCK_THRESHOLD_DAYS = 14
+
+// DRYP's `priority` field is free text, not a fixed union — same loose
+// mapping the Sunday Weekly Reset finalize route uses so DRYP tasks get a
+// real score instead of being skipped by the scorer entirely.
+function drypPriorityToUrgency(priority?: string): Task['urgency_level'] {
+  const p = (priority ?? '').toLowerCase()
+  if (p.includes('urgent') || p.includes('critical')) return 'critical'
+  if (p.includes('high')) return 'high'
+  if (p.includes('low')) return 'low'
+  return 'medium'
+}
 
 interface ClassifiedEvent {
   title: string
@@ -65,6 +78,7 @@ Return ONLY valid JSON:
   "day_energy": "1-2 sentence read of the day",
   "ai_message": "warm practical note from Luna",
   "gym_focus": "the correct weekday workout focus, or the movement choice label if not gym",
+  "top_3": [{ "title": "...", "reason": "short reason this matters today" }],
   "key_anchors": {
     "wake": "5:00 AM",
     "gym": "5:45 AM or null",
@@ -89,7 +103,7 @@ Return ONLY valid JSON:
 export async function POST(req: NextRequest) {
   try {
     interface PlanBody {
-      wakeTime?: string; gymTime?: string; location?: 'home' | 'office'
+      wakeTime?: string; gymTime?: string; location?: 'home' | 'office' | 'split' | 'auto'
       morningPlans?: string; workPlans?: string; workEndTime?: string
       hairWashDay?: boolean; eveningPlans?: string; movementChoice?: MovementChoice; tz?: string
     }
@@ -97,7 +111,7 @@ export async function POST(req: NextRequest) {
     const {
       wakeTime = '5:00 AM',
       gymTime = '5:45 AM',
-      location = 'home',
+      location: locationInput = 'home',
       morningPlans = '',
       workPlans = '',
       workEndTime = '6:00 PM',
@@ -140,6 +154,13 @@ export async function POST(req: NextRequest) {
       rawLocation: ev.location ?? '',
       attendeeEmails: ev.attendeeEmails ?? [],
     }))
+
+    // "Let Luna choose" resolves off today's real calendar, not a guess —
+    // an in-person commitment means office, otherwise home.
+    const hasInPersonToday = classifiedEvents.some(e => e.locationType === 'in_person_office' || e.locationType === 'in_person_client')
+    const location: 'home' | 'office' | 'split' = locationInput === 'auto'
+      ? (hasInPersonToday ? 'office' : 'home')
+      : locationInput
 
     const drypTasks = drypTasksRaw.map(flagTask)
     const overdue = drypTasks.filter(t => t.isOverdue)
@@ -185,31 +206,47 @@ export async function POST(req: NextRequest) {
     const prepMinutes = OCCASION_PREP_MINUTES[occasion]
 
     let taskList = ''
-    const ownTaskList = await (async () => {
+    interface OwnTaskRow { title: string; category?: string; project?: string; due_date?: string; urgency_level?: Task['urgency_level']; money_impact?: number }
+    const ownTasks: OwnTaskRow[] = await (async () => {
       try {
         const db = createAdminClient()
-        const { data: ownTasks } = await db
+        const { data } = await db
           .from('tasks')
-          .select('title, category, due_date, urgency_level, status')
+          .select('title, category, project, due_date, urgency_level, money_impact, status')
           .eq('user_id', ZOE_USER_ID)
           .not('status', 'in', '("done","cancelled")')
           .order('priority_score', { ascending: false })
           .limit(20)
-        interface OwnTaskRow { title: string; category?: string; due_date?: string; urgency_level?: string }
-        return (ownTasks ?? []).map((task: OwnTaskRow) =>
-          `• ${task.title}${task.category ? ` (${task.category})` : ''}${task.urgency_level ? ` [${task.urgency_level}]` : ''}${task.due_date ? ` — due ${task.due_date}` : ''}`
-        ).join('\n')
+        return (data ?? []) as OwnTaskRow[]
       } catch (dbError) {
         console.warn('[plan-my-day] own tasks unavailable:', dbError instanceof Error ? dbError.message : String(dbError))
-        return ''
+        return []
       }
     })()
+    const ownTaskList = ownTasks.map(task =>
+      `• ${task.title}${task.category ? ` (${task.category})` : ''}${task.urgency_level ? ` [${task.urgency_level}]` : ''}${task.due_date ? ` — due ${task.due_date}` : ''}`
+    ).join('\n')
     if (ownTaskList) taskList += `Her own tasks:\n${ownTaskList}\n\n`
     if (drypTasks.length) {
       taskList += `DRYP CRM open tasks (${overdue.length} overdue, ${dueSoon.length} due soon, ${stuck.length} stuck):\n` +
         drypTasks.map(t => `• ${t.title}${t.account_name ? ` (${t.account_name})` : ''}${t.priority ? ` [${t.priority}]` : ''}${t.due_date ? ` — due ${t.due_date.slice(0, 10)}` : ''}${t.isOverdue ? ' [OVERDUE]' : ''}${t.isStuck ? ' [STUCK]' : ''}`).join('\n')
     }
     if (!taskList.trim()) taskList = 'No open tasks were pulled. Build a calm, focused workday using her normal anchors.'
+
+    // Objective ranking first, same as the Sunday Weekly Reset finalize
+    // route — the AI phrases the top candidates, it doesn't invent the
+    // ranking, and every weekday plan gets a real Top 3, not just Sunday's.
+    const scoredLocal = ownTasks.map(t => ({
+      title: t.title,
+      score: calculatePriorityScore({ urgency_level: t.urgency_level, due_date: t.due_date, money_impact: t.money_impact, project: t.project, category: t.category }),
+      source: 'local' as const,
+    }))
+    const scoredDryp = drypTasks.map(t => ({
+      title: t.title + (t.account_name ? ` (${t.account_name})` : ''),
+      score: calculatePriorityScore({ urgency_level: drypPriorityToUrgency(t.priority), due_date: t.due_date }),
+      source: 'dryp' as const,
+    }))
+    const topCandidates = [...scoredLocal, ...scoredDryp].sort((a, b) => b.score - a.score).slice(0, 6)
 
     const movementLine = movementChoice === 'gym'
       ? `Movement today: gym (${gymFocus})`
@@ -223,7 +260,7 @@ ${routineContext}
 
 Wake time: ${wakeTime}
 ${movementChoice === 'gym' ? `Gym arrival: ${gymTime || '5:45 AM'}` : ''}
-Location: ${location === 'home' ? 'Working from home' : 'Going into the DRYP office'}
+Location: ${location === 'home' ? 'Working from home' : location === 'office' ? 'Going into the DRYP office' : 'A split day — partly home, partly office. Build in a real transition block between the two, not just a location label.'}
 ${morningPlans ? `Morning plans: ${morningPlans}` : ''}
 Protected work window: 10:00 AM to ${workEndTime || '6:00 PM'}
 ${workPlans ? `Work plans: ${workPlans}` : ''}
@@ -239,6 +276,9 @@ RECENT EMAIL (last 24h, flag anything urgent):
 ${emailSummary || 'No email data available.'}
 
 ${taskList}
+
+TOP-SCORED CANDIDATE TASKS (pre-ranked by an objective scorer — pick today's top_3 from these, don't invent new ones; break ties using today's business focus theme):
+${topCandidates.map(c => `• [${c.source}] ${c.title} (score ${c.score})`).join('\n') || 'None available — use today\'s business focus theme to name the top priority instead.'}
 
 Build the full day. Include the exact weekday gym focus and exercises under the gym block only if today's movement is gym. Protect breakfast, lunch, and dinner. Protect the 10:00 AM to ${workEndTime || '6:00 PM'} workday. Rank the business portion by today's focus theme. Keep the plan flexible, include buffers, and add one happiness or restoration block when realistic.`
 
@@ -272,6 +312,7 @@ Build the full day. Include the exact weekday gym focus and exercises under the 
       movement_choice: movementChoice,
       business_focus: businessFocus?.theme ?? null,
       comms_summary: commsCounts,
+      resolved_location: location,
     }
 
     try {

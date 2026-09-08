@@ -53,6 +53,8 @@ interface DayPlan {
   comms_summary?: CommsSummary
   key_anchors: { wake: string; gym: string | null; at_work: string; lunch: string; leave_work: string; wind_down: string; lights_out: string }
   schedule: ScheduleBlock[]
+  top_3?: { title: string; reason: string }[]
+  resolved_location?: 'home' | 'office' | 'split'
 }
 
 const WAKE_TIMES = ['5:00 AM','5:30 AM','6:00 AM','6:30 AM','7:00 AM','7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM']
@@ -68,7 +70,7 @@ export default function PlanMyDayPage() {
   const [weekday, setWeekday] = useState('')
 
   const [wakeTime, setWakeTime] = useState('6:00 AM')
-  const [location, setLocation] = useState<'home' | 'office'>('home')
+  const [location, setLocation] = useState<'home' | 'office' | 'split' | 'auto'>('home')
   const [morningPlans, setMorningPlans] = useState('')
   const [workPlans, setWorkPlans] = useState('')
   const [workEndTime, setWorkEndTime] = useState('6:00 PM')
@@ -83,6 +85,8 @@ export default function PlanMyDayPage() {
   const [journalUp, setJournalUp] = useState('')
   const [journalGrateful, setJournalGrateful] = useState('')
   const [journalTension, setJournalTension] = useState('')
+  const [journalCalm, setJournalCalm] = useState('')
+  const [journalGrounded, setJournalGrounded] = useState('')
 
   const [gymYes, setGymYes] = useState<boolean | null>(null)
   const [movementChoice, setMovementChoice] = useState<MovementChoice | null>(null)
@@ -149,6 +153,8 @@ export default function PlanMyDayPage() {
       journalUp && `Up and active: ${journalUp}`,
       journalGrateful && `Grateful for: ${journalGrateful}`,
       journalTension && `Tension or calm: ${journalTension}`,
+      journalCalm && `What's helping calm: ${journalCalm}`,
+      journalGrounded && `What would feel grounded today: ${journalGrounded}`,
     ].filter(Boolean).join('\n')
     if (!content) return
     fetch('/api/journal', {
@@ -346,17 +352,30 @@ export default function PlanMyDayPage() {
             {step === 'journal' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ fontSize: 13, color: 'var(--ink-3)', padding: '0 4px' }}>A short, calming journal — not another task.</p>
+                <div style={{ ...GLASS, padding: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <p style={{ fontSize: 12.5, fontStyle: 'italic', color: 'var(--ink-2)' }}>I am active and I am up.</p>
+                  <p style={{ fontSize: 12.5, fontStyle: 'italic', color: 'var(--ink-2)' }}>I am allowed to take the morning slowly.</p>
+                  <p style={{ fontSize: 12.5, fontStyle: 'italic', color: 'var(--ink-2)' }}>Going to the gym is already an accomplishment.</p>
+                </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>You&apos;re up and active — how does that feel?</p>
                   <SmartInput context="being up and active this morning" placeholder="Speak or tap..." value={journalUp} onChange={setJournalUp} patternType="morning" rows={2} autoSuggest={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>One thing you&apos;re grateful for right now</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>I am grateful to be calm — what&apos;s one thing?</p>
                   <SmartInput context="one thing grateful for right now" placeholder="Speak or tap..." value={journalGrateful} onChange={setJournalGrateful} patternType="morning" rows={2} autoSuggest={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>Notice: tension, or calm?</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What am I calm enough to notice? Tension, or calm?</p>
                   <SmartInput context="noticing tension or calm in the body" placeholder="Speak or tap..." value={journalTension} onChange={setJournalTension} patternType="morning" rows={2} autoSuggest={false} />
+                </div>
+                <div style={{ ...GLASS, padding: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What&apos;s helping you feel calm? <span style={{ fontWeight: 400, color: 'var(--ink-4)' }}>(optional)</span></p>
+                  <SmartInput context="what is helping her feel calm right now" placeholder="Speak or tap..." value={journalCalm} onChange={setJournalCalm} patternType="morning" rows={2} autoSuggest={false} />
+                </div>
+                <div style={{ ...GLASS, padding: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What would make today feel grounded, not rushed? <span style={{ fontWeight: 400, color: 'var(--ink-4)' }}>(optional)</span></p>
+                  <SmartInput context="what would make today feel grounded rather than rushed" placeholder="Speak or tap..." value={journalGrounded} onChange={setJournalGrounded} patternType="morning" rows={2} autoSuggest={false} />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={() => setStep('energy_mood')} style={{ flex: 'none', padding: '13px 18px', borderRadius: 16, border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', background: 'var(--surface-inactive)', color: 'var(--ink-3)' }}>
@@ -403,9 +422,14 @@ export default function PlanMyDayPage() {
 
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Where are you working?</p>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {([{ v: 'home', label: 'Work from home', icon: <Home className="h-3.5 w-3.5" /> }, { v: 'office', label: 'Going to office', icon: <Building2 className="h-3.5 w-3.5" /> }] as { v: 'home'|'office'; label: string; icon: React.ReactNode }[]).map(opt => (
-                      <button key={opt.v} onClick={() => setLocation(opt.v)} style={{ flex: 1, padding: '11px 8px', borderRadius: 16, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: location === opt.v ? 'rgba(201,169,110,0.2)' : 'var(--surface-inactive)', border: location === opt.v ? '1.5px solid rgba(201,169,110,0.4)' : '1px solid rgba(180,150,100,0.16)', color: location === opt.v ? '#8A6F2A' : 'var(--ink-3)' }}>{opt.icon}{opt.label}</button>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                    {([
+                      { v: 'home', label: 'Work from home', icon: <Home className="h-3.5 w-3.5" /> },
+                      { v: 'office', label: 'Going to office', icon: <Building2 className="h-3.5 w-3.5" /> },
+                      { v: 'split', label: 'Split day', icon: <RefreshCw className="h-3.5 w-3.5" /> },
+                      { v: 'auto', label: 'Let Luna choose', icon: <Sparkles className="h-3.5 w-3.5" /> },
+                    ] as { v: 'home' | 'office' | 'split' | 'auto'; label: string; icon: React.ReactNode }[]).map(opt => (
+                      <button key={opt.v} onClick={() => setLocation(opt.v)} style={{ padding: '11px 8px', borderRadius: 16, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: location === opt.v ? 'rgba(201,169,110,0.2)' : 'var(--surface-inactive)', border: location === opt.v ? '1.5px solid rgba(201,169,110,0.4)' : '1px solid rgba(180,150,100,0.16)', color: location === opt.v ? '#8A6F2A' : 'var(--ink-3)' }}>{opt.icon}{opt.label}</button>
                     ))}
                   </div>
                 </div>
@@ -473,6 +497,30 @@ export default function PlanMyDayPage() {
                   </div>
                 )}
 
+                {!!plan.top_3?.length && (
+                  <div style={{ ...GLASS, padding: 16 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Top 3 today</p>
+                    {plan.top_3.map((t, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: i === plan.top_3!.length - 1 ? 0 : 8 }}>
+                        <span style={{ flexShrink: 0, width: 18, height: 18, borderRadius: '50%', background: 'rgba(201,169,110,0.2)', color: '#8A6F2A', fontSize: 10, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1 }}>{i + 1}</span>
+                        <div>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-1)' }}>{t.title}</p>
+                          <p style={{ fontSize: 11.5, color: 'var(--ink-3)', marginTop: 1 }}>{t.reason}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {location === 'auto' && plan.resolved_location && (
+                  <div style={{ ...GLASS, padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--violet)' }} />
+                    <span style={{ fontSize: 12, color: 'var(--ink-2)' }}>
+                      Luna picked <strong>{plan.resolved_location === 'office' ? 'the office' : plan.resolved_location === 'split' ? 'a split day' : 'home'}</strong> based on today&apos;s calendar.
+                    </span>
+                  </div>
+                )}
+
                 {(plan.occasion || plan.movement_choice) && (
                   <div style={{ ...GLASS, padding: 16, display: 'flex', gap: 16 }}>
                     {plan.occasion && (
@@ -514,6 +562,47 @@ export default function PlanMyDayPage() {
                     </div>
                   </Link>
                 )}
+
+                {(() => {
+                  const breakfastBlock = plan.schedule?.find(b => /breakfast/i.test(b.label + ' ' + (b.detail ?? '')))
+                  const proteinBlock = plan.schedule?.find(b => /protein/i.test(b.label + ' ' + (b.detail ?? '')))
+                  const journalLogged = !!(journalUp || journalGrateful || journalTension || journalCalm || journalGrounded)
+                  const movementDetail = gymYes
+                    ? `Gym${plan.gym_focus ? ` — ${plan.gym_focus}` : ''}`
+                    : (movementChoice ? movementLabel(movementChoice) : '')
+                  const steps: { n: number; label: string; detail: string }[] = [
+                    { n: 1, label: 'Alarm', detail: wakeTime },
+                    { n: 2, label: 'Get out of bed', detail: '' },
+                    { n: 3, label: 'Shower', detail: 'The wake-up trigger' },
+                    { n: 4, label: 'Skincare / SPF', detail: '' },
+                    { n: 5, label: 'Hair', detail: hairWashDay ? 'Wash day — +20 min' : 'Curly hair up, bangs down' },
+                    { n: 6, label: 'Gym clothes', detail: '' },
+                    { n: 7, label: 'Tea', detail: '' },
+                    { n: 8, label: 'Breakfast', detail: breakfastBlock?.time ?? '' },
+                    { n: 9, label: 'Short journal', detail: journalLogged ? 'Logged' : 'Not logged yet' },
+                    { n: 10, label: 'Movement', detail: movementDetail },
+                    { n: 11, label: 'Protein', detail: proteinBlock?.time ?? '' },
+                    ...(gymYes ? [{ n: 12, label: 'Return home if needed', detail: '' }] : []),
+                    { n: 13, label: 'Quick refresh', detail: '' },
+                    { n: 14, label: plan.occasion === 'gym' ? 'Skincare, SPF, lip care, brows — no full makeup' : 'Makeup / hair', detail: plan.occasion && plan.occasion !== 'gym' ? OCCASION_LABEL[plan.occasion] : '' },
+                    { n: 15, label: 'Work outfit', detail: plan.occasion ? OCCASION_LABEL[plan.occasion] : '' },
+                    { n: 16, label: 'Business begins', detail: anchors?.at_work ?? '' },
+                  ]
+                  return (
+                    <div style={{ ...GLASS, padding: 16 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Your morning, step by step</p>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        {steps.map((s, i) => (
+                          <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderTop: i === 0 ? 'none' : '1px solid rgba(180,150,100,0.10)' }}>
+                            <span style={{ flexShrink: 0, width: 18, height: 18, borderRadius: '50%', background: 'rgba(201,169,110,0.16)', color: '#8A6F2A', fontSize: 9.5, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{s.n}</span>
+                            <span style={{ flex: 1, fontSize: 12.5, fontWeight: 600, color: 'var(--ink-1)' }}>{s.label}</span>
+                            {s.detail && <span style={{ fontSize: 11, color: 'var(--ink-3)', flexShrink: 0 }}>{s.detail}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {anchors && (
                   <div style={{ ...GLASS, padding: 16 }}>
