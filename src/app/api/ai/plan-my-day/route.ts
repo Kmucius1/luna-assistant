@@ -71,6 +71,7 @@ PLANNING RULES
 - Protect work from 10:00 AM to 6:00 PM every day unless a real fixed event says otherwise.
 - Breakfast, lunch, and dinner are mandatory anchors. Never omit them or schedule over them.
 - Include a "Get ready" block sized to the given prep-time-minutes budget for today's outfit occasion, positioned before any meeting it applies to.
+- Outfit direction: easy, classy, sexy, fashionable — professional when the occasion actually calls for it, never defaulting to overly formal. Avoid generic corporate/stiff styling language.
 - Do not punish a changed or low-energy day. Scale optional tasks and keep anchors.
 - Weave real open tasks into the work blocks with realistic estimates.
 - When a calendar event lists a real in-person trip with a drive/buffer estimate, add real "leave by" and "drive back" blocks using those exact minutes — don't just show the meeting time floating with no travel around it.
@@ -297,6 +298,30 @@ export async function POST(req: NextRequest) {
 
     const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills, ...scoredInvoices].sort((a, b) => b.score - a.score).slice(0, 6)
 
+    // Friday business money closeout — real DRYP financial data, not just
+    // the "Invoice & Close Loops" theme prose that used to be all Friday got.
+    const fridayMoneyCloseout = weekday === 'Friday' ? await (async () => {
+      try {
+        const db = createAdminClient()
+        const monday = new Date(); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7))
+        const weekStart = localDateKey(monday, tz)
+        const { data } = await db
+          .from('dryp_invoices')
+          .select('client_name, amount, status, paid_date')
+          .eq('user_id', ZOE_USER_ID)
+        const invoices = (data ?? []) as { client_name: string; amount: number; status: string; paid_date: string | null }[]
+        const needToSend = invoices.filter(i => ['draft', 'ready_to_invoice'].includes(i.status))
+        const outstanding = invoices.filter(i => ['sent', 'viewed', 'partially_paid', 'overdue'].includes(i.status))
+        const paidThisWeek = invoices.filter(i => i.paid_date && i.paid_date >= weekStart)
+        return {
+          needToSendCount: needToSend.length,
+          needToSendNames: needToSend.map(i => i.client_name),
+          outstandingTotal: outstanding.reduce((s, i) => s + i.amount, 0),
+          revenueClosedThisWeek: paidThisWeek.reduce((s, i) => s + i.amount, 0),
+        }
+      } catch { return null }
+    })() : null
+
     // Completion memory: if she already logged today's movement (gym or
     // otherwise), the planner should know rather than blindly suggesting it
     // again — the log exists precisely so this can be read back.
@@ -317,6 +342,7 @@ export async function POST(req: NextRequest) {
 
     const userPrompt = `Today: ${today} (${timeContext})
 ${businessFocus ? `Today's business focus theme: ${businessFocus.theme} — ${businessFocus.note}` : ''}
+${fridayMoneyCloseout ? `FRIDAY MONEY CLOSEOUT — real DRYP financial data: ${fridayMoneyCloseout.needToSendCount} invoice(s) need to be created/sent${fridayMoneyCloseout.needToSendNames.length ? ` (${fridayMoneyCloseout.needToSendNames.join(', ')})` : ''}. $${fridayMoneyCloseout.outstandingTotal.toFixed(0)} outstanding across open invoices. $${fridayMoneyCloseout.revenueClosedThisWeek.toFixed(0)} in revenue closed (paid) this week. Weave the real, non-zero items from this into today's work blocks or follow-ups — don't invent generic "invoicing" busywork if these are already zero.` : ''}
 ${movementLine}
 
 ${routineContext}

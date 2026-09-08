@@ -63,7 +63,7 @@ Return ONLY valid JSON in exactly this shape (all 7 weekdays required, use the e
       "meals": { "breakfast": "...", "lunch": "...", "dinner": "..." },
       "errands": ["..."],
       "self_care": ["..."],
-      "outfit_type": "...",
+      "outfit_type": "... — easy/classy/sexy/fashionable direction, professional only when the day actually calls for it, never defaulting to overly formal",
       "personal_plans": ["..."],
       "travel": ["short real travel note only if this day has an in-person commitment, e.g. 'Drive to DRYP office for 2pm client meeting' — omit/empty if fully virtual or home"]
     }

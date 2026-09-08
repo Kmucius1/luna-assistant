@@ -221,6 +221,35 @@ export default function WeeklyResetPage() {
     finalize()
   }
 
+  const [editingField, setEditingField] = useState<string | null>(null)
+  const [editFieldValue, setEditFieldValue] = useState('')
+
+  // A real patch — updates exactly the one field on the one day in the
+  // stored plan, no regeneration, so editing one thing can't destroy the
+  // rest of the week.
+  async function saveFieldEdit(day: string, field?: string, mealField?: string) {
+    const value = editFieldValue
+    setFinalResult(prev => {
+      if (!prev) return prev
+      const dayPlan = { ...prev.days[day] }
+      if (mealField) dayPlan.meals = { ...dayPlan.meals, [mealField]: value } as DayPlan['meals']
+      else if (field) (dayPlan as unknown as Record<string, unknown>)[field] = value
+      return { ...prev, days: { ...prev.days, [day]: dayPlan } }
+    })
+    setEditingField(null)
+    await fetch('/api/luna/weekly-reset/edit', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ day, field, mealField, value }),
+    }).catch(() => {})
+  }
+
+  async function cycleWorkLocation(day: string, current: string) {
+    const next = current === 'home' ? 'office' : current === 'office' ? 'off' : 'home'
+    setFinalResult(prev => prev ? { ...prev, days: { ...prev.days, [day]: { ...prev.days[day], work_location: next as DayPlan['work_location'] } } } : prev)
+    await fetch('/api/luna/weekly-reset/edit', {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ day, field: 'work_location', value: next }),
+    }).catch(() => {})
+  }
+
   async function markHomeTaskDone(type: 'laundry' | 'cleaning') {
     if (type === 'laundry') setLaundryDone(true); else setCleaningDone(true)
     await fetch('/api/home/tasks', {
@@ -817,9 +846,10 @@ export default function WeeklyResetPage() {
                   <div key={day} className="p-5" style={CARD}>
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-display text-base font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>
+                      <button type="button" onClick={() => cycleWorkLocation(day, d.work_location)}
+                        className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)', border: 'none', cursor: 'pointer' }}>
                         {d.work_location === 'home' ? 'Home' : d.work_location === 'office' ? 'Office' : 'Off'}
-                      </span>
+                      </button>
                     </div>
                     {d.meetings?.map((m, i) => (
                       <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-2)' }}>
@@ -829,13 +859,31 @@ export default function WeeklyResetPage() {
                     {d.work_blocks?.map((w, i) => (
                       <p key={i} className="text-xs mb-1" style={{ color: 'var(--text-3)' }}>{w.time} · {w.label}</p>
                     ))}
-                    <p className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--mist)' }}>
-                      <Dumbbell className="h-3 w-3" /> {d.gym_focus}
-                    </p>
+                    <div className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--mist)' }}>
+                      <Dumbbell className="h-3 w-3" />
+                      {editingField === `${day}:gym_focus` ? (
+                        <input autoFocus value={editFieldValue} onChange={e => setEditFieldValue(e.target.value)}
+                          onBlur={() => saveFieldEdit(day, 'gym_focus')} onKeyDown={e => e.key === 'Enter' && saveFieldEdit(day, 'gym_focus')}
+                          className="flex-1 text-xs px-1 py-0.5 rounded" style={{ border: '1px solid rgba(180,150,100,0.3)', background: 'white' }} />
+                      ) : (
+                        <span onClick={() => { setEditingField(`${day}:gym_focus`); setEditFieldValue(d.gym_focus ?? '') }} style={{ cursor: 'pointer' }}>{d.gym_focus}</span>
+                      )}
+                    </div>
                     {d.meals && (
-                      <p className="text-xs mt-1" style={{ color: 'var(--mist)' }}>
-                        {d.meals.breakfast} · {d.meals.lunch} · {d.meals.dinner}
-                      </p>
+                      <div className="text-xs mt-1 flex flex-wrap gap-1" style={{ color: 'var(--mist)' }}>
+                        {(['breakfast', 'lunch', 'dinner'] as const).map((mf, i) => (
+                          <span key={mf} style={{ display: 'flex', alignItems: 'center' }}>
+                            {i > 0 && <span className="mx-1">·</span>}
+                            {editingField === `${day}:meals:${mf}` ? (
+                              <input autoFocus value={editFieldValue} onChange={e => setEditFieldValue(e.target.value)}
+                                onBlur={() => saveFieldEdit(day, undefined, mf)} onKeyDown={e => e.key === 'Enter' && saveFieldEdit(day, undefined, mf)}
+                                className="text-xs px-1 py-0.5 rounded" style={{ width: 110, border: '1px solid rgba(180,150,100,0.3)', background: 'white' }} />
+                            ) : (
+                              <span onClick={() => { setEditingField(`${day}:meals:${mf}`); setEditFieldValue(d.meals[mf] ?? '') }} style={{ cursor: 'pointer' }}>{d.meals[mf]}</span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
                     )}
                     {!!d.travel?.length && (
                       <p className="text-xs mt-1 flex items-start gap-1" style={{ color: 'var(--mist)' }}>
