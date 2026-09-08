@@ -280,3 +280,42 @@
 .journalSaved { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 12.5px; color: var(--ink-2); }
 .journalSaved svg { color: var(--gold); }
 .journalSaved a { color: var(--gold); font-weight: 700; text-decoration: none; }
+
+/* ── Bathroom Restock ─────────────────────────────────── */
+
+.bathroomList {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.bathroomEmpty { font-size: 12px; color: var(--ink-3); margin: 4px 0; }
+.bathroomRow {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16);
+  border-radius: 14px; box-shadow: var(--soft-shadow); padding: 10px 12px;
+}
+.bathroomName { font-size: 12.5px; font-weight: 600; color: var(--ink-1); flex: 1; min-width: 0; }
+.bathroomStatusGroup { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.bathroomStatusBtn {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.01em; padding: 5px 8px; border-radius: 999px;
+  background: rgba(180,150,100,0.10); border: 1px solid rgba(180,150,100,0.16); color: var(--ink-3);
+  cursor: pointer; transition: all 0.15s ease;
+}
+.bathroomStatusBtn_in_stock { background: rgba(78,140,107,0.16); border-color: rgba(78,140,107,0.35); color: #3F7A5A; }
+.bathroomStatusBtn_low { background: rgba(184,134,47,0.18); border-color: rgba(184,134,47,0.38); color: #96650F; }
+.bathroomStatusBtn_empty { background: rgba(192,87,79,0.16); border-color: rgba(192,87,79,0.36); color: #A6443C; }
+.bathroomRemove {
+  width: 20px; height: 20px; border-radius: 50%; border: none; background: transparent;
+  color: var(--ink-3); font-size: 14px; line-height: 1; cursor: pointer; flex-shrink: 0;
+}
+.bathroomRemove:hover { color: #A6443C; }
+.bathroomAddRow { display: flex; gap: 8px; margin-top: 8px; }
+.bathroomAddInput {
+  flex: 1; font-size: 12.5px; padding: 10px 12px; border-radius: 12px;
+  background: rgba(255,255,255,0.6); border: 1px solid rgba(180,150,100,0.16); color: var(--ink-1);
+}
+.bathroomAddInput::placeholder { color: var(--ink-3); }
+.bathroomAddButton {
+  width: 38px; flex-shrink: 0; border-radius: 12px; border: none;
+  background: linear-gradient(135deg, var(--gold) 0%, #B8974F 100%); color: var(--ink-1);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.bathroomAddButton:disabled { opacity: 0.5; }

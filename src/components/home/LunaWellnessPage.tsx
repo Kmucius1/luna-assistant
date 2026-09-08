@@ -37,6 +37,8 @@ function yesterdayWeekday(): string {
   return new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d)
 }
 
+interface BathroomItem { id: string; name: string; status: 'in_stock' | 'low' | 'empty' }
+
 export function LunaWellnessPage() {
   const { now, weather, weatherError } = useTodayContext()
   const [feeling, setFeeling] = useState<string | null>(null)
@@ -53,6 +55,10 @@ export function LunaWellnessPage() {
   // This exact bug already hit this app once (see useLocation.ts's comment).
   const [energyAvg, setEnergyAvg] = useState<number | null>(null)
   const [selfCareStatuses, setSelfCareStatuses] = useState<Record<string, ReturnType<typeof getSelfCareStatus>>>({})
+  const [bathroomItems, setBathroomItems] = useState<BathroomItem[]>([])
+  const [bathroomLoading, setBathroomLoading] = useState(true)
+  const [newBathroomItem, setNewBathroomItem] = useState('')
+  const [addingBathroomItem, setAddingBathroomItem] = useState(false)
   // Also deferred to useEffect — new Date() during render can disagree
   // between server (UTC) and client (local) clocks right around midnight UTC.
   const [yesterday, setYesterday] = useState<string | null>(null)
@@ -90,6 +96,41 @@ export function LunaWellnessPage() {
       })
       .catch(() => setSleepRating('none'))
   }, [])
+
+  useEffect(() => {
+    fetch('/api/wellness/bathroom-inventory')
+      .then(r => r.json())
+      .then(d => setBathroomItems(d.items ?? []))
+      .finally(() => setBathroomLoading(false))
+  }, [])
+
+  async function setBathroomStatus(id: string, status: BathroomItem['status']) {
+    setBathroomItems(items => items.map(i => (i.id === id ? { ...i, status } : i)))
+    await fetch(`/api/wellness/bathroom-inventory/${id}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }),
+    }).catch(() => {})
+  }
+
+  async function removeBathroomItem(id: string) {
+    setBathroomItems(items => items.filter(i => i.id !== id))
+    await fetch(`/api/wellness/bathroom-inventory/${id}`, { method: 'DELETE' }).catch(() => {})
+  }
+
+  async function addBathroomItem() {
+    const name = newBathroomItem.trim()
+    if (!name) return
+    setAddingBathroomItem(true)
+    try {
+      const res = await fetch('/api/wellness/bathroom-inventory', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name }),
+      })
+      const data = await res.json()
+      if (data.item) setBathroomItems(items => [...items, data.item])
+      setNewBathroomItem('')
+    } finally {
+      setAddingBathroomItem(false)
+    }
+  }
 
   function addGlass() {
     const next = hydrationOz + GLASS_OZ
@@ -308,6 +349,46 @@ export function LunaWellnessPage() {
                 </button>
               )
             })}
+          </div>
+        </section>
+
+        <section>
+          <div className={styles.sectionHeader}>Bathroom Restock <span className={styles.sectionHint}>{bathroomLoading ? '' : `${bathroomItems.length} items`}</span></div>
+          <div className={styles.bathroomList}>
+            {bathroomLoading ? (
+              <p className={styles.bathroomEmpty}>Checking your bathroom stock…</p>
+            ) : (
+              bathroomItems.map(item => (
+                <div key={item.id} className={styles.bathroomRow}>
+                  <span className={styles.bathroomName}>{item.name}</span>
+                  <div className={styles.bathroomStatusGroup}>
+                    {(['in_stock', 'low', 'empty'] as const).map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`${styles.bathroomStatusBtn} ${item.status === s ? styles[`bathroomStatusBtn_${s}`] : ''}`}
+                        onClick={() => setBathroomStatus(item.id, s)}
+                      >
+                        {s === 'in_stock' ? 'In stock' : s === 'low' ? 'Low' : 'Empty'}
+                      </button>
+                    ))}
+                    <button type="button" className={styles.bathroomRemove} onClick={() => removeBathroomItem(item.id)} aria-label={`Remove ${item.name}`}>×</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <div className={styles.bathroomAddRow}>
+            <input
+              className={styles.bathroomAddInput}
+              placeholder="Add an item"
+              value={newBathroomItem}
+              onChange={e => setNewBathroomItem(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && addBathroomItem()}
+            />
+            <button type="button" className={styles.bathroomAddButton} onClick={addBathroomItem} disabled={addingBathroomItem || !newBathroomItem.trim()}>
+              <Plus size={14} />
+            </button>
           </div>
         </section>
 
