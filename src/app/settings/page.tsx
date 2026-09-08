@@ -381,9 +381,15 @@ export default function SettingsPage() {
                     </p>
                   </div>
                 </div>
-                <button onClick={checkCalendar} disabled={checkingCal} style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-                  <RefreshCw className={`h-3 w-3 ${checkingCal ? 'animate-spin' : ''}`} style={{ color: '#5E5474' }} />
-                </button>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <a href={`/api/gmail/auth${connStatus.accounts[0]?.email ? `?hint=${encodeURIComponent(connStatus.accounts[0].email)}` : ''}`}
+                    style={{ padding: '0 12px', height: 30, borderRadius: 9, background: 'rgba(90,138,164,0.15)', border: '1px solid rgba(90,138,164,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 600, color: '#4A7A96', textDecoration: 'none' }}>
+                    {calendarCount !== null ? 'Reconnect' : 'Connect'}
+                  </a>
+                  <button onClick={checkCalendar} disabled={checkingCal} style={{ width: 30, height: 30, borderRadius: 9, background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                    <RefreshCw className={`h-3 w-3 ${checkingCal ? 'animate-spin' : ''}`} style={{ color: '#5E5474' }} />
+                  </button>
+                </div>
               </div>
               {calendarCount === null && connStatus.connected && (
                 <div style={{ marginTop: 10, padding: '10px 14px', borderRadius: 12, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.2)' }}>

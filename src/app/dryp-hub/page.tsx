@@ -190,6 +190,9 @@ export default function DryphubPage() {
                     {label}
                   </button>
                 ))}
+                <Link href="/dryp-hub/billing" style={{ marginLeft: 'auto', padding: '7px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, textDecoration: 'none', border: '1px solid rgba(90,138,164,0.35)', background: 'rgba(90,138,164,0.12)', color: '#4A7A96', display: 'flex', alignItems: 'center' }}>
+                  Billing
+                </Link>
               </div>
             )}
 

@@ -144,7 +144,25 @@ export async function POST(req: NextRequest) {
       } catch { return [] }
     })()
 
-    const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills]
+    const scoredInvoices = await (async () => {
+      try {
+        const today = now.toISOString().split('T')[0]
+        const { data } = await db
+          .from('dryp_invoices')
+          .select('client_name, amount, due_date, status')
+          .eq('user_id', ZOE_USER_ID)
+          .in('status', ['sent', 'viewed', 'partially_paid', 'overdue'])
+        return ((data ?? []) as { client_name: string; amount: number; due_date: string | null; status: string }[])
+          .filter(inv => inv.due_date && inv.due_date <= today)
+          .map(inv => ({
+            title: `${inv.client_name} invoice is overdue ($${inv.amount.toFixed(0)})`,
+            score: calculatePriorityScore({ urgency_level: 'critical', due_date: inv.due_date ?? undefined, category: 'Money / Invoices' }),
+            source: 'local' as const,
+          }))
+      } catch { return [] }
+    })()
+
+    const topCandidates = [...scoredLocal, ...scoredDryp, ...scoredBills, ...scoredInvoices]
       .sort((a, b) => b.score - a.score)
       .slice(0, 8)
 
