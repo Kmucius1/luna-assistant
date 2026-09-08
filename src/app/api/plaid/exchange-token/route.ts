@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isUnauthorizedError, resolveMoneyUserId } from '@/lib/money/auth'
 import { runImportPipeline } from '@/lib/money/importPipeline'
 import type { RawTransactionRow } from '@/lib/money/importParsers'
+import { encryptSecret } from '@/lib/money/crypto'
 
 function mapAccountType(type: string, subtype: string | null): string {
   if (type === 'credit') return 'credit_card'
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     const { data: item, error: itemErr } = await db.from('plaid_items').upsert({
       user_id: userId,
       plaid_item_id: item_id,
-      access_token,
+      access_token: encryptSecret(access_token),
       institution_id: institution_id ?? null,
       institution_name: institution_name ?? null,
       products: ['transactions'],

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -7,11 +8,14 @@ import {
   CreditCard,
   FileText,
   ShieldCheck,
+  Trash2,
   Upload,
   WalletCards,
 } from 'lucide-react'
 
 import { AppLayout } from '@/components/layout/AppLayout'
+
+interface PlaidItem { id: string; institution_name: string | null; status: string; last_synced_at: string | null }
 
 const BG = 'linear-gradient(180deg, #FBF8F2 0%, #F6F1E7 55%, #F0E9DA 100%)'
 const CARD: React.CSSProperties = {
@@ -47,6 +51,23 @@ function ActionCard({ href, icon: Icon, title, text, color }: {
 }
 
 export default function ConnectBankPage() {
+  const [plaidItems, setPlaidItems] = useState<PlaidItem[]>([])
+  const [removingId, setRemovingId] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/api/plaid/items').then(r => r.json()).then(d => setPlaidItems(d.items ?? [])).catch(() => {})
+  }, [])
+
+  async function disconnect(id: string) {
+    setRemovingId(id)
+    try {
+      await fetch('/api/plaid/items', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
+      setPlaidItems(items => items.filter(i => i.id !== id))
+    } finally {
+      setRemovingId(null)
+    }
+  }
+
   return (
     <div style={{ background: BG, minHeight: '100vh' }}>
       <AppLayout noPad>
@@ -72,6 +93,24 @@ export default function ConnectBankPage() {
             <ActionCard href="/money/import" icon={Upload} title="Import a bank statement" text="Upload a PDF, CSV, or screenshot. LUNA checks subscriptions, bills, duplicates, and spending patterns." color="#5C4530" />
             <ActionCard href="/money/accounts" icon={CreditCard} title="Update account balances" text="Keep only the institution, nickname, last four digits, and current balance." color="#8fd6a3" />
           </div>
+
+          {plaidItems.length > 0 && (
+            <section style={{ ...CARD, padding: 18, marginTop: 14 }}>
+              <p style={{ margin: '0 0 10px', fontSize: 13.5, fontWeight: 800, color: '#100C1E' }}>Connected bank accounts</p>
+              {plaidItems.map(item => (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#100C1E' }}>{item.institution_name ?? 'Bank account'}</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 11, color: '#5E5474' }}>{item.status}{item.last_synced_at ? ` · last synced ${new Date(item.last_synced_at).toLocaleDateString()}` : ''}</p>
+                  </div>
+                  <button onClick={() => disconnect(item.id)} disabled={removingId === item.id}
+                    style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 12px', borderRadius: 12, border: '1px solid rgba(224,94,94,0.3)', background: 'rgba(224,94,94,0.08)', color: '#B23B3B', fontSize: 12, fontWeight: 600, cursor: 'pointer', opacity: removingId === item.id ? 0.5 : 1 }}>
+                    <Trash2 style={{ width: 13, height: 13 }} /> {removingId === item.id ? 'Removing…' : 'Disconnect'}
+                  </button>
+                </div>
+              ))}
+            </section>
+          )}
 
           <section style={{ ...CARD, padding: 18, marginTop: 14 }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
