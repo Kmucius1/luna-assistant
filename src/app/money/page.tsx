@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { formatCurrency } from '@/lib/money/format'
 import {
-  Sparkles, Upload, Settings, Car, Smartphone, TriangleAlert, Mic, Info, ChevronLeft,
+  Sparkles, Upload, Settings, Car, Smartphone, TriangleAlert, Mic, Info, ChevronLeft, Gift,
 } from 'lucide-react'
 import styles from './money.module.css'
 
@@ -73,6 +73,7 @@ export default function MoneyDashboard() {
         <div className={styles.topRow}>
           <Link href="/work-home" className={styles.iconButton} aria-label="Back"><ChevronLeft size={18} /></Link>
           <div style={{ display: 'flex', gap: 8 }}>
+            <Link href="/money/payday" className={styles.iconButton} aria-label="Payday"><Gift size={17} /></Link>
             <Link href="/money/import" className={styles.iconButton} aria-label="Import"><Upload size={17} /></Link>
             <Link href="/money/settings" className={styles.iconButton} aria-label="Settings"><Settings size={17} /></Link>
           </div>
