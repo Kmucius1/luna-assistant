@@ -10,6 +10,7 @@ import { SmartInput } from '@/components/ui/SmartInput'
 import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 import { STAPLE_GROUP_LABEL, STAPLE_GROUPS_ORDER, type StapleGroup, type StapleStatus } from '@/lib/luna/pantryStaples'
 import type { FreeSlot } from '@/lib/luna/calendarGaps'
+import { SELF_CARE_ITEMS, getSelfCareStatus } from '@/lib/luna/wellness'
 
 const CARD: React.CSSProperties = {
   background: 'rgba(255,255,255,0.6)',
@@ -87,6 +88,7 @@ interface DayPlan {
   self_care: string[]
   outfit_type: string
   personal_plans: string[]
+  travel?: string[]
 }
 interface FinalPayload {
   days: Record<string, DayPlan>
@@ -134,6 +136,56 @@ export default function WeeklyResetPage() {
   const [newStapleName, setNewStapleName] = useState('')
   const [newStapleGroup, setNewStapleGroup] = useState<StapleGroup>('easy_backup')
   const [addingStaple, setAddingStaple] = useState(false)
+
+  interface MoneyReview {
+    safeToSpend: number
+    billsDueThisWeek: { name: string; due_date: string; expected_amount: number | null }[]
+    subscriptionAlerts: number
+    duplicateAlerts: number
+  }
+  const [moneyReview, setMoneyReview] = useState<MoneyReview | null>(null)
+  const [selfCareOverdue, setSelfCareOverdue] = useState<{ label: string; dueLabel: string }[]>([])
+  const [reviewExtrasLoaded, setReviewExtrasLoaded] = useState(false)
+
+  interface FoodPlanPreview { mealCount: number; groceryCount: number }
+  const [foodPlanPreview, setFoodPlanPreview] = useState<FoodPlanPreview | null>(null)
+
+  useEffect(() => {
+    if (step !== 'result') return
+    fetch('/api/food/weekly-plan').then(r => r.json()).then(d => {
+      const plan = d.plan?.plan_json
+      if (!plan) return
+      const mealCount = (plan.breakfasts?.length ?? 0) + (plan.lunches?.length ?? 0) + (plan.dinners?.length ?? 0)
+      const groceryCount = Object.values(plan.grocery_list ?? {}).reduce((sum: number, items) => sum + (Array.isArray(items) ? items.length : 0), 0) as number
+      if (mealCount || groceryCount) setFoodPlanPreview({ mealCount, groceryCount })
+    }).catch(() => {})
+  }, [step])
+
+  async function loadReviewExtras() {
+    setReviewExtrasLoaded(true)
+    try {
+      const res = await fetch('/api/money/dashboard')
+      const d = await res.json()
+      if (!d.error) {
+        setMoneyReview({
+          safeToSpend: d.safe_to_spend?.safeToSpend ?? 0,
+          billsDueThisWeek: (d.bills_due_this_week ?? []).map((b: { name: string; due_date: string; expected_amount: number | null }) => ({ name: b.name, due_date: b.due_date, expected_amount: b.expected_amount })),
+          subscriptionAlerts: d.subscription_alerts_count ?? 0,
+          duplicateAlerts: d.duplicate_charges_count ?? 0,
+        })
+      }
+    } catch { /* soft-fail — Sunday review just won't include the money card */ }
+    const overdue = SELF_CARE_ITEMS
+      .map(item => ({ label: item.label, status: getSelfCareStatus(item) }))
+      .filter(x => x.status.overdue)
+      .map(x => ({ label: x.label, dueLabel: x.status.dueLabel }))
+    setSelfCareOverdue(overdue)
+  }
+
+  useEffect(() => {
+    if (step === 'review_week' && !reviewExtrasLoaded) loadReviewExtras()
+
+  }, [step, reviewExtrasLoaded])
   const [groceryTimeSlots, setGroceryTimeSlots] = useState<FreeSlot[]>([])
   const [prepTimeSlots, setPrepTimeSlots] = useState<FreeSlot[]>([])
   const [groceryTimeSlot, setGroceryTimeSlot] = useState<string | null>(null)
@@ -390,6 +442,45 @@ export default function WeeklyResetPage() {
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>DRYP load</p>
                 <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.dryp_load_summary}</p>
               </div>
+
+              {moneyReview && (
+                <div className="p-5" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Money this week</p>
+                  <p className="text-sm mb-3" style={{ color: 'var(--depth)' }}>
+                    Safe to spend: <span className="font-semibold">${moneyReview.safeToSpend.toFixed(0)}</span>
+                  </p>
+                  {moneyReview.billsDueThisWeek.length > 0 ? (
+                    <div className="mb-2">
+                      <p className="text-xs font-semibold mb-1.5" style={{ color: 'var(--mid)' }}>Bills due this week</p>
+                      {moneyReview.billsDueThisWeek.map((b, i) => (
+                        <p key={i} className="text-xs mb-0.5" style={{ color: 'var(--mist)' }}>
+                          • {b.name}{b.expected_amount ? ` — $${b.expected_amount.toFixed(0)}` : ''} ({b.due_date})
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs mb-2" style={{ color: 'var(--mist)' }}>No bills due this week.</p>
+                  )}
+                  {(moneyReview.subscriptionAlerts > 0 || moneyReview.duplicateAlerts > 0) && (
+                    <p className="text-xs" style={{ color: 'var(--mist)' }}>
+                      {moneyReview.subscriptionAlerts > 0 && `${moneyReview.subscriptionAlerts} subscription${moneyReview.subscriptionAlerts === 1 ? '' : 's'} to review`}
+                      {moneyReview.subscriptionAlerts > 0 && moneyReview.duplicateAlerts > 0 && ' · '}
+                      {moneyReview.duplicateAlerts > 0 && `${moneyReview.duplicateAlerts} unusual charge${moneyReview.duplicateAlerts === 1 ? '' : 's'}`}
+                      {' — '}<Link href="/money" style={{ color: 'var(--violet)', fontWeight: 600 }}>review in Money</Link>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {selfCareOverdue.length > 0 && (
+                <div className="p-5" style={CARD}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Self-care due</p>
+                  {selfCareOverdue.map((s, i) => (
+                    <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {s.label} — {s.dueLabel}</p>
+                  ))}
+                  <Link href="/wellness" style={{ fontSize: 12, color: 'var(--violet)', fontWeight: 600 }}>Open Wellness</Link>
+                </div>
+              )}
 
               {unclearEvents.length > 0 && (
                 <div className="p-5" style={CARD}>
@@ -746,6 +837,11 @@ export default function WeeklyResetPage() {
                         {d.meals.breakfast} · {d.meals.lunch} · {d.meals.dinner}
                       </p>
                     )}
+                    {!!d.travel?.length && (
+                      <p className="text-xs mt-1 flex items-start gap-1" style={{ color: 'var(--mist)' }}>
+                        🚗 {d.travel.join(' · ')}
+                      </p>
+                    )}
                   </div>
                 )
               })}
@@ -786,6 +882,27 @@ export default function WeeklyResetPage() {
                   </div>
                 )}
               </div>
+
+              {foodPlanPreview ? (
+                <Link href="/food/groceries" className="block">
+                  <div className="p-5 flex items-center justify-between" style={CARD}>
+                    <div className="flex items-center gap-2">
+                      <ShoppingBasket className="h-4 w-4" style={{ color: 'var(--violet)' }} />
+                      <span className="text-xs" style={{ color: 'var(--text-2)' }}>
+                        {foodPlanPreview.mealCount} meals planned · {foodPlanPreview.groceryCount} grocery items
+                      </span>
+                    </div>
+                    <ArrowRight className="h-4 w-4" style={{ color: 'var(--mist)' }} />
+                  </div>
+                </Link>
+              ) : groceriesNeeded && (
+                <Link href="/food" className="block">
+                  <div className="p-5 flex items-center justify-between" style={CARD}>
+                    <span className="text-xs" style={{ color: 'var(--text-2)' }}>No meal plan built yet this week — generate one in Food</span>
+                    <ArrowRight className="h-4 w-4" style={{ color: 'var(--mist)' }} />
+                  </div>
+                </Link>
+              )}
 
               <p className="text-sm text-center py-2 italic" style={{ color: 'var(--mist)' }}>{finalResult.ai_message}</p>
 

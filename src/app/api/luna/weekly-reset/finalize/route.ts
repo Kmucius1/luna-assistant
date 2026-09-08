@@ -64,7 +64,8 @@ Return ONLY valid JSON in exactly this shape (all 7 weekdays required, use the e
       "errands": ["..."],
       "self_care": ["..."],
       "outfit_type": "...",
-      "personal_plans": ["..."]
+      "personal_plans": ["..."],
+      "travel": ["short real travel note only if this day has an in-person commitment, e.g. 'Drive to DRYP office for 2pm client meeting' — omit/empty if fully virtual or home"]
     }
   },
   "laundry_cleaning_day": "...",
