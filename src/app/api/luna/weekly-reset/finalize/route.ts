@@ -5,6 +5,7 @@ import { calculatePriorityScore } from '@/lib/priority'
 import type { Task } from '@/types'
 import { ZOE_LIFESTYLE_PROFILE, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { planningWeekMondayKey, daysToPlanFor } from '@/lib/luna/planningCycle'
+import { localDateKey } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_TIMEZONE = 'America/New_York'
@@ -146,16 +147,21 @@ export async function POST(req: NextRequest) {
     // overdue/due-soon bill can actually compete for a top_3_business slot.
     const scoredBills = await (async () => {
       try {
-        const weekEnd = new Date(now); weekEnd.setDate(weekEnd.getDate() + 7)
+        // now.toISOString() is the server's UTC date, not her real ET
+        // date — a bill due "today" in ET could compare as not-yet-due
+        // (or the reverse near midnight UTC). localDateKey computes the
+        // actual ET calendar date instead.
+        const todayKeyForBills = localDateKey(now, ZOE_TIMEZONE)
+        const weekEndKey = localDateKey(new Date(now.getTime() + 7 * 86_400_000), ZOE_TIMEZONE)
         const { data } = await db
           .from('bills')
           .select('name, due_date, expected_amount')
           .eq('user_id', ZOE_USER_ID)
           .in('status', ['upcoming', 'needs_review'])
-          .lte('due_date', weekEnd.toISOString().split('T')[0])
+          .lte('due_date', weekEndKey)
         return ((data ?? []) as { name: string; due_date: string; expected_amount: number | null }[]).map(b => ({
           title: `Pay ${b.name}${b.expected_amount ? ` ($${b.expected_amount.toFixed(0)})` : ''}`,
-          score: calculatePriorityScore({ urgency_level: b.due_date <= now.toISOString().split('T')[0] ? 'critical' : 'high', due_date: b.due_date }),
+          score: calculatePriorityScore({ urgency_level: b.due_date <= todayKeyForBills ? 'critical' : 'high', due_date: b.due_date }),
           source: 'local' as const,
         }))
       } catch { return [] }
@@ -163,7 +169,7 @@ export async function POST(req: NextRequest) {
 
     const scoredInvoices = await (async () => {
       try {
-        const today = now.toISOString().split('T')[0]
+        const today = localDateKey(now, ZOE_TIMEZONE)
         const { data } = await db
           .from('dryp_invoices')
           .select('client_name, amount, due_date, status')

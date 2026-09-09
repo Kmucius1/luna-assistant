@@ -137,9 +137,15 @@ export async function storeGmailTokens(tokens: {
 }
 
 // ─── Revoke / disconnect ──────────────────────────────────────────────────────
-export async function disconnectGmail() {
+// Disconnects one connected account. Previously deleted every row
+// regardless of which account's "Disconnect" was tapped — Settings shows
+// info@drypdigital.com and zoe@drypdigital.com as separate rows, and
+// disconnecting one silently killed both, which looks identical to "LUNA
+// stopped reading my calendar right."
+export async function disconnectGmail(email?: string) {
   const db = adminDb()
-  await db.from('gmail_tokens').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+  const query = db.from('gmail_tokens').delete()
+  await (email ? query.eq('email', email) : query.neq('id', '00000000-0000-0000-0000-000000000000'))
 }
 
 // ─── Gmail API fetch helper ───────────────────────────────────────────────────

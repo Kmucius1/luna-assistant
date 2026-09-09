@@ -486,7 +486,7 @@ useEffect(() => {
           {step !== 'result' && (
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(244,235,212,0.9)' }}>
-                <Sparkles className="h-5 w-5" style={{ color: 'var(--violet)' }} strokeWidth={1.8} />
+                <Sparkles className="h-5 w-5" style={{ color: '#5C4530' }} strokeWidth={1.8} />
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Sunday Weekly Reset</p>
@@ -517,7 +517,7 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>This shapes how much I actually pack into it.</p>
               <div className="mb-6"><ChoiceGrid columns={2} options={FEELING_OPTIONS} value={weekFeeling} onChange={setWeekFeeling} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('intro')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('intro')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={startGather} disabled={!weekFeeling} className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -536,7 +536,7 @@ useEffect(() => {
               {gatherError && (
                 <div className="mt-8">
                   <p className="text-sm mb-4" style={{ color: '#C96B5A' }}>Couldn&apos;t gather your week — check your connection.</p>
-                  <button onClick={startGather} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <button onClick={startGather} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                     Try again
                   </button>
                 </div>
@@ -614,7 +614,7 @@ useEffect(() => {
                 ))}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('review_week')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('review_week')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_meeting_prep')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -634,7 +634,7 @@ useEffect(() => {
                   return (
                     <button key={day} type="button" onClick={() => toggleMulti(setMeetingPrepDays, day)}
                       className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
-                      style={{ background: isChecked ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${isChecked ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: isChecked ? 'var(--violet)' : 'var(--mid)' }}>
+                      style={{ background: isChecked ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${isChecked ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: isChecked ? '#5C4530' : '#5E5474' }}>
                       {day}
                     </button>
                   )
@@ -644,7 +644,7 @@ useEffect(() => {
                 <p className="text-xs mb-6" style={{ color: 'var(--mist)' }}>No in-person or client meetings detected this week — check any day yourself if I missed one.</p>
               )}
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_movement')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -668,9 +668,9 @@ useEffect(() => {
                         <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
                         <div className="flex gap-2">
                           <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: 'gym' }))}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: isGym ? 'var(--violet)' : 'rgba(244,235,212,0.9)', color: isGym ? 'white' : 'var(--mid)' }}>Gym</button>
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: isGym ? '#5C4530' : 'rgba(244,235,212,0.9)', color: isGym ? '#FFFFFF' : '#5C4530' }}>Gym</button>
                           <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: prev[day] && prev[day] !== 'gym' ? prev[day] : 'walk' }))}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: !isGym ? 'var(--violet)' : 'rgba(244,235,212,0.9)', color: !isGym ? 'white' : 'var(--mid)' }}>Not gym</button>
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: !isGym ? '#5C4530' : 'rgba(244,235,212,0.9)', color: !isGym ? '#FFFFFF' : '#5C4530' }}>Not gym</button>
                         </div>
                       </div>
                       {!isGym && (
@@ -686,7 +686,7 @@ useEffect(() => {
                 })}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_meeting_prep')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_meeting_prep')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_morning')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -702,7 +702,7 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>If it&apos;s busy, I&apos;ll compress your routine — never cut it.</p>
               <div className="mb-6"><ChoiceGrid columns={1} options={MORNING_REALISM_OPTIONS} value={morningRealism} onChange={setMorningRealism} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_movement')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_movement')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -718,7 +718,7 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>I&apos;ll build the meal plan and grocery list if so.</p>
               <div className="mb-6"><YesNoChoice value={groceriesNeeded} onChange={setGroceriesNeeded} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_rhythm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_rhythm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep(groceriesNeeded ? 'q_pantry_confirm' : 'q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -777,13 +777,13 @@ useEffect(() => {
                       onKeyDown={e => e.key === 'Enter' && addCustomStaple()}
                       placeholder="e.g. Frozen shrimp"
                       className="flex-1 px-3 py-2 rounded-xl text-sm"
-                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: 'var(--depth)' }}
+                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: '#100C1E' }}
                     />
                     <select
                       value={newStapleGroup}
                       onChange={e => setNewStapleGroup(e.target.value as StapleGroup)}
                       className="px-2 py-2 rounded-xl text-xs"
-                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: 'var(--depth)' }}
+                      style={{ background: 'rgba(255,255,255,0.6)', border: '1px solid rgba(180,150,100,0.2)', color: '#100C1E' }}
                     >
                       {STAPLE_GROUPS_ORDER.map(g => <option key={g} value={g}>{STAPLE_GROUP_LABEL[g]}</option>)}
                     </select>
@@ -796,7 +796,7 @@ useEffect(() => {
                 </div>
               )}
               <div className="flex gap-3 mt-2">
-                <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={confirmPantryStaples} disabled={pantryLoading || pantrySaving}
@@ -817,7 +817,7 @@ useEffect(() => {
                 <p className="text-sm mb-6" style={{ color: 'var(--mist)' }}>No open slots found this week — I&apos;ll keep it flexible.</p>
               )}
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_prep_time')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -837,7 +837,7 @@ useEffect(() => {
                 <p className="text-sm mb-6" style={{ color: 'var(--mist)' }}>No open slots found this week — I&apos;ll keep it flexible.</p>
               )}
               <div className="flex gap-3">
-                <button onClick={() => setStep(stapleNeedsGrocery ? 'q_grocery_time' : 'q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep(stapleNeedsGrocery ? 'q_grocery_time' : 'q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_dinner_choice')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -857,14 +857,14 @@ useEffect(() => {
                   return (
                     <button key={opt} type="button" onClick={() => toggleMulti(setDinnerChoices, opt)}
                       className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
-                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? '#5C4530' : '#5E5474' }}>
                       {opt}
                     </button>
                   )
                 })}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_prep_time')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_prep_time')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -882,7 +882,7 @@ useEffect(() => {
                 <SmartInput context="anything major this week — birthday, trip, event" placeholder="Nothing, or tell me what's coming up..." value={majorThisWeek} onChange={setMajorThisWeek} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_morning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_morning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_rhythm')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -898,7 +898,7 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Still want your usual weekly rhythm block this week?</p>
               <div className="mb-6"><YesNoChoice value={wantRhythmBlock} onChange={setWantRhythmBlock} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_personal')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_personal')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_groceries')} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -914,7 +914,7 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pick what makes sense, or move it to a lighter day.</p>
               <div className="mb-6"><ChoiceGrid options={LAUNDRY_OPTIONS} value={laundryChoice} onChange={setLaundryChoice} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep(groceriesNeeded ? 'q_dinner_choice' : 'q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep(groceriesNeeded ? 'q_dinner_choice' : 'q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_cleaning')} disabled={!laundryChoice} className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -938,7 +938,7 @@ useEffect(() => {
                       return (
                         <button key={cat} type="button" onClick={() => toggleCleaningCategory(cat)}
                           className="px-3 py-2 rounded-full text-xs font-semibold transition-all"
-                          style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                          style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? '#5C4530' : '#5E5474' }}>
                           {cat}
                         </button>
                       )
@@ -954,7 +954,7 @@ useEffect(() => {
                     return (
                       <button key={opt} type="button" onClick={() => toggleMulti(setHomeExtras, opt)}
                         className="px-3 py-2 rounded-full text-xs font-semibold transition-all"
-                        style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                        style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? '#5C4530' : '#5E5474' }}>
                         {opt}
                       </button>
                     )
@@ -962,7 +962,7 @@ useEffect(() => {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_laundry')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_laundry')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={saveHomeTasksAndContinue} disabled={!cleaningChoice || homeTasksSaving} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -991,14 +991,14 @@ useEffect(() => {
                   return (
                     <button key={opt} type="button" onClick={() => toggleMulti(setSelfCarePriorities, opt)}
                       className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
-                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? '#5C4530' : '#5E5474' }}>
                       {opt}
                     </button>
                   )
                 })}
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_cleaning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_cleaning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_money')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -1050,7 +1050,7 @@ useEffect(() => {
                 </div>
               )}
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_selfcare')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_selfcare')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={finalize} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -1067,7 +1067,7 @@ useEffect(() => {
               {finalizeError && (
                 <div className="mt-8">
                   <p className="text-sm mb-4" style={{ color: '#C96B5A' }}>Couldn&apos;t build your week — check your connection.</p>
-                  <button onClick={finalize} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <button onClick={finalize} className="px-6 py-3 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: '#5C4530' }}>
                     Try again
                   </button>
                 </div>
@@ -1083,7 +1083,7 @@ useEffect(() => {
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Top 3 business</p>
                 {finalResult.top_3_business.map((t, i) => (
                   <div key={i} className="flex items-start gap-2 py-1.5">
-                    <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>{i + 1}</span>
+                    <span className="w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: '#F4F0FA', color: '#5C4530' }}>{i + 1}</span>
                     <div>
                       <p className="text-sm font-medium" style={{ color: 'var(--depth)' }}>{t.title}</p>
                       <p className="text-xs" style={{ color: 'var(--mist)' }}>{t.reason}</p>
@@ -1124,7 +1124,7 @@ useEffect(() => {
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-display text-base font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
                       <button type="button" onClick={() => cycleWorkLocation(day, d.work_location)}
-                        className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)', border: 'none', cursor: 'pointer' }}>
+                        className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: '#F4F0FA', color: '#5C4530', border: 'none', cursor: 'pointer' }}>
                         {d.work_location === 'home' ? 'Home' : d.work_location === 'office' ? 'Office' : 'Off'}
                       </button>
                     </div>
@@ -1141,7 +1141,7 @@ useEffect(() => {
                       {editingField === `${day}:gym_focus` ? (
                         <input autoFocus value={editFieldValue} onChange={e => setEditFieldValue(e.target.value)}
                           onBlur={() => saveFieldEdit(day, 'gym_focus')} onKeyDown={e => e.key === 'Enter' && saveFieldEdit(day, 'gym_focus')}
-                          className="flex-1 text-xs px-1 py-0.5 rounded" style={{ border: '1px solid rgba(180,150,100,0.3)', background: 'white' }} />
+                          className="flex-1 text-xs px-1 py-0.5 rounded" style={{ border: '1px solid rgba(180,150,100,0.3)', background: 'white', color: '#100C1E' }} />
                       ) : (
                         <span onClick={() => { setEditingField(`${day}:gym_focus`); setEditFieldValue(d.gym_focus ?? '') }} style={{ cursor: 'pointer' }}>{d.gym_focus}</span>
                       )}
@@ -1154,7 +1154,7 @@ useEffect(() => {
                             {editingField === `${day}:meals:${mf}` ? (
                               <input autoFocus value={editFieldValue} onChange={e => setEditFieldValue(e.target.value)}
                                 onBlur={() => saveFieldEdit(day, undefined, mf)} onKeyDown={e => e.key === 'Enter' && saveFieldEdit(day, undefined, mf)}
-                                className="text-xs px-1 py-0.5 rounded" style={{ width: 110, border: '1px solid rgba(180,150,100,0.3)', background: 'white' }} />
+                                className="text-xs px-1 py-0.5 rounded" style={{ width: 110, border: '1px solid rgba(180,150,100,0.3)', background: 'white', color: '#100C1E' }} />
                             ) : (
                               <span onClick={() => { setEditingField(`${day}:meals:${mf}`); setEditFieldValue(d.meals[mf] ?? '') }} style={{ cursor: 'pointer' }}>{d.meals[mf]}</span>
                             )}
@@ -1182,7 +1182,7 @@ useEffect(() => {
                   {laundryChoice && (laundryDone ? (
                     <span className="text-xs font-semibold" style={{ color: '#4E8C6B' }}>Done</span>
                   ) : (
-                    <button onClick={() => markHomeTaskDone('laundry')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>Mark done</button>
+                    <button onClick={() => markHomeTaskDone('laundry')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: '#F4F0FA', color: '#5C4530' }}>Mark done</button>
                   ))}
                 </div>
                 {cleaningChoice && (
@@ -1196,7 +1196,7 @@ useEffect(() => {
                     {cleaningDone ? (
                       <span className="text-xs font-semibold" style={{ color: '#4E8C6B' }}>Done</span>
                     ) : (
-                      <button onClick={() => markHomeTaskDone('cleaning')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--violet-pale)', color: 'var(--violet)' }}>Mark done</button>
+                      <button onClick={() => markHomeTaskDone('cleaning')} className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: '#F4F0FA', color: '#5C4530' }}>Mark done</button>
                     )}
                   </div>
                 )}
@@ -1262,7 +1262,7 @@ useEffect(() => {
           {step === 'closing' && closingResult && (
             <div className="animate-fade-up space-y-4">
               <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.3)' }}>
-                <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>&ldquo;{closingResult.affirmation}&rdquo;</p>
+                <p className="font-display text-base italic" style={{ color: '#100C1E' }}>&ldquo;{closingResult.affirmation}&rdquo;</p>
               </div>
               {closingResult.intention_for_week && (
                 <div className={`p-5 ${styles.card}`}>

@@ -234,10 +234,13 @@ export default function SettingsPage() {
   }, [loadProfile, checkConnections, checkCalendar])
 
   async function handleDisconnect(email: string) {
-    // Disconnect a specific account (simplified: disconnect all for now)
     setConnecting(email)
     try {
-      await fetch('/api/gmail/disconnect', { method: 'POST' })
+      await fetch('/api/gmail/disconnect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
       await checkConnections()
       setCalendarCount(null)
     } finally {

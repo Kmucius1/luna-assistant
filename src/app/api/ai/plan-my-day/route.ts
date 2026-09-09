@@ -37,15 +37,20 @@ interface ClassifiedEvent {
   travelBuffer: ReturnType<typeof estimateTravelBuffer>
 }
 
-function flagTask(t: DryphubTask) {
+function flagTask(t: DryphubTask, tz: string) {
   const now = new Date()
-  const due = t.due_date ? new Date(t.due_date) : null
   const updated = new Date(t.updated_at)
   const daysSinceUpdate = (now.getTime() - updated.getTime()) / 86_400_000
+  // due_date is a calendar date, not an instant — comparing it against a
+  // raw UTC "now" made a task due "today" in her real timezone look
+  // overdue from the evening before. Compare calendar-date keys instead.
+  const todayKey = localDateKey(now, tz)
+  const dueKey = t.due_date ? t.due_date.slice(0, 10) : null
+  const sevenDaysOutKey = localDateKey(new Date(now.getTime() + 7 * 86_400_000), tz)
   return {
     ...t,
-    isOverdue: !!due && due < now,
-    isDueSoon: !!due && due >= now && due.getTime() - now.getTime() <= 7 * 86_400_000,
+    isOverdue: !!dueKey && dueKey < todayKey,
+    isDueSoon: !!dueKey && dueKey >= todayKey && dueKey <= sevenDaysOutKey,
     isStuck: daysSinceUpdate > STUCK_THRESHOLD_DAYS && !['waiting_client'].includes(t.status),
   }
 }
@@ -188,7 +193,7 @@ export async function POST(req: NextRequest) {
       ? (hasInPersonToday ? 'office' : 'home')
       : locationInput
 
-    const drypTasks = drypTasksRaw.map(flagTask)
+    const drypTasks = drypTasksRaw.map(t => flagTask(t, tz))
     const overdue = drypTasks.filter(t => t.isOverdue)
     const dueSoon = drypTasks.filter(t => t.isDueSoon)
     const stuck = drypTasks.filter(t => t.isStuck)

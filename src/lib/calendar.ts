@@ -153,7 +153,15 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
             const startStr = ev.start?.dateTime ?? ev.start?.date ?? ''
             const endStr   = ev.end?.dateTime   ?? ev.end?.date   ?? ''
             const allDay   = !ev.start?.dateTime
-            const startD   = new Date(startStr)
+            // All-day events come back as a bare 'YYYY-MM-DD' with no
+            // offset — `new Date()` parses that as UTC midnight, which in
+            // America/New_York is still the evening BEFORE that date,
+            // shifting every all-day event one day earlier. Anchor to UTC
+            // noon instead, which stays the correct calendar day in any
+            // continental US timezone.
+            const startD = allDay
+              ? new Date(`${startStr}T12:00:00Z`)
+              : new Date(startStr)
             const startKey = localDateKey(startD, ZOE_TIMEZONE)
 
             allEvents.push({

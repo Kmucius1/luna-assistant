@@ -7,6 +7,7 @@ import { getOpenTasks, getSummaryStats, getAccounts, getClientRoster, type Dryph
 import { classifyMeetingLocation, type MeetingLocationType } from '@/lib/luna/meetingLocation'
 import { ZOE_LIFESTYLE_PROFILE, ZOE_WORK_LOCATION_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
 import { planningWeekMondayKey } from '@/lib/luna/planningCycle'
+import { localDateKey } from '@/lib/luna/dailyCache'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_TIMEZONE = 'America/New_York'
@@ -32,14 +33,21 @@ interface DrypTaskFlags extends DryphubTask {
 
 function flagDrypTask(t: DryphubTask): DrypTaskFlags {
   const now = new Date()
-  const due = t.due_date ? new Date(t.due_date) : null
   const updated = new Date(t.updated_at)
   const daysSinceUpdate = (now.getTime() - updated.getTime()) / 86_400_000
 
+  // due_date is a calendar date, not an instant — comparing it against a
+  // raw UTC "now" made a task due "today" in her real ET timezone look
+  // overdue from ~8pm ET the evening before. Compare calendar-date keys
+  // instead (YYYY-MM-DD sorts correctly as a string).
+  const todayKey = localDateKey(now, ZOE_TIMEZONE)
+  const dueKey = t.due_date ? t.due_date.slice(0, 10) : null
+  const sevenDaysOutKey = localDateKey(new Date(now.getTime() + 7 * 86_400_000), ZOE_TIMEZONE)
+
   return {
     ...t,
-    isOverdue: !!due && due < now,
-    isDueSoon: !!due && due >= now && due.getTime() - now.getTime() <= 7 * 86_400_000,
+    isOverdue: !!dueKey && dueKey < todayKey,
+    isDueSoon: !!dueKey && dueKey >= todayKey && dueKey <= sevenDaysOutKey,
     isStuck: daysSinceUpdate > STUCK_THRESHOLD_DAYS && !['waiting_client'].includes(t.status),
   }
 }
@@ -125,7 +133,14 @@ export async function POST() {
 
     const classifiedEvents: ClassifiedEvent[] = events.map(ev => ({
       title: ev.title,
-      day: new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/New_York' }).format(new Date(ev.start)),
+      // All-day events are a bare 'YYYY-MM-DD' with no offset — parsing
+      // that directly as a UTC instant lands on the evening before in
+      // America/New_York, shifting the reported weekday back by one day.
+      // Anchor to UTC noon instead, which is unambiguously still the
+      // correct calendar day in any continental US timezone.
+      day: new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/New_York' }).format(
+        ev.allDay ? new Date(`${ev.start}T12:00:00Z`) : new Date(ev.start)
+      ),
       time: ev.startTime,
       locationType: classifyMeetingLocation(
         { location: ev.location, description: ev.description, hangoutLink: ev.hangoutLink, conferenceData: ev.conferenceData, attendeeEmails: ev.attendeeEmails, title: ev.title },
