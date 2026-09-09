@@ -44,6 +44,15 @@ export async function GET() {
       db.from('savings_goals').select('id, name, goal_type, current_amount, target_amount').eq('user_id', userId).eq('active', true).order('priority', { ascending: true }).limit(3),
     ])
 
+    // Visibility-only income preview for the Weekly Reset's money step —
+    // confirmed, plan-included sources only, no unconfirmed/paused guesses.
+    const { data: incomeRows } = await db
+      .from('income_events')
+      .select('source_name, amount')
+      .eq('user_id', userId)
+      .eq('confirmed', true)
+      .eq('include_in_plan', true)
+
     const bills = (billsRes.data ?? []) as BillRow[]
     const billsDueToday = bills.filter(b => b.due_date === today)
     const billsDueThisWeek = bills.filter(b => b.due_date! <= daysFromNow(7))
@@ -97,6 +106,7 @@ export async function GET() {
       savings_preview: goalsPreviewRes.data ?? [],
       debt_total: debtTotal,
       unknown_transactions_count: unknownCount,
+      income_sources: (incomeRows ?? []) as { source_name: string; amount: number }[],
     }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
     console.error('[money/dashboard] error:', error)

@@ -1,9 +1,9 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
-  ArrowRight, ChevronLeft, Home, Sparkles, CalendarClock, Briefcase,
+  ArrowRight, ChevronLeft, Home, Sparkles,
   ShoppingBasket, Dumbbell, HeartPulse, CheckCircle2, AlertCircle,
 } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
@@ -11,12 +11,56 @@ import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 import { STAPLE_GROUP_LABEL, STAPLE_GROUPS_ORDER, type StapleGroup, type StapleStatus } from '@/lib/luna/pantryStaples'
 import type { FreeSlot } from '@/lib/luna/calendarGaps'
 import { SELF_CARE_ITEMS, getSelfCareStatus } from '@/lib/luna/wellness'
+import { MOVEMENT_ALTERNATIVES, REST_OPTION, type MovementChoice } from '@/lib/luna/movementAlternatives'
 import styles from './weekly.module.css'
 
+const FEELING_OPTIONS = [
+  { value: 'calm', label: 'Calm' },
+  { value: 'productive', label: 'Productive' },
+  { value: 'social', label: 'Social' },
+  { value: 'focused', label: 'Focused' },
+  { value: 'restorative', label: 'Restorative' },
+  { value: 'creative', label: 'Creative' },
+  { value: 'balanced', label: 'Balanced' },
+  { value: 'high_energy', label: 'High-energy' },
+  { value: 'light', label: 'Light' },
+  { value: 'mix', label: 'Mix' },
+]
+
+const WEEKDAY_LOCATION_OPTIONS: Record<string, { value: string; label: string }[]> = {
+  Monday: [{ value: 'home', label: 'Home' }, { value: 'office', label: 'Office' }, { value: 'split', label: 'Split' }, { value: 'luna_decide', label: 'Let Luna decide' }],
+  Tuesday: [{ value: 'home', label: 'Home' }, { value: 'office', label: 'Office' }, { value: 'split', label: 'Split' }, { value: 'luna_decide', label: 'Let Luna decide' }],
+  Wednesday: [{ value: 'home', label: 'Home' }, { value: 'office', label: 'Office' }, { value: 'split', label: 'Split' }],
+  Thursday: [{ value: 'home', label: 'Home' }, { value: 'office', label: 'Office' }, { value: 'split', label: 'Split' }, { value: 'luna_decide', label: 'Let Luna decide' }],
+  Friday: [{ value: 'home', label: 'Home' }, { value: 'office', label: 'Office' }, { value: 'split', label: 'Split' }, { value: 'light', label: 'Light workday' }, { value: 'luna_decide', label: 'Let Luna decide' }],
+}
+const LOCATION_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+const MORNING_REALISM_OPTIONS = [
+  { value: 'slow', label: 'Full slow mornings' },
+  { value: 'normal', label: 'Normal mornings' },
+  { value: 'compressed', label: 'May need compressed mornings' },
+  { value: 'essentials_only', label: 'Very busy — protect the essentials only' },
+]
+
+const SELF_CARE_WEEK_OPTIONS = [
+  'Hair care', 'Nails', 'Brows', 'Long shower', 'Body care', 'Skincare',
+  'Beauty restock', 'Outfit prep', 'Early night', 'Full self-care block', 'Light self-care only',
+]
+
+const DINNER_OPTIONS = [
+  'Chicken + rice + veggies', 'Taco Tuesday', 'Buffalo chicken wraps', 'Crispy chicken tenders',
+  'Chicken quesadilla', 'Salmon', 'Pasta', 'Eat out', 'Flexible / easy night',
+]
+
+const HOME_EXTRA_OPTIONS = ['Car', 'Gas', 'Car wash', 'Grocery run', 'Personal admin']
+
 type Step =
-  | 'intro' | 'gathering' | 'review_week'
-  | 'q_location' | 'q_groceries' | 'q_pantry_confirm' | 'q_grocery_time' | 'q_prep_time'
-  | 'q_personal' | 'q_energy' | 'q_rhythm' | 'q_laundry' | 'q_cleaning'
+  | 'intro' | 'gathering' | 'q_feeling' | 'review_week'
+  | 'q_location' | 'q_meeting_prep' | 'q_movement' | 'q_morning'
+  | 'q_personal' | 'q_rhythm'
+  | 'q_groceries' | 'q_pantry_confirm' | 'q_grocery_time' | 'q_prep_time' | 'q_dinner_choice'
+  | 'q_laundry' | 'q_cleaning' | 'q_selfcare' | 'q_money'
   | 'finalizing' | 'result' | 'closing'
 
 interface StapleWithStatus { id?: string; name: string; group: string; category: string; status: StapleStatus | null; custom?: boolean }
@@ -90,12 +134,6 @@ const LOCATION_LABEL: Record<string, string> = {
   unclear: 'Unclear',
 }
 
-const WORK_LOCATION_OPTIONS = [
-  { value: 'mostly_home', label: 'Mostly home', icon: Home },
-  { value: 'mostly_office', label: 'Mostly office', icon: Briefcase },
-  { value: 'mixed', label: 'Mixed / usual pattern', icon: CalendarClock },
-]
-
 export default function WeeklyResetPage() {
   const [step, setStep] = useState<Step>('intro')
   const [gather, setGather] = useState<GatherPayload | null>(null)
@@ -104,11 +142,64 @@ export default function WeeklyResetPage() {
   const [finalizeError, setFinalizeError] = useState(false)
   const [confirmedUnclear, setConfirmedUnclear] = useState<Record<number, string>>({})
 
-  const [workLocationPattern, setWorkLocationPattern] = useState<string | null>(null)
+  const [weekFeeling, setWeekFeeling] = useState<string | null>(null)
+  const [workLocationByDay, setWorkLocationByDay] = useState<Record<string, string>>({ Wednesday: 'home' })
+  const [meetingPrepDays, setMeetingPrepDays] = useState<string[]>([])
+  const [movementByDay, setMovementByDay] = useState<Record<string, MovementChoice>>({})
+  const [morningRealism, setMorningRealism] = useState<string | null>(null)
+  const [selfCarePriorities, setSelfCarePriorities] = useState<string[]>([])
+  const [homeExtras, setHomeExtras] = useState<string[]>([])
+  const [dinnerChoices, setDinnerChoices] = useState<string[]>([])
+
+  interface MoneyVisibility {
+    mrr: { current: number; expected_next_month: number }
+    cashFlowIn: number
+    incomeSources: { source_name: string; amount: number }[]
+  }
+  const [moneyVisibility, setMoneyVisibility] = useState<MoneyVisibility | null>(null)
+  const [moneyVisibilityLoading, setMoneyVisibilityLoading] = useState(false)
+
   const [groceriesNeeded, setGroceriesNeeded] = useState<boolean | null>(null)
   const [majorThisWeek, setMajorThisWeek] = useState('')
-  const [energyLevel, setEnergyLevel] = useState(7)
   const [wantRhythmBlock, setWantRhythmBlock] = useState<boolean | null>(null)
+
+  function toggleMulti(setter: React.Dispatch<React.SetStateAction<string[]>>, value: string) {
+    setter(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
+  }
+
+  // Candidate meeting-prep days — derived from real classified calendar
+  // events (in-person/office meetings), pre-checked rather than guessed
+  // from nothing. She can still adjust before continuing.
+  const candidateMeetingDays = Array.from(new Set(
+    (gather?.events ?? [])
+      .filter(e => e.locationType === 'in_person_office' || e.locationType === 'in_person_client')
+      .map(e => e.day)
+  ))
+
+  async function loadMoneyVisibility() {
+    setMoneyVisibilityLoading(true)
+    try {
+      const [dashRes, revRes] = await Promise.all([
+        fetch('/api/money/dashboard').then(r => r.json()).catch(() => null),
+        fetch('/api/dryp/revenue-summary').then(r => r.json()).catch(() => null),
+      ])
+      setMoneyVisibility({
+        mrr: { current: revRes?.mrr?.current ?? 0, expected_next_month: revRes?.mrr?.expected_next_month ?? 0 },
+        cashFlowIn: revRes?.cash_flow_this_month?.dryp_money_in ?? 0,
+        incomeSources: dashRes?.income_sources ?? [],
+      })
+      if (!moneyReview && dashRes && !dashRes.error) {
+        setMoneyReview({
+          safeToSpend: dashRes.safe_to_spend?.safeToSpend ?? 0,
+          billsDueThisWeek: (dashRes.bills_due_this_week ?? []).map((b: { name: string; due_date: string; expected_amount: number | null }) => ({ name: b.name, due_date: b.due_date, expected_amount: b.expected_amount })),
+          subscriptionAlerts: dashRes.subscription_alerts_count ?? 0,
+          duplicateAlerts: dashRes.duplicate_charges_count ?? 0,
+        })
+      }
+    } catch { /* soft-fail — money step just shows what it has */ } finally {
+      setMoneyVisibilityLoading(false)
+    }
+  }
 
   const [pantryStaples, setPantryStaples] = useState<StapleWithStatus[] | null>(null)
   const [pantryStatuses, setPantryStatuses] = useState<Record<string, StapleStatus>>({})
@@ -127,7 +218,6 @@ export default function WeeklyResetPage() {
   }
   const [moneyReview, setMoneyReview] = useState<MoneyReview | null>(null)
   const [selfCareOverdue, setSelfCareOverdue] = useState<{ label: string; dueLabel: string }[]>([])
-  const [reviewExtrasLoaded, setReviewExtrasLoaded] = useState(false)
 
   interface FoodPlanPreview { mealCount: number; groceryCount: number }
   const [foodPlanPreview, setFoodPlanPreview] = useState<FoodPlanPreview | null>(null)
@@ -143,31 +233,30 @@ export default function WeeklyResetPage() {
     }).catch(() => {})
   }, [step])
 
-  async function loadReviewExtras() {
-    setReviewExtrasLoaded(true)
-    try {
-      const res = await fetch('/api/money/dashboard')
-      const d = await res.json()
-      if (!d.error) {
-        setMoneyReview({
-          safeToSpend: d.safe_to_spend?.safeToSpend ?? 0,
-          billsDueThisWeek: (d.bills_due_this_week ?? []).map((b: { name: string; due_date: string; expected_amount: number | null }) => ({ name: b.name, due_date: b.due_date, expected_amount: b.expected_amount })),
-          subscriptionAlerts: d.subscription_alerts_count ?? 0,
-          duplicateAlerts: d.duplicate_charges_count ?? 0,
-        })
-      }
-    } catch { /* soft-fail — Sunday review just won't include the money card */ }
+useEffect(() => {
+    if (step !== 'q_selfcare' || selfCareOverdue.length) return
     const overdue = SELF_CARE_ITEMS
       .map(item => ({ label: item.label, status: getSelfCareStatus(item) }))
       .filter(x => x.status.overdue)
       .map(x => ({ label: x.label, dueLabel: x.status.dueLabel }))
     setSelfCareOverdue(overdue)
-  }
+  }, [step, selfCareOverdue.length])
 
   useEffect(() => {
-    if (step === 'review_week' && !reviewExtrasLoaded) loadReviewExtras()
+    if (step === 'q_money' && !moneyVisibility && !moneyVisibilityLoading) loadMoneyVisibility()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
 
-  }, [step, reviewExtrasLoaded])
+  // Pre-check meeting-prep days from real classified calendar events —
+  // only seeds once, so her own edits afterward aren't overwritten.
+  const meetingPrepSeeded = useRef(false)
+  useEffect(() => {
+    if (step === 'q_meeting_prep' && !meetingPrepSeeded.current && candidateMeetingDays.length) {
+      meetingPrepSeeded.current = true
+      setMeetingPrepDays(candidateMeetingDays)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
   const [groceryTimeSlots, setGroceryTimeSlots] = useState<FreeSlot[]>([])
   const [prepTimeSlots, setPrepTimeSlots] = useState<FreeSlot[]>([])
   const [groceryTimeSlot, setGroceryTimeSlot] = useState<string | null>(null)
@@ -200,7 +289,7 @@ export default function WeeklyResetPage() {
     } catch { /* soft-fail — she can still finish the week */ } finally {
       setHomeTasksSaving(false)
     }
-    finalize()
+    setStep('q_selfcare')
   }
 
   const [editingField, setEditingField] = useState<string | null>(null)
@@ -338,17 +427,23 @@ export default function WeeklyResetPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           answers: {
-            work_location_pattern: workLocationPattern,
+            week_feeling: weekFeeling,
+            work_location_by_day: workLocationByDay,
+            meeting_prep_days: meetingPrepDays,
+            movement_by_day: movementByDay,
+            morning_realism: morningRealism,
             groceries_needed: groceriesNeeded,
             major_this_week: majorThisWeek,
-            energy_level: energyLevel,
             want_rhythm_block: wantRhythmBlock,
             unclear_confirmations: confirmedUnclear,
             grocery_time_slot: groceryTimeSlot,
             prep_time_slot: prepTimeSlot,
+            dinner_choices: dinnerChoices,
             laundry_choice: laundryChoice,
             cleaning_choice: cleaningChoice,
             cleaning_categories: cleaningCategories,
+            home_extras: homeExtras,
+            self_care_priorities: selfCarePriorities,
           },
         }),
       })
@@ -357,7 +452,8 @@ export default function WeeklyResetPage() {
       setFinalResult(data)
       setStep('result')
       if (groceriesNeeded) {
-        fetch('/api/ai/weekly-meal-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) }).catch(() => {})
+        const dinnerNote = dinnerChoices.length ? `Preferred dinners this week: ${dinnerChoices.join(', ')}.` : ''
+        fetch('/api/ai/weekly-meal-plan', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ notes: dinnerNote }) }).catch(() => {})
       }
     } catch {
       setFinalizeError(true)
@@ -407,11 +503,27 @@ export default function WeeklyResetPage() {
               <p className="text-base mb-8" style={{ color: 'var(--text-2)' }}>
                 I&apos;ll review your calendar, email, and DRYP CRM first — then I&apos;ll only ask you what I can&apos;t already know.
               </p>
-              <button onClick={startGather}
+              <button onClick={() => setStep('q_feeling')}
                 className="w-full py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                 style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                 Review my week <ArrowRight className="h-4 w-4" />
               </button>
+            </div>
+          )}
+
+          {step === 'q_feeling' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>How do you want this week to feel?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>This shapes how much I actually pack into it.</p>
+              <div className="mb-6"><ChoiceGrid columns={2} options={FEELING_OPTIONS} value={weekFeeling} onChange={setWeekFeeling} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('intro')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={startGather} disabled={!weekFeeling} className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
             </div>
           )}
 
@@ -454,45 +566,6 @@ export default function WeeklyResetPage() {
                 <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.dryp_load_summary}</p>
               </div>
 
-              {moneyReview && (
-                <div className={`p-5 ${styles.card}`}>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Money this week</p>
-                  <p className="text-sm mb-3" style={{ color: 'var(--depth)' }}>
-                    Safe to spend: <span className="font-semibold">${moneyReview.safeToSpend.toFixed(0)}</span>
-                  </p>
-                  {moneyReview.billsDueThisWeek.length > 0 ? (
-                    <div className="mb-2">
-                      <p className="text-xs font-semibold mb-1.5" style={{ color: 'var(--mid)' }}>Bills due this week</p>
-                      {moneyReview.billsDueThisWeek.map((b, i) => (
-                        <p key={i} className="text-xs mb-0.5" style={{ color: 'var(--mist)' }}>
-                          • {b.name}{b.expected_amount ? ` — $${b.expected_amount.toFixed(0)}` : ''} ({b.due_date})
-                        </p>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-xs mb-2" style={{ color: 'var(--mist)' }}>No bills due this week.</p>
-                  )}
-                  {(moneyReview.subscriptionAlerts > 0 || moneyReview.duplicateAlerts > 0) && (
-                    <p className="text-xs" style={{ color: 'var(--mist)' }}>
-                      {moneyReview.subscriptionAlerts > 0 && `${moneyReview.subscriptionAlerts} subscription${moneyReview.subscriptionAlerts === 1 ? '' : 's'} to review`}
-                      {moneyReview.subscriptionAlerts > 0 && moneyReview.duplicateAlerts > 0 && ' · '}
-                      {moneyReview.duplicateAlerts > 0 && `${moneyReview.duplicateAlerts} unusual charge${moneyReview.duplicateAlerts === 1 ? '' : 's'}`}
-                      {' — '}<Link href="/money" style={{ color: 'var(--violet)', fontWeight: 600 }}>review in Money</Link>
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {selfCareOverdue.length > 0 && (
-                <div className={`p-5 ${styles.card}`}>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Self-care due</p>
-                  {selfCareOverdue.map((s, i) => (
-                    <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {s.label} — {s.dueLabel}</p>
-                  ))}
-                  <Link href="/wellness" style={{ fontSize: 12, color: 'var(--violet)', fontWeight: 600 }}>Open Wellness</Link>
-                </div>
-              )}
-
               {unclearEvents.length > 0 && (
                 <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: '#B08D52' }}>
@@ -525,13 +598,114 @@ export default function WeeklyResetPage() {
 
           {step === 'q_location' && (
             <div className="animate-fade-up">
-              <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--depth)' }}>How does this week look?</h2>
-              <div className="mb-6"><ChoiceGrid options={WORK_LOCATION_OPTIONS} value={workLocationPattern} onChange={setWorkLocationPattern} /></div>
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Where do you actually want to work?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Day by day — no assumptions.</p>
+              <div className="space-y-5 mb-6">
+                {LOCATION_DAYS.map(day => (
+                  <div key={day}>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>{day}</p>
+                    <ChoiceGrid
+                      columns={2}
+                      options={WEEKDAY_LOCATION_OPTIONS[day]}
+                      value={workLocationByDay[day] ?? (day === 'Wednesday' ? 'home' : null)}
+                      onChange={v => setWorkLocationByDay(prev => ({ ...prev, [day]: v }))}
+                    />
+                  </div>
+                ))}
+              </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('review_week')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button onClick={() => setStep('q_groceries')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                <button onClick={() => setStep('q_meeting_prep')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_meeting_prep' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Which days need full meeting-day prep?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pre-checked from your real calendar — adjust if I missed one.</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {WEEKDAYS.slice(0, 5).map(day => {
+                  const isChecked = meetingPrepDays.includes(day)
+                  return (
+                    <button key={day} type="button" onClick={() => toggleMulti(setMeetingPrepDays, day)}
+                      className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
+                      style={{ background: isChecked ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${isChecked ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: isChecked ? 'var(--violet)' : 'var(--mid)' }}>
+                      {day}
+                    </button>
+                  )
+                })}
+              </div>
+              {candidateMeetingDays.length === 0 && (
+                <p className="text-xs mb-6" style={{ color: 'var(--mist)' }}>No in-person or client meetings detected this week — check any day yourself if I missed one.</p>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_movement')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_movement' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Movement, day by day.</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>No zero-movement days — gym or something real instead.</p>
+              <div className="space-y-4 mb-6">
+                {WEEKDAYS.map(day => {
+                  const current = movementByDay[day] ?? 'gym'
+                  const isGym = current === 'gym'
+                  return (
+                    <div key={day} className={`p-4 ${styles.card}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
+                        <div className="flex gap-2">
+                          <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: 'gym' }))}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: isGym ? 'var(--violet)' : 'rgba(244,235,212,0.9)', color: isGym ? 'white' : 'var(--mid)' }}>Gym</button>
+                          <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: prev[day] && prev[day] !== 'gym' ? prev[day] : 'walk' }))}
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: !isGym ? 'var(--violet)' : 'rgba(244,235,212,0.9)', color: !isGym ? 'white' : 'var(--mid)' }}>Not gym</button>
+                        </div>
+                      </div>
+                      {!isGym && (
+                        <ChoiceGrid
+                          columns={2}
+                          options={[...MOVEMENT_ALTERNATIVES, REST_OPTION]}
+                          value={current}
+                          onChange={v => setMovementByDay(prev => ({ ...prev, [day]: v as MovementChoice }))}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_meeting_prep')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_morning')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_morning' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>How realistic are mornings this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>If it&apos;s busy, I&apos;ll compress your routine — never cut it.</p>
+              <div className="mb-6"><ChoiceGrid columns={1} options={MORNING_REALISM_OPTIONS} value={morningRealism} onChange={setMorningRealism} /></div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_movement')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                   Continue <ArrowRight className="inline h-4 w-4 ml-1" />
                 </button>
               </div>
@@ -544,10 +718,10 @@ export default function WeeklyResetPage() {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>I&apos;ll build the meal plan and grocery list if so.</p>
               <div className="mb-6"><YesNoChoice value={groceriesNeeded} onChange={setGroceriesNeeded} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_location')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_rhythm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button onClick={() => setStep(groceriesNeeded ? 'q_pantry_confirm' : 'q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                <button onClick={() => setStep(groceriesNeeded ? 'q_pantry_confirm' : 'q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                   Continue <ArrowRight className="inline h-4 w-4 ml-1" />
                 </button>
               </div>
@@ -666,7 +840,34 @@ export default function WeeklyResetPage() {
                 <button onClick={() => setStep(stapleNeedsGrocery ? 'q_grocery_time' : 'q_pantry_confirm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button onClick={() => setStep('q_personal')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                <button onClick={() => setStep('q_dinner_choice')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_dinner_choice' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>What dinners do you want this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pick as many as sound good — I&apos;ll place them across the week.</p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {DINNER_OPTIONS.map(opt => {
+                  const active = dinnerChoices.includes(opt)
+                  return (
+                    <button key={opt} type="button" onClick={() => toggleMulti(setDinnerChoices, opt)}
+                      className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
+                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                      {opt}
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_prep_time')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                   Continue <ArrowRight className="inline h-4 w-4 ml-1" />
                 </button>
               </div>
@@ -681,28 +882,7 @@ export default function WeeklyResetPage() {
                 <SmartInput context="anything major this week — birthday, trip, event" placeholder="Nothing, or tell me what's coming up..." value={majorThisWeek} onChange={setMajorThisWeek} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
               <div className="flex gap-3">
-                <button onClick={() => setStep(groceriesNeeded ? 'q_prep_time' : 'q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button onClick={() => setStep('q_energy')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
-                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 'q_energy' && (
-            <div className="animate-fade-up">
-              <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--depth)' }}>How&apos;s your capacity right now?</h2>
-              <div className={`p-5 mb-6 ${styles.card}`}>
-                <div className="flex justify-between mb-2">
-                  <span className="text-sm font-medium" style={{ color: 'var(--depth)' }}>Energy / capacity</span>
-                  <span className="text-sm font-semibold" style={{ color: 'var(--violet)' }}>{energyLevel}/10</span>
-                </div>
-                <input type="range" min={1} max={10} value={energyLevel} onChange={e => setEnergyLevel(Number(e.target.value))} />
-              </div>
-              <div className="flex gap-3">
-                <button onClick={() => setStep('q_personal')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_morning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_rhythm')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -718,10 +898,10 @@ export default function WeeklyResetPage() {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Still want your usual weekly rhythm block this week?</p>
               <div className="mb-6"><YesNoChoice value={wantRhythmBlock} onChange={setWantRhythmBlock} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_energy')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep('q_personal')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
-                <button onClick={() => setStep('q_laundry')} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                <button onClick={() => setStep('q_groceries')} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
                   Continue <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -734,7 +914,7 @@ export default function WeeklyResetPage() {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Pick what makes sense, or move it to a lighter day.</p>
               <div className="mb-6"><ChoiceGrid options={LAUNDRY_OPTIONS} value={laundryChoice} onChange={setLaundryChoice} /></div>
               <div className="flex gap-3">
-                <button onClick={() => setStep('q_rhythm')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                <button onClick={() => setStep(groceriesNeeded ? 'q_dinner_choice' : 'q_groceries')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={() => setStep('q_cleaning')} disabled={!laundryChoice} className="flex-1 py-4 rounded-2xl font-semibold text-white disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
@@ -766,12 +946,115 @@ export default function WeeklyResetPage() {
                   </div>
                 </div>
               )}
+              <div className="mb-6">
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Anything else this week? (optional)</p>
+                <div className="flex flex-wrap gap-2">
+                  {HOME_EXTRA_OPTIONS.map(opt => {
+                    const active = homeExtras.includes(opt)
+                    return (
+                      <button key={opt} type="button" onClick={() => toggleMulti(setHomeExtras, opt)}
+                        className="px-3 py-2 rounded-full text-xs font-semibold transition-all"
+                        style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                        {opt}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('q_laundry')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <button onClick={saveHomeTasksAndContinue} disabled={!cleaningChoice || homeTasksSaving} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-40" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
-                  <Sparkles className="h-4 w-4" /> {homeTasksSaving ? 'Saving…' : 'Build my week'}
+                  {homeTasksSaving ? 'Saving…' : 'Continue'} <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_selfcare' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>What self-care do you want protected this week?</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Weekends default to this first.</p>
+              {selfCareOverdue.length > 0 && (
+                <div className={`p-4 mb-6 ${styles.card}`}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Actually due</p>
+                  {selfCareOverdue.map((s, i) => (
+                    <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {s.label} — {s.dueLabel}</p>
+                  ))}
+                  <Link href="/wellness" style={{ fontSize: 12, color: 'var(--violet)', fontWeight: 600 }}>Open Wellness</Link>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {SELF_CARE_WEEK_OPTIONS.map(opt => {
+                  const active = selfCarePriorities.includes(opt)
+                  return (
+                    <button key={opt} type="button" onClick={() => toggleMulti(setSelfCarePriorities, opt)}
+                      className="px-4 py-3 rounded-2xl text-sm font-semibold transition-all"
+                      style={{ background: active ? 'var(--violet-pale)' : 'rgba(244,235,212,0.6)', border: `1.5px solid ${active ? 'var(--violet)' : 'rgba(180,150,100,0.2)'}`, color: active ? 'var(--violet)' : 'var(--mid)' }}>
+                      {opt}
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_cleaning')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={() => setStep('q_money')} className="flex-1 py-4 rounded-2xl font-semibold text-white" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  Continue <ArrowRight className="inline h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 'q_money' && (
+            <div className="animate-fade-up">
+              <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Your money, at a glance.</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>Visibility only — nothing here becomes your task.</p>
+              {moneyVisibilityLoading ? (
+                <div className="text-center py-10">
+                  <div className="w-12 h-12 rounded-full mx-auto mb-4 animate-breathe" style={{ background: 'radial-gradient(circle, rgba(201,169,110,0.4), rgba(201,169,110,0.1))' }} />
+                  <p className="text-sm" style={{ color: 'var(--mist)' }}>Pulling this together…</p>
+                </div>
+              ) : (
+                <div className="space-y-4 mb-6">
+                  {moneyReview && (
+                    <div className={`p-5 ${styles.card}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Personal</p>
+                      <p className="text-sm mb-2" style={{ color: 'var(--depth)' }}>Safe to spend: <span className="font-semibold">${moneyReview.safeToSpend.toFixed(0)}</span></p>
+                      {moneyReview.billsDueThisWeek.length > 0 ? (
+                        moneyReview.billsDueThisWeek.map((b, i) => (
+                          <p key={i} className="text-xs mb-0.5" style={{ color: 'var(--mist)' }}>• {b.name}{b.expected_amount ? ` — $${b.expected_amount.toFixed(0)}` : ''} ({b.due_date})</p>
+                        ))
+                      ) : (
+                        <p className="text-xs" style={{ color: 'var(--mist)' }}>No bills due this week.</p>
+                      )}
+                    </div>
+                  )}
+                  {moneyVisibility && moneyVisibility.incomeSources.length > 0 && (
+                    <div className={`p-5 ${styles.card}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Expected income</p>
+                      {moneyVisibility.incomeSources.map((s, i) => (
+                        <p key={i} className="text-xs mb-0.5" style={{ color: 'var(--mist)' }}>• {s.source_name} — ${s.amount.toFixed(0)}</p>
+                      ))}
+                    </div>
+                  )}
+                  {moneyVisibility && (
+                    <div className={`p-5 ${styles.card}`}>
+                      <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>DRYP — awareness only</p>
+                      <p className="text-xs mb-0.5" style={{ color: 'var(--mist)' }}>Current MRR: ${moneyVisibility.mrr.current.toFixed(0)} · expected next month: ${moneyVisibility.mrr.expected_next_month.toFixed(0)}</p>
+                      <p className="text-xs" style={{ color: 'var(--mist)' }}>Money in this month: ${moneyVisibility.cashFlowIn.toFixed(0)}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div className="flex gap-3">
+                <button onClick={() => setStep('q_selfcare')} className="flex-none px-5 py-4 rounded-2xl font-semibold" style={{ background: 'rgba(244,235,212,0.9)', color: 'var(--violet)' }}>
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button onClick={finalize} className="flex-1 py-4 rounded-2xl font-semibold text-white transition-all active:scale-95 flex items-center justify-center gap-2" style={{ background: 'linear-gradient(135deg, var(--violet), var(--violet-deep))' }}>
+                  <Sparkles className="h-4 w-4" /> Build my week
                 </button>
               </div>
             </div>
@@ -819,6 +1102,18 @@ export default function WeeklyResetPage() {
                     <p className="text-xs" style={{ color: 'var(--mist)' }}>{t.reason}</p>
                   </div>
                 ))}
+              </div>
+
+              {!!(gather?.pipeline_note) && (
+                <div className={`p-5 ${styles.card}`}>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>What you only need awareness of</p>
+                  <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.pipeline_note}</p>
+                </div>
+              )}
+
+              <div className={`p-5 ${styles.card}`}>
+                <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>What belongs to the team</p>
+                <p className="text-sm" style={{ color: 'var(--text-2)' }}>Every DRYP task above is already confirmed yours — nothing assigned to the rest of the team gets placed on your week.</p>
               </div>
 
               {WEEKDAYS.map(day => {
