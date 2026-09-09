@@ -1,0 +1,40 @@
+/* Light-mode values (unchanged from before) live in :root scope; the
+   [data-theme="dark"] block below is what was missing — this page's text
+   was hardcoded near-black, illegible against AppLayout's dark
+   moon-goddess background whenever dark mode is active. */
+.palette {
+  --violet: #5C4530;
+  --violet-deep: #B08D52;
+  --violet-pale: #F5EBD3;
+  --depth: #100C1E;
+  --mid: #32284A;
+  --mist: #5E5474;
+  --text-1: #100C1E;
+  --text-2: #32284A;
+  --text-3: #5E5474;
+}
+
+:global([data-theme='dark']) .palette {
+  --violet: #D4B896;
+  --violet-deep: #8A6B42;
+  --violet-pale: #F5EBD3;
+  --depth: #F5EFE3;
+  --mid: rgba(245, 239, 227, 0.82);
+  --mist: rgba(245, 239, 227, 0.6);
+  --text-1: #F5EFE3;
+  --text-2: rgba(245, 239, 227, 0.82);
+  --text-3: rgba(245, 239, 227, 0.6);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(180, 150, 100, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(60, 46, 24, 0.08);
+}
+
+:global([data-theme='dark']) .card {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(201, 169, 110, 0.2);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}

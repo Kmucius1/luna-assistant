@@ -11,25 +11,7 @@ import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 import { STAPLE_GROUP_LABEL, STAPLE_GROUPS_ORDER, type StapleGroup, type StapleStatus } from '@/lib/luna/pantryStaples'
 import type { FreeSlot } from '@/lib/luna/calendarGaps'
 import { SELF_CARE_ITEMS, getSelfCareStatus } from '@/lib/luna/wellness'
-
-const CARD: React.CSSProperties = {
-  background: 'rgba(255,255,255,0.6)',
-  border: '1px solid rgba(180,150,100,0.18)',
-  borderRadius: 20,
-  boxShadow: '0 6px 24px rgba(60,46,24,0.08)',
-}
-
-const PALETTE = {
-  '--violet': '#5C4530',
-  '--violet-deep': '#B08D52',
-  '--violet-pale': '#F5EBD3',
-  '--depth': '#100C1E',
-  '--mid': '#32284A',
-  '--mist': '#5E5474',
-  '--text-1': '#100C1E',
-  '--text-2': '#32284A',
-  '--text-3': '#5E5474',
-} as React.CSSProperties
+import styles from './weekly.module.css'
 
 type Step =
   | 'intro' | 'gathering' | 'review_week'
@@ -401,7 +383,7 @@ export default function WeeklyResetPage() {
   const unclearEvents = (gather?.events ?? []).map((e, i) => ({ ...e, idx: i })).filter(e => e.locationType === 'unclear')
 
   return (
-    <div style={PALETTE}>
+    <div className={styles.palette}>
       <AppLayout noPad className="pt-16">
         <div className="px-6 pb-nav">
 
@@ -454,12 +436,12 @@ export default function WeeklyResetPage() {
             <div className="animate-fade-up space-y-4">
               <h2 className="font-display text-xl font-semibold" style={{ color: 'var(--text-1)' }}>Here&apos;s what I found.</h2>
 
-              <div className="p-5" style={CARD}>
+              <div className={`p-5 ${styles.card}`}>
                 <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.week_summary}</p>
               </div>
 
               {!!(gather.flagged_deadlines?.length) && (
-                <div className="p-5" style={CARD}>
+                <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Flagged deadlines</p>
                   {gather.flagged_deadlines.map((d, i) => (
                     <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {d}</p>
@@ -467,13 +449,13 @@ export default function WeeklyResetPage() {
                 </div>
               )}
 
-              <div className="p-5" style={CARD}>
+              <div className={`p-5 ${styles.card}`}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>DRYP load</p>
                 <p className="text-sm" style={{ color: 'var(--text-2)' }}>{gather.dryp_load_summary}</p>
               </div>
 
               {moneyReview && (
-                <div className="p-5" style={CARD}>
+                <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--violet)' }}>Money this week</p>
                   <p className="text-sm mb-3" style={{ color: 'var(--depth)' }}>
                     Safe to spend: <span className="font-semibold">${moneyReview.safeToSpend.toFixed(0)}</span>
@@ -502,7 +484,7 @@ export default function WeeklyResetPage() {
               )}
 
               {selfCareOverdue.length > 0 && (
-                <div className="p-5" style={CARD}>
+                <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Self-care due</p>
                   {selfCareOverdue.map((s, i) => (
                     <p key={i} className="text-sm mb-1" style={{ color: 'var(--text-2)' }}>• {s.label} — {s.dueLabel}</p>
@@ -512,7 +494,7 @@ export default function WeeklyResetPage() {
               )}
 
               {unclearEvents.length > 0 && (
-                <div className="p-5" style={CARD}>
+                <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3 flex items-center gap-1.5" style={{ color: '#B08D52' }}>
                     <AlertCircle className="h-3.5 w-3.5" /> Confirm these
                   </p>
@@ -590,7 +572,7 @@ export default function WeeklyResetPage() {
                       <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>{STAPLE_GROUP_LABEL[group as StapleGroup]}</p>
                       <div className="space-y-3">
                         {items.map(s => (
-                          <div key={s.name} className="p-3" style={CARD}>
+                          <div key={s.name} className={`p-3 ${styles.card}`}>
                             <div className="flex items-center justify-between mb-2">
                               <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>{s.name}</p>
                               {s.custom && (
@@ -612,7 +594,7 @@ export default function WeeklyResetPage() {
                 })
               )}
               {!pantryLoading && (
-                <div className="p-3 mb-2" style={CARD}>
+                <div className={`p-3 mb-2 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Add an item</p>
                   <div className="flex gap-2 mb-2">
                     <input
@@ -695,7 +677,7 @@ export default function WeeklyResetPage() {
             <div className="animate-fade-up">
               <h2 className="font-display text-2xl font-semibold mb-2" style={{ color: 'var(--depth)' }}>Anything major this week?</h2>
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>A birthday, a trip, an event not yet on your calendar. Optional.</p>
-              <div className="p-5 mb-6" style={CARD}>
+              <div className={`p-5 mb-6 ${styles.card}`}>
                 <SmartInput context="anything major this week — birthday, trip, event" placeholder="Nothing, or tell me what's coming up..." value={majorThisWeek} onChange={setMajorThisWeek} patternType="weekly" rows={3} autoSuggest={false} />
               </div>
               <div className="flex gap-3">
@@ -712,7 +694,7 @@ export default function WeeklyResetPage() {
           {step === 'q_energy' && (
             <div className="animate-fade-up">
               <h2 className="font-display text-2xl font-semibold mb-6" style={{ color: 'var(--depth)' }}>How&apos;s your capacity right now?</h2>
-              <div className="p-5 mb-6" style={CARD}>
+              <div className={`p-5 mb-6 ${styles.card}`}>
                 <div className="flex justify-between mb-2">
                   <span className="text-sm font-medium" style={{ color: 'var(--depth)' }}>Energy / capacity</span>
                   <span className="text-sm font-semibold" style={{ color: 'var(--violet)' }}>{energyLevel}/10</span>
@@ -814,7 +796,7 @@ export default function WeeklyResetPage() {
             <div className="animate-fade-up space-y-4">
               <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--text-1)' }}>Your week.</h2>
 
-              <div className="p-5" style={CARD}>
+              <div className={`p-5 ${styles.card}`}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Top 3 business</p>
                 {finalResult.top_3_business.map((t, i) => (
                   <div key={i} className="flex items-start gap-2 py-1.5">
@@ -827,7 +809,7 @@ export default function WeeklyResetPage() {
                 ))}
               </div>
 
-              <div className="p-5" style={CARD}>
+              <div className={`p-5 ${styles.card}`}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: 'var(--herb, #6B8E5A)' }}>
                   <HeartPulse className="h-3.5 w-3.5" /> Top 3 personal
                 </p>
@@ -843,7 +825,7 @@ export default function WeeklyResetPage() {
                 const d = finalResult.days[day]
                 if (!d) return null
                 return (
-                  <div key={day} className="p-5" style={CARD}>
+                  <div key={day} className={`p-5 ${styles.card}`}>
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-display text-base font-semibold" style={{ color: 'var(--depth)' }}>{day}</p>
                       <button type="button" onClick={() => cycleWorkLocation(day, d.work_location)}
@@ -894,7 +876,7 @@ export default function WeeklyResetPage() {
                 )
               })}
 
-              <div className="p-5 flex flex-col gap-3" style={CARD}>
+              <div className={`p-5 flex flex-col gap-3 ${styles.card}`}>
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4" style={{ color: laundryDone ? '#4E8C6B' : 'var(--violet)' }} />
@@ -933,7 +915,7 @@ export default function WeeklyResetPage() {
 
               {foodPlanPreview ? (
                 <Link href="/food/groceries" className="block">
-                  <div className="p-5 flex items-center justify-between" style={CARD}>
+                  <div className={`p-5 flex items-center justify-between ${styles.card}`}>
                     <div className="flex items-center gap-2">
                       <ShoppingBasket className="h-4 w-4" style={{ color: 'var(--violet)' }} />
                       <span className="text-xs" style={{ color: 'var(--text-2)' }}>
@@ -945,7 +927,7 @@ export default function WeeklyResetPage() {
                 </Link>
               ) : groceriesNeeded && (
                 <Link href="/food" className="block">
-                  <div className="p-5 flex items-center justify-between" style={CARD}>
+                  <div className={`p-5 flex items-center justify-between ${styles.card}`}>
                     <span className="text-xs" style={{ color: 'var(--text-2)' }}>No meal plan built yet this week — generate one in Food</span>
                     <ArrowRight className="h-4 w-4" style={{ color: 'var(--mist)' }} />
                   </div>
@@ -988,7 +970,7 @@ export default function WeeklyResetPage() {
                 <p className="font-display text-base italic" style={{ color: 'var(--text-1)' }}>&ldquo;{closingResult.affirmation}&rdquo;</p>
               </div>
               {closingResult.intention_for_week && (
-                <div className="p-5" style={CARD}>
+                <div className={`p-5 ${styles.card}`}>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Intention for next week</p>
                   <p className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{closingResult.intention_for_week}</p>
                 </div>
