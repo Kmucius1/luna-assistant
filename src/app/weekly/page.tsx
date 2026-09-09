@@ -660,8 +660,15 @@ useEffect(() => {
               <p className="text-sm mb-6" style={{ color: 'var(--mid)' }}>No zero-movement days — gym or something real instead.</p>
               <div className="space-y-4 mb-6">
                 {WEEKDAYS.map(day => {
-                  const current = movementByDay[day] ?? 'gym'
+                  // Monday-Friday actually is her real gym split (see
+                  // ZOE_GYM_BY_DAY), so defaulting those to gym is a real
+                  // fact, not a guess. Saturday is explicitly "her choice"
+                  // and Sunday is Recovery Sunday — neither gets defaulted
+                  // to gym; she has to actually tap one.
+                  const isWeekend = day === 'Saturday' || day === 'Sunday'
+                  const current = movementByDay[day] ?? (isWeekend ? undefined : 'gym')
                   const isGym = current === 'gym'
+                  const isNotGym = current !== undefined && current !== 'gym'
                   return (
                     <div key={day} className={`p-4 ${styles.card}`}>
                       <div className="flex items-center justify-between mb-2">
@@ -670,10 +677,13 @@ useEffect(() => {
                           <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: 'gym' }))}
                             className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: isGym ? '#5C4530' : 'rgba(244,235,212,0.9)', color: isGym ? '#FFFFFF' : '#5C4530' }}>Gym</button>
                           <button type="button" onClick={() => setMovementByDay(prev => ({ ...prev, [day]: prev[day] && prev[day] !== 'gym' ? prev[day] : 'walk' }))}
-                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: !isGym ? '#5C4530' : 'rgba(244,235,212,0.9)', color: !isGym ? '#FFFFFF' : '#5C4530' }}>Not gym</button>
+                            className="px-3 py-1.5 rounded-full text-xs font-semibold" style={{ background: isNotGym ? '#5C4530' : 'rgba(244,235,212,0.9)', color: isNotGym ? '#FFFFFF' : '#5C4530' }}>Not gym</button>
                         </div>
                       </div>
-                      {!isGym && (
+                      {current === undefined && (
+                        <p className="text-xs" style={{ color: 'var(--mist)' }}>{day === 'Sunday' ? 'Recovery day by default — pick gym or an alternative.' : 'Your choice this week — pick gym or an alternative.'}</p>
+                      )}
+                      {isNotGym && (
                         <ChoiceGrid
                           columns={2}
                           options={[...MOVEMENT_ALTERNATIVES, REST_OPTION]}
