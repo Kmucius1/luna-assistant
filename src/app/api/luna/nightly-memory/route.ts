@@ -48,7 +48,7 @@ async function handle(req: NextRequest) {
     const startISO = start.toISOString()
     const endISO = end.toISOString()
 
-    const [{ data: messages }, { data: checkIns }, { data: brainDumps }, { data: journalEntries }, { data: tasksCreated }, { data: intentionsSet }] = await Promise.all([
+    const [{ data: messages }, { data: checkIns }, { data: brainDumps }, { data: journalEntries }, { data: tasksCreated }, { data: intentionsSet }, { data: mealsLogged }, { data: workoutsLogged }] = await Promise.all([
       db.from('luna_messages')
         .select('role, content, created_at')
         .eq('user_id', ZOE_USER_ID)
@@ -74,9 +74,20 @@ async function handle(req: NextRequest) {
         .select('text')
         .eq('user_id', ZOE_USER_ID)
         .gte('created_at', startISO).lt('created_at', endISO),
+      // Most real days she's in the app through Food/Fitness rather than
+      // chatting with LUNA directly or journaling — without these, memory
+      // silently skipped nearly every day she actually used LUNA.
+      db.from('food_log_entries')
+        .select('meal_type, title')
+        .eq('user_id', ZOE_USER_ID)
+        .eq('date_key', dateKey),
+      db.from('workout_logs')
+        .select('activity_type, focus')
+        .eq('user_id', ZOE_USER_ID)
+        .eq('date_key', dateKey),
     ])
 
-    const hasAnyActivity = [messages, checkIns, brainDumps, journalEntries, tasksCreated, intentionsSet]
+    const hasAnyActivity = [messages, checkIns, brainDumps, journalEntries, tasksCreated, intentionsSet, mealsLogged, workoutsLogged]
       .some(rows => (rows?.length ?? 0) > 0)
 
     if (!hasAnyActivity) {
@@ -101,6 +112,8 @@ async function handle(req: NextRequest) {
       .join('\n---\n')
     const tasksText = (tasksCreated ?? []).map((t: { title: string }) => `- ${t.title}`).join('\n')
     const intentionsText = (intentionsSet ?? []).map((i: { text: string }) => `- ${i.text}`).join('\n')
+    const mealsText = (mealsLogged ?? []).map((m: { meal_type: string; title: string }) => `- ${m.meal_type}: ${m.title}`).join('\n')
+    const workoutsText = (workoutsLogged ?? []).map((w: { activity_type: string | null; focus: string | null }) => `- ${w.activity_type ?? 'gym'}${w.focus ? ` (${w.focus})` : ''}`).join('\n')
 
     const userPrompt = `DATE: ${dateKey}
 
@@ -122,6 +135,12 @@ ${tasksText || '(none)'}
 INTENTIONS SHE SET THAT DAY:
 ${intentionsText || '(none)'}
 
+MEALS SHE LOGGED THAT DAY:
+${mealsText || '(none)'}
+
+WORKOUTS SHE LOGGED THAT DAY:
+${workoutsText || '(none)'}
+
 Extract what LUNA should remember long-term from this day.`
 
     let summary: string
@@ -138,6 +157,8 @@ Extract what LUNA should remember long-term from this day.`
         (journalEntries?.length ?? 0) && `${journalEntries!.length} journal entr${journalEntries!.length === 1 ? 'y' : 'ies'}`,
         (tasksCreated?.length ?? 0) && `${tasksCreated!.length} task(s)`,
         (intentionsSet?.length ?? 0) && `${intentionsSet!.length} intention(s)`,
+        (mealsLogged?.length ?? 0) && `${mealsLogged!.length} meal(s) logged`,
+        (workoutsLogged?.length ?? 0) && `${workoutsLogged!.length} workout(s) logged`,
       ].filter(Boolean).join(', ')
       summary = `${dateKey}: ${counts} logged — summary generation failed, raw activity preserved and reviewable in the Full Record.`
       source = 'fallback'
