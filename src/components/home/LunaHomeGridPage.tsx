@@ -8,7 +8,6 @@ import {
   ArrowUpRight,
   Briefcase,
   Brain,
-  CalendarClock,
   DollarSign,
   Dumbbell,
   Flower2,
@@ -80,17 +79,6 @@ export function LunaHomeGridPage() {
   const isDesktop = useIsDesktop()
   const pageSize = isDesktop ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE
 
-  // Whether THIS week's reset is done — not whether today is Sunday. Keeps
-  // nudging on Home every day of the week (not just Sunday) until it's
-  // actually completed, in case Sunday itself gets missed.
-  const [resetDue, setResetDue] = useState(false)
-  useEffect(() => {
-    fetch('/api/luna/weekly-reset/status', { cache: 'no-store' })
-      .then(res => res.json())
-      .then(data => setResetDue(data.completedThisWeek === false))
-      .catch(() => {})
-  }, [])
-
   const pages = useMemo(() => {
     const chunks: Room[][] = []
     for (let i = 0; i < ROOMS.length; i += pageSize) chunks.push(ROOMS.slice(i, i + pageSize))
@@ -123,17 +111,6 @@ export function LunaHomeGridPage() {
     <AppLayout noPad noScroll>
       <div className={styles.page}>
         <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
-
-        {resetDue && (
-          <Link href="/weekly" className={styles.resetNudge}>
-            <CalendarClock size={14} strokeWidth={1.8} />
-            <span className={styles.resetNudgeText}>
-              <strong>This week&apos;s reset isn&apos;t done yet</strong>
-              <span>{now?.weekday === 'Sunday' ? "Today's the day — let's get it done" : 'Sunday came and went — let’s catch it up now'}</span>
-            </span>
-            <ArrowRight size={13} />
-          </Link>
-        )}
 
         <Link href="/plan-my-day" className={styles.hero}>
           <Image

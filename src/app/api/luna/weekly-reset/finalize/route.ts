@@ -4,16 +4,13 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { calculatePriorityScore } from '@/lib/priority'
 import type { Task } from '@/types'
 import { ZOE_LIFESTYLE_PROFILE, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { planningWeekMondayKey, daysToPlanFor } from '@/lib/luna/planningCycle'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
-const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const ZOE_TIMEZONE = 'America/New_York'
 
 function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
+  return planningWeekMondayKey(date, ZOE_TIMEZONE)
 }
 
 // DRYP's `priority` field is free text, not a fixed union — map loosely to
@@ -37,11 +34,11 @@ interface DrypTaskFlagged {
   isStuck: boolean
 }
 
-function isShapeValid(parsed: Record<string, unknown>): boolean {
+function isShapeValid(parsed: Record<string, unknown>, requiredDays: string[]): boolean {
   const days = parsed.days as Record<string, unknown> | undefined
   const top3b = parsed.top_3_business as unknown[] | undefined
   const top3p = parsed.top_3_personal as unknown[] | undefined
-  return !!days && WEEKDAYS.every(d => d in days) && Array.isArray(top3b) && Array.isArray(top3p)
+  return !!days && requiredDays.every(d => d in days) && Array.isArray(top3b) && Array.isArray(top3p)
 }
 
 const SYSTEM = `You are LUNA, Zoe's personal planner, finishing her Sunday Weekly Reset. You already gathered her real calendar, DRYP CRM, and email data. Now merge that with her answers to a short questionnaire into her final Monday-through-Sunday plan.
@@ -82,6 +79,10 @@ export async function POST(req: NextRequest) {
 
     const now = new Date()
     const dateKey = mondayOf(now)
+    // Run fresh (Monday, or Sunday once the cycle flips) -> full week.
+    // Run as a mid-week catch-up -> only today through Saturday — Monday/
+    // Tuesday already happened, and Sunday belongs to the next reset.
+    const daysRequired = daysToPlanFor(now, ZOE_TIMEZONE)
     const db = createAdminClient()
 
     const { data: gatherRow } = await db
@@ -188,27 +189,30 @@ ${topCandidates.map(c => `• [${c.source}] ${c.title} (score ${c.score})`).join
 ZOE'S ANSWERS TO THIS WEEK'S QUESTIONNAIRE:
 ${JSON.stringify(questionnaireAnswers, null, 2)}
 
-Build the full Monday-through-Sunday plan now. Respect her stated work-location preference from the questionnaire where given, otherwise use the default pattern. If she said no groceries needed, set grocery_day to null. Her laundry_choice and cleaning_choice answers (if present) are already decided and tracked separately from this response — set laundry_cleaning_day to a short one-line summary consistent with them (e.g. "Laundry moved to Monday, 30-min home reset today") rather than inventing a contradictory plan. Keep every string value concise (one short sentence max) — this output has 7 days of nested detail, so brevity per field matters more than completeness of prose.`
+Build the plan now for exactly these days: ${daysRequired.join(', ')}. Respect her stated work-location preference from the questionnaire where given, otherwise use the default pattern. If she said no groceries needed, set grocery_day to null. Her laundry_choice and cleaning_choice answers (if present) are already decided and tracked separately from this response — set laundry_cleaning_day to a short one-line summary consistent with them (e.g. "Laundry moved to Monday, 30-min home reset today") rather than inventing a contradictory plan. Keep every string value concise (one short sentence max) — this output has 7 days of nested detail, so brevity per field matters more than completeness of prose.`
 
     // A 7-day nested plan is the most complex JSON shape anywhere in this
     // app — give it real headroom and a couple of self-repair passes rather
     // than the single-shot pattern simpler prompts use, since truncation
     // and escaping slips are meaningfully more likely at this size.
-    let raw = await callAI(SYSTEM, userPrompt, 6000)
+    const systemPrompt = daysRequired.length === 7
+      ? SYSTEM
+      : `${SYSTEM}\n\nThis reset is running mid-week as a catch-up (Sunday was missed), not fresh — only plan these remaining days: ${daysRequired.join(', ')}. Only include those keys under "days" — do NOT invent or backfill days that already passed this week, and do NOT include Sunday (that belongs to next week's own reset).`
+    let raw = await callAI(systemPrompt, userPrompt, 6000)
     let parsed: Record<string, unknown> | null = null
     let parseFailureReason = ''
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
         parsed = parseAIJson<Record<string, unknown>>(raw)
-        if (isShapeValid(parsed)) { parseFailureReason = ''; break }
-        parseFailureReason = 'missing required fields (all 7 weekday keys under "days", or top_3_business/top_3_personal as arrays)'
+        if (isShapeValid(parsed, daysRequired)) { parseFailureReason = ''; break }
+        parseFailureReason = `missing required fields (need these day keys under "days": ${daysRequired.join(', ')}; or top_3_business/top_3_personal as arrays)`
       } catch (e) {
         parsed = null
         parseFailureReason = e instanceof Error ? e.message : 'invalid JSON'
       }
       if (attempt < 2) {
         const repairPrompt = `Your previous JSON response had a problem: ${parseFailureReason}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape. Double-check every string value is properly escaped (no unescaped quotes or line breaks inside string values), and that every array/object is properly closed.`
-        raw = await callAI(SYSTEM, repairPrompt, 6000)
+        raw = await callAI(systemPrompt, repairPrompt, 6000)
       }
     }
     if (!parsed) throw new Error(`AI could not produce valid JSON after retries: ${parseFailureReason}`)

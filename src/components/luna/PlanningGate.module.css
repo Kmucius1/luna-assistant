@@ -1,0 +1,61 @@
+.screen {
+  --ivory-1: #FBF8F2;
+  --ivory-2: #F6F1E7;
+  --ink-1: #100C1E;
+  --ink-3: #5E5474;
+  --gold: #5C4530;
+
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: linear-gradient(180deg, var(--ivory-1) 0%, var(--ivory-2) 100%);
+  padding: 24px;
+  text-align: center;
+}
+
+:global([data-theme='dark']) .screen {
+  --ivory-1: #211C14;
+  --ivory-2: #17130D;
+  --ink-1: #F5EFE3;
+  --ink-3: rgba(245, 239, 227, 0.6);
+  --gold: #C4A47C;
+}
+
+.mark {
+  font-family: var(--font-display-var, serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-1);
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(92, 69, 48, 0.18);
+  border-top-color: var(--gold);
+  animation: spin 0.8s linear infinite;
+}
+
+:global([data-theme='dark']) .spinner {
+  border-color: rgba(196, 164, 124, 0.2);
+  border-top-color: var(--gold);
+}
+
+.message {
+  font-family: var(--font-sans-var, sans-serif);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-3);
+  max-width: 260px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

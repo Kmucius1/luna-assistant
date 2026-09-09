@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { planningWeekMondayKey } from '@/lib/luna/planningCycle'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_TIMEZONE = 'America/New_York'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const EDITABLE_FIELDS = ['work_location', 'gym_focus', 'outfit_type'] as const
 const EDITABLE_MEAL_FIELDS = ['breakfast', 'lunch', 'dinner'] as const
 
 function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
+  return planningWeekMondayKey(date, ZOE_TIMEZONE)
 }
 
 // A real patch, not a regenerate — updates exactly the one field on the one

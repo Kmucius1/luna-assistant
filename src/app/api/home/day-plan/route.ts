@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { localDateKey } from '@/lib/luna/dailyCache'
+import { planningDateKey } from '@/lib/luna/planningCycle'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -9,7 +9,7 @@ const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 export async function GET(req: NextRequest) {
   try {
     const tz = req.nextUrl.searchParams.get('tz') || 'America/New_York'
-    const dateKey = localDateKey(new Date(), tz)
+    const dateKey = planningDateKey(new Date(), tz)
 
     const db = createAdminClient()
     const { data } = await db
@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest) {
     const { blockIndex, action, tz } = body as { blockIndex?: number; action?: 'complete' | 'uncomplete' | 'remove'; tz?: string }
     if (typeof blockIndex !== 'number' || !action) return NextResponse.json({ error: 'blockIndex and action are required' }, { status: 400 })
 
-    const dateKey = localDateKey(new Date(), tz || 'America/New_York')
+    const dateKey = planningDateKey(new Date(), tz || 'America/New_York')
     const db = createAdminClient()
 
     const { data: row, error: fetchError } = await db

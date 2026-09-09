@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from '@/lib/theme'
+import { PlanningGate } from '@/components/luna/PlanningGate'
 import './globals.css'
 import './luna-home-polish.css'
 
@@ -73,7 +74,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body className="h-full">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <PlanningGate>{children}</PlanningGate>
+        </ThemeProvider>
       </body>
     </html>
   )

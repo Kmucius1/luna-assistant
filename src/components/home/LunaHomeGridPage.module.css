@@ -32,45 +32,6 @@
   border-color: rgba(201, 169, 110, 0.18);
 }
 
-/* ── Weekly reset nudge (shown any day the week's reset is still open) ── */
-
-.resetNudge {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 10px;
-  border-radius: 12px;
-  background: rgba(92, 69, 48, 0.09);
-  border: 1px solid rgba(180, 150, 100, 0.22);
-  color: var(--gold);
-}
-
-:global([data-theme='dark']) .resetNudge {
-  background: rgba(196, 164, 124, 0.1);
-  border-color: rgba(201, 169, 110, 0.24);
-}
-
-.resetNudgeText {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}
-
-.resetNudgeText strong {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--ink-1);
-}
-
-.resetNudgeText span {
-  font-size: 8.5px;
-  font-weight: 500;
-  color: var(--ink-3);
-}
-
 /* ── Hero (with View Plan button, unlike /today's) ────── */
 
 .hero {

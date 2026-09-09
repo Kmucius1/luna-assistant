@@ -6,16 +6,14 @@ import { getAllValidGmailTokens, listGmailMessages, type GmailMessage } from '@/
 import { getOpenTasks, getSummaryStats, getAccounts, getClientRoster, type DryphubTask, type ClientRosterEntry } from '@/lib/dryp-crm'
 import { classifyMeetingLocation, type MeetingLocationType } from '@/lib/luna/meetingLocation'
 import { ZOE_LIFESTYLE_PROFILE, ZOE_WORK_LOCATION_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { planningWeekMondayKey } from '@/lib/luna/planningCycle'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_TIMEZONE = 'America/New_York'
 const STUCK_THRESHOLD_DAYS = 14
 
 function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
+  return planningWeekMondayKey(date, ZOE_TIMEZONE)
 }
 
 interface ClassifiedEvent {

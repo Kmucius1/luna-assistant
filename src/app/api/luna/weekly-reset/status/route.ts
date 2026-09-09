@@ -1,24 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { planningWeekMondayKey } from '@/lib/luna/planningCycle'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
-
-function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
-}
+const ZOE_TIMEZONE = 'America/New_York'
 
 // Whether THIS week's reset (keyed to this week's Monday, same date_key
 // finalize() writes to) has actually been completed — not whether today
-// happens to be Sunday. Lets Home nudge her toward it any day of the week
-// if Sunday got missed, instead of only ever prompting on Sunday itself.
+// happens to be Sunday. The cycle itself flips at Sunday 4am local (see
+// planningWeekMondayKey), so Home starts nudging her toward it from that
+// moment, any day of the week, instead of only ever prompting on Sunday.
 export async function GET() {
   try {
     const supabase = createAdminClient()
-    const weekMondayKey = mondayOf(new Date())
+    const weekMondayKey = planningWeekMondayKey(new Date(), ZOE_TIMEZONE)
 
     const { data, error } = await supabase
       .from('daily_generation_cache')

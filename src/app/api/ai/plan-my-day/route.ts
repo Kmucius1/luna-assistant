@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localHour, localDateKey } from '@/lib/luna/dailyCache'
+import { planningDateKey, planningWeekMondayKey } from '@/lib/luna/planningCycle'
 import { buildLunaContext } from '@/lib/luna/context'
 import { ZOE_GYM_BY_DAY, ZOE_LIFESTYLE_PROFILE, ZOE_BUSINESS_FOCUS_BY_DAY, ZOE_WEEKDAY_BUSINESS_FOCUS_PROSE } from '@/lib/luna/zoeLifestyleProfile'
 import { getTodayEvents, type CalendarEvent } from '@/lib/calendar'
@@ -139,6 +140,25 @@ export async function POST(req: NextRequest) {
       lunaContext.assistantProfile?.dailyRoutine && `Her saved daily routine: ${lunaContext.assistantProfile.dailyRoutine}`,
       lunaContext.assistantProfile?.personalGoals && `Her saved personal goals: ${lunaContext.assistantProfile.personalGoals}`,
     ].filter(Boolean).join('\n') || 'Use the current lifestyle profile as the source of truth.'
+
+    // This week's already-decided plan for today, from the Weekly Reset —
+    // a starting point to confirm/adjust against real-time data below, not
+    // something to regenerate from scratch when it already exists.
+    const weeklyPlanForToday = await (async () => {
+      try {
+        const db = createAdminClient()
+        const weekKey = planningWeekMondayKey(todayDate, tz)
+        const { data } = await db
+          .from('daily_generation_cache')
+          .select('payload')
+          .eq('user_id', ZOE_USER_ID)
+          .eq('date_key', weekKey)
+          .eq('generation_type', 'weekly_reset_final')
+          .maybeSingle()
+        const days = (data?.payload as { days?: Record<string, unknown> } | undefined)?.days
+        return days?.[weekday] ?? null
+      } catch { return null }
+    })()
 
     // Gather real Calendar + Gmail + DRYP CRM — same pattern as the Sunday
     // Weekly Reset gather step, scoped to today instead of the week ahead.
@@ -341,6 +361,7 @@ export async function POST(req: NextRequest) {
         : `Movement today: ${movementLabel(movementChoice)} — NOT the gym, do not schedule a gym block, schedule this instead.`
 
     const userPrompt = `Today: ${today} (${timeContext})
+${weeklyPlanForToday ? `ALREADY DECIDED IN THIS WEEK'S RESET FOR TODAY — use these as the real starting point, only depart from them where the calendar/DRYP/bill data below has genuinely changed since Sunday: ${JSON.stringify(weeklyPlanForToday)}` : ''}
 ${businessFocus ? `Today's business focus theme: ${businessFocus.theme} — ${businessFocus.note}` : ''}
 ${fridayMoneyCloseout ? `FRIDAY MONEY CLOSEOUT — real DRYP financial data: ${fridayMoneyCloseout.needToSendCount} invoice(s) need to be created/sent${fridayMoneyCloseout.needToSendNames.length ? ` (${fridayMoneyCloseout.needToSendNames.join(', ')})` : ''}. $${fridayMoneyCloseout.outstandingTotal.toFixed(0)} outstanding across open invoices. $${fridayMoneyCloseout.revenueClosedThisWeek.toFixed(0)} in revenue closed (paid) this week. Weave the real, non-zero items from this into today's work blocks or follow-ups — don't invent generic "invoicing" busywork if these are already zero.` : ''}
 ${movementLine}
@@ -414,7 +435,13 @@ Build the full day. Include the exact weekday gym focus and exercises under the 
       const db = createAdminClient()
       await db.from('daily_generation_cache').upsert({
         user_id: ZOE_USER_ID,
-        date_key: localDateKey(todayDate, tz),
+        // Plan My Day rolls over at 4am local, not midnight — she's often
+        // still up past midnight and "today's plan" shouldn't flip while
+        // she's still awake in the previous day. This is the one date_key
+        // in this route that means "which day is this plan for" — the
+        // other localDateKey() calls above are real calendar-date lookups
+        // (bill due dates, today's logged workout) and stay midnight-based.
+        date_key: planningDateKey(todayDate, tz),
         timezone: tz,
         generation_type: 'day_plan',
         payload,
