@@ -60,6 +60,14 @@ export function classifyMeetingLocation(
     return 'in_person_client' // has a real address, not the office — treat as an external/client-type location
   }
 
+  // No video link and nothing that reads like a real address — if there's
+  // also no one else on the invite, this was never a meeting to begin with
+  // (a solo work block like "BLOGS" or a content task she put on her own
+  // calendar), not a real meeting with a genuinely unclear location. Only
+  // an event with other attendees but no resolvable location stays
+  // 'unclear' and gets surfaced for her to confirm.
+  if ((event.attendeeEmails ?? []).length === 0) return 'virtual'
+
   return 'unclear'
 }
 
