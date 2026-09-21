@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isMickContact } from '@/lib/calendarPeople'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -9,7 +10,6 @@ function adminDb() {
 const DEFAULTS = [
   { name: 'Shannon Martin', email: null },
   { name: 'Kaleb Mucius',   email: null },
-  { name: 'Mick Hoover',    email: null },
 ]
 
 async function ensureDefaults(db: ReturnType<typeof adminDb>) {
@@ -24,7 +24,7 @@ export async function GET() {
     await ensureDefaults(db)
     const { data, error } = await db.from('priority_contacts').select('*').order('name')
     if (error) throw error
-    return NextResponse.json({ contacts: data ?? [] })
+    return NextResponse.json({ contacts: (data ?? []).filter(c => !isMickContact(c)) })
   } catch {
     // Table may not exist yet — return defaults
     return NextResponse.json({ contacts: DEFAULTS.map((c, i) => ({ id: String(i), ...c, created_at: new Date().toISOString() })) })

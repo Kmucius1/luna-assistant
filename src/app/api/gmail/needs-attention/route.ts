@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getAllValidGmailTokens, listGmailMessages, type GmailMessage } from '@/lib/gmail'
+import { isMickContact } from '@/lib/calendarPeople'
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
 }
 
-const PRIORITY_DEFAULTS = ['Shannon Martin', 'Kaleb Mucius', 'Mick Hoover']
+const PRIORITY_DEFAULTS = ['Shannon Martin', 'Kaleb Mucius']
 
 async function getPriorityContacts(): Promise<{ name: string; email: string | null }[]> {
   try {
     const { data } = await adminDb().from('priority_contacts').select('name, email')
-    if (data?.length) return data
+    if (data?.length) return data.filter(c => !isMickContact(c))
   } catch {}
   return PRIORITY_DEFAULTS.map(name => ({ name, email: null }))
 }

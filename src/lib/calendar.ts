@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { localDateKey } from '@/lib/luna/dailyCache'
+import { isMickCalendar } from '@/lib/calendarPeople'
 
 const CLIENT_ID     = process.env.GOOGLE_CLIENT_ID!
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET!
@@ -127,7 +128,10 @@ export async function getUpcomingEvents(daysAhead = 14): Promise<CalendarEvent[]
   await Promise.all(tokens.map(async (tok) => {
     try {
       const calList  = await calFetch(tok.access_token, '/users/me/calendarList?maxResults=20')
-      const calendars: { id: string; summary: string }[] = calList.items ?? []
+      // Filtered before the 8-calendar cap and before any events are fetched.
+      const calendars: { id: string; summary: string }[] = (calList.items ?? []).filter(
+        (c: { id: string; summary: string }) => !isMickCalendar(c),
+      )
 
       await Promise.all(calendars.slice(0, 8).map(async (cal) => {
         try {

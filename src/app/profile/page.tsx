@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Save, Check, Plus, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { NIGHT_ROUTINE_DEFAULT } from '@/lib/luna/nightRoutine'
 
 const PROFILE_KEY = 'luna_zoe_profile_v2'
 
@@ -129,16 +130,7 @@ const DEFAULT_PROFILE: ZoeProfile = {
     'Eat something before work',
     'Set my one priority for the day',
   ],
-  night_routine: [
-    'Stop working by 9:30 PM — or earlier',
-    'Skin care routine',
-    'No new input (news, social, messages) after 10 PM',
-    'Journal or dictate in LUNA',
-    'Check tomorrow\'s calendar',
-    'Lay out clothes if going out',
-    'Gratitude — end on something good',
-    'Breathe before sleep — in for 4, hold for 4, out for 6',
-  ],
+  night_routine: NIGHT_ROUTINE_DEFAULT,
   astrology_notes: 'Scorpio Sun & Mercury (deep, strategic, investigative). Cancer Moon & North Node (emotional foundation is everything). Gemini Rising (quick, verbal, idea-forward). Virgo Midheaven (career through systems and service). Venus Sag (freedom, beauty, meaning). Mars Libra (act from balance, not reaction). Saturn Taurus (slow money, self-worth work).',
   human_design_notes: 'Self-Projected Projector, 4/6. Authority is in my voice — I hear my truth when I speak it out loud. Wait for recognition before giving big energy. Bitterness = I am forcing. Success = being seen and invited. Role model through lived experience.',
   custom_context: '',

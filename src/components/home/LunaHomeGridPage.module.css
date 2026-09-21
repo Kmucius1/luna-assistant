@@ -77,6 +77,13 @@
   margin: 0 0 2px;
 }
 
+/* Night routine headline: one line so the card keeps its fixed hero size. */
+.heroTitleOneLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .heroContent p {
   font-size: 9px;
   font-weight: 600;

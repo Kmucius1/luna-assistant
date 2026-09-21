@@ -24,6 +24,7 @@ import {
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
 import { DailyCreativeSpark } from '@/components/home/DailyCreativeSpark'
 import { ZOE_HERO_FOCUS_BY_DAY } from '@/lib/luna/zoeLifestyleProfile'
+import { EVENING_START_HOUR, NIGHT_HERO, isNightWindow, loadNightRoutine } from '@/lib/luna/nightRoutine'
 import { AppLayout } from '@/components/layout/AppLayout'
 import styles from './LunaHomeGridPage.module.css'
 
@@ -73,9 +74,49 @@ function useIsDesktop(): boolean {
 
 const HERO_FOCUS_FALLBACK = ZOE_HERO_FOCUS_BY_DAY.Monday
 
+// Night mode for the hero card. Keeps its own clock because useTodayContext's
+// `now` is read once on mount — a phone app left open from afternoon into the
+// evening would otherwise keep showing the daytime focus. Also checks whether
+// today's gym/movement is already logged, which moves night mode up to 5 PM.
+function useNightHero() {
+  const [hour, setHour] = useState<number | null>(null)
+  const [movementDone, setMovementDone] = useState(false)
+  const [routine, setRoutine] = useState<string[]>([])
+  const doneRef = useRef(false)
+  const lastCheckRef = useRef(0)
+
+  useEffect(() => {
+    function refresh() {
+      const h = new Date().getHours()
+      setHour(h)
+      setRoutine(loadNightRoutine())
+      // A new day's first hours must not inherit yesterday's "already worked out".
+      if (h < EVENING_START_HOUR && doneRef.current) { doneRef.current = false; setMovementDone(false) }
+      if (h >= EVENING_START_HOUR && !doneRef.current && Date.now() - lastCheckRef.current > 5 * 60_000) {
+        lastCheckRef.current = Date.now()
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        fetch(`/api/fitness/workouts?tz=${encodeURIComponent(tz)}&limit=1`, { cache: 'no-store' })
+          .then(r => r.json())
+          .then(d => { if (d?.completedToday) { doneRef.current = true; setMovementDone(true) } })
+          .catch(() => { /* unknown -> treat as not done; the 8 PM cutoff still applies */ })
+      }
+    }
+    refresh()
+    const id = setInterval(refresh, 60_000)
+    document.addEventListener('visibilitychange', refresh)
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', refresh) }
+  }, [])
+
+  return { isNight: hour !== null && isNightWindow(hour, movementDone), routine }
+}
+
 export function LunaHomeGridPage() {
   const { now, weather, weatherError } = useTodayContext()
   const focus = (now && ZOE_HERO_FOCUS_BY_DAY[now.weekday]) ?? HERO_FOCUS_FALLBACK
+  const { isNight, routine } = useNightHero()
+  // Most important step is the headline; the next two sit underneath, so the
+  // card keeps its exact size (label + title + two lines + button).
+  const [topStep, ...nextSteps] = routine
   const isDesktop = useIsDesktop()
   const pageSize = isDesktop ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE
 
@@ -112,23 +153,43 @@ export function LunaHomeGridPage() {
       <div className={styles.page}>
         <GreetingHeader now={now} weather={weather} weatherError={weatherError} />
 
-        <Link href="/plan-my-day" className={styles.hero}>
-          <Image
-            src={focus.image}
-            alt={focus.title}
-            fill
-            sizes="(max-width: 640px) 100vw, 640px"
-            style={focus.imagePosition ? { objectPosition: focus.imagePosition } : undefined}
-            priority
-          />
-          <div className={styles.heroOverlay} />
-          <div className={styles.heroContent}>
-            <div className={styles.heroLabel}>Today&apos;s Focus</div>
-            <h2>{focus.title} {focus.title === 'Recovery Sunday' ? <Waves size={13} strokeWidth={2} style={{ display: 'inline', verticalAlign: -2, color: '#5C4530' }} /> : focus.emoji}</h2>
-            <p>{focus.subtitle}</p>
-            <span className={styles.heroButton}>View Plan <ArrowRight size={11} /></span>
-          </div>
-        </Link>
+        {isNight && topStep ? (
+          <Link href={NIGHT_HERO.href} className={styles.hero}>
+            <Image
+              src={NIGHT_HERO.image}
+              alt="Tonight's routine"
+              fill
+              sizes="(max-width: 640px) 100vw, 640px"
+              style={{ objectPosition: NIGHT_HERO.imagePosition }}
+              priority
+            />
+            <div className={styles.heroOverlay} />
+            <div className={styles.heroContent}>
+              <div className={styles.heroLabel}>{NIGHT_HERO.label}</div>
+              <h2 className={styles.heroTitleOneLine}>{topStep} {NIGHT_HERO.emoji}</h2>
+              <p>{nextSteps.length ? `Then: ${nextSteps.slice(0, 2).join(' · ')}` : 'Wind down and let your body rest.'}</p>
+              <span className={styles.heroButton}>View Routine <ArrowRight size={11} /></span>
+            </div>
+          </Link>
+        ) : (
+          <Link href="/plan-my-day" className={styles.hero}>
+            <Image
+              src={focus.image}
+              alt={focus.title}
+              fill
+              sizes="(max-width: 640px) 100vw, 640px"
+              style={focus.imagePosition ? { objectPosition: focus.imagePosition } : undefined}
+              priority
+            />
+            <div className={styles.heroOverlay} />
+            <div className={styles.heroContent}>
+              <div className={styles.heroLabel}>Today&apos;s Focus</div>
+              <h2>{focus.title} {focus.title === 'Recovery Sunday' ? <Waves size={13} strokeWidth={2} style={{ display: 'inline', verticalAlign: -2, color: '#5C4530' }} /> : focus.emoji}</h2>
+              <p>{focus.subtitle}</p>
+              <span className={styles.heroButton}>View Plan <ArrowRight size={11} /></span>
+            </div>
+          </Link>
+        )}
 
         <div className={styles.roomsSection}>
           <div className={styles.roomPager} ref={scrollerRef} onScroll={handleScroll}>

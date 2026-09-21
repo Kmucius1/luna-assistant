@@ -1,9 +1,10 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Sparkles, RefreshCw, ArrowLeft, ChevronLeft, ArrowRight, Clock, Home, Building2, Droplets, Dumbbell, Mail, ShirtIcon } from 'lucide-react'
 import Link from 'next/link'
-import { SmartInput } from '@/components/ui/SmartInput'
+import { SmartInput, getAutosaveKey } from '@/components/ui/SmartInput'
+import { clearAutosaveDraft } from '@/hooks/useAutosave'
 import { YesNoChoice, ChoiceGrid } from '@/components/ui/ChoiceButton'
 import { MOVEMENT_ALTERNATIVES, REST_OPTION, movementLabel, type MovementChoice } from '@/lib/luna/movementAlternatives'
 import { OCCASION_LABEL, type OutfitOccasion } from '@/lib/luna/outfitOccasion'
@@ -64,6 +65,27 @@ const END_TIMES  = ['4:00 PM','5:00 PM','6:00 PM','7:00 PM','8:00 PM']
 const MORNING_SEQUENCE = ['Shower', 'Skincare / SPF', 'Curly hair up, bangs down', 'Gym clothes', 'Tea + breakfast']
 const LATE_WAKE_THRESHOLD = '7:00 AM'
 
+// The text boxes this page must always open empty. SmartInput used to save
+// drafts to localStorage under a label-derived key with no date, which restored
+// the previous day's text on every visit. Drafts are now off here, and any
+// already stored on this device are cleared on mount.
+const FRESH_INPUT_CONTEXTS = [
+  'what is on your mind this morning',
+  'being up and active this morning',
+  'one thing grateful for right now',
+  'noticing tension or calm in the body',
+  'what is helping her feel calm right now',
+  'what would make today feel grounded rather than rushed',
+]
+
+// Client-side twin of planningDateKey (4am rollover). The server version can't
+// be imported here — its module pulls in the service-role Supabase client.
+function planningDayKey(): string {
+  const now = new Date()
+  const effective = now.getHours() < 4 ? new Date(now.getTime() - 24 * 60 * 60 * 1000) : now
+  return effective.toLocaleDateString('en-CA')
+}
+
 type Step = 'wake' | 'energy_mood' | 'journal' | 'movement' | 'loading' | 'result' | 'recovery'
 
 export default function PlanMyDayPage() {
@@ -105,15 +127,9 @@ export default function PlanMyDayPage() {
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   const isSaturday = weekday === 'Saturday'
 
-  useEffect(() => {
-    const wd = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
-    setWeekday(wd)
-    setLocation(ZOE_WORK_LOCATION_BY_DAY[wd] ?? 'home')
-  }, [])
-
   // If today's plan already exists, show it directly — this page is a
   // review of what's actually happening today, not a fresh form every time.
-  useEffect(() => {
+  function loadSavedPlan() {
     fetch(`/api/home/day-plan?tz=${encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone)}`)
       .then(r => r.json())
       .then(d => {
@@ -132,7 +148,54 @@ export default function PlanMyDayPage() {
       })
       .catch(() => {})
       .finally(() => setCheckingSaved(false))
-  }, [])
+  }
+
+  // Back to a blank slate: every typed field and choice at its default, no plan.
+  function resetForNewDay() {
+    const wd = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
+    setWeekday(wd)
+    setLocation(ZOE_WORK_LOCATION_BY_DAY[wd] ?? 'home')
+    setStep('wake'); setPlan(null); setError('')
+    setWakeTime('6:00 AM'); setWorkEndTime('6:00 PM'); setHairWashDay(false)
+    setMorningPlans(''); setWorkPlans(''); setEveningPlans('')
+    setEnergy(null); setMood(null); setShowFullCheckIn(false); setOnMind('')
+    setJournalUp(''); setJournalGrateful(''); setJournalTension(''); setJournalCalm(''); setJournalGrounded('')
+    setGymYes(null); setMovementChoice(null); setGymTime('6:30 AM'); setSaturdayType(null)
+    setMovementLogged(false); setCarCareChecked(new Set())
+    FRESH_INPUT_CONTEXTS.forEach(c => clearAutosaveDraft(getAutosaveKey(c)))
+    setCheckingSaved(true)
+    loadSavedPlan()
+  }
+
+  const planningDayRef = useRef('')
+
+  useEffect(() => {
+    const wd = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(new Date())
+    setWeekday(wd)
+    setLocation(ZOE_WORK_LOCATION_BY_DAY[wd] ?? 'home')
+
+    // Drafts saved by earlier versions of this page would otherwise linger on this device.
+    FRESH_INPUT_CONTEXTS.forEach(c => clearAutosaveDraft(getAutosaveKey(c)))
+
+    planningDayRef.current = planningDayKey()
+    loadSavedPlan()
+
+    // A phone app left open overnight never remounts, so yesterday's typed text
+    // and plan would still be on screen. Start fresh when the planning day changes.
+    function onReturn() {
+      if (document.visibilityState === 'hidden') return
+      const key = planningDayKey()
+      if (key === planningDayRef.current) return
+      planningDayRef.current = key
+      resetForNewDay()
+    }
+    document.addEventListener('visibilitychange', onReturn)
+    window.addEventListener('pageshow', onReturn)
+    return () => {
+      document.removeEventListener('visibilitychange', onReturn)
+      window.removeEventListener('pageshow', onReturn)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function submitCheckIn() {
     fetch('/api/check-ins', {
@@ -367,7 +430,7 @@ export default function PlanMyDayPage() {
                 ) : (
                   <div style={{ ...GLASS, padding: 16 }}>
                     <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What&apos;s on your mind?</p>
-                    <SmartInput context="what is on your mind this morning" placeholder="Optional..." value={onMind} onChange={setOnMind} patternType="morning" rows={2} autoSuggest={false} />
+                    <SmartInput context="what is on your mind this morning" placeholder="Optional..." value={onMind} onChange={setOnMind} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                   </div>
                 )}
 
@@ -392,23 +455,23 @@ export default function PlanMyDayPage() {
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>You&apos;re up and active — how does that feel?</p>
-                  <SmartInput context="being up and active this morning" placeholder="Speak or tap..." value={journalUp} onChange={setJournalUp} patternType="morning" rows={2} autoSuggest={false} />
+                  <SmartInput context="being up and active this morning" placeholder="Speak or tap..." value={journalUp} onChange={setJournalUp} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>I am grateful to be calm — what&apos;s one thing?</p>
-                  <SmartInput context="one thing grateful for right now" placeholder="Speak or tap..." value={journalGrateful} onChange={setJournalGrateful} patternType="morning" rows={2} autoSuggest={false} />
+                  <SmartInput context="one thing grateful for right now" placeholder="Speak or tap..." value={journalGrateful} onChange={setJournalGrateful} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What am I calm enough to notice? Tension, or calm?</p>
-                  <SmartInput context="noticing tension or calm in the body" placeholder="Speak or tap..." value={journalTension} onChange={setJournalTension} patternType="morning" rows={2} autoSuggest={false} />
+                  <SmartInput context="noticing tension or calm in the body" placeholder="Speak or tap..." value={journalTension} onChange={setJournalTension} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What&apos;s helping you feel calm? <span style={{ fontWeight: 400, color: 'var(--ink-4)' }}>(optional)</span></p>
-                  <SmartInput context="what is helping her feel calm right now" placeholder="Speak or tap..." value={journalCalm} onChange={setJournalCalm} patternType="morning" rows={2} autoSuggest={false} />
+                  <SmartInput context="what is helping her feel calm right now" placeholder="Speak or tap..." value={journalCalm} onChange={setJournalCalm} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                 </div>
                 <div style={{ ...GLASS, padding: 16 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--violet)', marginBottom: 8 }}>What would make today feel grounded, not rushed? <span style={{ fontWeight: 400, color: 'var(--ink-4)' }}>(optional)</span></p>
-                  <SmartInput context="what would make today feel grounded rather than rushed" placeholder="Speak or tap..." value={journalGrounded} onChange={setJournalGrounded} patternType="morning" rows={2} autoSuggest={false} />
+                  <SmartInput context="what would make today feel grounded rather than rushed" placeholder="Speak or tap..." value={journalGrounded} onChange={setJournalGrounded} patternType="morning" rows={2} autoSuggest={false} autosave={false} />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button onClick={() => setStep('energy_mood')} style={{ flex: 'none', padding: '13px 18px', borderRadius: 16, border: '1px solid rgba(180,150,100,0.16)', cursor: 'pointer', background: 'var(--surface-inactive)', color: 'var(--ink-3)' }}>
