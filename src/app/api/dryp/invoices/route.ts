@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { todayKey } from '@/lib/luna/today'
 
 const OUTSTANDING_STATUSES = ['ready_to_invoice', 'sent', 'viewed', 'partially_paid', 'overdue']
 
@@ -21,7 +22,6 @@ interface InvoiceRow {
   notes: string | null
 }
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
 
 export async function GET() {
   try {

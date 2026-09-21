@@ -11,6 +11,7 @@ type RetroData = {
     meaning: { theme: string; do: string[]; avoid: string[]; luna: string }
   }>
   next_mercury_retro: string | null
+  mercury_station?: { type: 'retrograde' | 'direct'; when: string; placement: string } | null
   is_mercury_retrograde: boolean
 }
 
@@ -86,10 +87,10 @@ export default function RetrogradesPage() {
                     </div>
                   </>
                 )}
-                {data.next_mercury_retro && !data.is_mercury_retrograde && (
+                {data.mercury_station && (
                   <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(180,150,100,0.15)' }}>
                     <p className="text-xs" style={{ color: 'var(--text-3)' }}>
-                      Next Mercury Retrograde: {data.next_mercury_retro}
+                      {data.mercury_station.type === 'retrograde' ? 'Mercury turns retrograde' : 'Mercury turns direct'}: {data.mercury_station.when} · {data.mercury_station.placement}
                     </p>
                   </div>
                 )}

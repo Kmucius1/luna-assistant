@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { todayKey, daysFromNow } from '@/lib/luna/today'
 
 export interface SafeToSpendBreakdown {
   postedBalances: number
@@ -21,9 +22,6 @@ export interface SafeToSpendBreakdown {
   notComputed: string[]
 }
 
-function todayKey(): string {
-  return new Date().toISOString().split('T')[0]
-}
 
 // posted checking/cash + confirmed income - pending outflows - bills due
 // - grocery/gas/necessity reserves - minimum debt payments - planned
@@ -34,7 +32,7 @@ export async function computeSafeToSpend(db: SupabaseClient, userId: string): Pr
   const weeklyGrocery = prefs?.weekly_grocery_target ?? 0
   const weeklyGas = prefs?.weekly_gas_target ?? 0
   const today = todayKey()
-  const cutoffDate: string = prefs?.planning_cutoff_date ?? new Date(Date.now() + 14 * 86_400_000).toISOString().split('T')[0]
+  const cutoffDate: string = prefs?.planning_cutoff_date ?? daysFromNow(14)
   const daysToCutoff = Math.max(1, Math.round((new Date(cutoffDate).getTime() - Date.now()) / 86_400_000))
 
   const { data: accounts } = await db.from('financial_accounts')

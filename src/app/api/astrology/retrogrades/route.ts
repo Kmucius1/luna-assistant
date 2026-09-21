@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentPlanets, isRetrograde } from '@/lib/astrology'
+import { getCurrentPlanets, isRetrograde, getNextStation } from '@/lib/astrology'
 
 const RETROGRADE_MEANINGS: Record<string, {
   theme: string; do: string[]; avoid: string[]; luna: string
@@ -72,21 +72,16 @@ export async function GET(req: NextRequest) {
       },
     }))
 
-    // Find next Mercury retrograde (most commonly tracked)
+    // Mercury's next station (most commonly tracked), exact to the minute.
+    // If Mercury is retrograde now, the next station is when it turns direct.
     let nextMercuryRetro: string | null = null
+    let mercuryStation: { type: 'retrograde' | 'direct'; when: string; placement: string } | null = null
     try {
-      let searchDate = now
-      let found = false
-      for (let d = 0; d < 90; d++) {
-        searchDate = new Date(now.getTime() + d * 86400_000)
-        if (isRetrograde('Mercury', searchDate) && !isRetrograde('Mercury', now)) {
-          found = true
-          break
-        }
-      }
-      if (found) {
-        const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'long', day: 'numeric' })
-        nextMercuryRetro = fmt.format(searchDate)
+      const st = getNextStation('Mercury', now)
+      if (st) {
+        const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
+        mercuryStation = { type: st.type, when: fmt.format(st.date), placement: st.placement }
+        if (st.type === 'retrograde') nextMercuryRetro = mercuryStation.when
       }
     } catch { /* ignore */ }
 
@@ -94,6 +89,7 @@ export async function GET(req: NextRequest) {
       retrograde_count: retroPlanets.length,
       retrogrades: retroData,
       next_mercury_retro: nextMercuryRetro,
+      mercury_station: mercuryStation,
       is_mercury_retrograde: isRetrograde('Mercury', now),
       calculated_at: now.toISOString(),
     })

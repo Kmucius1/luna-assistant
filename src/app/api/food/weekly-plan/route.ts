@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { mondayKeyOf } from '@/lib/luna/today'
 
-function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
-}
+function mondayOf(date: Date): string { return mondayKeyOf(date) }
 
 export async function GET() {
   try {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { todayKey } from '@/lib/luna/today'
 
 const STATUSES = ['draft', 'ready_to_invoice', 'sent', 'viewed', 'partially_paid', 'paid', 'overdue', 'disputed', 'cancelled']
 
@@ -14,7 +15,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() }
     if (STATUSES.includes(body.status)) {
       updates.status = body.status
-      if (body.status === 'paid' && !body.paid_date) updates.paid_date = new Date().toISOString().split('T')[0]
+      if (body.status === 'paid' && !body.paid_date) updates.paid_date = todayKey()
     }
     if (typeof body.amount === 'number') updates.amount = body.amount
     if (typeof body.deposit_paid === 'number') updates.deposit_paid = body.deposit_paid

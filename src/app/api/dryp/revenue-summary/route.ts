@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { todayKey, daysFromNow, monthBoundsKeys } from '@/lib/luna/today'
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
-function monthBounds(): { start: string; end: string } {
-  const now = new Date()
-  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0]
-  return { start, end }
-}
+function monthBounds(): { start: string; end: string } { return monthBoundsKeys() }
 
 interface BillingRow { retainer_amount: number | null; billing_type: string; contract_start: string | null; contract_end: string | null }
 interface OpportunityRow { potential_value: number | null; probability_pct: number | null }
@@ -22,7 +17,7 @@ export async function GET() {
 
     const today = todayKey()
     const { start: monthStart, end: monthEnd } = monthBounds()
-    const in30Days = new Date(Date.now() + 30 * 86_400_000).toISOString().split('T')[0]
+    const in30Days = daysFromNow(30)
 
     const [billingRes, oppsRes, invoicesRes, expensesRes] = await Promise.all([
       supabase.from('dryp_client_billing').select('retainer_amount, billing_type, contract_start, contract_end').eq('user_id', user.id),

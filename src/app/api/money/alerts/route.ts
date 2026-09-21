@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId } from '@/lib/money/auth'
+import { todayKey, daysFromNow } from '@/lib/luna/today'
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
-function daysFromNow(n: number): string { return new Date(Date.now() + n * 86_400_000).toISOString().split('T')[0] }
 
 interface BillRow { id: string; name: string; due_date: string; expected_amount: number | null }
 

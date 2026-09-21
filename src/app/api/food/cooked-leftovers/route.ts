@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { todayKey } from '@/lib/luna/today'
 
 const SAFE_DAYS = 4 // cooked protein/mixed dishes — 3-4 days refrigerated
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
 function addDays(dateKey: string, days: number): string {
   const d = new Date(dateKey)
   d.setDate(d.getDate() + days)

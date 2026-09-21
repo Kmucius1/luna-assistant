@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId } from '@/lib/money/auth'
+import { todayKey } from '@/lib/luna/today'
 
 // income_events.confirmed gates whether computeSafeToSpend() counts a
 // deposit at all — nothing writes to this table anywhere else in the app
@@ -9,7 +10,7 @@ export async function GET() {
   try {
     const userId = await resolveMoneyUserId()
     const db = createAdminClient()
-    const today = new Date().toISOString().split('T')[0]
+    const today = todayKey()
     const { data, error } = await db.from('income_events').select('*').eq('user_id', userId).gte('expected_date', today).order('expected_date', { ascending: true })
     if (error) throw error
     return NextResponse.json({ income: data ?? [] }, { headers: { 'Cache-Control': 'no-store' } })

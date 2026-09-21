@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { todayKey } from '@/lib/luna/today'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,7 @@ function seededNumber(seed: number, offset: number) {
 
 export async function GET(request: NextRequest) {
   const now = new Date()
-  const dateKey = request.nextUrl.searchParams.get('date') || now.toISOString().slice(0, 10)
+  const dateKey = request.nextUrl.searchParams.get('date') || todayKey(now)
   const parsedDate = new Date(`${dateKey}T12:00:00Z`)
   const safeDate = Number.isNaN(parsedDate.getTime()) ? now : parsedDate
   const daySeed = Math.floor(safeDate.getTime() / 86_400_000)

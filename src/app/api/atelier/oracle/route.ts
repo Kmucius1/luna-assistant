@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { callAI, STYLE_ORACLE_SYSTEM_PROMPT, parseAIJson } from '@/lib/ai'
+import { todayKey } from '@/lib/luna/today'
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (user) {
       await supabase.from('outfit_ideas').insert({
         user_id: user.id,
-        date: new Date().toISOString().split('T')[0],
+        date: todayKey(),
         title: (parsed as { outfit_energy?: string }).outfit_energy ?? 'Daily Look',
         style_lane: (parsed as { style_lane?: string }).style_lane,
         mood_target: desired_feel ?? mood,

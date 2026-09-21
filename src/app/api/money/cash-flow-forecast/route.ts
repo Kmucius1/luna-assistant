@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId, isUnauthorizedError } from '@/lib/money/auth'
 import { computeSafeToSpend } from '@/lib/money/safeToSpend'
+import { todayKey, daysFromNow } from '@/lib/luna/today'
 
 const WINDOWS = [7, 30, 60, 90]
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
-function daysFromNow(n: number): string { return new Date(Date.now() + n * 86_400_000).toISOString().split('T')[0] }
 
 interface BillRow { expected_amount: number | null; due_date: string | null }
 interface SubRow { expected_amount: number | null; next_expected_date: string | null }

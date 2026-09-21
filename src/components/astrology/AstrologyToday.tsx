@@ -44,7 +44,7 @@ interface DailyGuidance {
   affirmation: string
 }
 
-interface EclipseEvent { type: string; dateFormatted: string; description: string }
+interface UpcomingEvent { kind: 'moon' | 'eclipse' | 'station'; title: string; detail: string; date: string; dateFormatted: string }
 
 const NATAL_CATEGORIES: Record<string, { label: string; icon: typeof Heart }[]> = {
   Moon:       [{ label: 'Emotions', icon: Heart }, { label: 'Self-Care', icon: SparklesIcon }],
@@ -72,7 +72,7 @@ export function AstrologyToday() {
   const [moon, setMoon] = useState<MoonData | null>(null)
   const [transits, setTransits] = useState<TransitData | null>(null)
   const [guidance, setGuidance] = useState<DailyGuidance | null>(null)
-  const [eclipses, setEclipses] = useState<EclipseEvent[]>([])
+  const [upcoming, setUpcoming] = useState<UpcomingEvent[]>([])
   const { now, weather, weatherError } = useTodayContext()
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export function AstrologyToday() {
 
     fetch(`/api/astrology/moon?tz=${encodeURIComponent(tz)}`).then(r => r.json()).then(setMoon).catch(() => {})
     fetch('/api/astrology/transits').then(r => r.json()).then(setTransits).catch(() => {})
-    fetch(`/api/astrology/planets?tz=${encodeURIComponent(tz)}`).then(r => r.json()).then(d => setEclipses(d.eclipses ?? [])).catch(() => {})
+    fetch(`/api/astrology/planets?tz=${encodeURIComponent(tz)}`).then(r => r.json()).then(d => setUpcoming(d.upcoming ?? [])).catch(() => {})
 
     const localDate = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date())
     const localTime = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
@@ -185,19 +185,13 @@ export function AstrologyToday() {
       <div>
         <div className={styles.sectionHeader}>Upcoming Cosmic Dates</div>
         <div className={styles.upcomingList} style={{ marginTop: 8 }}>
-          {moon?.phase.next_exact && (
-            <div className={styles.upcomingRow}>
-              <div className={styles.upcomingIcon}><Moon size={15} /></div>
-              <div className={styles.upcomingBody}><strong>{moon.phase.next_exact.name}</strong><span>{moon.phase.next_exact.time}</span></div>
-            </div>
-          )}
-          {eclipses.slice(0, 3).map(e => (
-            <div key={e.type + e.dateFormatted} className={styles.upcomingRow}>
-              <div className={styles.upcomingIcon}><Sun size={15} /></div>
-              <div className={styles.upcomingBody}><strong>{e.type}</strong><span>{e.dateFormatted}</span></div>
+          {upcoming.slice(0, 5).map(u => (
+            <div key={u.kind + u.title + u.date} className={styles.upcomingRow}>
+              <div className={styles.upcomingIcon}>{u.kind === 'moon' ? <Moon size={15} /> : u.kind === 'eclipse' ? <Sun size={15} /> : <Calendar size={15} />}</div>
+              <div className={styles.upcomingBody}><strong>{u.title}</strong><span>{u.dateFormatted}{u.detail ? ` · ${u.detail}` : ''}</span></div>
             </div>
           ))}
-          {!moon?.phase.next_exact && eclipses.length === 0 && (
+          {upcoming.length === 0 && (
             <div className={styles.upcomingRow}>
               <div className={styles.upcomingIcon}><Calendar size={15} /></div>
               <div className={styles.upcomingBody}><strong>Nothing major this week</strong><span>Check Timing for the full picture</span></div>

@@ -3,13 +3,12 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId } from '@/lib/money/auth'
 import { computeSafeToSpend } from '@/lib/money/safeToSpend'
 import { callAI, parseAIJson } from '@/lib/ai'
+import { todayKey, daysFromNow } from '@/lib/luna/today'
 
 const SYSTEM = `You are Luna, narrating Zoe's real financial numbers in plain, warm, direct language — never generic personal-finance filler. You are told the exact real numbers below; never invent or round loosely, and never claim income exists unless it's marked confirmed. Write 2-3 short sentences: what's covered, what's left, and the single most useful thing to pay attention to right now (if anything). No toxic positivity, no shame, no jargon.
 
 Return ONLY valid JSON: { "message": "..." }`
 
-function todayKey() { return new Date().toISOString().split('T')[0] }
-function daysFromNow(n: number) { return new Date(Date.now() + n * 86_400_000).toISOString().split('T')[0] }
 
 export async function GET() {
   try {

@@ -346,20 +346,64 @@ export function getNextExactMoonPhase(date: Date): { name: string; date: Date } 
   }
 }
 
+// ─── Upcoming exact Moon phases ───────────────────────────────
+// The next `count` New / First Quarter / Full / Last Quarter moments, exact to
+// the minute. (getNextExactMoonPhase only reports one within ~48 hours.)
+export function getUpcomingMoonPhases(date: Date, count = 4): Array<{ name: string; date: Date }> {
+  const names = ['New Moon', 'First Quarter', 'Full Moon', 'Last Quarter']
+  const out: Array<{ name: string; date: Date }> = []
+  try {
+    let q = Astronomy.SearchMoonQuarter(date)
+    for (let i = 0; i < count; i++) {
+      out.push({ name: names[q.quarter], date: q.time.date })
+      q = Astronomy.NextMoonQuarter(q)
+    }
+  } catch { /* return what we have */ }
+  return out
+}
+
+// ─── Next retrograde / direct station ─────────────────────────
+// Exact moment the planet next turns retrograde or direct. Scans in 6-hour
+// steps, then bisects to the minute using the same isRetrograde() the rest of
+// the app uses — so dates here can never disagree with the retrograde status.
+export function getNextStation(
+  name: string, date: Date, maxDays = 500,
+): { type: 'retrograde' | 'direct'; date: Date; placement: string } | null {
+  const STEP = 6 * 3600_000
+  const start = date.getTime()
+  const startState = isRetrograde(name, date)
+  for (let ms = STEP; ms <= maxDays * 86_400_000; ms += STEP) {
+    if (isRetrograde(name, new Date(start + ms)) === startState) continue
+    let lo = start + ms - STEP, hi = start + ms
+    while (hi - lo > 60_000) {
+      const mid = Math.floor((lo + hi) / 2)
+      if (isRetrograde(name, new Date(mid)) === startState) lo = mid; else hi = mid
+    }
+    const at = new Date(hi)
+    return { type: startState ? 'direct' : 'retrograde', date: at, placement: longitudeToSign(getPlanetLongitude(name, at)).formatted }
+  }
+  return null
+}
+
 // ─── Upcoming eclipses ────────────────────────────────────────
-export function getUpcomingEclipses(date: Date): Array<{ type: string; date: Date; description: string }> {
-  const eclipses: Array<{ type: string; date: Date; description: string }> = []
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+export function getUpcomingEclipses(date: Date): Array<{ type: string; date: Date; description: string; placement: string }> {
+  const eclipses: Array<{ type: string; date: Date; description: string; placement: string }> = []
   try {
     const lunar = Astronomy.SearchLunarEclipse(date)
     eclipses.push({
-      type: `Lunar Eclipse (${lunar.kind})`,
+      type: `Lunar Eclipse (${cap(lunar.kind)})`,
       date: lunar.peak.date,
+      // Where the eclipse falls in the zodiac at its peak — the Moon's position.
+      placement: longitudeToSign(getPlanetLongitude('Moon', lunar.peak.date)).formatted,
       description: 'Eclipses accelerate what needs to change. Release, closure, and sudden clarity.',
     })
     const solar = Astronomy.SearchGlobalSolarEclipse(date)
     eclipses.push({
-      type: `Solar Eclipse`,
+      type: `Solar Eclipse (${cap(solar.kind)})`,
       date: solar.peak.date,
+      placement: longitudeToSign(getPlanetLongitude('Sun', solar.peak.date)).formatted,
       description: 'New chapter begins. What seeds are you planting in the dark?',
     })
   } catch {

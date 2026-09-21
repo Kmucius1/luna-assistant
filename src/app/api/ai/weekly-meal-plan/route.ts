@@ -4,6 +4,7 @@ import { ZOE_LIFESTYLE_PROFILE, ZOE_MEAL_ROTATION_BY_DAY } from '@/lib/luna/zoeL
 import { createClient } from '@/lib/supabase/server'
 import { FoodProfile, formatFoodProfileForPrompt, mergedNeverFoods } from '@/lib/luna/foodProfile'
 import { ZOE_PANTRY_STAPLES, type StapleDef } from '@/lib/luna/pantryStaples'
+import { todayKey, mondayKeyOf } from '@/lib/luna/today'
 
 const MEAL_ROTATION_PROSE = Object.entries(ZOE_MEAL_ROTATION_BY_DAY)
   .map(([day, note]) => `- ${day}: ${note}`)
@@ -48,13 +49,7 @@ Return ONLY valid JSON in this shape:
 }`
 }
 
-function mondayOf(date: Date): string {
-  const d = new Date(date)
-  const day = d.getDay() // 0 = Sunday
-  const diff = day === 0 ? -6 : 1 - day
-  d.setDate(d.getDate() + diff)
-  return d.toISOString().split('T')[0]
-}
+function mondayOf(date: Date): string { return mondayKeyOf(date) }
 
 export async function POST(req: NextRequest) {
   try {
@@ -113,7 +108,7 @@ export async function POST(req: NextRequest) {
         .select('meal_name, cooked_at, safe_until')
         .eq('user_id', user.id)
         .eq('status', 'active')
-        .gte('safe_until', new Date().toISOString().split('T')[0])
+        .gte('safe_until', todayKey())
       if (error) throw error
       activeLeftovers = data ?? []
     } catch { /* migration not applied yet */ }

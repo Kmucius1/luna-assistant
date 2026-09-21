@@ -2,9 +2,8 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId } from '@/lib/money/auth'
 import { computeSafeToSpend } from '@/lib/money/safeToSpend'
+import { todayKey, daysFromNow } from '@/lib/luna/today'
 
-function todayKey(): string { return new Date().toISOString().split('T')[0] }
-function daysFromNow(n: number): string { return new Date(Date.now() + n * 86_400_000).toISOString().split('T')[0] }
 
 interface BillRow { due_date: string | null; expected_amount: number | null; minimum_amount: number | null }
 interface TxnRow { amount: number; ownership_type: string; direction: string; category: string | null; account_id?: string; id?: string }

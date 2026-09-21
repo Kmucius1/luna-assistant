@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { depleteStaplesFromMealTitle } from '@/lib/luna/staplesDepletion'
+import { todayKey } from '@/lib/luna/today'
 
-function todayKey(): string {
-  return new Date().toISOString().split('T')[0]
-}
 
 const NUTRITION_ESTIMATE_SYSTEM = `You estimate real-world nutrition for a short food description someone just ate.
 Give your honest best estimate for a typical serving — not zero, not a refusal, even if the description is vague (use a reasonable typical portion).

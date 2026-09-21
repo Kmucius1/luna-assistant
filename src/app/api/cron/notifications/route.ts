@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 import { sendPushToUser, alreadySentToday, markSentToday } from '@/lib/luna/pushNotifications'
+import { mondayKeyOf } from '@/lib/luna/today'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_TIMEZONE = 'America/New_York'
@@ -61,13 +62,7 @@ const SLOTS: Slot[] = [
     key: 'evening_wind_down',
     hour: 18,
     build: async (db, weekday) => {
-      const monday = (() => {
-        const d = new Date()
-        const day = d.getUTCDay()
-        const diff = day === 0 ? -6 : 1 - day
-        d.setUTCDate(d.getUTCDate() + diff)
-        return d.toISOString().split('T')[0]
-      })()
+      const monday = mondayKeyOf()
       const { data: plan } = await db.from('food_weekly_plans')
         .select('plan_json').eq('user_id', ZOE_USER_ID).eq('week_start', monday).maybeSingle()
       const dinners = (plan?.plan_json as { dinners?: { day: string; meal: string }[] } | undefined)?.dinners

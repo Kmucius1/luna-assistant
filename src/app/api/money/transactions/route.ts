@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { isUnauthorizedError, resolveMoneyUserId } from '@/lib/money/auth'
 import { buildFingerprint } from '@/lib/money/fingerprint'
+import { todayKey } from '@/lib/luna/today'
 
 interface TransactionRow { direction: string; ownership_type: string; amount: number; [key: string]: unknown }
 
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
     const userId = await resolveMoneyUserId()
     const db = createAdminClient()
-    const date = body.transaction_date ?? new Date().toISOString().split('T')[0]
+    const date = body.transaction_date ?? todayKey()
     const merchant = body.merchant.trim().slice(0, 300)
     const fingerprint = buildFingerprint({
       userId, accountId: body.account_id, postedDate: date, merchantNormalized: merchant, amount: Math.abs(body.amount), direction: body.direction,

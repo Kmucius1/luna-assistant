@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { estimateShelfLife } from '@/lib/luna/foodShelfLife'
+import { todayKey, addDaysToKey } from '@/lib/luna/today'
 
 type Category = 'produce' | 'protein' | 'dairy' | 'bakery_and_grains' | 'pantry' | 'frozen' | 'other'
 type Storage = 'fridge' | 'freezer' | 'pantry'
@@ -63,9 +64,8 @@ export async function POST(req: NextRequest) {
       if (!expiresOn) {
         const match = estimates.find(e => e.name.toLowerCase() === i.name.toLowerCase())
         if (match) {
-          const d = new Date(today)
-          d.setDate(d.getDate() + match.days)
-          expiresOn = d.toISOString().split('T')[0]
+          // Calendar days from today in ET — not the server's UTC date, which is tomorrow after 8 PM ET.
+          expiresOn = addDaysToKey(todayKey(today), match.days)
         }
       }
       return {

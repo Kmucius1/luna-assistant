@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentPlanets, getRetrogradePlanets, getUpcomingEclipses } from '@/lib/astrology'
+import { getCurrentPlanets, getRetrogradePlanets, getUpcomingEclipses, getUpcomingMoonPhases, getNextStation } from '@/lib/astrology'
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,7 +16,22 @@ export async function GET(req: NextRequest) {
       hour: 'numeric', minute: '2-digit', hour12: true,
     })
 
+    // One merged, chronological list for the "Upcoming Cosmic Dates" box — exact
+    // Moon phases, eclipses (with zodiac placement) and Mercury's next station.
+    const upcoming: Array<{ kind: 'moon' | 'eclipse' | 'station'; title: string; detail: string; date: string; dateFormatted: string }> = [
+      ...getUpcomingMoonPhases(now, 4).map(p => ({ kind: 'moon' as const, title: p.name, detail: '', date: p.date })),
+      ...eclipses.map(e => ({ kind: 'eclipse' as const, title: e.type, detail: e.placement, date: e.date })),
+    ].map(e => ({ ...e, date: e.date.toISOString(), dateFormatted: fmt.format(new Date(e.date)) }))
+    const merc = getNextStation('Mercury', now)
+    if (merc) upcoming.push({
+      kind: 'station',
+      title: merc.type === 'retrograde' ? 'Mercury turns retrograde' : 'Mercury turns direct',
+      detail: merc.placement, date: merc.date.toISOString(), dateFormatted: fmt.format(merc.date),
+    })
+    upcoming.sort((a, b) => a.date.localeCompare(b.date))
+
     return NextResponse.json({
+      upcoming: upcoming.slice(0, 7),
       planets,
       retrogrades: retrogrades.map(p => p.name),
       eclipses: eclipses.map(e => ({

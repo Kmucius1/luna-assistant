@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { resolveMoneyUserId, isUnauthorizedError } from '@/lib/money/auth'
+import { todayKey } from '@/lib/luna/today'
 
 export const PAYDAY_CATEGORIES = [
   'bills', 'business_expenses', 'savings', 'debt', 'groceries', 'gas_car',
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
     const db = createAdminClient()
     const { data, error } = await db.from('payday_allocations').insert({
       user_id: userId,
-      pay_date: body.pay_date || new Date().toISOString().split('T')[0],
+      pay_date: body.pay_date || todayKey(),
       total_amount: totalAmount,
       allocations,
     }).select().single()
