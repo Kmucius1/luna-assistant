@@ -94,7 +94,7 @@ export async function getReadingHistory(
 export async function upsertReading(userId: string, row: StoredReading): Promise<void> {
   try {
     const db = createAdminClient()
-    await db.from('daily_readings').upsert(
+    const { error } = await db.from('daily_readings').upsert(
       {
         user_id: userId,
         reading_date: row.reading_date,
@@ -116,9 +116,12 @@ export async function upsertReading(userId: string, row: StoredReading): Promise
       },
       { onConflict: 'user_id,reading_date,timezone' },
     )
-  } catch {
-    // Persist best-effort — the reading still returns to the caller even
-    // if the write fails (e.g. table not migrated yet).
+    // supabase-js returns the error instead of throwing — without this a failed
+    // save was invisible and the hourly job kept regenerating the same reading.
+    if (error) console.error(`[dailyReadingStore] failed to save reading ${row.reading_date}:`, error.message)
+  } catch (e) {
+    console.error(`[dailyReadingStore] failed to save reading ${row.reading_date}:`, e instanceof Error ? e.message : e)
+    // Best-effort — the reading still returns to the caller even if the write fails.
   }
 }
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generateDailyReading, READING_VERSION } from '@/lib/luna/readingGenerator'
-import { getReadingWindow, upsertReading, type StoredReading } from '@/lib/luna/dailyReadingStore'
+import { generateDailyReading, READING_VERSION, recentTextsFromReading, type RecentTexts } from '@/lib/luna/readingGenerator'
+import { getReadingWindow, getReadingHistory, upsertReading, type StoredReading } from '@/lib/luna/dailyReadingStore'
 import { getSixDayWindow, dateFromKey, localDateKeyFromDate, localNoonFromKey } from '@/lib/luna/dateWindow'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
@@ -25,6 +25,9 @@ export async function GET(req: NextRequest) {
   const existing = await getReadingWindow(userId, dateKeys, timezone)
 
   const readings: StoredReading[] = []
+  // Recent readings, so newly generated ones don't reuse their wording.
+  const past = await getReadingHistory(userId, timezone, dateKeys[0])
+  const recent: RecentTexts[] = past.filter(r => r.reading_date < dateKeys[0]).slice(0, 8).map(recentTextsFromReading)
   for (const dateKey of dateKeys) {
     const cached = existing.get(dateKey)
     // A reading that only made it to the real-data fallback (e.g. the AI call
@@ -49,7 +52,7 @@ export async function GET(req: NextRequest) {
       continue
     }
 
-    const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone)
+    const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone, recent)
     const now = new Date()
     const expiresAt = new Date(dateFromKey(dateKey))
     expiresAt.setDate(expiresAt.getDate() + 1)
@@ -73,6 +76,7 @@ export async function GET(req: NextRequest) {
     }
 
     await upsertReading(userId, row)
+    recent.unshift(recentTextsFromReading({ reading_json: generated.payload, luna_message: generated.payload.luna_message }))
     readings.push(row)
   }
 

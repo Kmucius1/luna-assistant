@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { moonSignChangeNote } from '@/lib/luna/moonChange'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -98,6 +99,7 @@ export async function GET(req: NextRequest) {
     const planets  = getCurrentPlanets(now)
     const transits = getTransitsToNatal(now).slice(0, 8)
 
+    const moonChange = moonSignChangeNote(now, clientTz)
     const planetLines = planets.map(p =>
       `${p.name}: ${p.sign} ${p.degree}°${p.retrograde ? ' Rx' : ''}`
     ).join('\n')
@@ -125,7 +127,7 @@ export async function GET(req: NextRequest) {
           const prompt = `Today is ${dateStr}.
 
 CURRENT SKY:
-${planetLines}
+${planetLines}${moonChange}
 
 ZOE'S LOVE-RELATED TRANSITS TODAY:
 ${transitLines || 'No major love transits active right now — quiet field.'}

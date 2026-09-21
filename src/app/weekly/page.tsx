@@ -134,12 +134,21 @@ const LOCATION_LABEL: Record<string, string> = {
   unclear: 'Unclear',
 }
 
+// A request that never returns leaves the phone on a spinner forever. Abort after `ms`
+// so the existing error + "Try again" state appears instead.
+function fetchWithTimeout(url: string, init: RequestInit = {}, ms = 120_000): Promise<Response> {
+  const ctrl = new AbortController()
+  const t = setTimeout(() => ctrl.abort(), ms)
+  return fetch(url, { ...init, signal: ctrl.signal }).finally(() => clearTimeout(t))
+}
+
 export default function WeeklyResetPage() {
   const [step, setStep] = useState<Step>('intro')
   const [gather, setGather] = useState<GatherPayload | null>(null)
   const [gatherError, setGatherError] = useState(false)
   const [finalResult, setFinalResult] = useState<FinalPayload | null>(null)
   const [finalizeError, setFinalizeError] = useState(false)
+  const [saveNotice, setSaveNotice] = useState<string | null>(null)
   const [confirmedUnclear, setConfirmedUnclear] = useState<Record<number, string>>({})
 
   const [weekFeeling, setWeekFeeling] = useState<string | null>(null)
@@ -298,6 +307,19 @@ useEffect(() => {
   // A real patch — updates exactly the one field on the one day in the
   // stored plan, no regeneration, so editing one thing can't destroy the
   // rest of the week.
+  // Applies an edit on the server and tells her if it didn't stick — the change
+  // shows on screen immediately, so a silent failure looked saved and then vanished.
+  async function saveEdit(body: { day: string; field?: string; mealField?: string; value: string }) {
+    try {
+      const res = await fetchWithTimeout('/api/luna/weekly-reset/edit', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      }, 20_000)
+      setSaveNotice(res.ok ? null : "That change didn't save — it may revert when you reopen LUNA. Try it again.")
+    } catch {
+      setSaveNotice("That change didn't save — check your connection and try it again.")
+    }
+  }
+
   async function saveFieldEdit(day: string, field?: string, mealField?: string) {
     const value = editFieldValue
     setFinalResult(prev => {
@@ -308,17 +330,13 @@ useEffect(() => {
       return { ...prev, days: { ...prev.days, [day]: dayPlan } }
     })
     setEditingField(null)
-    await fetch('/api/luna/weekly-reset/edit', {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ day, field, mealField, value }),
-    }).catch(() => {})
+    await saveEdit({ day, field, mealField, value })
   }
 
   async function cycleWorkLocation(day: string, current: string) {
     const next = current === 'home' ? 'office' : current === 'office' ? 'off' : 'home'
     setFinalResult(prev => prev ? { ...prev, days: { ...prev.days, [day]: { ...prev.days[day], work_location: next as DayPlan['work_location'] } } } : prev)
-    await fetch('/api/luna/weekly-reset/edit', {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ day, field: 'work_location', value: next }),
-    }).catch(() => {})
+    await saveEdit({ day, field: 'work_location', value: next })
   }
 
   async function markHomeTaskDone(type: 'laundry' | 'cleaning') {
@@ -408,7 +426,7 @@ useEffect(() => {
     setStep('gathering')
     setGatherError(false)
     try {
-      const res = await fetch('/api/luna/weekly-reset', { method: 'POST' })
+      const res = await fetchWithTimeout('/api/luna/weekly-reset', { method: 'POST' }, 120_000)
       if (!res.ok) throw new Error('gather failed')
       const data = await res.json()
       setGather(data)
@@ -422,7 +440,7 @@ useEffect(() => {
     setStep('finalizing')
     setFinalizeError(false)
     try {
-      const res = await fetch('/api/luna/weekly-reset/finalize', {
+      const res = await fetchWithTimeout('/api/luna/weekly-reset/finalize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -446,9 +464,13 @@ useEffect(() => {
             self_care_priorities: selfCarePriorities,
           },
         }),
-      })
+      }, 170_000)
       if (!res.ok) throw new Error('finalize failed')
       const data = await res.json()
+      // The server now reports whether the week was actually stored.
+      setSaveNotice(data.saved === false
+        ? "Your week was built but couldn't be saved, so it may not be here next time you open LUNA. Try building it again."
+        : null)
       setFinalResult(data)
       setStep('result')
       if (groceriesNeeded) {
@@ -1088,6 +1110,11 @@ useEffect(() => {
           {step === 'result' && finalResult && (
             <div className="animate-fade-up space-y-4">
               <h2 className="font-display text-2xl font-semibold" style={{ color: 'var(--text-1)' }}>Your week.</h2>
+              {saveNotice && (
+                <div role="alert" className="rounded-2xl p-3 text-sm" style={{ background: 'rgba(201,107,90,0.12)', border: '1px solid rgba(201,107,90,0.35)', color: '#A8503F' }}>
+                  {saveNotice}
+                </div>
+              )}
 
               <div className={`p-5 ${styles.card}`}>
                 <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>Top 3 business</p>

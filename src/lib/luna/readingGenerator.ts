@@ -7,13 +7,13 @@ import {
   getCurrentPlanets,
   getTransitsToNatal,
   getMoonPhase,
-  getMoonSign,
   SIGN_ENERGY_DESCRIPTIONS,
   type TransitAspect,
 } from '@/lib/astrology'
 import { calculatePersonalDay, getPersonalDayMeaning } from '@/lib/numerology'
 import { getChineseDayEnergy, ELEMENT_GUIDANCE } from '@/lib/chineseAstrology'
-import { localDateKey, localDayBoundsUTC } from './dailyCache'
+import { localDateKey } from './dailyCache'
+import { moonSignChangeNote } from './moonChange'
 import { LIFE_LANGUAGE_RULES } from './voiceRules'
 
 // Mirrors the ZOE_USER_ID hardcoding pattern used by every route in this
@@ -127,7 +127,36 @@ SCIENCE-AWARE VOICE RULES (mandatory, non-negotiable):
 // date (v1 used 8 PM ET the night before and carried the previous day's date).
 export const READING_VERSION = 2
 
-export async function generateDailyReading(date: Date, timezone: string): Promise<GeneratedReading> {
+// What recent readings already said, so a new one doesn't reuse their openings.
+export interface RecentTexts { title?: string; luna_message?: string; do_this?: string; affirmation?: string; journal_prompt?: string }
+
+export function recentTextsFromReading(r: { reading_json?: Partial<ReadingJSON> | null; luna_message?: string | null }): RecentTexts {
+  const j = (r.reading_json ?? {}) as Partial<ReadingJSON> & { guidance?: Partial<ReadingJSON['guidance']> }
+  return {
+    title: j.title,
+    luna_message: r.luna_message ?? j.luna_message,
+    do_this: j.guidance?.do_this,
+    affirmation: j.guidance?.affirmation,
+    journal_prompt: j.guidance?.journal_prompt,
+  }
+}
+
+const firstWords = (s: string | undefined, n = 9) => (s ?? '').replace(/\s+/g, ' ').trim().split(' ').slice(0, n).join(' ')
+
+function buildAvoidRepeatBlock(recent: RecentTexts[]): string {
+  const rows = recent.slice(0, 8)
+  if (!rows.length) return ''
+  const list = (key: keyof RecentTexts) => rows.map(r => firstWords(r[key])).filter(Boolean).map(t => `  - "${t}…"`).join('\n')
+  return `\n=== AVOID REPEATING (recent readings — new wording, new openings, new images) ===
+Each field below must open differently from the recent openings listed, and must not reuse their phrases or metaphors. Never open luna_message with "Remember, Zoe" or "Zoe, today".
+luna_message openings already used:\n${list('luna_message')}
+affirmations already used:\n${list('affirmation')}
+journal prompts already used:\n${list('journal_prompt')}
+do_this suggestions already used:\n${list('do_this')}
+titles already used:\n${list('title')}\n`
+}
+
+export async function generateDailyReading(date: Date, timezone: string, recent: RecentTexts[] = []): Promise<GeneratedReading> {
   const planets = getCurrentPlanets(date)
   const transits = getTransitsToNatal(date).slice(0, 5)
   const retrogrades = planets.filter(p => p.retrograde)
@@ -146,16 +175,8 @@ export async function generateDailyReading(date: Date, timezone: string): Promis
     timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   }).format(date)
 
-  // If the Moon changes sign during this local day, the reading must say so —
-  // one sign for the whole day would be wrong for part of it.
-  const { start: dayStart, end: dayEnd } = localDayBoundsUTC(localDateKey(date, timezone), timezone)
-  const startMoon = getMoonSign(dayStart)
-  let moonChangeLine = ''
-  if (startMoon.nextSignDate && startMoon.nextSignDate < dayEnd) {
-    const newSign = getMoonSign(new Date(startMoon.nextSignDate.getTime() + 60_000)).sign
-    const at = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(startMoon.nextSignDate)
-    moonChangeLine = `\nMoon sign change today: ${startMoon.sign} until ${at}, then ${newSign}. State both signs and the time in the reading.`
-  }
+  // If the Moon changes sign during this local day, the reading must say so.
+  const moonChangeLine = moonSignChangeNote(date, timezone)
 
   const facts = {
     sunSign, moonSign, moonPhase, personalDay,
@@ -186,6 +207,7 @@ ${chineseDay.label} (${chineseDay.element} element)
 === ZOE'S NATAL CHART & PERSONALITY ===
 Scorpio Sun, Cancer Moon, Gemini Rising. Self-Projected Projector, 4/6 Human Design profile — gains clarity through speaking, needs invitation over initiation. Runs Ad-Vantage Media Agency and DRYP Digital.
 
+${buildAvoidRepeatBlock(recent)}
 Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, no prose outside the JSON. Match this exact schema:
 
 {

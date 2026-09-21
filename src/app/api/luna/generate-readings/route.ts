@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateDailyReading, READING_VERSION } from '@/lib/luna/readingGenerator'
-import { getReadingWindow, upsertReading, startRun, finishRun, type StoredReading } from '@/lib/luna/dailyReadingStore'
+import { generateDailyReading, READING_VERSION, recentTextsFromReading, type RecentTexts } from '@/lib/luna/readingGenerator'
+import { getReadingWindow, getReadingHistory, upsertReading, startRun, finishRun, type StoredReading } from '@/lib/luna/dailyReadingStore'
 import { getSixDayWindow, dateFromKey, localNoonFromKey } from '@/lib/luna/dateWindow'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
@@ -23,6 +23,9 @@ async function handle(req: NextRequest) {
   try {
     const dateKeys = getSixDayWindow(timezone)
     const existing = await getReadingWindow(ZOE_USER_ID, dateKeys, timezone)
+    // The last week of readings, so each new one can be told not to repeat them.
+    const past = await getReadingHistory(ZOE_USER_ID, timezone, dateKeys[0])
+    const recent: RecentTexts[] = past.filter(r => r.reading_date < dateKeys[0]).slice(0, 8).map(recentTextsFromReading)
 
     for (const dateKey of dateKeys) {
       const cached = existing.get(dateKey)
@@ -42,7 +45,7 @@ async function handle(req: NextRequest) {
       if (!isMissing && !isStale && !isUpgradeable && !isOutdated) continue
 
       try {
-        const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone)
+        const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone, recent)
         const now = new Date()
         const expiresAt = new Date(dateFromKey(dateKey))
         expiresAt.setDate(expiresAt.getDate() + 1)
@@ -66,6 +69,7 @@ async function handle(req: NextRequest) {
         }
 
         await upsertReading(ZOE_USER_ID, row)
+        recent.unshift(recentTextsFromReading({ reading_json: generated.payload, luna_message: generated.payload.luna_message }))
         if (isMissing) created++
         else updated++
       } catch (e) {

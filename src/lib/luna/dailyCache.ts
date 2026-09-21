@@ -105,7 +105,7 @@ export async function getOrCreateDailyContent<T>(params: {
   const { payload, source } = await params.generate()
 
   try {
-    await db.from('daily_generation_cache').upsert({
+    const { error } = await db.from('daily_generation_cache').upsert({
       user_id: userId,
       date_key: dateKey,
       timezone,
@@ -114,8 +114,12 @@ export async function getOrCreateDailyContent<T>(params: {
       source,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id,date_key,generation_type' })
-  } catch {
-    // Persist best-effort — content still returns to the caller even if the write fails.
+    // Returned, not thrown — without this a failed write was invisible and the
+    // content silently regenerated on every request.
+    if (error) console.error(`[dailyCache] failed to persist ${generationType} for ${dateKey}:`, error.message)
+  } catch (e) {
+    console.error(`[dailyCache] failed to persist ${generationType} for ${dateKey}:`, e instanceof Error ? e.message : e)
+    // Best-effort — content still returns to the caller even if the write fails.
   }
 
   return { payload, source, cached: false }

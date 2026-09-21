@@ -241,8 +241,11 @@ Build the plan now for exactly these days: ${daysRequired.join(', ')}. Respect h
 
     const payload = { ...parsed, week_of: dateKey, questionnaire_answers: questionnaireAnswers }
 
+    // supabase-js returns { error } instead of throwing, so a try/catch alone
+    // never noticed a failed save — the page showed a finished week that wasn't stored.
+    let saved = true
     try {
-      await db.from('daily_generation_cache').upsert({
+      const { error: saveError } = await db.from('daily_generation_cache').upsert({
         user_id: ZOE_USER_ID,
         date_key: dateKey,
         timezone: 'America/New_York',
@@ -251,11 +254,13 @@ Build the plan now for exactly these days: ${daysRequired.join(', ')}. Respect h
         source: 'ai',
         updated_at: now.toISOString(),
       }, { onConflict: 'user_id,date_key,generation_type' })
+      if (saveError) throw saveError
     } catch (saveError) {
+      saved = false
       console.error('[luna/weekly-reset/finalize] failed to persist final payload:', saveError instanceof Error ? saveError.message : saveError)
     }
 
-    return NextResponse.json(payload)
+    return NextResponse.json({ ...payload, saved })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     console.error('[luna/weekly-reset/finalize] POST error:', message)

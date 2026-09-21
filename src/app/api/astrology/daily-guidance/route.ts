@@ -4,6 +4,7 @@ import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, type P
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
+import { moonSignChangeNote } from '@/lib/luna/moonChange'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -97,6 +98,7 @@ export async function GET(req: NextRequest) {
     const planets  = getCurrentPlanets(now)
     const transits = getTransitsToNatal(now).slice(0, 5)
 
+    const moonChange = moonSignChangeNote(now, clientTz)
     const planetLines = planets.map(p =>
       `${p.name}: ${p.sign} ${p.degree}°${p.minutes.toString().padStart(2,'0')}'${p.retrograde ? ' (retrograde)' : ''}`
     ).join('\n')
@@ -117,7 +119,7 @@ export async function GET(req: NextRequest) {
     const userPrompt = `Today is ${dateStr} at ${timeStr}.
 
 === CURRENT SKY ===
-${planetLines}
+${planetLines}${moonChange}
 
 === ZOE'S TOP TRANSITS TODAY ===
 ${transitLines}

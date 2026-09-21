@@ -56,8 +56,37 @@ declare global {
 // Shared with parent pages that need to clear a field's autosaved draft
 // from the outside once a multi-step flow finishes (see useAutosave.ts's
 // clearAutosaveDraft) — must stay in sync with the slug logic below.
+// Drafts belong to the day they were started (planning day: rolls over at 4 AM).
+// Keyed only by field label, a draft used to come back on every later day — the
+// previous day's text kept re-appearing in empty fields.
+function draftDay(): string {
+  const now = new Date()
+  const effective = now.getHours() < 4 ? new Date(now.getTime() - 24 * 60 * 60 * 1000) : now
+  return effective.toLocaleDateString('en-CA') // YYYY-MM-DD
+}
+
 export function getAutosaveKey(context: string, autosaveKey?: string) {
-  return autosaveKey ?? context.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40)
+  const base = autosaveKey ?? context.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 40)
+  return `${base}__${draftDay()}`
+}
+
+// Remove drafts from earlier days, and old undated ones left by earlier versions
+// (those are what kept restoring yesterday's text). Once per page load.
+let draftsPruned = false
+export function pruneOldDrafts() {
+  if (draftsPruned || typeof window === 'undefined') return
+  draftsPruned = true
+  try {
+    const today = draftDay()
+    const stale: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (!k || !k.startsWith('luna_draft_')) continue
+      const m = k.match(/__(\d{4}-\d{2}-\d{2})$/)
+      if (!m || m[1] < today) stale.push(k)
+    }
+    stale.forEach(k => localStorage.removeItem(k))
+  } catch { /* localStorage unavailable — nothing to prune */ }
 }
 
 export function SmartInput({
@@ -66,6 +95,7 @@ export function SmartInput({
   history = [], autoSuggest = true, autosave = true,
   autosaveKey, className, style,
 }: SmartInputProps) {
+  pruneOldDrafts()
   const storageKey = getAutosaveKey(context, autosaveKey)
   const { status: saveStatus, clearDraft } = useAutosave(
     autosave

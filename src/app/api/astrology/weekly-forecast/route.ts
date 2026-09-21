@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { todayKey } from '@/lib/luna/today'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -104,7 +105,7 @@ export async function GET(req: NextRequest) {
     const localDate = searchParams.get('date') || ''
 
     const now = new Date()
-    const dateKey = `weekly_${localDate.replace(/[^a-zA-Z0-9]/g, '_') || now.toDateString()}`
+    const dateKey = `weekly_${localDate.replace(/[^a-zA-Z0-9]/g, '_') || todayKey(now, clientTz)}`
 
     // Build per-day planet data for all 7 days
     const dayData = Array.from({ length: 7 }, (_, i) => {

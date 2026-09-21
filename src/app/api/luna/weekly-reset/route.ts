@@ -156,7 +156,10 @@ export async function POST() {
     const pipelineAccounts = drypAccounts.filter(a => ['proposal', 'prospect'].includes(a.client_pipeline_stage ?? ''))
 
     let emailSummary = ''
-    let clientEmailDeadlines: string[] = []
+    // Started here, awaited alongside the main synthesis below — the two AI
+    // calls don't depend on each other, so running them one after the other
+    // just doubled the wait.
+    let extractionPromise: Promise<string[]> = Promise.resolve([])
     try {
       const allMessages = (await Promise.all(
         gmailTokens.map(t => listGmailMessages(t.access_token, 'newer_than:7d in:inbox', 15, 'metadata').catch(() => []))
@@ -171,7 +174,7 @@ export async function POST() {
       // extracted here that doesn't already match an open DRYP task is
       // deterministically tagged and guaranteed into flagged_deadlines,
       // rather than being one option among many the big prompt might skip.
-      clientEmailDeadlines = await extractClientEmailDeadlines(allMessages, clientRoster, drypTasks)
+      extractionPromise = extractClientEmailDeadlines(allMessages, clientRoster, drypTasks)
     } catch { /* Gmail unavailable — proceed without it */ }
 
     const userPrompt = `THIS WEEK'S CALENDAR EVENTS:
@@ -189,7 +192,7 @@ ${emailSummary || 'No email data available.'}
 
 Build the week's synthesis now.`
 
-    const raw = await callAI(SYSTEM, userPrompt, 3000)
+    const [raw, clientEmailDeadlines] = await Promise.all([callAI(SYSTEM, userPrompt, 3000), extractionPromise])
     const parsed = parseAIJson<Record<string, unknown>>(raw)
 
     // Deterministic merge, not optional — a verified client-email deadline
@@ -207,9 +210,11 @@ Build the week's synthesis now.`
       pipeline_accounts: pipelineAccounts.map(a => ({ name: a.business_name, stage: a.client_pipeline_stage })),
     }
 
+    // supabase-js returns { error } rather than throwing — check it explicitly.
+    let saved = true
     try {
       const db = createAdminClient()
-      await db.from('daily_generation_cache').upsert({
+      const { error: saveError } = await db.from('daily_generation_cache').upsert({
         user_id: ZOE_USER_ID,
         date_key: dateKey,
         timezone: 'America/New_York',
@@ -218,11 +223,13 @@ Build the week's synthesis now.`
         source: 'ai',
         updated_at: now.toISOString(),
       }, { onConflict: 'user_id,date_key,generation_type' })
+      if (saveError) throw saveError
     } catch (saveError) {
+      saved = false
       console.error('[luna/weekly-reset] failed to persist gather payload:', saveError instanceof Error ? saveError.message : saveError)
     }
 
-    return NextResponse.json(payload)
+    return NextResponse.json({ ...payload, saved })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     console.error('[luna/weekly-reset] POST error:', message)
