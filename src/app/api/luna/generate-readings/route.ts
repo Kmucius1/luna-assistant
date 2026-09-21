@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateDailyReading } from '@/lib/luna/readingGenerator'
+import { generateDailyReading, READING_VERSION } from '@/lib/luna/readingGenerator'
 import { getReadingWindow, upsertReading, startRun, finishRun, type StoredReading } from '@/lib/luna/dailyReadingStore'
-import { getSixDayWindow, dateFromKey } from '@/lib/luna/dateWindow'
+import { getSixDayWindow, dateFromKey, localNoonFromKey } from '@/lib/luna/dateWindow'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 const ZOE_TIMEZONE = 'America/New_York'
@@ -36,10 +36,13 @@ async function handle(req: NextRequest) {
       const lastSource = cached?.source_log_json?.[cached.source_log_json.length - 1] as { source?: string } | undefined
       const isUpgradeable = cached?.status === 'ready' && lastSource?.source === 'fallback'
       const isStale = !isMissing && cached?.status !== 'ready'
-      if (!isMissing && !isStale && !isUpgradeable) continue
+      // Readings stored before READING_VERSION 2 were built for the wrong instant
+      // and carry the previous day's date — redo each one once.
+      const isOutdated = !isMissing && (lastSource as { v?: number } | undefined)?.v !== READING_VERSION
+      if (!isMissing && !isStale && !isUpgradeable && !isOutdated) continue
 
       try {
-        const generated = await generateDailyReading(dateFromKey(dateKey), timezone)
+        const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone)
         const now = new Date()
         const expiresAt = new Date(dateFromKey(dateKey))
         expiresAt.setDate(expiresAt.getDate() + 1)
@@ -58,7 +61,7 @@ async function handle(req: NextRequest) {
           luna_message: generated.payload.luna_message,
           generated_at: now.toISOString(),
           expires_at: expiresAt.toISOString(),
-          source_log_json: [...(cached?.source_log_json ?? []), { source: generated.source, generated_at: now.toISOString() }],
+          source_log_json: [...(cached?.source_log_json ?? []), { source: generated.source, generated_at: now.toISOString(), v: READING_VERSION }],
           status: 'ready',
         }
 

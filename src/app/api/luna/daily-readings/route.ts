@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generateDailyReading } from '@/lib/luna/readingGenerator'
+import { generateDailyReading, READING_VERSION } from '@/lib/luna/readingGenerator'
 import { getReadingWindow, upsertReading, type StoredReading } from '@/lib/luna/dailyReadingStore'
-import { getSixDayWindow, dateFromKey, localDateKeyFromDate } from '@/lib/luna/dateWindow'
+import { getSixDayWindow, dateFromKey, localDateKeyFromDate, localNoonFromKey } from '@/lib/luna/dateWindow'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -40,14 +40,16 @@ export async function GET(req: NextRequest) {
     // is what caused "Generated Jul 24" to show while viewing Jul 26.
     const isTodaySlot = dateKey === dateKeys[0]
     const wasPregenerated = isTodaySlot && !!cached && localDateKeyFromDate(new Date(cached.generated_at), timezone) !== dateKey
-    const needsGeneration = !cached || (refresh && isTodaySlot) || isUpgradeable || wasPregenerated
+    const lastLog = cached?.source_log_json?.[cached.source_log_json.length - 1] as { v?: number } | undefined
+    const isOutdated = !!cached && lastLog?.v !== READING_VERSION
+    const needsGeneration = !cached || (refresh && isTodaySlot) || isUpgradeable || wasPregenerated || isOutdated
 
     if (!needsGeneration && cached) {
       readings.push(cached)
       continue
     }
 
-    const generated = await generateDailyReading(dateFromKey(dateKey), timezone)
+    const generated = await generateDailyReading(localNoonFromKey(dateKey, timezone), timezone)
     const now = new Date()
     const expiresAt = new Date(dateFromKey(dateKey))
     expiresAt.setDate(expiresAt.getDate() + 1)
@@ -66,7 +68,7 @@ export async function GET(req: NextRequest) {
       luna_message: generated.payload.luna_message,
       generated_at: now.toISOString(),
       expires_at: expiresAt.toISOString(),
-      source_log_json: [{ source: generated.source, generated_at: now.toISOString() }],
+      source_log_json: [{ source: generated.source, generated_at: now.toISOString(), v: READING_VERSION }],
       status: 'ready',
     }
 

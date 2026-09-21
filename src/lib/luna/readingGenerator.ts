@@ -7,12 +7,13 @@ import {
   getCurrentPlanets,
   getTransitsToNatal,
   getMoonPhase,
+  getMoonSign,
   SIGN_ENERGY_DESCRIPTIONS,
   type TransitAspect,
 } from '@/lib/astrology'
 import { calculatePersonalDay, getPersonalDayMeaning } from '@/lib/numerology'
 import { getChineseDayEnergy, ELEMENT_GUIDANCE } from '@/lib/chineseAstrology'
-import { localDateKey } from './dailyCache'
+import { localDateKey, localDayBoundsUTC } from './dailyCache'
 import { LIFE_LANGUAGE_RULES } from './voiceRules'
 
 // Mirrors the ZOE_USER_ID hardcoding pattern used by every route in this
@@ -121,6 +122,11 @@ SCIENCE-AWARE VOICE RULES (mandatory, non-negotiable):
 - Prefer offering a reflection question, journaling prompt, or grounding suggestion over any deterministic instruction.
 - "clarity_note" must explicitly and plainly separate what is calculated fact (today's real Moon sign, real transiting planet positions — computed via ephemeris math) from what is symbolic interpretation, in Luna's own voice, 1-2 sentences.`
 
+// Bump when the way readings are calculated changes so already-stored readings
+// are regenerated once automatically. v2: built for local noon of the reading's
+// date (v1 used 8 PM ET the night before and carried the previous day's date).
+export const READING_VERSION = 2
+
 export async function generateDailyReading(date: Date, timezone: string): Promise<GeneratedReading> {
   const planets = getCurrentPlanets(date)
   const transits = getTransitsToNatal(date).slice(0, 5)
@@ -140,6 +146,17 @@ export async function generateDailyReading(date: Date, timezone: string): Promis
     timeZone: timezone, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   }).format(date)
 
+  // If the Moon changes sign during this local day, the reading must say so —
+  // one sign for the whole day would be wrong for part of it.
+  const { start: dayStart, end: dayEnd } = localDayBoundsUTC(localDateKey(date, timezone), timezone)
+  const startMoon = getMoonSign(dayStart)
+  let moonChangeLine = ''
+  if (startMoon.nextSignDate && startMoon.nextSignDate < dayEnd) {
+    const newSign = getMoonSign(new Date(startMoon.nextSignDate.getTime() + 60_000)).sign
+    const at = new Intl.DateTimeFormat('en-US', { timeZone: timezone, hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).format(startMoon.nextSignDate)
+    moonChangeLine = `\nMoon sign change today: ${startMoon.sign} until ${at}, then ${newSign}. State both signs and the time in the reading.`
+  }
+
   const facts = {
     sunSign, moonSign, moonPhase, personalDay,
     chineseDayEnergy: chineseDay.label,
@@ -155,7 +172,7 @@ export async function generateDailyReading(date: Date, timezone: string): Promis
     const userPrompt = `Today is ${dateStr}.
 
 === CALCULATED SKY (real ephemeris data) ===
-Sun: ${sunSign} | Moon: ${moonSign} | Moon phase: ${moonPhase}
+Sun: ${sunSign} | Moon: ${moonSign} | Moon phase: ${moonPhase}${moonChangeLine}
 Retrogrades: ${retroLines}
 Top transits to Zoe's natal chart:
 ${transitLines || 'No major transits active today.'}

@@ -313,10 +313,13 @@ export function getMoonPhase(date: Date): MoonPhaseInfo {
 export function getMoonSign(date: Date): { sign: ZodiacSign; degree: number; minutes: number; formatted: string; nextSignDate: Date | null } {
   const lon = getPlanetLongitude('Moon', date)
   const { sign, degree, minutes, formatted } = longitudeToSign(lon)
-  const degInSign = lon % 30
-  // Moon moves ~0.5498°/hour on average
-  const hoursToNextSign = (30 - degInSign) / 0.5498
-  const nextSignDate = hoursToNextSign < 48 ? new Date(date.getTime() + hoursToNextSign * 3600_000) : null
+  // Exact sign-change moment from the ephemeris (not a constant-speed estimate —
+  // the Moon's speed varies ~20%, which made this off by minutes to hours).
+  // Only reported when it's within 48 hours, as before.
+  const target = ((Math.floor(lon / 30) + 1) * 30) % 360
+  const angleTo = (t: Astronomy.AstroTime) => ((getPlanetLongitude('Moon', t.date) - target + 540) % 360) - 180
+  const found = Astronomy.Search(angleTo, Astronomy.MakeTime(date), Astronomy.MakeTime(new Date(date.getTime() + 3 * 86_400_000)), { dt_tolerance_seconds: 5 })
+  const nextSignDate = found && found.date.getTime() - date.getTime() < 48 * 3600_000 ? found.date : null
   return { sign, degree, minutes, formatted, nextSignDate }
 }
 

@@ -51,3 +51,22 @@ export function dateFromKey(dateKey: string): Date {
   const [year, month, day] = dateKey.split('-').map(Number)
   return new Date(year, month - 1, day)
 }
+
+/**
+ * The instant of 12:00 noon on `dateKey` in `timezone`. Readings are calculated
+ * for this moment, not `dateFromKey()`: that returns server-local midnight, which
+ * on Vercel (UTC) is 8 PM ET the evening BEFORE — so every reading carried the
+ * previous day's date, and its Moon sign/phase came from the previous night's sky.
+ * DST-safe: the offset is measured at the noon instant itself.
+ */
+export function localNoonFromKey(dateKey: string, timezone: string = 'America/New_York'): Date {
+  const [year, month, day] = dateKey.split('-').map(Number)
+  const guess = new Date(Date.UTC(year, month - 1, day, 12, 0, 0))
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  }).formatToParts(guess)
+  const get = (t: string) => parseInt(parts.find(p => p.type === t)?.value ?? '0', 10)
+  const asIfLocalWereUTC = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'))
+  return new Date(guess.getTime() - (asIfLocalWereUTC - guess.getTime()))
+}
