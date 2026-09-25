@@ -55,7 +55,7 @@ const SECTIONS = [
   },
   {
     title: '13. Contact',
-    body: 'Questions? Contact Zoe Taylor at info@drypdigital.com — DRYP Digital / Ad-Vantage Media Agency.',
+    body: 'Questions? Contact Zoe Taylor at info@drypdigital.com — DRYP Digital.',
   },
 ]
 

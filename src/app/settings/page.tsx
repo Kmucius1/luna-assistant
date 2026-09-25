@@ -48,14 +48,14 @@ const INPUT_STYLE: React.CSSProperties = {
 // ─── Default profile ──────────────────────────────────────────────────────────
 const DEFAULT_PROFILE: Omit<AssistantProfile, 'id' | 'user_id' | 'created_at' | 'updated_at'> = {
   preferred_tone: 'Clear, warm, human, and confident. Not too formal. Gets to the point.',
-  business_context: "Zoe runs Ad-Vantage Media Agency and DRYP Digital. Active clients: EHM Strategies, DRYP Studio, Babe Coffee Lounge, Flanagan's Irish Pub, Villa Residential, Hoover Digital, Linked Up events.",
-  personal_context: 'Zoe is in school at USF. She has personal appointments, social media goals, content creation goals, and business growth goals.',
+  business_context: "Zoe runs DRYP Digital (with Kaleb and Mick). Active clients: EHM Strategies, DRYP Studio, Babe Coffee Lounge, Flanagan's Irish Pub, Villa Residential, Hoover Digital, Linked Up events. Ad-Vantage is old business — no longer active.",
+  personal_context: 'Zoe is in school at USF. Outside DRYP Digital, her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion — she has personal appointments, social media goals, content creation goals, and business growth goals.',
   banned_phrases: ['As per my last email', 'I hope this email finds you well', 'Please don\'t hesitate', 'Best regards', 'Synergy', 'Leverage'],
   response_style: 'Direct and clear. Warm but not overly casual. No corporate filler. No over-explaining.',
-  main_projects: ['EHM Strategies', 'DRYP Studio', 'DRYP Digital', 'Ad-Vantage', 'Hoover Digital', 'Babe Coffee Lounge', "Flanagan's Irish Pub", 'Villa Residential', 'Linked Up', 'USF'],
+  main_projects: ['EHM Strategies', 'DRYP Studio', 'DRYP Digital', 'Hoover Digital', 'Babe Coffee Lounge', "Flanagan's Irish Pub", 'Villa Residential', 'Linked Up', 'Modeling', 'Tattooing', 'Painting', 'Fashion', 'USF'],
   common_contacts: 'Mick (Flanagan\'s), Shannon Martin, Kaleb Mucius, clients from EHM, DRYP team, USF professors',
   daily_routine: 'Morning: email + priority tasks. Afternoon: client work and calls. Evening: creative and admin.',
-  personal_goals: 'Grow Ad-Vantage, expand DRYP Studio, graduate from USF, grow personal social media, stay healthy.',
+  personal_goals: 'Grow DRYP Digital, expand DRYP Studio, build her personal brand across modeling, tattooing, TikTok, painting, and fashion, graduate from USF, stay healthy.',
 }
 
 // ─── Connection status row ────────────────────────────────────────────────────

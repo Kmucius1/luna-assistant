@@ -87,7 +87,7 @@ ${patternText}
 ZOE'S CONTEXT:
 Birth chart: Scorpio Sun 22°, Cancer Moon 4°, Gemini Rising 12°, Virgo Midheaven, Venus Sagittarius, Mars Libra, Saturn Taurus, North Node Cancer.
 Human Design: Self-Projected Projector, 4/6 (Opportunist/Role Model).
-She runs Ad-Vantage (full-service agency) and DRYP Digital. She is in her 6th line transition — becoming the role model through lived experience.
+She runs DRYP Digital. Outside that, her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. She is in her 6th line transition — becoming the role model through lived experience.
 Goals: wealth, beauty, success, abundance, inner peace, security, confidence, alchemy.
 
 Based on ALL of the above, generate her personalized daily coaching. Return ONLY this JSON object:

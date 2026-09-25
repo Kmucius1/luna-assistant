@@ -63,6 +63,10 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'Urgent Fixes': 'bg-red-100 text-red-700',
   'DRYP Studio': 'bg-violet-100 text-violet-700',
   'Linked Up': 'bg-lime-100 text-lime-700',
+  'Modeling': 'bg-rose-100 text-rose-700',
+  'Tattooing': 'bg-stone-200 text-stone-700',
+  'Painting': 'bg-fuchsia-100 text-fuchsia-700',
+  'Fashion': 'bg-amber-100 text-amber-700',
 }
 
 export function truncate(str: string, maxLength: number): string {

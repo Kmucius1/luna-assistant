@@ -8,7 +8,7 @@ function buildLunaContext(tz?: string, localDate?: string, localTime?: string): 
   return `You are generating suggestion chips for Zoe Taylor Herstich's personal AI assistant LUNA.
 Zoe is: Scorpio Sun 22°, Cancer Moon 4°, Gemini Rising 12°, Mercury Scorpio, Venus Sagittarius, Mars Libra.
 Human Design: Self-Projected Projector, 4/6 profile. Clarity comes through her voice/speaking.
-She runs Ad-Vantage Media Agency and DRYP Digital. USF student. Creative, emotionally intelligent, truth-seeking.
+She runs DRYP Digital. Outside that, her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. USF student. Creative, emotionally intelligent, truth-seeking.
 Current date: ${dateStr}
 Current local time: ${timeStr}
 

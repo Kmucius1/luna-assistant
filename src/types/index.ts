@@ -249,11 +249,15 @@ export interface LessonEntry {
 }
 
 // ─── Legacy category type (for backwards compat) ─────────────
+// 'Ad-Vantage' kept only so old tagged tasks still render correctly — it's
+// old business, no longer offered as a choice for new tasks (see TaskForm).
+// Modeling/Tattooing/Painting/Fashion added for her actual current focus.
 export type TaskCategory =
   | 'EHM Strategies' | 'DRYP Digital' | 'Ad-Vantage' | 'Client Websites'
   | 'Social Media' | 'School' | 'Personal' | 'Health' | 'Content Creation'
   | 'Events' | 'Follow-ups' | 'Money / Invoices' | 'Urgent Fixes'
   | 'DRYP Studio' | 'Linked Up'
+  | 'Modeling' | 'Tattooing' | 'Painting' | 'Fashion'
 
 // ─── Legacy ──────────────────────────────────────────────────
 export interface AssistantProfile {

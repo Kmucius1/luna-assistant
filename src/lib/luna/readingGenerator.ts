@@ -206,7 +206,7 @@ Personal Day Number: ${personalDay} — ${getPersonalDayMeaning(personalDay)}
 ${chineseDay.label} (${chineseDay.element} element)
 
 === ZOE'S NATAL CHART & PERSONALITY ===
-Scorpio Sun, Cancer Moon, Gemini Rising. Self-Projected Projector, 4/6 Human Design profile — gains clarity through speaking, needs invitation over initiation. Runs Ad-Vantage Media Agency and DRYP Digital.
+Scorpio Sun, Cancer Moon, Gemini Rising. Self-Projected Projector, 4/6 Human Design profile — gains clarity through speaking, needs invitation over initiation. Runs DRYP Digital; outside that, her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion.
 
 ${buildAvoidRepeatBlock(recent)}
 Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, no prose outside the JSON. Match this exact schema:
@@ -224,7 +224,7 @@ Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, 
     "natal_focus": "2-3 sentences on what today's transits highlight in Zoe's chart — name the placement, then spell out concretely what to pay attention to today: a specific kind of moment, feeling, or situation, not just 'the area where X lives'",
     "emotional_theme": "1-2 sentences, grounded in the Moon sign/phase, described as an actual mood or feeling she might notice",
     "relationship_theme": "1-2 sentences on love/connection energy today — a real, concrete relational scenario, not just a placement",
-    "career_theme": "1-2 sentences on work/business energy today — she runs Ad-Vantage and DRYP Digital — concrete, not abstract",
+    "career_theme": "1-2 sentences on work/business energy today — she runs DRYP Digital, and outside that her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion — concrete, not abstract",
     "energy_theme": "1-2 sentences on body/energy today, described physically/emotionally, not just named"
   },
   "numerology": { "personal_day": "${personalDay}", "meaning": "1 sentence expanding on the Personal Day meaning above, in Luna's voice" },

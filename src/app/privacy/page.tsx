@@ -126,7 +126,7 @@ export default function PrivacyPage() {
           <br /><br />
           <strong>Zoe Taylor</strong><br />
           <a href="mailto:info@drypdigital.com" style={{ color: '#8B9FD4' }}>info@drypdigital.com</a><br />
-          DRYP Digital / Ad-Vantage Media Agency
+          DRYP Digital
         </Section>
 
         <div style={{ marginTop: 48, paddingTop: 24, borderTop: '1px solid rgba(180,150,100,0.16)', display: 'flex', gap: 16, flexWrap: 'wrap' }}>

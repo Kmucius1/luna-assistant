@@ -7,15 +7,18 @@ import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { calculatePriorityScore } from '@/lib/priority'
 
+// Ad-Vantage is old business — not offered for new tasks (still a valid
+// TaskCategory value so any already-tagged task still renders correctly).
 const CATEGORIES: TaskCategory[] = [
-  'EHM Strategies', 'DRYP Digital', 'Ad-Vantage', 'DRYP Studio',
+  'EHM Strategies', 'DRYP Digital', 'DRYP Studio',
   'Client Websites', 'Social Media', 'School', 'Personal', 'Health',
-  'Content Creation', 'Events', 'Follow-ups', 'Money / Invoices',
+  'Content Creation', 'Modeling', 'Tattooing', 'Painting', 'Fashion',
+  'Events', 'Follow-ups', 'Money / Invoices',
   'Urgent Fixes', 'Linked Up'
 ]
 
 const PROJECTS = [
-  'EHM Strategies', 'DRYP Studio', 'DRYP Digital', 'Ad-Vantage',
+  'EHM Strategies', 'DRYP Studio', 'DRYP Digital',
   'Hoover Digital', 'Babe Coffee Lounge', "Flanagan's Irish Pub",
   'Villa Residential', 'Linked Up', 'School', 'Personal'
 ]
@@ -31,7 +34,7 @@ export function TaskForm({ onSubmit, onCancel, initialValues }: TaskFormProps) {
   const [form, setForm] = useState({
     title: initialValues?.title || '',
     description: initialValues?.description || '',
-    category: initialValues?.category || 'Ad-Vantage' as TaskCategory,
+    category: initialValues?.category || 'DRYP Digital' as TaskCategory,
     project: initialValues?.project || '',
     due_date: initialValues?.due_date || '',
     urgency_level: initialValues?.urgency_level || 'medium' as UrgencyLevel,

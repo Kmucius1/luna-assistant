@@ -63,7 +63,7 @@ const PEOPLE: Person[] = [
     name: 'Kaleb',
     initials: 'KM',
     type: 'team',
-    role: 'Partner — Ad-Vantage',
+    role: 'Partner — DRYP Digital',
     lastContact: '2 days ago',
     health: 'strong',
     note: 'Review Q2 campaign strategy',

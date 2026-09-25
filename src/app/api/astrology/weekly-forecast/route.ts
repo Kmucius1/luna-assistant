@@ -169,7 +169,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
       "theme": "1-2 sentences: the central theme or gift of this day for Zoe",
       "energy": "3-4 sentences of what this day FEELS like in her body and life, from morning to evening. Visceral and real — no generic astro talk. Reference the transits and Moon sign.",
       "love": "3 sentences about her love and connection energy this specific day — a real moment or feeling, not just a mood word",
-      "career": "3 sentences about her work and business energy this specific day — she runs Ad-Vantage and DRYP Digital. Name a real kind of task, meeting, or decision the day favors.",
+      "career": "3 sentences about her work and business energy this specific day — she runs DRYP Digital, and outside that her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. Name a real kind of task, meeting, or decision the day favors.",
       "guidance": ["4 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits, each a full sentence"],
       "watch_for": "1-2 sentences: an honest warning or caution specific to this day, including what it could look like if ignored",
       "affirmation": "1 powerful first-person declaration tailored to this day's energy",
