@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
 import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
@@ -67,7 +67,7 @@ function buildFallbackLoveGuidance(planets: PlanetPosition[], transits: TransitA
     : 'The sky is quiet in your love sector — use this space for inner reflection.'
 
   const navigateNow = [
-    loveTransits[0] ? `${loveTransits[0].transiting} ${loveTransits[0].type} your natal ${loveTransits[0].natal}: ${loveTransits[0].interpretation}` : 'Trust your intuition in love today — it is reliable.',
+    loveTransits[0] ? `${loveTransits[0].transiting} is ${plainAspectPhrase(loveTransits[0].type)} your ${loveTransits[0].natal}: ${loveTransits[0].interpretation}` : 'Trust your intuition in love today — it is reliable.',
     moon ? `Moon in ${moon.sign}: ${moonMsg}` : '',
     venus ? `Venus in ${venus.sign} amplifies your magnetic pull. ${venusMsg}` : '',
     'Your Venus in Sagittarius 29° craves honesty, freedom, and expansive connection. If it feels constricting, it is not the one.',
@@ -75,9 +75,9 @@ function buildFallbackLoveGuidance(planets: PlanetPosition[], transits: TransitA
   ].filter(Boolean)
 
   return {
-    daily_message: `${venus ? `Venus in ${venus.sign} lights up your love field today.` : 'The sky holds space for love today.'} ${venusMsg} Your natal Venus in Sagittarius 29° — the very last and most potent degree — means you love with your whole spirit or not at all. Half-measures do not work for you. ${transitMsg}`,
-    love_energy:   `${moonMsg} ${loveTransits.length > 0 ? `Active transits are touching your love planets right now — ${loveTransits.map(t => `${t.transiting} ${t.type} your ${t.natal}`).join(', ')}.` : 'The cosmic field around love is calm today.'}`,
-    venus_influence: `Your natal Venus in Sagittarius 29° (the anaretic degree) means your capacity for love is both fierce and free. You love without restraint when it feels right — and you cannot stay where love feels like a cage. ${venus ? `Today's Venus in ${venus.sign} ${venus.retrograde ? '(retrograde — a time of review and return)' : ''} adds ${VENUS_SIGN_LOVE[venus.sign] ?? 'an additional layer of magnetism'} to your natural pull.` : ''}`,
+    daily_message: `${venus ? `Venus in ${venus.sign} lights up your love field today.` : 'The sky holds space for love today.'} ${venusMsg} Your own Venus sits at the very last degree of Sagittarius — the most intense spot a planet can be in that sign — which means you love with your whole spirit or not at all. Half-measures do not work for you. ${transitMsg}`,
+    love_energy:   `${moonMsg} ${loveTransits.length > 0 ? `Real shifts are touching your love planets right now — ${loveTransits.map(t => `${t.transiting} ${plainAspectPhrase(t.type)} your ${t.natal}`).join(', ')}.` : 'The cosmic field around love is calm today.'}`,
+    venus_influence: `Your own Venus sits at the very last degree of Sagittarius, which means your capacity for love is both fierce and free. You love without restraint when it feels right — and you cannot stay where love feels like a cage. ${venus ? `Today's Venus in ${venus.sign} ${venus.retrograde ? '(moving backward for a while — a time to review and reconnect, not to start something new)' : ''} adds ${VENUS_SIGN_LOVE[venus.sign] ?? 'an additional layer of magnetism'} to your natural pull.` : ''}`,
     attract_energy: `Your Gemini Rising makes you incredibly charming and mentally magnetic — people are drawn to your mind and your way of connecting. Your Scorpio Sun adds depth and mystique beneath that surface sparkle. Today you attract best through: honest conversation, genuine curiosity about the other person, and being unapologetically yourself. Do not perform or over-give to be liked.`,
     watch_out: loveTransits.some(t => ['square', 'opposition'].includes(t.type))
       ? `Watch for: ${loveTransits.filter(t => ['square', 'opposition'].includes(t.type)).map(t => t.interpretation).join(' ')} Your Cancer Moon may feel this tension more intensely — give yourself space before reacting.`

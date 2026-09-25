@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
+import { plainAspectPhrase } from '@/lib/astrology'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -119,7 +120,7 @@ export async function GET(request: NextRequest) {
           transits ? [
             transits.daily_theme ? `Today's cosmic theme: ${transits.daily_theme}` : '',
             transits.moon_house ? `Moon is in Zoe's ${transits.moon_house}th house — ${transits.moon_house_meaning}` : '',
-            transits.major_aspects?.length ? `Active transits to her natal chart:\n${transits.major_aspects.map((a: { transiting: string; type: string; natal: string; interpretation: string }) => `- ${a.transiting} ${a.type} natal ${a.natal}: ${a.interpretation}`).join('\n')}` : '',
+            transits.major_aspects?.length ? `What's active in her chart right now:\n${transits.major_aspects.map((a: { transiting: string; type: string; natal: string; interpretation: string }) => `- ${a.transiting} is ${plainAspectPhrase(a.type)} her ${a.natal}: ${a.interpretation}`).join('\n')}` : '',
           ].filter(Boolean).join('\n') : 'Transit data unavailable',
         ].join('\n\n')
 

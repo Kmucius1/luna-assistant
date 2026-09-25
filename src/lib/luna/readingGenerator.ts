@@ -8,6 +8,7 @@ import {
   getTransitsToNatal,
   getMoonPhase,
   SIGN_ENERGY_DESCRIPTIONS,
+  plainAspectPhrase,
   type TransitAspect,
 } from '@/lib/astrology'
 import { calculatePersonalDay, getPersonalDayMeaning } from '@/lib/numerology'
@@ -86,16 +87,16 @@ function buildReadingFallback(
   return {
     title: `${dateStr} — ${moonPhase} in ${moonSign}`,
     date: dateStr,
-    main_theme: `The Moon in ${moonSign} may color today with ${moonFeel}. ${top ? `${top.transiting} ${top.type} your natal ${top.natal} may also be part of what's active today.` : 'The sky is relatively quiet today.'}`,
+    main_theme: `The Moon in ${moonSign} may color today with ${moonFeel}. ${top ? `${top.transiting} is ${plainAspectPhrase(top.type)} your ${top.natal}, which may also be part of what's active today.` : 'The sky is relatively quiet today.'}`,
     cosmic_weather: {
       sun_sign: sunSign,
       moon_sign: moonSign,
       moon_phase: moonPhase,
-      major_aspects: majorTransits.slice(0, 3).map(t => `${t.transiting} ${t.type} natal ${t.natal}`),
+      major_aspects: majorTransits.slice(0, 3).map(t => `${t.transiting} ${plainAspectPhrase(t.type)} your ${t.natal}`),
       retrogrades: [],
     },
     personal_alignment: {
-      natal_focus: top ? `This may highlight your natal ${top.natal} — ${top.interpretation}` : 'No major transit is especially active today — a good day to notice the quieter signals.',
+      natal_focus: top ? `This may highlight your ${top.natal} — ${top.interpretation}` : 'No major transit is especially active today — a good day to notice the quieter signals.',
       emotional_theme: `The Moon in ${moonSign} may bring ${moonFeel} to the surface. This is information, not a verdict.`,
       relationship_theme: 'Connection today may go better through honesty than performance — say the true thing, gently.',
       career_theme: 'Focused, steady effort on one thing may serve you better today than spreading across many.',

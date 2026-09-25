@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import Link from 'next/link'
 import { ArrowLeft, Zap, Sparkles, PenLine, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
+import { plainAspectPhrase } from '@/lib/astrology'
 import {
   saveTransitReflection, getTransitReflectionForTransit,
   type TransitReflection,
@@ -127,12 +128,12 @@ function TransitCard({ aspect, today }: { aspect: Aspect; today: string }) {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-sm font-bold" style={{ color: 'var(--text-1)' }}>
-                {aspect.transiting} {aspect.type} natal {aspect.natal}
+                {aspect.transiting} is {plainAspectPhrase(aspect.type)} your {aspect.natal}
               </p>
               <div className="flex gap-1.5">
                 <span className="px-2 py-0.5 rounded-full text-xs font-bold"
                   style={{ background: color + '20', color }}>
-                  {aspect.orb}° orb
+                  {aspect.orb < 2 ? 'Very Strong' : aspect.orb < 5 ? 'Strong' : 'Present'}
                 </span>
                 {aspect.applying && (
                   <span className="px-2 py-0.5 rounded-full text-xs font-bold"

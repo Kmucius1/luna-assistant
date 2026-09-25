@@ -217,6 +217,21 @@ const TRANSIT_MEANINGS: Record<string, Record<string, string>> = {
   },
 }
 
+// Plain, non-jargon phrase for how two placements relate — used by every
+// fallback (no-AI) template so a Groq rate-limit or outage never falls back
+// to raw astrology-class words like "square" or "natal" in Zoe's face.
+const PLAIN_ASPECT_PHRASE: Record<string, string> = {
+  conjunction: 'lined up with',
+  sextile: 'in an easy match with',
+  square: 'in a tense match with',
+  trine: 'in a supportive match with',
+  opposition: 'pulling against',
+}
+
+export function plainAspectPhrase(type: string): string {
+  return PLAIN_ASPECT_PHRASE[type] ?? 'connecting with'
+}
+
 function getTransitInterpretation(aspect: string, transiting: string, natal: string): string {
   const key1 = `${transiting}-${natal}`
   const key2 = `${natal}-${transiting}`
