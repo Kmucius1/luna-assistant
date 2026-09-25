@@ -3,6 +3,7 @@ import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
+import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 
 const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
 
@@ -158,7 +159,7 @@ Generate a complete love energy reading for today. Return ONLY valid JSON matchi
   "affirmation": "One powerful first-person love affirmation written from her Scorpio depth. Specific to today, not generic.",
   "compatibility_now": "2 sentences about who she is most magnetically aligned with right now based on current sky and her natal chart. Be specific about qualities, not just sun signs.",
   "navigate_now": ["5 specific pieces of guidance for how to navigate her love life right now, grounded in today's transits and her chart"]
-}`
+}${LIFE_LANGUAGE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Write about love with honesty, warmth, and real depth. No toxic positivity. No vague generalities. You know this woman — speak directly to her. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 1500)

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
+import { buildDailyThemeHeadline } from '@/lib/luna/dailyThemeHeadline'
 import { TilePager } from '@/components/ui/TilePager'
 import { RoomTileCard } from '@/components/ui/RoomTileCard'
 import styles from './AstrologyToday.module.css'
@@ -99,6 +100,23 @@ export function AstrologyToday() {
         <TilePager items={ASTROLOGY_TILES} keyFor={t => t.id} renderItem={t => <RoomTileCard {...t} />} />
       </div>
 
+      {/* Daily horoscope first — the thing she actually reads every day — with
+          the Moon snapshot right after it, not the other way around. The headline
+          is computed from today's real Moon phase + sign (not AI text), so it's
+          both accurate and guaranteed to read differently whenever the sky does. */}
+      <div className={styles.card}>
+        <div className={styles.cardLabel}>Today&apos;s Theme</div>
+        {moon && (
+          <h2 className={styles.themeHeadline}>{buildDailyThemeHeadline(moon.phase.name, moon.sign.name)}</h2>
+        )}
+        {guidance ? (
+          <>
+            <p className={styles.themeQuote}>{guidance.affirmation.replace(/\.$/, '')}</p>
+            <p className={styles.themeBody}>{guidance.horoscope}</p>
+          </>
+        ) : <p className={styles.loadingText}>Luna is reading today&apos;s sky…</p>}
+      </div>
+
       <Link href="/astrology/moon" className={styles.cardLink}>
         <div className={styles.card}>
           <div className={styles.cardLabel}>Current Moon</div>
@@ -114,16 +132,6 @@ export function AstrologyToday() {
           ) : <p className={styles.loadingText}>Reading the sky…</p>}
         </div>
       </Link>
-
-      <div className={styles.card}>
-        <div className={styles.cardLabel}>Today&apos;s Theme</div>
-        {guidance ? (
-          <>
-            <p className={styles.themeQuote}>{guidance.affirmation.replace(/\.$/, '')}</p>
-            <p className={styles.themeBody}>{guidance.horoscope}</p>
-          </>
-        ) : <p className={styles.loadingText}>Luna is reading today&apos;s sky…</p>}
-      </div>
 
       {topTransit && (
         <div className={styles.card}>

@@ -120,7 +120,7 @@ SCIENCE-AWARE VOICE RULES (mandatory, non-negotiable):
 - Use hedged, non-deterministic language throughout: "may", "could", "the chart points toward", "this energy supports" — NEVER "will", "will definitely", "is going to happen".
 - NEVER make any deterministic claim about health, death, pregnancy, legal outcomes, cheating/infidelity, or someone dying. If a transit is traditionally linked to one of these themes, redirect to reflection/self-awareness language instead.
 - Prefer offering a reflection question, journaling prompt, or grounding suggestion over any deterministic instruction.
-- "clarity_note" must explicitly and plainly separate what is calculated fact (today's real Moon sign, real transiting planet positions — computed via ephemeris math) from what is symbolic interpretation, in Luna's own voice, 1-2 sentences.`
+- "clarity_note" must explicitly and plainly separate what is calculated fact (today's real Moon sign and planet positions — the actual astronomy, not a guess) from what is symbolic interpretation, in Luna's own voice, written so an eighth grader would follow it, 1-2 sentences.`
 
 // Bump when the way readings are calculated changes so already-stored readings
 // are regenerated once automatically. v2: built for local noon of the reading's

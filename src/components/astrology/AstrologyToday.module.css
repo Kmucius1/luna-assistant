@@ -25,6 +25,7 @@
 
 /* ── Theme card ───────────────────────────────────────── */
 
+.themeHeadline { font-family: var(--font-display-var, serif); font-size: 19px; font-weight: 700; color: var(--astro-text); line-height: 1.25; margin: 0 0 6px; }
 .themeQuote { font-family: var(--font-display-var, serif); font-size: 17px; font-weight: 700; color: var(--astro-text); line-height: 1.35; margin: 0 0 8px; }
 .themeBody { font-size: 12.5px; color: var(--astro-muted); line-height: 1.5; margin: 0; }
 
