@@ -495,10 +495,82 @@ export function getFullNatalChart(): NatalPlacement[] {
   })
 }
 
+// ─── Synastry (chart-to-chart) aspect meanings ────────────────
+// Works for any two people, not just Zoe's fixed chart — so this is a topic +
+// energy template rather than a specific lookup like the natal aspects above.
+const SYNASTRY_PAIR_TOPICS: Record<string, string> = {
+  'Sun-Sun': "whether your core personalities naturally get each other",
+  'Moon-Sun': "the meeting point between one person's core identity and the other's emotional world",
+  'Mercury-Sun': "the meeting point between one person's identity and the other's way of thinking and communicating",
+  'Sun-Venus': "the meeting point between one person's identity and the other's love and values",
+  'Mars-Sun': "the meeting point between one person's identity and the other's drive and desire",
+  'Saturn-Sun': "the meeting point between one person's identity and the other's need for structure and responsibility",
+  'Moon-Moon': "how naturally your emotional worlds understand each other",
+  'Mercury-Moon': "the meeting point between one person's feelings and the other's way of thinking and talking things through",
+  'Moon-Venus': "the meeting point between one person's emotional needs and the other's love and values",
+  'Mars-Moon': "the meeting point between one person's emotional needs and the other's drive and how they assert themselves",
+  'Moon-Saturn': "the meeting point between one person's emotional needs and the other's sense of responsibility and boundaries",
+  'Mercury-Mercury': "how easily your minds understand and talk to each other",
+  'Mercury-Venus': "the meeting point between one person's way of thinking and the other's values and sense of love",
+  'Mars-Mercury': "the meeting point between one person's communication style and the other's drive and directness",
+  'Mercury-Saturn': "the meeting point between one person's way of thinking and the other's need for structure and seriousness",
+  'Venus-Venus': "how naturally your tastes, values, and way of loving line up",
+  'Mars-Venus': "the chemistry and attraction between one person's love nature and the other's drive and desire",
+  'Saturn-Venus': "the meeting point between one person's way of loving and the other's need for commitment and structure",
+  'Mars-Mars': "how your drive, desire, and energy match up",
+  'Mars-Saturn': "the meeting point between one person's drive and the other's need for structure and patience",
+  'Saturn-Saturn': "how your sense of responsibility, commitment, and long-term thinking line up",
+}
+
+const SYNASTRY_ASPECT_ENERGY: Record<string, string> = {
+  conjunction: 'intense and merged — you two amplify each other here, for better or worse',
+  sextile: 'easy and cooperative — a natural, gentle opportunity between you',
+  square: 'a little tense — real friction that can push you both to grow if you work with it instead of against it',
+  trine: 'easy and supportive — this flows naturally between you with little effort',
+  opposition: 'a pull in two directions — you balance each other here, which can feel like magnetism or like tug-of-war depending on the day',
+}
+
+export function getSynastryAspectMeaning(theirPoint: string, herPoint: string, type: string): string {
+  const key = [theirPoint, herPoint].sort().join('-')
+  const topic = SYNASTRY_PAIR_TOPICS[key] ?? `how ${theirPoint} and ${herPoint} interact between you two`
+  const energy = SYNASTRY_ASPECT_ENERGY[type] ?? 'worth paying attention to'
+  return `Their ${theirPoint} and your ${herPoint} touch on ${topic}. This connection feels ${energy}.`
+}
+
 // ─── Natal-to-natal aspects (for the chart wheel's aspect lines) ─────
-export type NatalAspect = { a: string; b: string; type: string; orb: number; emoji: string }
+export type NatalAspect = { a: string; b: string; type: string; orb: number; emoji: string; interpretation: string }
 
 const NATAL_ASPECT_POINTS = ['Sun','Moon','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune','Pluto','Chiron','NNode']
+
+// Specific, written interpretation for each of Zoe's actual natal aspects — her
+// chart is fixed, so this is a bounded, real set (not a generic combinatorial
+// table). Keyed 'A-B-type' in the order produced by getNatalAspects() below;
+// getNatalAspectInterpretation() also tries the reverse point order.
+const NATAL_ASPECT_MEANINGS: Record<string, string> = {
+  'Mercury-Neptune-square': "Your sharp, investigative mind sometimes clashes with a pull toward dreamy or idealized thinking — you can talk yourself into believing what you want to be true, especially about people. The fix isn't losing your imagination, it's fact-checking it before you act on it.",
+  'Moon-Mercury-trine': "Your feelings and your thinking are naturally in sync. When something feels off, you can usually find the words for it right away, and talking something through out loud actually settles your emotions instead of stirring them up more.",
+  'Mars-Jupiter-trine': "Taking action and growing opportunity come easily together for you. When you commit to something, doors tend to open, and your instinct to act on a good idea rarely backfires.",
+  'Moon-Mars-square': "There's a real tug-of-war between wanting harmony and needing to protect your feelings — you may swallow irritation to keep the peace until it builds up and comes out sideways. Naming what's bothering you early, calmly, saves you from that later blowup.",
+  'Uranus-Chiron-sextile': "An old wound around freedom or belonging has an easy path to healing through doing things your own way. The more you let yourself be different instead of trying to fit in, the more that old hurt loses its grip.",
+  'Mars-Neptune-trine': "Your drive and your imagination work well together. You're able to chase a vision, a creative idea, or a cause you believe in without losing steam, and your actions often carry a bigger, more inspired purpose than just getting something done.",
+  'Pluto-Chiron-conjunction': "A generational wound around belief and freedom sits right on top of the planet of deep transformation in your chart. Personally, this shows up as a lifelong pull to rebuild your own worldview from the ground up rather than inherit someone else's — real healing comes through that rebuilding, not around it.",
+  'Mercury-Venus-sextile': "Your sharp mind and your big-hearted values get along easily. You're good at finding the right words for how you feel about someone or something you love, and conversations about what you want in relationships tend to go smoothly rather than getting tangled.",
+  'Jupiter-Neptune-trine': "Your natural curiosity and your capacity to dream big reinforce each other. When you follow an idea that excites you, it tends to actually expand into something real rather than staying just a nice thought.",
+  'Jupiter-Pluto-opposition': "There's a pull between wanting to expand freely and a deeper need to control outcomes — you may over-plan or grip too tightly right when you're on the edge of a big opportunity. Loosening your grip at exactly that moment is usually what lets the growth actually happen.",
+  'Moon-Venus-opposition': "Part of you needs deep emotional safety and closeness, and another part needs freedom and space in love — it can feel like wanting two different things from the same relationship. The people who are actually right for you can hold both without you having to choose.",
+  'Sun-Saturn-opposition': "You can feel like your sense of who you are is constantly being tested against real-world limits, deadlines, or self-doubt — but this is also exactly what builds the kind of quiet, earned confidence that doesn't need anyone's permission. The heaviness you sometimes feel about proving yourself is usually a sign you're doing the real work, not a sign you're behind.",
+  'Sun-Uranus-square': "Part of you wants deep stability and control, and another part is restless for change and independence. Expect to occasionally blow up a plan or a routine just because it started to feel like a cage, even if it was working — that's not self-sabotage, it's your need for freedom asking to be included.",
+  'Sun-NNode-trine': "Who you are at your core is already pointed in the direction you're meant to grow. Following your gut instead of forcing yourself onto someone else's path tends to work out for you, because your identity and your life direction aren't fighting each other.",
+  'Saturn-Neptune-trine': "Your ability to build something real, patiently, over time works well with your ability to dream big. You're someone who can actually turn a vision into something concrete instead of it staying just an idea, as long as you give it the time it needs.",
+  'Venus-Mars-square': "What you want in love and how you go after what you want don't always agree — you might hold back from pursuing someone or something because you don't want to seem too eager, then feel frustrated when nothing moves. It's okay to want something and go get it without waiting for permission.",
+  'Jupiter-Chiron-opposition': "Your urge to learn and expand can bump up against an old wound about not feeling truly understood or believed — sometimes chasing more information is really a way of avoiding a feeling. Growth here comes from letting people actually see you, not just what you know.",
+}
+
+export function getNatalAspectInterpretation(a: string, b: string, type: string): string {
+  return NATAL_ASPECT_MEANINGS[`${a}-${b}-${type}`]
+      ?? NATAL_ASPECT_MEANINGS[`${b}-${a}-${type}`]
+      ?? `${a} and ${b} are ${plainAspectPhrase(type)} each other in your chart — these two areas of your life are linked, working together or in tension depending on the moment.`
+}
 
 export function getNatalAspects(): NatalAspect[] {
   const aspects: NatalAspect[] = []
@@ -510,7 +582,11 @@ export function getNatalAspects(): NatalAspect[] {
       const cfg = getAspect(a.lon, b.lon)
       if (!cfg) continue
       const orb = Math.abs(angleBetween(a.lon, b.lon) - cfg.angle)
-      aspects.push({ a: NATAL_ASPECT_POINTS[i], b: NATAL_ASPECT_POINTS[j], type: cfg.name, orb: Math.round(orb * 10) / 10, emoji: cfg.emoji })
+      const pointA = NATAL_ASPECT_POINTS[i], pointB = NATAL_ASPECT_POINTS[j]
+      aspects.push({
+        a: pointA, b: pointB, type: cfg.name, orb: Math.round(orb * 10) / 10, emoji: cfg.emoji,
+        interpretation: getNatalAspectInterpretation(pointA, pointB, cfg.name),
+      })
     }
   }
   return aspects.sort((x, y) => x.orb - y.orb)

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import {
   Heart, Briefcase, Palette, MessageCircle, Sparkles as SparklesIcon, Star,
   Check, Moon, Sun, Sparkles, Calendar, PieChart, Clock, Grid3x3,
+  Target, DollarSign, Users, Compass,
 } from 'lucide-react'
+import { plainAspectPhrase } from '@/lib/astrology'
 
 import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeader'
 import { buildDailyThemeHeadline } from '@/lib/luna/dailyThemeHeadline'
@@ -14,7 +16,7 @@ import { RoomTileCard } from '@/components/ui/RoomTileCard'
 import styles from './AstrologyToday.module.css'
 
 const ASTROLOGY_TILES = [
-  { id: 'chart', href: '/astrology/chart', label: 'My Chart', tagline: 'Your full natal placements.', icon: PieChart, accent: 'rgba(201,169,110,0.32)', image: '/images/astrology/chart.jpg' },
+  { id: 'chart', href: '/astrology/chart', label: 'My Chart', tagline: 'Your full birth chart, mapped out.', icon: PieChart, accent: 'rgba(201,169,110,0.32)', image: '/images/astrology/chart.jpg' },
   { id: 'timing', href: '/astrology/timing', label: 'Timing', tagline: 'What the sky favors right now.', icon: Clock, accent: 'rgba(150,160,200,0.32)', image: '/images/astrology/timing.jpg' },
   { id: 'connections', href: '/astrology/connections', label: 'Connections', tagline: 'Compatibility and synastry.', icon: Heart, accent: 'rgba(210,150,150,0.32)', image: '/images/astrology/connections.jpg' },
   { id: 'spirit', href: '/spirit', label: 'Spirit', tagline: 'Tarot, crystals, and rituals.', icon: Sparkles, accent: 'rgba(200,180,220,0.32)', image: '/images/astrology/spirit.jpg' },
@@ -41,8 +43,8 @@ interface TransitData {
 
 interface DailyGuidance {
   horoscope: string; energy: string; do_today: string[]; dont_today: string[]
-  career: string; love: string; money: string; family: string; self_reflection: string
-  affirmation: string
+  career: string; love: string; sex: string; money: string; friendship: string; family: string
+  self_reflection: string; main_focus: string; highest_self: string; affirmation: string
 }
 
 interface UpcomingEvent { kind: 'moon' | 'eclipse' | 'station'; title: string; detail: string; date: string; dateFormatted: string }
@@ -61,12 +63,6 @@ const NATAL_CATEGORIES: Record<string, { label: string; icon: typeof Heart }[]> 
 
 const STATUS_LABEL: Record<string, string> = {
   conjunction: 'Exact', square: 'Challenging', opposition: 'Mixed', trine: 'Supportive', sextile: 'Supportive',
-}
-
-const OUTLOOK_LABELS = ['High', 'Flowing', 'Focused', 'Reflective', 'Sensitive', 'Restorative']
-
-function outlookFor(seed: number): string {
-  return OUTLOOK_LABELS[Math.abs(seed) % OUTLOOK_LABELS.length]
 }
 
 export function AstrologyToday() {
@@ -113,9 +109,21 @@ export function AstrologyToday() {
           <>
             <p className={styles.themeQuote}>{guidance.affirmation.replace(/\.$/, '')}</p>
             <p className={styles.themeBody}>{guidance.horoscope}</p>
+            <div className={styles.themeEnergyLabel}>How Today Feels</div>
+            <p className={styles.themeEnergyBody}>{guidance.energy}</p>
           </>
         ) : <p className={styles.loadingText}>Luna is reading today&apos;s sky…</p>}
       </div>
+
+      {guidance?.main_focus && (
+        <div className={styles.focusBanner}>
+          <Target />
+          <div>
+            <div className={styles.focusBannerLabel}>Main Focus Today</div>
+            <p className={styles.focusBannerBody}>{guidance.main_focus}</p>
+          </div>
+        </div>
+      )}
 
       <Link href="/astrology/moon" className={styles.cardLink}>
         <div className={styles.card}>
@@ -142,7 +150,7 @@ export function AstrologyToday() {
               <span className={`${styles.pill} ${styles.pillMuted}`}>{STATUS_LABEL[topTransit.type] ?? topTransit.type}</span>
             </div>
           </div>
-          <h2 className={styles.transitTitle}>{topTransit.transiting} {topTransit.type} your natal {topTransit.natal}</h2>
+          <h2 className={styles.transitTitle}>{topTransit.transiting} is {plainAspectPhrase(topTransit.type)} your {topTransit.natal}</h2>
           <p className={styles.themeBody} style={{ marginBottom: 10 }}>{topTransit.interpretation}</p>
 
           {categories.length > 0 && (
@@ -168,25 +176,61 @@ export function AstrologyToday() {
         </div>
       )}
 
-      <div>
-        <div className={styles.sectionHeader}>Daily Outlook</div>
-        <div className={styles.outlookGrid} style={{ marginTop: 8 }}>
-          {[
-            { label: 'Energy', seed: 1 }, { label: 'Love', seed: 2 }, { label: 'Work', seed: 3 },
-            { label: 'Creativity', seed: 4 }, { label: 'Emotional Tone', seed: 5 }, { label: 'Wellness', seed: 6 },
-          ].map(o => (
-            <div key={o.label} className={styles.outlookCard}>
-              <span>{o.label}</span>
-              <div className={styles.outlookLabel}>{outlookFor(o.seed + (transits?.aspects?.[0]?.orb ? Math.round(transits.aspects[0].orb) : 0))}</div>
+      {guidance && (
+        <div>
+          <div className={styles.sectionHeader}>Life Areas Today</div>
+          <div className={styles.card} style={{ marginTop: 8, marginBottom: 8 }}>
+            <div className={styles.lifeAreaCard}>
+              <div className={styles.lifeAreaIcon}><Briefcase /></div>
+              <div>
+                <div className={styles.lifeAreaLabel}>Career &amp; Work</div>
+                <p className={styles.lifeAreaBody}>{guidance.career}</p>
+              </div>
             </div>
-          ))}
+          </div>
+          <div className={styles.card} style={{ marginBottom: 8 }}>
+            <div className={styles.lifeAreaCard}>
+              <div className={styles.lifeAreaIcon}><Heart /></div>
+              <div>
+                <div className={styles.lifeAreaLabel}>Love &amp; Connection</div>
+                <p className={styles.lifeAreaBody}>{guidance.love}</p>
+                {guidance.sex && <p className={styles.lifeAreaBody}>{guidance.sex}</p>}
+              </div>
+            </div>
+          </div>
+          <div className={styles.card} style={{ marginBottom: 8 }}>
+            <div className={styles.lifeAreaCard}>
+              <div className={styles.lifeAreaIcon}><DollarSign /></div>
+              <div>
+                <div className={styles.lifeAreaLabel}>Money</div>
+                <p className={styles.lifeAreaBody}>{guidance.money}</p>
+              </div>
+            </div>
+          </div>
+          <div className={styles.card}>
+            <div className={styles.lifeAreaCard}>
+              <div className={styles.lifeAreaIcon}><Users /></div>
+              <div>
+                <div className={styles.lifeAreaLabel}>Family &amp; Friends</div>
+                <p className={styles.lifeAreaBody}>{guidance.family}</p>
+                {guidance.friendship && <p className={styles.lifeAreaBody}>{guidance.friendship}</p>}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {guidance && (
         <div className={styles.lunaCard}>
           <div className={styles.lunaLabel}><Sparkles /> Luna&apos;s Message</div>
           <p className={styles.lunaText}>{guidance.self_reflection}</p>
+        </div>
+      )}
+
+      {guidance?.highest_self && (
+        <div className={styles.lunaCard}>
+          <div className={styles.lunaLabel}><Compass /> Your Highest Self Today</div>
+          <p className={styles.lunaText}>{guidance.highest_self}</p>
         </div>
       )}
 

@@ -1,11 +1,41 @@
 import { NextResponse } from 'next/server'
 import { getTransitsToNatal, getCurrentPlanets, ZOE_NATAL } from '@/lib/astrology'
 
+// A quick, deterministic 7-day look-ahead — no AI, always available — so the
+// Timing page can say something real about the coming week, not just today.
+// Intensity is a simple, transparent count: hard aspects (square/opposition/
+// conjunction) push it up, easy ones (trine/sextile) pull it down.
+function buildWeekPreview(startDate: Date): {
+  bestDay: string; bestDayReason: string
+  challengingDay: string; challengingDayReason: string
+} {
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(startDate.getTime() + i * 86_400_000)
+    const dayAspects = getTransitsToNatal(d).slice(0, 5)
+    const score = dayAspects.reduce((sum, a) => {
+      if (a.type === 'trine' || a.type === 'sextile') return sum + 1
+      if (a.type === 'square' || a.type === 'opposition') return sum - 1
+      return sum
+    }, 0)
+    return { label: i === 0 ? 'Today' : dayNames[d.getDay()], score, top: dayAspects[0] }
+  })
+  const best = days.reduce((a, b) => (b.score > a.score ? b : a))
+  const challenging = days.reduce((a, b) => (b.score < a.score ? b : a))
+  return {
+    bestDay: best.label,
+    bestDayReason: best.top ? best.top.interpretation : 'The sky is calm and open — a good day to move forward on anything.',
+    challengingDay: challenging.label,
+    challengingDayReason: challenging.top ? challenging.top.interpretation : 'Nothing major stands out — just an ordinary day to move through gently.',
+  }
+}
+
 export async function GET() {
   try {
     const now = new Date()
     const aspects = getTransitsToNatal(now)
     const current = getCurrentPlanets(now)
+    const weekPreview = buildWeekPreview(now)
 
     // Group aspects by intensity
     const major = aspects.filter(a => a.type === 'conjunction' || a.type === 'opposition' || a.type === 'square')
@@ -23,7 +53,7 @@ export async function GET() {
         sextile:     'gently supports',
       }
       const verb = verbMap[tightest.type] ?? 'connects to'
-      dailyTheme = `Transiting ${tightest.transiting} in ${tightest.transitSign} ${verb} your natal ${tightest.natal} in ${tightest.natalSign}. ${tightest.interpretation}`
+      dailyTheme = `Today's ${tightest.transiting} in ${tightest.transitSign} ${verb} your own ${tightest.natal} in ${tightest.natalSign}. ${tightest.interpretation}`
     }
 
     // Moon's current house (approximate based on natal rising)
@@ -44,6 +74,7 @@ export async function GET() {
       moon_house: moonHouse,
       moon_house_meaning: moonHouse ? HOUSE_MEANINGS[moonHouse] : null,
       active_natal_points: [...new Set(aspects.map(a => a.natal))],
+      week_preview: weekPreview,
       calculated_at: now.toISOString(),
     })
   } catch (err) {

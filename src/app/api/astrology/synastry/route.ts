@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCurrentPlanets, getAspect, ZOE_NATAL, angleBetween as _angleBetween } from '@/lib/astrology'
+import { getCurrentPlanets, getAspect, getSynastryAspectMeaning, ZOE_NATAL, angleBetween as _angleBetween } from '@/lib/astrology'
 
 // Real synastry: the other person's planetary positions at their birth
 // moment are computed with the exact same astronomy-engine functions used
@@ -10,6 +10,8 @@ import { getCurrentPlanets, getAspect, ZOE_NATAL, angleBetween as _angleBetween 
 export const dynamic = 'force-dynamic'
 
 interface SynastryBody { birthDate: string; birthTime?: string }
+
+interface ScoredAspect { a: string; b: string; type: string; orb: number; interpretation: string }
 
 // Note: no Rising/Ascendant comparison here — that requires the other
 // person's birth LOCATION (not just date/time), which this minimal form
@@ -47,14 +49,15 @@ export async function POST(req: NextRequest) {
     const theirPlanets = getCurrentPlanets(dateTime)
     const theirRelevant = theirPlanets.filter(p => NATAL_POINTS.includes(p.name))
 
-    const aspects: Array<{ a: string; b: string; type: string; orb: number }> = []
+    const aspects: ScoredAspect[] = []
     for (const their of theirRelevant) {
       for (const natalPoint of NATAL_POINTS) {
         const zoePoint = ZOE_NATAL[natalPoint]
         if (!zoePoint) continue
         const cfg = getAspect(their.lon, zoePoint.lon)
         if (!cfg) continue
-        aspects.push({ a: their.name, b: natalPoint, type: cfg.name, orb: Math.round(Math.abs(_angleBetween(their.lon, zoePoint.lon) - cfg.angle) * 10) / 10 })
+        const orb = Math.round(Math.abs(_angleBetween(their.lon, zoePoint.lon) - cfg.angle) * 10) / 10
+        aspects.push({ a: their.name, b: natalPoint, type: cfg.name, orb, interpretation: getSynastryAspectMeaning(their.name, natalPoint, cfg.name) })
       }
     }
     aspects.sort((x, y) => x.orb - y.orb)

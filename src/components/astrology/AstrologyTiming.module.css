@@ -10,6 +10,15 @@
 .timelinePill { font-size: 8.5px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; background: var(--astro-gold-soft); color: var(--astro-gold); }
 .timelineMeta { font-size: 11px; color: var(--astro-muted); }
 
+.weekGlanceCard { background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--astro-shadow); }
+.weekGlanceRow { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.weekGlanceRow:last-child { margin-bottom: 0; }
+.weekGlanceBadge { flex-shrink: 0; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 4px 9px; border-radius: 999px; white-space: nowrap; }
+.weekGlanceBadgeBest { background: rgba(90,138,122,0.16); color: #4A7A6A; }
+.weekGlanceBadgeTough { background: rgba(201,107,90,0.14); color: #A8503F; }
+.weekGlanceText { font-size: 12px; line-height: 1.5; color: var(--astro-text); }
+.weekGlanceText strong { color: var(--astro-text); }
+
 .linkCard {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px;

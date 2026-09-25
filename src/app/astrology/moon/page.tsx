@@ -169,9 +169,9 @@ export default function MoonPortal() {
                 <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--violet)' }}>Your Natal Moon</p>
               </div>
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>
-                Your natal Moon is in <strong>Cancer at 4°</strong> — the most feeling-centred moon placement.
-                When the transiting Moon moves through Cancer (every ~27 days), it returns home to your natal Moon.
-                These are your most emotionally intense and intuitive days.
+                Your own Moon is in <strong>Cancer at 4°</strong> — the most feeling-centred moon placement there is.
+                About every 27 days, today&apos;s Moon moves back through Cancer and lines up with your own — a kind of monthly homecoming.
+                These are your most emotionally intense and intuitive days: feelings run closer to the surface, old memories can resurface, and your gut instincts are especially trustworthy.
                 {moon.sign.name === 'Cancer' ? ' 🌙 The moon is home in Cancer right now — trust your instincts deeply today.' : ''}
               </p>
             </div>

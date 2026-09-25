@@ -34,3 +34,9 @@
 .categoryValue { font-size: 11px; font-weight: 700; color: var(--astro-text); width: 32px; text-align: right; flex-shrink: 0; }
 
 .disclaimer { font-size: 10.5px; color: var(--astro-muted); line-height: 1.4; font-style: italic; margin-top: 4px; }
+
+.aspectDetailRow { background: var(--astro-card, #fff); border: 1px solid var(--astro-border, #EDE7DA); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+.aspectDetailHeader { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.aspectDetailHeader span:first-child { font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--astro-gold, #5C4530); }
+.aspectDetailStrength { margin-left: auto; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--astro-muted); flex-shrink: 0; }
+.aspectDetailBody { font-size: 12px; line-height: 1.5; color: var(--astro-text); }

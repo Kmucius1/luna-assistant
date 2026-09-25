@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Plus, ChevronLeft } from 'lucide-react'
 
 import { getSavedPeople, addSavedPerson, type SavedPerson } from '@/lib/luna/savedPeople'
+import { plainAspectPhrase } from '@/lib/astrology'
 import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyConnections.module.css'
 
@@ -11,7 +12,7 @@ const RELATIONSHIPS: SavedPerson['relationship'][] = ['Romantic', 'Friendship', 
 
 interface SynastryResult {
   categories: { emotionalConnection: number; communication: number; attraction: number; trustAndSupport: number }
-  aspects: Array<{ a: string; b: string; type: string; orb: number }>
+  aspects: Array<{ a: string; b: string; type: string; orb: number; interpretation: string }>
   note: string
 }
 
@@ -104,6 +105,24 @@ export function AstrologyConnections() {
                 <span className={styles.categoryValue}>{value}%</span>
               </div>
             ))}
+
+            {synastry.aspects.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                <p style={{ fontSize: 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--astro-muted)', marginBottom: 8 }}>
+                  What&apos;s Actually Going On Between You
+                </p>
+                {synastry.aspects.slice(0, 6).map(a => (
+                  <div key={`${a.a}-${a.b}-${a.type}`} className={styles.aspectDetailRow}>
+                    <div className={styles.aspectDetailHeader}>
+                      <span>{a.a === 'NNode' ? 'North Node' : a.a} {plainAspectPhrase(a.type)} {a.b === 'NNode' ? 'North Node' : a.b}</span>
+                      <span className={styles.aspectDetailStrength}>{a.orb < 2 ? 'Very Strong' : a.orb < 5 ? 'Strong' : 'Present'}</span>
+                    </div>
+                    <p className={styles.aspectDetailBody}>{a.interpretation}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <p className={styles.disclaimer}>{synastry.note} These reflect real chart-to-chart aspects, not a guaranteed outcome — astrology describes patterns, not destiny.</p>
           </>
         )}

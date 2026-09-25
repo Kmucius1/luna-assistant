@@ -16,7 +16,7 @@ const ASPECT_COLORS: Record<string, string> = {
 }
 
 export interface WheelPlacement { point: string; sign: string; degree: number; minutes: number; lon: number; house: number }
-export interface WheelAspect { a: string; b: string; type: string; orb: number }
+export interface WheelAspect { a: string; b: string; type: string; orb: number; interpretation?: string }
 
 interface NatalWheelProps {
   placements: WheelPlacement[]

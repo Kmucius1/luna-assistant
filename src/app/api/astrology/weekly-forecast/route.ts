@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal } from '@/lib/astrology'
+import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
+import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey } from '@/lib/luna/today'
 
@@ -65,7 +66,7 @@ function buildFallbackWeekly(startDate: Date, tz: string): WeeklyForecast {
       date:       dayStr,
       dayLabel:   label,
       theme:      moonData ? `${moonData.keyword}: ${moon!.sign} Moon brings ${moonData.feel} energy.` : 'A day of movement and awareness.',
-      energy:     `${moon ? `The Moon in ${moon.sign} colors everything with ${moonData?.feel ?? 'shifting'} energy.` : ''} ${topT ? `The strongest transit active is ${topT.transiting} ${topT.type} your natal ${topT.natal} — ${topT.interpretation}` : 'The day has a gentle, open quality.'}`,
+      energy:     `${moon ? `The Moon in ${moon.sign} colors everything with ${moonData?.feel ?? 'shifting'} energy.` : ''} ${topT ? `The strongest thing active today is ${topT.transiting} ${plainAspectPhrase(topT.type)} your own ${topT.natal} — ${topT.interpretation}` : 'The day has a gentle, open quality.'}`,
       love:       transits.find(t => ['Venus','Mars','Moon','NNode'].includes(t.natal))
         ? transits.find(t => ['Venus','Mars','Moon','NNode'].includes(t.natal))!.interpretation
         : `Your magnetism is ${intensity > 6 ? 'heightened' : 'steady'} today. ${moon?.sign === 'Cancer' || moon?.sign === 'Scorpio' ? 'Emotional depth is available — let it be felt.' : 'Light, playful energy works in love.'}`,
@@ -165,20 +166,20 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
     {
       "date": "weekday, Month Day (e.g. Monday, June 23)",
       "dayLabel": "Today / Tomorrow / Monday / etc",
-      "theme": "1 sentence: the central theme or gift of this day for Zoe",
-      "energy": "2-3 sentences of what this day FEELS like in her body and life. Visceral and real — no generic astro talk. Reference the transits and Moon sign.",
-      "love": "2 sentences about her love and connection energy this specific day",
-      "career": "2 sentences about her work and business energy this specific day — she runs Ad-Vantage and DRYP Digital",
-      "guidance": ["3 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits"],
-      "watch_for": "1 honest warning or caution specific to this day",
+      "theme": "1-2 sentences: the central theme or gift of this day for Zoe",
+      "energy": "3-4 sentences of what this day FEELS like in her body and life, from morning to evening. Visceral and real — no generic astro talk. Reference the transits and Moon sign.",
+      "love": "3 sentences about her love and connection energy this specific day — a real moment or feeling, not just a mood word",
+      "career": "3 sentences about her work and business energy this specific day — she runs Ad-Vantage and DRYP Digital. Name a real kind of task, meeting, or decision the day favors.",
+      "guidance": ["4 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits, each a full sentence"],
+      "watch_for": "1-2 sentences: an honest warning or caution specific to this day, including what it could look like if ignored",
       "affirmation": "1 powerful first-person declaration tailored to this day's energy",
       "intensity": 7
     }
   ]
-}`
+}${LIFE_LANGUAGE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
-          const rawText = await callAI(SYSTEM, prompt, 4000)
+          const rawText = await callAI(SYSTEM, prompt, 6500)
           const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
           const parsed = JSON.parse(jsonText) as WeeklyForecast
           return { payload: parsed, source: 'ai' as const }

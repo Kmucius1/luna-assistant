@@ -6,6 +6,7 @@ import { AlertTriangle } from 'lucide-react'
 import { NatalWheel, type WheelPlacement, type WheelAspect } from './NatalWheel'
 import { AstrologyHero } from './AstrologyHero'
 import { BottomSheet } from '@/components/ui/BottomSheet'
+import { plainAspectPhrase } from '@/lib/astrology'
 import styles from './AstrologyChart.module.css'
 
 interface NatalPlacement extends WheelPlacement { houseTheme: string; notes?: string; retrograde: boolean }
@@ -138,9 +139,11 @@ export function AstrologyChart() {
           {data.aspects.length === 0 && <p style={{ fontSize: 12, color: 'var(--astro-muted)', textAlign: 'center' }}>No major aspects found.</p>}
           {data.aspects.map(a => (
             <div key={`${a.a}-${a.b}`} className={styles.aspectRow}>
-              <span className={styles.aspectType}>{a.type}</span>
-              <span>{a.a} – {a.b}</span>
-              <span className={styles.aspectOrb}>{a.orb}° orb</span>
+              <div className={styles.aspectHeaderRow}>
+                <span className={styles.aspectType}>{a.a === 'NNode' ? 'North Node' : a.a} {plainAspectPhrase(a.type)} {a.b === 'NNode' ? 'North Node' : a.b}</span>
+                <span className={styles.aspectStrength}>{a.orb < 2 ? 'Very Strong' : a.orb < 5 ? 'Strong' : 'Present'}</span>
+              </div>
+              <p className={styles.aspectMeaning}>{a.interpretation}</p>
             </div>
           ))}
         </>
