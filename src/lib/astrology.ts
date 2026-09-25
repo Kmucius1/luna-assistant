@@ -53,8 +53,8 @@ export const PLANET_KEYWORDS = planetsData.PLANET_KEYWORDS as Record<string, str
 // generic transit sentences never print an internal code like "NNode" as if
 // it were a planet.
 const POINT_LABELS: Record<string, string> = {
-  NNode: 'your North Node',
-  Midheaven: 'your Midheaven',
+  NNode: 'the part of your chart about where your growth is headed',
+  Midheaven: 'the part of your chart about your career and reputation',
   Rising: 'your Rising sign',
   Chiron: 'your Chiron',
   Lilith: 'your Lilith',
