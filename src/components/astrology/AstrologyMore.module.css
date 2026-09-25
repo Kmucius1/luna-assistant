@@ -1,15 +1,20 @@
 .row {
-  display: flex; align-items: center; justify-content: space-between; text-decoration: none;
+  display: flex; align-items: center; justify-content: space-between; text-decoration: none; gap: 10px;
   background: var(--astro-card); border: 1px solid var(--astro-border); border-radius: 14px;
-  box-shadow: var(--astro-shadow); padding: 13px 14px; margin-bottom: 8px;
-  font-size: 13.5px; font-weight: 600; color: var(--astro-text);
+  box-shadow: var(--astro-shadow); padding: 12px 14px; margin-bottom: 8px;
+  font-size: 13.5px; font-weight: 600; color: var(--astro-text); min-height: 44px;
 }
-.row svg:first-child { color: var(--astro-gold); margin-right: 10px; }
-.rowArrow { color: var(--astro-muted); }
-.rowMeta { display: flex; align-items: center; }
+.row svg:first-child { color: var(--astro-gold); margin-right: 10px; flex-shrink: 0; }
+.rowArrow { color: var(--astro-muted); flex-shrink: 0; }
+.rowMeta { display: flex; align-items: flex-start; min-width: 0; flex: 1; }
+.rowEnd { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.rowText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.rowLabel { font-size: 13.5px; font-weight: 700; color: var(--astro-text); }
+.rowDesc { font-size: 11px; font-weight: 500; color: var(--astro-muted); line-height: 1.35; }
 
 .soonRow { opacity: 0.55; }
 .soonBadge { font-size: 8px; font-weight: 700; text-transform: uppercase; color: #14110b; background: var(--astro-gold); padding: 2px 7px; border-radius: 999px; margin-right: 8px; }
+.elsewhereBadge { font-size: 8px; font-weight: 700; text-transform: uppercase; color: var(--astro-gold); background: var(--astro-gold-soft); padding: 2px 7px; border-radius: 999px; flex-shrink: 0; }
 
 .sectionHeader { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--astro-muted); margin: 12px 0 8px; }
 .sectionHeader:first-child { margin-top: 0; }

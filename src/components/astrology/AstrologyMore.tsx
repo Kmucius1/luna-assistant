@@ -2,11 +2,36 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight, ChevronLeft, Moon, MapPin, BookOpen, GraduationCap, Sun, Archive, Settings, Check } from 'lucide-react'
+import {
+  ChevronRight, ChevronLeft, Moon, MapPin, BookOpen, GraduationCap, RotateCcw,
+  Archive, Settings, Check, CalendarDays, Activity, ScrollText,
+} from 'lucide-react'
 
 import { SmartInput } from '@/components/ui/SmartInput'
 import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyMore.module.css'
+
+// Every real destination in the Astrology room, in one place with an honest
+// one-line description, so nothing requires already knowing it exists.
+export function ExploreRow({ href, icon, label, desc, badge }: {
+  href: string; icon: React.ReactNode; label: string; desc: string; badge?: string
+}) {
+  return (
+    <Link href={href} className={styles.row}>
+      <span className={styles.rowMeta}>
+        {icon}
+        <span className={styles.rowText}>
+          <span className={styles.rowLabel}>{label}</span>
+          <span className={styles.rowDesc}>{desc}</span>
+        </span>
+      </span>
+      <span className={styles.rowEnd}>
+        {badge && <span className={styles.elsewhereBadge}>{badge}</span>}
+        <ChevronRight size={16} className={styles.rowArrow} />
+      </span>
+    </Link>
+  )
+}
 
 interface MoonData { phase: { name: string }; sign: { name: string } }
 interface ChartBirthData { date: string; time: string; place: string; timeAccuracy: string }
@@ -93,36 +118,49 @@ export function AstrologyMore() {
 
   return (
     <>
-      <AstrologyHero image="/images/astrology/more.jpg" label="Explore" title="Every Tool, One Place" subtitle="Moon room, journal, deep dives, and the sky right now." />
+      <AstrologyHero image="/images/astrology/more.jpg" label="Explore" title="Every Tool, One Place" subtitle="Everything in the Astrology room, in one list — nothing buried." />
 
-      <div className={styles.sectionHeader}>Explore</div>
-      <Link href="/astrology/moon" className={styles.row}>
-        <span className={styles.rowMeta}><Moon size={16} /> Moon Room</span>
-        <ChevronRight size={16} className={styles.rowArrow} />
-      </Link>
+      <div className={styles.sectionHeader}>Read</div>
+      <ExploreRow href="/astrology/daily" icon={<ScrollText size={16} />} label="Daily Reading Archive"
+        desc="The full version of today's reading, plus every past day you can look back on" />
+      <ExploreRow href="/astrology/forecasts" icon={<CalendarDays size={16} />} label="Weekly Forecast"
+        desc="Day-by-day outlook for the next 7 days — best day, rest day, love window" />
+      <ExploreRow href="/astrology/moon" icon={<Moon size={16} />} label="Moon"
+        desc="Current phase, sign, and what it means for your emotions, body, and rituals" />
+
+      <div className={styles.sectionHeader}>Explore The Sky</div>
+      <ExploreRow href="/astrology/transits" icon={<Activity size={16} />} label="Transit Explorer"
+        desc="Every real aspect active right now, filterable by tension or flow" />
+      <ExploreRow href="/astrology/retrogrades" icon={<RotateCcw size={16} />} label="Retrogrades"
+        desc="What's retrograde right now, what it means, and when Mercury turns next" />
+      <ExploreRow href="/travel/astrocartography" icon={<MapPin size={16} />} label="Places"
+        desc="Where on the map your chart lights up — lives in the Travel room" badge="Travel" />
+
+      <div className={styles.sectionHeader}>Learn &amp; Keep</div>
+      <ExploreRow href="/astrology/deep-dives" icon={<GraduationCap size={16} />} label="Learn"
+        desc="What every planet, house, and aspect actually means, in plain English" />
+      <ExploreRow href="/astrology/saved-readings" icon={<Archive size={16} />} label="Saved Readings"
+        desc="Every daily reading you've had, browsable by date" />
       <button type="button" onClick={() => setView('journal')} className={styles.row} style={{ width: '100%', border: 'none' }}>
-        <span className={styles.rowMeta}><BookOpen size={16} /> Astrology Journal</span>
+        <span className={styles.rowMeta}>
+          <BookOpen size={16} />
+          <span className={styles.rowText}>
+            <span className={styles.rowLabel}>Astrology Journal</span>
+            <span className={styles.rowDesc}>Write what's alive for you right now, tagged with today's Moon</span>
+          </span>
+        </span>
         <ChevronRight size={16} className={styles.rowArrow} />
       </button>
-      <Link href="/astrology/deep-dives" className={styles.row}>
-        <span className={styles.rowMeta}><GraduationCap size={16} /> Learn</span>
-        <ChevronRight size={16} className={styles.rowArrow} />
-      </Link>
-      <Link href="/astrology/retrogrades" className={styles.row}>
-        <span className={styles.rowMeta}><Sun size={16} /> Current Sky</span>
-        <ChevronRight size={16} className={styles.rowArrow} />
-      </Link>
-      <Link href="/astrology/saved-readings" className={styles.row}>
-        <span className={styles.rowMeta}><Archive size={16} /> Saved Readings</span>
-        <ChevronRight size={16} className={styles.rowArrow} />
-      </Link>
-
-      <div className={styles.sectionHeader}>Advanced</div>
-      <div className={`${styles.row} ${styles.soonRow}`}><span className={styles.soonBadge}>Soon</span> <MapPin size={16} style={{ marginRight: 6 }} /> Places (Astrocartography)</div>
 
       <div className={styles.sectionHeader}>Settings</div>
       <button type="button" onClick={() => setView('settings')} className={styles.row} style={{ width: '100%', border: 'none' }}>
-        <span className={styles.rowMeta}><Settings size={16} /> Astrology Settings</span>
+        <span className={styles.rowMeta}>
+          <Settings size={16} />
+          <span className={styles.rowText}>
+            <span className={styles.rowLabel}>Astrology Settings</span>
+            <span className={styles.rowDesc}>Your birth date, time, place, and house system</span>
+          </span>
+        </span>
         <ChevronRight size={16} className={styles.rowArrow} />
       </button>
     </>

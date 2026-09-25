@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Heart, Briefcase, Palette, MessageCircle, Sparkles as SparklesIcon, Star,
   Check, Moon, Sun, Sparkles, Calendar, PieChart, Clock, Grid3x3,
-  Target, DollarSign, Users, Compass,
+  Target, DollarSign, Users, Compass, ScrollText, CalendarDays, Activity, RotateCcw, GraduationCap,
 } from 'lucide-react'
 import { plainAspectPhrase } from '@/lib/astrology'
 
@@ -13,6 +13,7 @@ import { GreetingHeader, useTodayContext } from '@/components/home/GreetingHeade
 import { buildDailyThemeHeadline } from '@/lib/luna/dailyThemeHeadline'
 import { TilePager } from '@/components/ui/TilePager'
 import { RoomTileCard } from '@/components/ui/RoomTileCard'
+import { ExploreRow } from './AstrologyMore'
 import styles from './AstrologyToday.module.css'
 
 const ASTROLOGY_TILES = [
@@ -249,6 +250,28 @@ export function AstrologyToday() {
               <div className={styles.upcomingBody}><strong>Nothing major this week</strong><span>Check Timing for the full picture</span></div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Everything else in Astrology, right here — these used to only exist one
+          more tap in on the More tab, which is exactly what made them hard to find. */}
+      <div>
+        <div className={styles.sectionHeader}>More To Explore</div>
+        <div style={{ marginTop: 8 }}>
+          <ExploreRow href="/astrology/daily" icon={<ScrollText size={16} />} label="Daily Reading Archive"
+            desc="The full version of today's reading, plus your past days" />
+          <ExploreRow href="/astrology/forecasts" icon={<CalendarDays size={16} />} label="Weekly Forecast"
+            desc="Day-by-day outlook for the next 7 days" />
+          <ExploreRow href="/astrology/moon" icon={<Moon size={16} />} label="Moon"
+            desc="Phase, sign, and what it means for you right now" />
+          <ExploreRow href="/astrology/transits" icon={<Activity size={16} />} label="Transit Explorer"
+            desc="Every real aspect active right now" />
+          <ExploreRow href="/astrology/retrogrades" icon={<RotateCcw size={16} />} label="Retrogrades"
+            desc="What's retrograde right now and what it means" />
+          <ExploreRow href="/astrology/deep-dives" icon={<GraduationCap size={16} />} label="Learn"
+            desc="What every planet, house, and aspect actually means" />
+          <ExploreRow href="/astrology/more" icon={<Grid3x3 size={16} />} label="Everything Else"
+            desc="Saved readings, your astrology journal, and settings" />
         </div>
       </div>
     </>

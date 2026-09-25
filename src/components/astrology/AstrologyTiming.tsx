@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight, Calendar, Moon, TrendingUp, TrendingDown } from 'lucide-react'
+import { ChevronRight, Calendar, Moon, TrendingUp, TrendingDown, RotateCcw } from 'lucide-react'
 import { AstrologyHero } from './AstrologyHero'
 import { plainAspectPhrase } from '@/lib/astrology'
 import styles from './AstrologyTiming.module.css'
@@ -65,7 +65,11 @@ export function AstrologyTiming() {
         <ChevronRight size={16} />
       </Link>
       <Link href="/astrology/moon" className={styles.linkCard}>
-        <span><Moon size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: -2 }} /> Cosmic Calendar (Moon Phases)</span>
+        <span><Moon size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: -2 }} /> Moon</span>
+        <ChevronRight size={16} />
+      </Link>
+      <Link href="/astrology/retrogrades" className={styles.linkCard}>
+        <span><RotateCcw size={14} style={{ display: 'inline', marginRight: 6, verticalAlign: -2 }} /> Retrogrades</span>
         <ChevronRight size={16} />
       </Link>
 
