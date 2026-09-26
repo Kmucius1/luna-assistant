@@ -17,6 +17,41 @@ async function resolveUserId(): Promise<string> {
   return ZOE_USER_ID
 }
 
+// A real first-person line for every Moon sign, so the fallback affirmation
+// changes whenever the Moon does (every ~2.5 days) instead of ever repeating
+// the exact same sentence — this is what she reads whenever the AI call
+// below fails, so it can never be allowed to be a single fixed string again.
+const AFFIRMATION_BY_MOON_SIGN: Record<string, string> = {
+  Aries: 'I trust the fire in me to move first and figure the rest out as I go.',
+  Taurus: 'I build slowly and steadily, and that steadiness is its own kind of power.',
+  Gemini: 'I follow my curiosity today and trust it to lead somewhere real.',
+  Cancer: 'I let myself feel everything today without needing to fix it right away.',
+  Leo: 'I let myself be seen today, exactly as I am.',
+  Virgo: 'I do one thing well today instead of everything halfway.',
+  Libra: 'I choose connection today, and I let it be easy.',
+  Scorpio: 'I go deep instead of staying on the surface today.',
+  Sagittarius: 'I say yes to what actually excites me today.',
+  Capricorn: 'I keep building, one honest step at a time.',
+  Aquarius: 'I trust my own way of doing things today, even if it looks different.',
+  Pisces: 'I let my intuition lead today, even when I cannot explain why.',
+}
+
+// A short second line reflecting whether today's strongest real transit is
+// easy or tense — so the affirmation also shifts with the day's actual sky,
+// not just the Moon sign.
+function affirmationTransitClause(transits: TransitAspect[]): string {
+  const top = transits[0]
+  if (!top) return 'Today has room to breathe, and so do I.'
+  if (top.type === 'trine' || top.type === 'sextile') return 'Today is on my side, and I can feel it.'
+  if (top.type === 'square' || top.type === 'opposition') return "Today asks more of me than usual, and I am steady enough to meet it."
+  return 'Today is intense, and I am ready for it.'
+}
+
+function buildFallbackAffirmation(moon: PlanetPosition | undefined, transits: TransitAspect[]): string {
+  const moonLine = moon ? (AFFIRMATION_BY_MOON_SIGN[moon.sign] ?? 'I move at the pace that is actually mine.') : 'I move at the pace that is actually mine.'
+  return `${moonLine} ${affirmationTransitClause(transits)}`
+}
+
 // ─── Transit-based fallback (works with no AI credits) ────────────────────────
 const SIGN_BODY = SIGN_ENERGY_DESCRIPTIONS
 function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dateStr: string, _timeStr: string): DailyGuidance {
@@ -55,7 +90,7 @@ function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dat
     self_reflection: top[0] ? `${top[0].transiting} is ${plainAspectPhrase(top[0].type)} your ${top[0].natal} today — what is the part of yourself that you keep avoiding looking at directly, and what would it mean to stop turning away?` : `Your Scorpio Mercury wants depth — where in your life are you accepting a surface answer when the real truth is something more uncomfortable and more true?`,
     main_focus: top[0] ? top[0].interpretation : `Honor your natural energy rhythm today — do what is genuinely energizing, rest when it is not, and trust that this IS the work.`,
     highest_self: `Your 6th line is in its transition from experimenter to role model — you are becoming the person others look to for how to actually live. ${top[0] ? `Today, ${top[0].transiting} ${plainAspectPhrase(top[0].type)} your ${top[0].natal} is part of that becoming — it is showing you something about your ${top[0].natal}.` : 'Today is about living your truth visibly, even in small ways.'} As a Self-Projected Projector, your clarity comes from speaking — speak your truth today, even just to yourself. Wait for genuine invitations rather than initiating from pressure, and trust that the right recognition is already on its way.`,
-    affirmation: `I move through this day in full alignment with who I am becoming. My pace is perfect. My energy is magnetic. What is truly mine will arrive.`,
+    affirmation: buildFallbackAffirmation(moon, transits),
   }
 }
 
@@ -177,23 +212,35 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
         try {
           const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice. Never leave a planet, sign, house, or aspect standing alone as just a label — always translate it into what it actually looks or feels like in her real day (a conversation, a mood, a decision, a tension, a physical feeling). Speak as if you deeply know this woman. Be specific, be real, be encouraging but honest. Make every word feel personally written for Zoe, not for a generic reader. Return ONLY valid JSON — no markdown fences, no prose outside the JSON.'
 
-          const rawText = await callAI(SYSTEM, userPrompt, 3600)
-          const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
-          const parsed = JSON.parse(jsonText) as DailyGuidance
-
           const required: (keyof DailyGuidance)[] = [
             'horoscope','energy','do_today','dont_today','career','love',
             'sex','money','friendship','family','self_reflection','main_focus',
             'highest_self','affirmation',
           ]
-          for (const field of required) {
-            if (parsed[field] === undefined) {
-              throw new Error(`Missing field in AI response: ${field}`)
+
+          let raw = await callAI(SYSTEM, userPrompt, 3600)
+          let lastError = ''
+          for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+              const jsonText = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+              const parsed = JSON.parse(jsonText) as DailyGuidance
+              const missing = required.filter(f => parsed[f] === undefined)
+              if (missing.length === 0) return { payload: parsed, source: 'ai' as const }
+              lastError = `missing fields: ${missing.join(', ')}`
+            } catch (e) {
+              lastError = e instanceof Error ? e.message : 'invalid JSON'
+            }
+            if (attempt === 0) {
+              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 3600)
             }
           }
-          return { payload: parsed, source: 'ai' as const }
-        } catch {
-          // AI unavailable — use transit-based fallback (always accurate, no AI needed)
+          throw new Error(lastError)
+        } catch (err) {
+          // AI unavailable or produced bad JSON even after a repair attempt — use the
+          // always-real transit-based fallback. Logged, not swallowed silently, so a
+          // spike in fallback use (e.g. the JSON repeatedly getting cut off) is visible
+          // in the logs instead of just quietly showing template text every day.
+          console.error('[daily-guidance] AI generation failed, using fallback:', err instanceof Error ? err.message : err)
           return { payload: buildFallback(planets, transits, dateStr, timeStr), source: 'fallback' as const }
         }
       },
