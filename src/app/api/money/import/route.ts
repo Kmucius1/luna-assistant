@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash } from 'crypto'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import { parseCsv, extractTransactionsFromImage, extractTransactionsFromPdf, type RawTransactionRow } from '@/lib/money/importParsers'
 import { runImportPipeline } from '@/lib/money/importPipeline'
 
@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
     const report = await runImportPipeline(db, userId, account_id, importRow?.id ?? null, rows)
     return NextResponse.json({ report })
   } catch (err) {
+    if (isUnauthorizedError(err)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/import] error:', err)
     return NextResponse.json({ error: 'Import failed. Try again.' }, { status: 500 })
   }

@@ -1,8 +1,9 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDayBoundsUTC } from '@/lib/luna/dailyCache'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
 
 // Everything Zoe told LUNA/the app on a given local day — the complete raw

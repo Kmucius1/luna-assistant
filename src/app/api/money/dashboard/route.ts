@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import { computeSafeToSpend } from '@/lib/money/safeToSpend'
 import { todayKey, daysFromNow } from '@/lib/luna/today'
 
@@ -108,6 +108,7 @@ export async function GET() {
       income_sources: (incomeRows ?? []) as { source_name: string; amount: number }[],
     }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/dashboard] error:', error)
     return NextResponse.json({ error: 'Failed to load dashboard' }, { status: 500 })
   }

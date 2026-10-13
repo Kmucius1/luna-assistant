@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import { todayKey, daysFromNow } from '@/lib/luna/today'
 
 
@@ -61,6 +61,7 @@ export async function GET() {
     const alerts = [...billAlerts, ...dupeAlerts, ...subAlerts]
     return NextResponse.json({ alerts, count: alerts.length })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[alerts] error:', error)
     return NextResponse.json({ alerts: [], count: 0 })
   }
@@ -78,6 +79,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ alert: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[alerts] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update alert' }, { status: 500 })
   }

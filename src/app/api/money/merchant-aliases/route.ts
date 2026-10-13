@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 export async function GET() {
   try {
@@ -10,6 +10,7 @@ export async function GET() {
     if (error) throw error
     return NextResponse.json({ aliases: data ?? [] }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/merchant-aliases] GET error:', error)
     return NextResponse.json({ aliases: [] })
   }
@@ -46,6 +47,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ alias: data, relabeled })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/merchant-aliases] POST error:', error)
     return NextResponse.json({ error: 'Failed to save alias' }, { status: 500 })
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 export async function GET() {
   try {
@@ -14,6 +14,7 @@ export async function GET() {
     const totalTarget = goals.reduce((s, g) => s + (g.target_amount ?? 0), 0)
     return NextResponse.json({ goals, total_saved: totalSaved, total_target: totalTarget }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[goals] error:', error)
     return NextResponse.json({ goals: [], total_saved: 0, total_target: 0 })
   }
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ goal: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[goals] POST error:', error)
     return NextResponse.json({ error: 'Failed to create goal' }, { status: 500 })
   }
@@ -55,6 +57,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ goal: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[goals] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update goal' }, { status: 500 })
   }

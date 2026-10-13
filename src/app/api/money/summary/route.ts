@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import { computeSafeToSpend } from '@/lib/money/safeToSpend'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { todayKey, daysFromNow } from '@/lib/luna/today'
@@ -42,6 +42,7 @@ Safety buffer held back: $${sts.safetyBuffer.toFixed(2)}`
     const parsed = parseAIJson(raw)
     return NextResponse.json(parsed)
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     const message = error instanceof Error ? error.message : String(error)
     console.error('[money/summary]', message)
     return NextResponse.json({ message: null, error: 'Could not generate summary', detail: message }, { status: 500 })

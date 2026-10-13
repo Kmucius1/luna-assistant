@@ -1,22 +1,26 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextResponse } from 'next/server'
 import { CountryCode, Products } from 'plaid'
 import { plaidClient } from '@/lib/plaid'
 import { createClient } from '@/lib/supabase/server'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
-async function resolveUserId(): Promise<string> {
+// A bank link token is only ever issued to a signed-in session. Previously this
+// fell back to the owner id when there was no session.
+async function resolveUserId(): Promise<string | null> {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (user?.id) return user.id
   } catch { /* fall through */ }
-  return ZOE_USER_ID
+  return null
 }
 
 export async function POST() {
   try {
     const userId = await resolveUserId()
+    if (!userId) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     const response = await plaidClient.linkTokenCreate({
       client_name: 'LUNA',
       language: 'en',

@@ -212,6 +212,17 @@ export function LunaTodayPage() {
       <div className={styles.page}>
         <GreetingHeader now={now} weather={weather} weatherError={weatherError} backHref="/home" />
 
+        <Link
+          href="/thirty"
+          style={{
+            display: 'block', margin: '0 16px 12px', padding: '14px 18px', borderRadius: 20,
+            background: 'var(--surface)', border: '1px solid var(--surface-border)', color: 'var(--text-1)', textDecoration: 'none',
+          }}
+        >
+          <span style={{ display: 'block', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-4)', fontWeight: 600 }}>30-day plan</span>
+          <span style={{ fontSize: 17 }}>What is Zoe doing next?</span>
+        </Link>
+
         <Link href="/plan-my-day" className={styles.hero}>
           <Image src="/images/today/hero.jpg" alt={gymFocusName} fill sizes="(max-width: 640px) 100vw, 640px" priority />
           <div className={styles.heroOverlay} />

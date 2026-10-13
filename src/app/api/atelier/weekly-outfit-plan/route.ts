@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
@@ -5,7 +6,7 @@ import { getUpcomingEvents } from '@/lib/calendar'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { outfitImageForDate } from '@/lib/luna/outfitImages'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 // WMO weather codes (Open-Meteo) collapsed to a short human phrase — no
 // existing lookup for this in the repo, so it's scoped locally here.

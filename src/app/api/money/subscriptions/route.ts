@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 interface SubscriptionRow { status: string; expected_amount: number | null; billing_frequency: string | null; [key: string]: unknown }
 
@@ -24,6 +24,7 @@ export async function GET() {
 
     return NextResponse.json({ subscriptions: subs, count: active.length, monthly_total: monthlyTotal }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[subscriptions] error:', error)
     return NextResponse.json({ subscriptions: [], count: 0, monthly_total: 0 })
   }
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ subscription: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[subscriptions] POST error:', error)
     return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 })
   }
@@ -70,6 +72,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ subscription: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[subscriptions] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 })
   }

@@ -1,10 +1,11 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey } from '@/lib/luna/dailyCache'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_IDS = [
   '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb',
   'dc25215f-cda4-4e91-84ee-c9fe49678b6b',

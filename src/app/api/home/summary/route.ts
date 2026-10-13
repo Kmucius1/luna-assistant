@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getTodayEvents, type CalendarEvent } from '@/lib/calendar'
@@ -8,7 +9,7 @@ import { isMickEvent } from '@/lib/calendarPeople'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 function adminDb() {
   return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)

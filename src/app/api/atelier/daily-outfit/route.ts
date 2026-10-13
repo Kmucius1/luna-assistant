@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getOrCreateDailyContent, localDateKey } from '@/lib/luna/dailyCache'
@@ -6,7 +7,7 @@ import { callAI, parseAIJson } from '@/lib/ai'
 import { OUTFIT_IMAGES, outfitImageForDate } from '@/lib/luna/outfitImages'
 import { OCCASION_LABEL, type OutfitOccasion } from '@/lib/luna/outfitOccasion'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 interface DayPlanAnchors { at_work?: string; gym?: string }
 interface DayPlan { key_anchors?: DayPlanAnchors; occasion?: OutfitOccasion }

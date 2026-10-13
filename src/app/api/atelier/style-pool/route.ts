@@ -1,10 +1,11 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey, getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { generateFashionImage } from '@/lib/higgsfield'
 import { searchPinterestImages } from '@/lib/pinterestSearch'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const DAILY_COUNT = 12
 const DAILY_GENERATE_COUNT = 4
 

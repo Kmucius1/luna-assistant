@@ -1,8 +1,9 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { regenerateDraftVariant, type RegenerateInstruction } from '@/lib/luna/text-messaging'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const VALID_INSTRUCTIONS: RegenerateInstruction[] = ['shorter', 'warmer', 'more_direct', 'more_like_me']
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {

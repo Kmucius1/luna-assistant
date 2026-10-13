@@ -186,3 +186,14 @@ The approved Home screen is the visual benchmark for Luna. Every future screen m
 No future feature may introduce a new design language, color palette, card style, navigation pattern, icon family, typography system, or interaction model without an intentional update to this Design Bible.
 
 Consistency is a product feature.
+
+## Luna Prosperity — Night Theme (approved by Zoe, 2026-10-04)
+
+Luna Prosperity (`/prosperity`) is a second Luna environment with an intentional, approved exception to the ivory palette: a **midnight** look. It is the only area allowed to use it, and its styles are scoped to the Prosperity shell so nothing leaks into the rest of Luna.
+
+- **Background:** deep midnight navy / near-black blue. Never pure black.
+- **Surfaces:** soft translucent glass over midnight, hairline champagne borders.
+- **Text:** warm ivory primary, muted ivory secondary.
+- **Accents:** champagne and muted gold (primary), with a very restrained dusty lavender as a tertiary accent only. No neon, no purple gradients, no glow overload.
+- **Everything else in this Bible still applies:** no emojis, one thin-stroke rounded icon family, SF Pro + editorial serif for large headings only, large consistent radius, physical animation, mobile-first on iPhone 17 Pro, floating glass dock, no sidebar, no dense enterprise tables.
+- **Clip Studio exception:** an editor needs a wide canvas and a bottom timeline. On desktop it renders inside the centered floating app container; the timeline is a bottom panel, never a sidebar.

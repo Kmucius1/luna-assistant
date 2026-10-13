@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
@@ -5,7 +6,7 @@ import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
 import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 export interface LoveGuidance {
   daily_message:     string

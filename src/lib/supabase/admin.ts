@@ -7,6 +7,11 @@ export function createAdminClient() {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!url || !url.startsWith('http') || !key || key === 'your_supabase_service_role_key') {
+    // In production a missing key must be loud. Returning an empty stub makes
+    // every route "succeed" with blank data and hides a broken deploy.
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Supabase admin client is not configured')
+    }
     return {
       from: () => ({
         select: () => ({ eq: () => ({ data: [], error: null }), data: [], error: null }),

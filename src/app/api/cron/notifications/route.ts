@@ -1,10 +1,13 @@
+import { isCronAuthorized } from '@/lib/cronAuth'
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 import { sendPushToUser, alreadySentToday, markSentToday } from '@/lib/luna/pushNotifications'
-import { mondayKeyOf } from '@/lib/luna/today'
+import { mondayKeyOf, todayKey } from '@/lib/luna/today'
+import { WORK_CHECKINS, dayNumber, themeFor, weekdayOf } from '@/lib/luna/thirtyDay'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
 
 interface Slot {
@@ -76,9 +79,40 @@ const SLOTS: Slot[] = [
   },
 ]
 
+// 30-day program reminders. They only fire on weekdays for work check-ins and
+// only while the program is active, so the older slots above are untouched.
+function thirtyDayActive(): boolean {
+  const n = dayNumber(todayKey())
+  return n >= 1 && n <= 30
+}
+const isWeekday = () => { const d = weekdayOf(todayKey()); return d >= 1 && d <= 5 }
+
+const THIRTY_SLOTS: Slot[] = [
+  ...WORK_CHECKINS.map(c => ({
+    key: `thirty_work_${c.key}`,
+    hour: c.hour,
+    build: async () => (thirtyDayActive() && isWeekday() ? { title: c.title, body: c.body, url: '/thirty' } : null),
+  })),
+  {
+    key: 'thirty_evening_focus',
+    hour: 18,
+    build: async () => {
+      if (!thirtyDayActive()) return null
+      const t = themeFor(todayKey())
+      return { title: `Tonight: ${t.block}`, body: `Your evening has a purpose. DONE means: ${t.done}`, url: '/thirty' }
+    },
+  },
+  {
+    key: 'thirty_close_day',
+    hour: 21,
+    build: async () => (thirtyDayActive()
+      ? { title: 'Close the day', body: 'Gym tomorrow? Outfit, bag, Top 3. Then journal and rest.', url: '/thirty' }
+      : null),
+  },
+]
+
 async function handle(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -90,7 +124,7 @@ async function handle(req: NextRequest) {
 
   const results: Record<string, string> = {}
 
-  for (const slot of SLOTS) {
+  for (const slot of [...SLOTS, ...THIRTY_SLOTS]) {
     if (slot.hour !== hour) continue
     if (await alreadySentToday(ZOE_USER_ID, slot.key, dateKey)) { results[slot.key] = 'already sent'; continue }
 

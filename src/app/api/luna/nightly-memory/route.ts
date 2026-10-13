@@ -1,9 +1,11 @@
+import { isCronAuthorized } from '@/lib/cronAuth'
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { callAI } from '@/lib/ai'
 import { localDateKey, localDayBoundsUTC } from '@/lib/luna/dailyCache'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
 
 const MEMORY_SYSTEM = `You are LUNA's memory system. You read one full day of Zoe's activity across
@@ -19,8 +21,7 @@ reviewable separately, so it's fine to be selective here.`
 
 // Vercel Cron always invokes via GET — both GET and POST share this handler.
 async function handle(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (process.env.NODE_ENV === 'production' && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

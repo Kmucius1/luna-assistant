@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 interface BillRow { due_date: string | null; expected_amount: number | null; minimum_amount: number | null; [key: string]: unknown }
 
@@ -20,6 +20,7 @@ export async function GET() {
 
     return NextResponse.json({ bills, total_monthly: totalMonthly, count: bills.length }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[bills] error:', error)
     return NextResponse.json({ bills: [], total_monthly: 0, count: 0 })
   }
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ bill: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[bills] POST error:', error)
     return NextResponse.json({ error: 'Failed to create bill' }, { status: 500 })
   }
@@ -63,6 +65,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ bill: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[bills] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update bill' }, { status: 500 })
   }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 export async function GET() {
   try {
@@ -14,6 +14,7 @@ export async function GET() {
     const totalMinimums = debts.reduce((s, d) => s + (d.minimum_payment ?? 0), 0)
     return NextResponse.json({ debts, total_balance: totalBalance, total_minimums: totalMinimums }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[debts] error:', error)
     return NextResponse.json({ debts: [], total_balance: 0, total_minimums: 0 })
   }
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ debt: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[debts] POST error:', error)
     return NextResponse.json({ error: 'Failed to create debt' }, { status: 500 })
   }
@@ -54,6 +56,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ debt: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[debts] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update debt' }, { status: 500 })
   }

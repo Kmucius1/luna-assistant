@@ -48,9 +48,8 @@ const ALL_APPS: AppDef[] = [
   { label: 'Transactions',   emoji: '💳', href: '/money/transactions',   color: '#8AB88A', desc: 'Transactions'                 },
   { label: 'Bills',          emoji: '🧾', href: '/money/bills',          color: '#8AB88A', desc: 'Bill tracker'                 },
   { label: 'Subscriptions',  emoji: '🔁', href: '/money/subscriptions',  color: '#A8C4DA', desc: 'Recurring payments'           },
-  { label: 'Business Exp.',  emoji: '📊', href: '/money/business-expenses', color: '#8AB88A', desc: 'Business expense tracker'  },
-  { label: 'Money Insights', emoji: '📈', href: '/money/insights',       color: '#8AB88A', desc: 'AI spending insights'         },
-  { label: 'Budget Planning',emoji: '🗂️', href: '/money/planning',      color: '#8AB88A', desc: 'Budget planning'              },
+  { label: 'Money Insights', emoji: '📈', href: '/money',                color: '#8AB88A', desc: 'AI spending insights'         },
+  { label: 'Budget Planning',emoji: '🗂️', href: '/money/payday',         color: '#8AB88A', desc: 'Budget planning'              },
   { label: 'EHM Strategies', emoji: '🏠', href: 'https://ehmstrategies.com', color: '#5C4530', desc: 'Mortgage & real estate', external: true },
 
   // ── LUNA Tools ─────────────────────────────────────────────────────

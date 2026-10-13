@@ -1,10 +1,11 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, SPIRITUAL_GUIDANCE_PROMPT, parseAIJson } from '@/lib/ai'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { createClient } from '@/lib/supabase/server'
 import { format } from 'date-fns'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 async function resolveUserId(): Promise<string> {
   try {

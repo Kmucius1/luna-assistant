@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
@@ -6,7 +7,7 @@ import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 async function resolveUserId(): Promise<string> {
   try {

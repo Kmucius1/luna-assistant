@@ -1,12 +1,13 @@
 {
-  "name": "zoe-assistant",
+  "name": "luna-assistant",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:smoke": "node --test tests/smoke.test.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.98.0",

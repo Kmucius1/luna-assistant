@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 
 export async function GET() {
   try {
@@ -10,6 +10,7 @@ export async function GET() {
     if (error) throw error
     return NextResponse.json({ preferences: data ?? null }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/settings] GET error:', error)
     return NextResponse.json({ preferences: null })
   }
@@ -34,6 +35,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ preferences: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/settings] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })
   }

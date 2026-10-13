@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import { todayKey } from '@/lib/luna/today'
 
 // income_events.confirmed gates whether computeSafeToSpend() counts a
@@ -15,6 +15,7 @@ export async function GET() {
     if (error) throw error
     return NextResponse.json({ income: data ?? [] }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[income] error:', error)
     return NextResponse.json({ income: [] })
   }
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ income: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[income] POST error:', error)
     return NextResponse.json({ error: 'Failed to save income' }, { status: 500 })
   }
@@ -55,6 +57,7 @@ export async function PATCH(req: NextRequest) {
     if (error) throw error
     return NextResponse.json({ income: data })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[income] PATCH error:', error)
     return NextResponse.json({ error: 'Failed to update income' }, { status: 500 })
   }

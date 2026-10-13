@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -14,7 +15,7 @@ import { movementLabel, type MovementChoice } from '@/lib/luna/movementAlternati
 import { calculatePriorityScore } from '@/lib/priority'
 import type { Task } from '@/types'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const STUCK_THRESHOLD_DAYS = 14
 
 // DRYP's `priority` field is free text, not a fixed union — same loose

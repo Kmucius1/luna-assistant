@@ -1,8 +1,9 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { planningWeekMondayKey } from '@/lib/luna/planningCycle'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
 const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const EDITABLE_FIELDS = ['work_location', 'gym_focus', 'outfit_type'] as const

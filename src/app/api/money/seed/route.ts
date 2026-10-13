@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { resolveMoneyUserId } from '@/lib/money/auth'
+import { resolveMoneyUserId , isUnauthorizedError } from '@/lib/money/auth'
 import initialCharges from '@/data/money/initial_recurring_charges.json'
 
 const SEED_ACCOUNTS = [
@@ -64,6 +64,7 @@ export async function POST() {
 
     return NextResponse.json({ accountsCreated, subscriptionsCreated, subscriptionsSkipped })
   } catch (error) {
+    if (isUnauthorizedError(error)) return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     console.error('[money/seed] error:', error)
     return NextResponse.json({ error: 'Seed failed' }, { status: 500 })
   }

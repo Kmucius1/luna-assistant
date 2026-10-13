@@ -1,7 +1,8 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 // Read-only view of the durable daily memory built by /api/luna/nightly-memory.
 export async function GET() {

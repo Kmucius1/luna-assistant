@@ -1,9 +1,10 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { plainAspectPhrase } from '@/lib/astrology'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 
 interface DailyBrief {
   overall_vibe: string

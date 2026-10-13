@@ -1,3 +1,4 @@
+import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI, parseAIJson } from '@/lib/ai'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -7,7 +8,7 @@ import { ZOE_LIFESTYLE_PROFILE, ZOE_GYM_BY_DAY } from '@/lib/luna/zoeLifestylePr
 import { planningWeekMondayKey, daysToPlanFor } from '@/lib/luna/planningCycle'
 import { localDateKey } from '@/lib/luna/dailyCache'
 
-const ZOE_USER_ID = '5fe7c8b7-cc2c-475c-a126-5bf1e73f6dbb'
+const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
 
 function mondayOf(date: Date): string {
