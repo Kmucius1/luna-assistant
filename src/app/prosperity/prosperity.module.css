@@ -1,0 +1,192 @@
+/* Luna Prosperity — midnight theme (approved in LUNA_DESIGN_BIBLE.md).
+   All tokens are scoped to .shell so nothing leaks into the rest of Luna. */
+.shell {
+  --p-bg: #070a1a;
+  --p-bg-2: #0d1230;
+  --p-surface: rgba(255, 255, 255, 0.05);
+  --p-surface-strong: rgba(255, 255, 255, 0.09);
+  --p-border: rgba(232, 215, 181, 0.16);
+  --p-text: #f3ecdc;
+  --p-muted: rgba(243, 236, 220, 0.62);
+  --p-dim: rgba(243, 236, 220, 0.38);
+  --p-accent: #d9bf8c;
+  --p-gold: #b8975a;
+  --p-lavender: #9a93c4;
+  --p-radius: 24px;
+  --p-radius-sm: 16px;
+  --p-dock-clear: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 84px);
+
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--p-text);
+  font-family: var(--font-sans-var), -apple-system, 'SF Pro Text', system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(154, 147, 196, 0.16), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217, 191, 140, 0.07), transparent 60%),
+    linear-gradient(180deg, var(--p-bg-2) 0%, var(--p-bg) 100%);
+  color-scheme: dark;
+  z-index: 50;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: var(--p-dock-clear);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Floating glass dock */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(14px, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: min(calc(100% - 24px), 520px);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 8px;
+  border-radius: 30px;
+  background: rgba(16, 20, 48, 0.72);
+  border: 1px solid var(--p-border);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  z-index: 60;
+}
+
+.dockItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 52px;
+  padding: 6px 2px;
+  border-radius: 22px;
+  color: var(--p-muted);
+  text-decoration: none;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dockItem[aria-current='page'] {
+  color: var(--p-accent);
+  background: rgba(217, 191, 140, 0.12);
+  font-weight: 600;
+}
+
+.exit {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top, 0px));
+  right: 14px;
+  z-index: 61;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  border: 1px solid var(--p-border);
+  background: rgba(16, 20, 48, 0.6);
+  color: var(--p-muted);
+  font-size: 12px;
+  text-decoration: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Home */
+.page {
+  width: min(100% - 32px, 880px);
+  margin: 0 auto;
+  padding: clamp(28px, 6vh, 64px) 0 24px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--p-accent);
+}
+
+.title {
+  font-family: var(--font-display-var), Georgia, serif;
+  font-weight: 500;
+  font-size: clamp(30px, 6vw, 48px);
+  line-height: 1.1;
+  margin: 12px 0 10px;
+}
+
+.sub {
+  color: var(--p-muted);
+  font-size: clamp(15px, 2.2vw, 17px);
+  line-height: 1.55;
+  max-width: 560px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+  min-height: 132px;
+  border-radius: var(--p-radius);
+  border: 1px solid var(--p-border);
+  background: var(--p-surface);
+  color: inherit;
+  text-decoration: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+a.card:hover {
+  background: var(--p-surface-strong);
+  transform: translateY(-2px);
+}
+
+.cardTitle {
+  font-family: var(--font-display-var), Georgia, serif;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--p-text);
+}
+
+.cardBody {
+  color: var(--p-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: auto;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--p-border);
+  color: var(--p-accent);
+}
+
+.badgeSoon {
+  composes: badge;
+  color: var(--p-dim);
+}
