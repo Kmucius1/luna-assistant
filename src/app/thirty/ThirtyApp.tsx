@@ -143,6 +143,7 @@ type Toggle = (id: string, v: boolean) => void
 function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part; setOpen: (p: Part) => void; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send }) {
   const [top, setTop] = useState<string[]>(() => [0, 1, 2].map(i => b.day.top3[i]?.text ?? ''))
   const [more, setMore] = useState(false)
+  const [editingTop, setEditingTop] = useState(false)
 
   const saveTop = (list: string[], done?: boolean[]) =>
     send({ action: 'top3', value: list.map((text, i) => ({ text, done: done ? done[i] : !!b.day.top3[i]?.done })) })
@@ -185,26 +186,49 @@ function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part
 
       <section className={styles.card}>
         <p className={styles.cardTitle}>Today’s top 3</p>
-        {b.carryover.length > 0 && top.every(t => !t) && (
-          <p className={styles.note}>From yesterday, not finished: {b.carryover.join(' · ')}. Carry any of it forward below.</p>
+        {!editingTop && top.some(t => t.trim()) ? (
+          <>
+            {labels.map((l, i) => top[i].trim() ? (
+              <div key={l} className={styles.check} onClick={() => { const d = [0, 1, 2].map(k => !!b.day.top3[k]?.done); d[i] = !d[i]; saveTop(top, d) }}>
+                <div className={`${styles.box} ${b.day.top3[i]?.done ? styles.boxOn : ''}`}>{b.day.top3[i]?.done ? '✓' : ''}</div>
+                <div className={`${styles.checkText} ${b.day.top3[i]?.done ? styles.checkDone : ''}`}>
+                  <span className={styles.time}>{l}</span>{top[i]}
+                </div>
+              </div>
+            ) : null)}
+            <button className={`${styles.tab}`} style={{ marginTop: 10 }} onClick={() => setEditingTop(true)}>Edit my top 3</button>
+          </>
+        ) : (
+          <>
+            {b.carryover.length > 0 && top.every(t => !t) && (
+              <p className={styles.note}>From yesterday, not finished: {b.carryover.join(' · ')}.</p>
+            )}
+            {b.tomorrowFirst && top[0] === '' && (
+              <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ margin: '8px 0' }}
+                onClick={() => { const n = [...top]; n[0] = b.tomorrowFirst; setTop(n) }}>
+                Use last night’s first priority: {b.tomorrowFirst}
+              </button>
+            )}
+            {labels.map((l, i) => (
+              <div key={l} style={{ marginTop: i ? 10 : 0 }}>
+                <span className={styles.time}>{i + 1}. {l}</span>
+                <input className={styles.input} value={top[i]} placeholder="What matters most here?"
+                  onChange={e => { const n = [...top]; n[i] = e.target.value; setTop(n) }} />
+              </div>
+            ))}
+            <button className={styles.btn} style={{ marginTop: 12 }} disabled={!top.some(t => t.trim())}
+              onClick={async () => { await saveTop(top); setEditingTop(false) }}>Save my top 3</button>
+            <p className={styles.note}>Plan it once. Then come back and check each one off as you finish.</p>
+          </>
         )}
-        {b.tomorrowFirst && top[0] === '' && (
-          <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginBottom: 10 }}
-            onClick={() => { const n = [...top]; n[0] = b.tomorrowFirst; setTop(n); saveTop(n) }}>
-            Use last night’s first priority: {b.tomorrowFirst}
-          </button>
-        )}
-        {labels.map((l, i) => (
-          <div key={l} style={{ marginTop: i ? 10 : 0 }}>
-            <span className={styles.time}>{i + 1}. {l}</span>
-            <div className={styles.row}>
-              <div className={`${styles.box} ${b.day.top3[i]?.done ? styles.boxOn : ''}`} role="checkbox" aria-checked={!!b.day.top3[i]?.done}
-                onClick={() => { const d = [0, 1, 2].map(k => !!b.day.top3[k]?.done); d[i] = !d[i]; saveTop(top, d) }}>{b.day.top3[i]?.done ? '✓' : ''}</div>
-              <input className={styles.input} value={top[i]} placeholder="What matters most here?"
-                onChange={e => { const n = [...top]; n[i] = e.target.value; setTop(n) }} onBlur={() => saveTop(top)} />
-            </div>
-          </div>
-        ))}
+      </section>
+
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Plan the day, then check it off</p>
+        <PlanList b={b} noteKey="plan_outfit" label="Outfit" placeholder="Cream knit, black trousers, gold hoops" send={send} />
+        <PlanList b={b} noteKey="plan_content" label="Content to capture" placeholder="Coffee pour, outfit in the mirror, sunset" send={send} />
+        <PlanList b={b} noteKey="plan_creative" label="Creative block" placeholder="45 minutes on the tattoo flash sheet" send={send} />
+        <PlanList b={b} noteKey="plan_errands" label="Errands + life admin" placeholder="Return package, groceries" send={send} />
       </section>
 
       {b.fridayPrompt && <FridayAsk send={send} text={b.fridayPrompt} />}
@@ -286,6 +310,36 @@ function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part
   )
 }
 
+function PlanList({ b, noteKey, label, placeholder, send, date }: {
+  b: Bundle; noteKey: string; label: string; placeholder: string; send: Send; date?: string
+}) {
+  type Row = { t: string; d: boolean }
+  const parse = (raw?: string): Row[] => { try { const v = JSON.parse(raw ?? '[]'); return Array.isArray(v) ? v : [] } catch { return [] } }
+  const [rows, setRows] = useState<Row[]>(() => parse(b.day.notes[noteKey]))
+  const [text, setText] = useState('')
+  const save = (next: Row[]) => {
+    setRows(next)
+    send({ action: 'note', key: noteKey, value: JSON.stringify(next) }, date)
+  }
+  const add = () => { if (text.trim()) { save([...rows, { t: text.trim(), d: false }]); setText('') } }
+  return (
+    <div style={{ marginTop: 14 }}>
+      <span className={styles.time}>{label}</span>
+      {rows.map((r, i) => (
+        <div key={i} className={styles.check} style={{ padding: '8px 0' }}>
+          <div className={`${styles.box} ${r.d ? styles.boxOn : ''}`} onClick={() => save(rows.map((x, k) => (k === i ? { ...x, d: !x.d } : x)))}>{r.d ? '✓' : ''}</div>
+          <div className={`${styles.checkText} ${r.d ? styles.checkDone : ''}`} onClick={() => save(rows.map((x, k) => (k === i ? { ...x, d: !x.d } : x)))}>{r.t}</div>
+          <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} aria-label="Remove" onClick={() => save(rows.filter((_, k) => k !== i))}>✕</button>
+        </div>
+      ))}
+      <div className={styles.row} style={{ marginTop: 6 }}>
+        <input className={styles.input} value={text} placeholder={placeholder} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
+        <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={add}>Add</button>
+      </div>
+    </div>
+  )
+}
+
 function FridayAsk({ send, text }: { send: Send; text: string }) {
   const [v, setV] = useState('')
   return (
@@ -305,8 +359,8 @@ function Stepper({ label, value, onChange }: { label: string; value: number; onC
       <div className={styles.statNum}>{value}</div>
       <div className={styles.statLbl}>{label}</div>
       <div className={styles.row} style={{ justifyContent: 'center', marginTop: 6 }}>
-        <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ padding: '6px 14px', minHeight: 40 }} onClick={() => onChange(Math.max(0, value - 1))}>−</button>
-        <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ padding: '6px 14px', minHeight: 40 }} onClick={() => onChange(value + 1)}>+</button>
+        <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ padding: '6px 0', minHeight: 44, flex: 1 }} aria-label={`Less ${label}`} onClick={() => onChange(Math.max(0, value - 1))}>−</button>
+        <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ padding: '6px 0', minHeight: 44, flex: 1 }} aria-label={`More ${label}`} onClick={() => onChange(value + 1)}>+</button>
       </div>
     </div>
   )
@@ -321,8 +375,8 @@ function Quick({ b, send }: { b: Bundle; send: Send }) {
   return (
     <>
       <section className={styles.card}>
-        <p className={styles.cardTitle}>Content today</p>
-        <div className={styles.row}>
+        <p className={styles.cardTitle}>Reflect: content today</p>
+        <div className={styles.grid2}>
           <Stepper label="Clips" value={s.clips ?? 0} onChange={n => send({ action: 'stat', key: 'clips', set: n })} />
           <Stepper label="Edited" value={s.edited ?? 0} onChange={n => send({ action: 'stat', key: 'edited', set: n })} />
           <Stepper label="Posted" value={s.posted ?? 0} onChange={n => send({ action: 'stat', key: 'posted', set: n })} />
@@ -332,7 +386,7 @@ function Quick({ b, send }: { b: Bundle; send: Send }) {
       </section>
 
       <section className={styles.card}>
-        <p className={styles.cardTitle}>Today’s outfit</p>
+        <p className={styles.cardTitle}>Reflect: how the outfit felt</p>
         <div className={styles.rowWrap}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
             <button key={n} className={`${styles.tab} ${rating === n ? styles.tabOn : ''}`} style={{ minWidth: 44 }}
@@ -371,8 +425,28 @@ function NightWrap({ b, send }: { b: Bundle; send: Send }) {
   const [first, setFirst] = useState(b.day.notes.tomorrow_first_priority ?? '')
   const [ans, setAns] = useState<string[]>(NIGHT_JOURNAL_PROMPTS.map((_, i) => b.day.notes[`journal_${i}`] ?? ''))
   const [eod, setEod] = useState(b.day.notes.eod_summary ?? '')
+  const [tb, setTb] = useState<Bundle | null>(null)
+  useEffect(() => {
+    let live = true
+    fetch(`/api/thirty?date=${tomorrow}`, { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (live && d && !d.setupNeeded) setTb(d) })
+      .catch(() => {})
+    return () => { live = false }
+  }, [tomorrow])
   return (
     <>
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Plan tomorrow, then check it off tomorrow</p>
+        {tb ? (
+          <>
+            <PlanList b={tb} date={tomorrow} noteKey="plan_outfit" label="Outfit" placeholder="What are you wearing?" send={send} />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_content" label="Content to capture" placeholder="Shots you want tomorrow" send={send} />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_creative" label="Creative block" placeholder="What are you making?" send={send} />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_errands" label="Errands + life admin" placeholder="Anything to handle" send={send} />
+          </>
+        ) : <p className={styles.sub}>Loading tomorrow…</p>}
+      </section>
       <section className={styles.card}>
         <p className={styles.cardTitle}>Prepare tomorrow</p>
         <p className={styles.sub}>Gym tomorrow morning?</p>

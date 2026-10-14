@@ -44,3 +44,7 @@
 .item { padding: 12px 0; border-top: 1px solid var(--surface-border); }
 .item:first-of-type { border-top: 0; }
 .pill { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; background: var(--tab-active-bg); color: var(--tab-active-text); }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.page * { min-width: 0; }
+.page { overflow-x: hidden; }
