@@ -426,11 +426,12 @@ function NightWrap({ b, send }: { b: Bundle; send: Send }) {
   const [ans, setAns] = useState<string[]>(NIGHT_JOURNAL_PROMPTS.map((_, i) => b.day.notes[`journal_${i}`] ?? ''))
   const [eod, setEod] = useState(b.day.notes.eod_summary ?? '')
   const [tb, setTb] = useState<Bundle | null>(null)
+  const [gymTom, setGymTom] = useState<boolean | null>(null)
   useEffect(() => {
     let live = true
     fetch(`/api/thirty?date=${tomorrow}`, { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { if (live && d && !d.setupNeeded) setTb(d) })
+      .then(d => { if (live && d && !d.setupNeeded) { setTb(d); setGymTom(d.day.gymToday ?? null) } })
       .catch(() => {})
     return () => { live = false }
   }, [tomorrow])
@@ -451,9 +452,16 @@ function NightWrap({ b, send }: { b: Bundle; send: Send }) {
         <p className={styles.cardTitle}>Prepare tomorrow</p>
         <p className={styles.sub}>Gym tomorrow morning?</p>
         <div className={styles.seg} style={{ margin: '8px 0 12px' }}>
-          <button className={styles.segBtn} onClick={() => send({ action: 'gym', value: true }, tomorrow)}>Yes</button>
-          <button className={styles.segBtn} onClick={() => send({ action: 'gym', value: false }, tomorrow)}>No</button>
+          <button className={`${styles.segBtn} ${gymTom === true ? styles.segOn : ''}`}
+            onClick={() => { setGymTom(true); send({ action: 'gym', value: true }, tomorrow) }}>Yes</button>
+          <button className={`${styles.segBtn} ${gymTom === false ? styles.segOn : ''}`}
+            onClick={() => { setGymTom(false); send({ action: 'gym', value: false }, tomorrow) }}>No</button>
         </div>
+        {gymTom !== null && (
+          <p className={styles.note} style={{ margin: '0 0 12px' }}>
+            {gymTom ? 'Tomorrow starts with the gym: wake at 6:00, out the door at 8:15.' : 'No gym tomorrow: wake at 6:30 and take it slow.'}
+          </p>
+        )}
         <span className={styles.time}>Tomorrow’s first work priority</span>
         <input className={styles.input} value={first} onChange={e => setFirst(e.target.value)}
           onBlur={() => send({ action: 'note', key: 'tomorrow_first_priority', value: first })} placeholder="The first thing at 9" />
