@@ -2,6 +2,7 @@ import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { realLifeBlock } from '@/lib/luna/realLife'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
@@ -150,6 +151,10 @@ export async function GET(req: NextRequest) {
         : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
 
     const userId = await resolveUserId()
+    const realLife = await realLifeBlock(
+      userId,
+      forDay ?? new Intl.DateTimeFormat('en-CA', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+    )
 
     // ── Build astronomical context ──────────────────────────────────────────
     const planets  = getCurrentPlanets(now)
@@ -181,7 +186,7 @@ ${planetLines}${moonChange}
 === ZOE'S TOP TRANSITS TODAY ===
 ${transitLines}
 
-=== ZOE'S NATAL CHART ===
+${realLife ? `=== ZOE'S REAL DAY (facts from her calendar, lists and plan; cite these by name when the sky relates to them) ===\n${realLife}\n\n` : ''}=== ZOE'S NATAL CHART ===
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
 Mercury: Scorpio 3° | Venus: Sagittarius 29° | Mars: Libra 6°
 Jupiter: Gemini 7° | Saturn: Taurus 27° | North Node: Cancer 17°
@@ -211,6 +216,9 @@ ADVICE QUALITY RULES (mandatory):
 - The horoscope string must have three short paragraphs separated by a blank line (\n\n): Morning, Midday, Evening. Start each with that word and a colon.
 - Be direct and kind. Say the real thing, including a hard truth if the sky points to one. No filler, no repeating the same idea in different words, no fortune-cookie lines.
 - Everything must be grounded in the sky, transits and Human Design data above. Never invent events that will happen to her.
+- ACCURACY: when a REAL DAY section is present, tie advice to those actual events and tasks by name (for example "before your 2:00 call...") whenever the sky genuinely relates. Never mention a meeting, person, deadline or task that is not listed. If nothing is listed, give advice by type of situation, not invented specifics.
+- Separate what is calculated from what is interpreted: the planets' positions are facts; what they mean for her day is a read. Use language like "this tends to show up as" and "watch for", never "this will happen". Never predict health diagnoses, deaths, or guaranteed money or relationship outcomes.
+- If you are not sure a transit is strong, say it is subtle rather than inflating it.
 
 Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdown, no prose outside the JSON. The JSON must exactly match this schema:
 
@@ -241,7 +249,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v2',
+      generationType: 'daily_guidance_v3',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
