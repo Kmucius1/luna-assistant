@@ -35,14 +35,101 @@ function IntensityPips({ value }: { value: number }) {
   )
 }
 
+// ─── Full day reading (the long, plain-words version for one date) ───────────
+type FullGuidance = {
+  in_plain_words?: string
+  transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
+  real_advice?: { situation: string; do: string }[]
+  horoscope: string; energy: string; do_today: string[]; dont_today: string[]
+  career: string; love: string; sex?: string; money: string; friendship: string; family: string
+  self_reflection: string; main_focus: string; highest_self: string; affirmation: string
+}
+
+const H = ({ children }: { children: React.ReactNode }) => (
+  <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(16,12,30,0.4)', margin: '16px 0 5px' }}>{children}</p>
+)
+const P = ({ children, bold }: { children: React.ReactNode; bold?: boolean }) => (
+  <p style={{ fontSize: 13.5, lineHeight: 1.7, color: 'rgba(16,12,30,0.82)', margin: '0 0 6px', fontWeight: bold ? 600 : 400, whiteSpace: 'pre-line' }}>{children}</p>
+)
+
+function FullDayReading({ iso, delayMs, label }: { iso: string; delayMs: number; label: string }) {
+  const [g, setG] = useState<FullGuidance | null>(null)
+  const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading')
+
+  useEffect(() => {
+    let live = true
+    const t = setTimeout(async () => {
+      try {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        const r = await fetch(`/api/astrology/daily-guidance?day=${iso}&tz=${encodeURIComponent(tz)}`)
+        if (!r.ok) throw new Error()
+        const d = await r.json()
+        if (!live) return
+        if (d?.horoscope) { setG(d); setState('ready') } else setState('error')
+      } catch { if (live) setState('error') }
+    }, delayMs)
+    return () => { live = false; clearTimeout(t) }
+  }, [iso, delayMs])
+
+  if (state === 'loading') return <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.45)', padding: '12px 0' }}>Writing the full reading for {label}…</p>
+  if (state === 'error' || !g) return <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.5)', padding: '12px 0' }}>Couldn’t load this day’s full reading. Close and reopen it to try again.</p>
+
+  return (
+    <div style={{ borderTop: '1px solid rgba(180,150,100,0.12)', marginTop: 10, paddingTop: 4 }}>
+      {g.in_plain_words && (<><H>In plain words</H><P bold>{g.in_plain_words}</P></>)}
+      <H>The day, morning to evening</H><P>{g.horoscope}</P>
+      <H>How it feels</H><P>{g.energy}</P>
+      {g.transit_breakdown && g.transit_breakdown.length > 0 && (
+        <>
+          <H>What the sky is doing</H>
+          {g.transit_breakdown.map((t, i) => (
+            <div key={i} style={{ marginBottom: 10 }}>
+              <P bold>{t.sky}</P>
+              <P><strong>What it feels like:</strong> {t.feels_like}</P>
+              <P><strong>What to do:</strong> {t.what_to_do}</P>
+            </div>
+          ))}
+        </>
+      )}
+      <H>Main focus</H><P>{g.main_focus}</P>
+      {g.real_advice && g.real_advice.length > 0 && (
+        <>
+          <H>Real advice</H>
+          {g.real_advice.map((a, i) => (
+            <div key={i} style={{ marginBottom: 10 }}>
+              <P bold>{a.situation}</P>
+              <P>{a.do}</P>
+            </div>
+          ))}
+        </>
+      )}
+      <H>Work + career</H><P>{g.career}</P>
+      <H>Money</H><P>{g.money}</P>
+      <H>Love + romance</H><P>{g.love}</P>
+      <H>Friends</H><P>{g.friendship}</P>
+      <H>Family</H><P>{g.family}</P>
+      <H>Do today</H>
+      {g.do_today.map((x, i) => <P key={i}>• {x}</P>)}
+      <H>Avoid today</H>
+      {g.dont_today.map((x, i) => <P key={i}>• {x}</P>)}
+      <H>Your highest self today</H><P>{g.highest_self}</P>
+      <H>Question to sit with</H><P>{g.self_reflection}</P>
+      <H>Affirmation</H><P bold>“{g.affirmation}”</P>
+    </div>
+  )
+}
+
 // ─── Day card ─────────────────────────────────────────────────────────────────
-function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
-  const [open, setOpen] = useState(isFirst)
+function DayCard({ day, isFirst, iso, fullAll, stagger }: { day: DayForecast; isFirst: boolean; iso: string; fullAll: boolean; stagger: number }) {
+  const [openOwn, setOpen] = useState(isFirst)
+  const open = openOwn || fullAll
+  const [fullOwn, setFullOwn] = useState(false)
+  const showFull = fullAll || fullOwn
 
   return (
     <div style={{ ...GLASS, marginBottom: 10, overflow: 'hidden' }}>
       {/* Header row */}
-      <button onClick={() => setOpen(v => !v)} style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }}>
+      <button onClick={() => setOpen(v => !(v || fullAll) ? true : false)} style={{ width: '100%', padding: '16px 18px', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', textAlign: 'left' }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: isFirst ? '#5C4530' : '#100C1E' }}>{day.dayLabel}</p>
@@ -101,6 +188,15 @@ function DayCard({ day, isFirst }: { day: DayForecast; isFirst: boolean }) {
           <div style={{ padding: 14, borderRadius: 16, background: 'rgba(201,169,110,0.08)', border: '1px solid rgba(201,169,110,0.18)', textAlign: 'center' }}>
             <p style={{ fontSize: 12, color: '#5C4530', fontStyle: 'italic', lineHeight: 1.55 }}>&quot;{day.affirmation}&quot;</p>
           </div>
+
+          {!showFull ? (
+            <button onClick={() => setFullOwn(true)}
+              style={{ width: '100%', marginTop: 14, padding: '13px 16px', borderRadius: 14, border: '1px solid rgba(92,69,48,0.3)', background: 'rgba(92,69,48,0.08)', color: '#5C4530', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+              Show the full detailed reading for this day
+            </button>
+          ) : (
+            <FullDayReading iso={iso} delayMs={stagger} label={day.dayLabel} />
+          )}
         </div>
       )}
     </div>
@@ -112,6 +208,7 @@ export default function ForecastsPage() {
   const location = useLocation()
   const [forecast, setForecast] = useState<WeeklyForecast | null>(null)
   const [loading,  setLoading]  = useState(true)
+  const [fullAll, setFullAll] = useState(false)
 
   const loadWeekly = useCallback(async (forceRefresh = false) => {
     setLoading(true)
@@ -186,10 +283,17 @@ export default function ForecastsPage() {
             ) : forecast ? (
               <div>
                 <Label text={`7-Day Forecast · ${forecast.days.length} Days`} color="rgba(16,12,30,0.35)" />
+                <button onClick={() => setFullAll(v => !v)}
+                  style={{ width: '100%', margin: '10px 0 4px', padding: '14px 16px', borderRadius: 16, border: '1px solid rgba(92,69,48,0.3)', background: fullAll ? 'rgba(92,69,48,0.14)' : '#5C4530', color: fullAll ? '#5C4530' : '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+                  {fullAll ? 'Hide the full week details' : 'Show full details for the whole week'}
+                </button>
+                {fullAll && <p style={{ fontSize: 11, color: 'rgba(16,12,30,0.45)', margin: '4px 2px 8px' }}>Each day is written in full, one after another. It can take a minute for all seven.</p>}
                 <div style={{ marginTop: 10 }}>
-                  {forecast.days.map((day, i) => (
-                    <DayCard key={day.date} day={day} isFirst={i === 0} />
-                  ))}
+                  {forecast.days.map((day, i) => {
+                    const d = new Date(); d.setDate(d.getDate() + i)
+                    const iso = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
+                    return <DayCard key={day.date} day={day} isFirst={i === 0} iso={iso} fullAll={fullAll} stagger={fullAll ? i * 3500 : 0} />
+                  })}
                 </div>
               </div>
             ) : (

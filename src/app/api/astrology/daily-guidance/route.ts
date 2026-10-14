@@ -136,11 +136,18 @@ export async function GET(req: NextRequest) {
     const localTime = searchParams.get('time')  || ''   // e.g. "7:42 PM"
     const localDate = searchParams.get('date')  || ''   // e.g. "Sunday, June 22, 2025"
 
-    const now    = new Date()
+    // `day=YYYY-MM-DD` asks for the full reading of a specific upcoming day (used by the
+    // weekly forecast). The sky is computed for midday that date, and it caches per day.
+    const dayParam = searchParams.get('day')
+    const forDay   = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : null
+
+    const now    = forDay ? new Date(`${forDay}T16:00:00Z`) : new Date()
     // Use client's local date as cache key so the reading resets at midnight for Zoe, not at UTC midnight
-    const dateKey = localDate
-      ? localDate.replace(/[^a-zA-Z0-9]/g, '_')
-      : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+    const dateKey = forDay
+      ? `day_${forDay}`
+      : localDate
+        ? localDate.replace(/[^a-zA-Z0-9]/g, '_')
+        : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
 
     const userId = await resolveUserId()
 
@@ -158,15 +165,15 @@ export async function GET(req: NextRequest) {
     ).join('\n')
 
     // Always use client's timezone for display so we don't tell Claude it's 2 AM when it's 10 PM
-    const dateStr = localDate || new Intl.DateTimeFormat('en-US', {
+    const dateStr = (forDay ? '' : localDate) || new Intl.DateTimeFormat('en-US', {
       timeZone: clientTz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
     }).format(now)
-    const timeStr = localTime || new Intl.DateTimeFormat('en-US', {
+    const timeStr = forDay ? 'all day' : localTime || new Intl.DateTimeFormat('en-US', {
       timeZone: clientTz, hour: 'numeric', minute: '2-digit', hour12: true, timeZoneName: 'short',
     }).format(now)
 
     // ── Prompt ─────────────────────────────────────────────────────────────
-    const userPrompt = `Today is ${dateStr} at ${timeStr}.
+    const userPrompt = `${forDay ? `This reading is for ${dateStr}, a day in the coming week (write it as that day, covering the whole day from morning to evening).` : `Today is ${dateStr} at ${timeStr}.`}
 
 === CURRENT SKY ===
 ${planetLines}${moonChange}
