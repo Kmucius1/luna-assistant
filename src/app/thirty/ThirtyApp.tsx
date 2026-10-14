@@ -40,19 +40,12 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 const PART_LABEL: Record<Part, string> = { morning: 'Morning', work: 'Workday', after: 'After work', night: 'Night' }
 
-function partForHour(h: number): Part {
-  return h < 9 ? 'morning' : h < 17 ? 'work' : h < 21 ? 'after' : 'night'
-}
-function easternHour(): number {
-  return Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date())) % 24
-}
 const usd = (n: number) => `$${n.toLocaleString('en-US', { maximumFractionDigits: 2 })}`
 
 export function ThirtyApp() {
   const [b, setB] = useState<Bundle | null>(null)
   const [tab, setTab] = useState<Tab>('today')
   const [err, setErr] = useState('')
-  const [open, setOpen] = useState<Part>(partForHour(easternHour()))
 
   const load = useCallback(async () => {
     try {
@@ -118,7 +111,7 @@ export function ThirtyApp() {
         ))}
       </nav>
 
-      {tab === 'today' && <Today key={b.dateKey} b={b} open={open} setOpen={setOpen} toggle={toggle} skip={skip} send={send} />}
+      {tab === 'today' && <Today key={b.dateKey} b={b} toggle={toggle} skip={skip} send={send} />}
       {tab === 'week' && <Week b={b} toggle={toggle} send={send} />}
       {tab === 'closet' && <Closet b={b} send={send} />}
       {tab === 'style' && <Style b={b} send={send} />}
@@ -140,172 +133,256 @@ type Toggle = (id: string, v: boolean) => void
 
 // ---------------------------------------------------------------- TODAY
 
-function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part; setOpen: (p: Part) => void; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send }) {
+type Sub = 'overview' | 'morning' | 'work' | 'after' | 'night' | 'tomorrow'
+const SUBS: { id: Sub; label: string }[] = [
+  { id: 'overview', label: 'Overview' }, { id: 'morning', label: 'Morning' }, { id: 'work', label: 'Workday' },
+  { id: 'after', label: 'After work' }, { id: 'night', label: 'Night' }, { id: 'tomorrow', label: 'Tomorrow' },
+]
+
+// Free-form notes for a section of the day. Saved when you tap away.
+function SectionNotes({ b, noteKey, send, date, label = 'Notes' }: { b: Bundle; noteKey: string; send: Send; date?: string; label?: string }) {
+  const [v, setV] = useState(b.day.notes[noteKey] ?? '')
+  const [saved, setSaved] = useState(false)
+  return (
+    <section className={styles.card}>
+      <p className={styles.cardTitle}>{label}</p>
+      <textarea className={styles.area} value={v} placeholder="Anything you want to remember or get out of your head"
+        onChange={e => { setV(e.target.value); setSaved(false) }}
+        onBlur={async () => { await send({ action: 'note', key: noteKey, value: v }, date); setSaved(true) }} />
+      {saved && <p className={styles.note}>Saved.</p>}
+    </section>
+  )
+}
+
+// One part of the day as a checklist. Every line can be checked, skipped,
+// reworded, and you can add your own lines underneath.
+function PartChecklist({ b, part, title, toggle, skip, send }: {
+  b: Bundle; part: Part; title: string; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send
+}) {
+  const list = b.plan[part]
+  const [editId, setEditId] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const done = list.filter(i => b.day.checks[i.id] || b.day.skips[i.id]).length
+  return (
+    <>
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>{title} · {done}/{list.length}</p>
+        {list.length === 0 && <p className={styles.sub}>Nothing scheduled here today.</p>}
+        {list.map(i => {
+          const on = !!b.day.checks[i.id]
+          const skipped = !!b.day.skips[i.id]
+          const custom = b.day.notes[`label_${i.id}`]
+          const label = custom || i.label
+          return (
+            <div key={i.id} className={styles.check} onClick={() => editId !== i.id && !skipped && toggle(i.id, !on)}>
+              <div className={`${styles.box} ${on ? styles.boxOn : ''}`}>{on ? '✓' : ''}</div>
+              <div className={`${styles.checkText} ${on || skipped ? styles.checkDone : ''}`}>
+                {i.time && <span className={styles.time}>{i.time}</span>}
+                {editId === i.id ? (
+                  <span onClick={e => e.stopPropagation()}>
+                    <input className={styles.input} autoFocus value={draft} onChange={e => setDraft(e.target.value)}
+                      onBlur={() => { const t = draft.trim(); if (t !== label) send({ action: 'note', key: `label_${i.id}`, value: t === i.label ? '' : t }); setEditId(null) }}
+                      onKeyDown={e => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
+                  </span>
+                ) : <>{label}{i.core && <span className={styles.core}>core</span>}</>}
+                {i.detail && editId !== i.id && <span className={styles.time} style={{ marginTop: 2 }}>{i.detail}</span>}
+                <span className={styles.rowWrap} style={{ marginTop: 8 }} onClick={e => e.stopPropagation()}>
+                  {skipped ? (
+                    <>
+                      <span className={styles.small}>Skipped. That’s okay.</span>
+                      <button className={styles.tab} onClick={() => skip(i.id, false)}>Undo</button>
+                    </>
+                  ) : (
+                    <>
+                      {i.skippable && <button className={styles.tab} onClick={() => skip(i.id, true)}>Not feeling it</button>}
+                      <button className={styles.tab} onClick={() => { setDraft(label); setEditId(i.id) }}>Edit</button>
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </section>
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Add your own</p>
+        <PlanList b={b} noteKey={`extra_${part}`} label="" placeholder="Something to add to this part of the day" send={send} />
+      </section>
+      <SectionNotes b={b} noteKey={`note_${part}`} send={send} />
+    </>
+  )
+}
+
+function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send }) {
+  const [sub, setSub] = useState<Sub>('overview')
   const [top, setTop] = useState<string[]>(() => [0, 1, 2].map(i => b.day.top3[i]?.text ?? ''))
-  const [more, setMore] = useState(false)
   const [editingTop, setEditingTop] = useState(false)
 
   const saveTop = (list: string[], done?: boolean[]) =>
     send({ action: 'top3', value: list.map((text, i) => ({ text, done: done ? done[i] : !!b.day.top3[i]?.done })) })
   const labels = ['Work / money', 'Personal / life', 'Creative / growth']
-  const hour = easternHour()
-  const isNight = hour >= 20
+  const parts: Part[] = ['morning', 'work', 'after', 'night']
+  const count = (p: Part) => {
+    const l = b.plan[p]
+    return { done: l.filter(i => b.day.checks[i.id] || b.day.skips[i.id]).length, total: l.length }
+  }
 
   return (
     <>
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Today’s energy</p>
-        <div className={styles.seg}>
-          {(['low', 'normal', 'high'] as Energy[]).map(e => (
-            <button key={e} className={`${styles.segBtn} ${b.day.energy === e ? styles.segOn : ''}`}
-              onClick={() => send({ action: 'energy', value: e })}>{e[0].toUpperCase() + e.slice(1)}</button>
-          ))}
-        </div>
-        {b.day.energy === 'low' && <p className={styles.note}>Low-energy day: the plan is trimmed to the essentials. It still counts.</p>}
-      </section>
+      <nav className={styles.tabs} aria-label="Parts of the day" style={{ marginTop: 12 }}>
+        {SUBS.map(t => (
+          <button key={t.id} className={`${styles.tab} ${sub === t.id ? styles.tabOn : ''}`} onClick={() => setSub(t.id)}>{t.label}</button>
+        ))}
+      </nav>
 
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>What is Zoe doing next?</p>
-        {b.next ? (
-          <>
-            <p className={styles.next}>{b.next.label}</p>
-            {b.next.detail && <p className={styles.detail}>{b.next.detail}</p>}
-            <div className={styles.rowWrap}>
-              <button className={styles.btn} onClick={() => toggle(b.next!.id, true)}>Done</button>
-              {b.next.skippable && (
-                <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => skip(b.next!.id, true)}>Not feeling it</button>
-              )}
+      {sub === 'overview' && (
+        <>
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Today’s energy</p>
+            <div className={styles.seg}>
+              {(['low', 'normal', 'high'] as Energy[]).map(e => (
+                <button key={e} className={`${styles.segBtn} ${b.day.energy === e ? styles.segOn : ''}`}
+                  onClick={() => send({ action: 'energy', value: e })}>{e[0].toUpperCase() + e.slice(1)}</button>
+              ))}
             </div>
-          </>
-        ) : <p className={styles.next}>Everything for today is done. Rest is part of the plan.</p>}
-        <div className={styles.rowWrap} style={{ marginTop: 14 }}>
-          <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => send({ action: 'mode', value: 'stuck' })}>I’m stuck</button>
-          <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => send({ action: 'mode', value: 'spiral' })}>I’m spiraling</button>
-        </div>
-      </section>
+            {b.day.energy === 'low' && <p className={styles.note}>Low-energy day: the plan is trimmed to the essentials. It still counts.</p>}
+          </section>
 
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Today’s top 3</p>
-        {!editingTop && top.some(t => t.trim()) ? (
-          <>
-            {labels.map((l, i) => top[i].trim() ? (
-              <div key={l} className={styles.check} onClick={() => { const d = [0, 1, 2].map(k => !!b.day.top3[k]?.done); d[i] = !d[i]; saveTop(top, d) }}>
-                <div className={`${styles.box} ${b.day.top3[i]?.done ? styles.boxOn : ''}`}>{b.day.top3[i]?.done ? '✓' : ''}</div>
-                <div className={`${styles.checkText} ${b.day.top3[i]?.done ? styles.checkDone : ''}`}>
-                  <span className={styles.time}>{l}</span>{top[i]}
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>What is Zoe doing next?</p>
+            {b.next ? (
+              <>
+                <p className={styles.next}>{b.day.notes[`label_${b.next.id}`] || b.next.label}</p>
+                {b.next.detail && <p className={styles.detail}>{b.next.detail}</p>}
+                <div className={styles.rowWrap}>
+                  <button className={styles.btn} onClick={() => toggle(b.next!.id, true)}>Done</button>
+                  {b.next.skippable && (
+                    <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => skip(b.next!.id, true)}>Not feeling it</button>
+                  )}
                 </div>
-              </div>
-            ) : null)}
-            <button className={`${styles.tab}`} style={{ marginTop: 10 }} onClick={() => setEditingTop(true)}>Edit my top 3</button>
-          </>
-        ) : (
-          <>
-            {b.carryover.length > 0 && top.every(t => !t) && (
-              <p className={styles.note}>From yesterday, not finished: {b.carryover.join(' · ')}.</p>
-            )}
-            {b.tomorrowFirst && top[0] === '' && (
-              <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ margin: '8px 0' }}
-                onClick={() => { const n = [...top]; n[0] = b.tomorrowFirst; setTop(n) }}>
-                Use last night’s first priority: {b.tomorrowFirst}
-              </button>
-            )}
-            {labels.map((l, i) => (
-              <div key={l} style={{ marginTop: i ? 10 : 0 }}>
-                <span className={styles.time}>{i + 1}. {l}</span>
-                <input className={styles.input} value={top[i]} placeholder="What matters most here?"
-                  onChange={e => { const n = [...top]; n[i] = e.target.value; setTop(n) }} />
-              </div>
-            ))}
-            <button className={styles.btn} style={{ marginTop: 12 }} disabled={!top.some(t => t.trim())}
-              onClick={async () => { await saveTop(top); setEditingTop(false) }}>Save my top 3</button>
-            <p className={styles.note}>Plan it once. Then come back and check each one off as you finish.</p>
-          </>
-        )}
-      </section>
+              </>
+            ) : <p className={styles.next}>Everything for today is done. Rest is part of the plan.</p>}
+            <div className={styles.rowWrap} style={{ marginTop: 14 }}>
+              <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => send({ action: 'mode', value: 'stuck' })}>I’m stuck</button>
+              <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => send({ action: 'mode', value: 'spiral' })}>I’m spiraling</button>
+            </div>
+          </section>
 
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Plan the day, then check it off</p>
-        <PlanList b={b} noteKey="plan_outfit" label="Outfit" placeholder="Cream knit, black trousers, gold hoops" send={send} />
-        <PlanList b={b} noteKey="plan_content" label="Content to capture" placeholder="Coffee pour, outfit in the mirror, sunset" send={send} />
-        <PlanList b={b} noteKey="plan_creative" label="Creative block" placeholder="45 minutes on the tattoo flash sheet" send={send} />
-        <PlanList b={b} noteKey="plan_errands" label="Errands + life admin" placeholder="Return package, groceries" send={send} />
-      </section>
-
-      {b.fridayPrompt && <FridayAsk send={send} text={b.fridayPrompt} />}
-
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Gym</p>
-        <p className={styles.sub}>Gym this morning?</p>
-        <div className={styles.seg} style={{ marginTop: 8 }}>
-          <button className={`${styles.segBtn} ${b.day.gymToday === true ? styles.segOn : ''}`} onClick={() => send({ action: 'gym', value: true })}>Yes</button>
-          <button className={`${styles.segBtn} ${b.day.gymToday === false ? styles.segOn : ''}`} onClick={() => send({ action: 'gym', value: false })}>No</button>
-        </div>
-      </section>
-
-      {(['morning', 'work', 'after', 'night'] as Part[]).map(part => {
-        const list = b.plan[part]
-        if (list.length === 0) return null
-        const done = list.filter(i => b.day.checks[i.id]).length
-        const isOpen = open === part
-        return (
-          <section key={part} className={styles.card}>
-            <button className={styles.row} style={{ width: '100%', background: 'none', border: 0, padding: 0, cursor: 'pointer', justifyContent: 'space-between', color: 'inherit' }}
-              onClick={() => setOpen(isOpen ? (part === 'morning' ? 'work' : 'morning') : part)}>
-              <span className={styles.cardTitle} style={{ margin: 0 }}>{PART_LABEL[part]}</span>
-              <span className={styles.small}>{done}/{list.length}</span>
-            </button>
-            {isOpen && (
-              <div style={{ marginTop: 8 }}>
-                {list.map(i => {
-                  const on = !!b.day.checks[i.id]
-                  const skipped = !!b.day.skips[i.id]
-                  return (
-                    <div key={i.id} className={styles.check} onClick={() => !skipped && toggle(i.id, !on)}>
-                      <div className={`${styles.box} ${on ? styles.boxOn : ''}`}>{on ? '✓' : ''}</div>
-                      <div className={`${styles.checkText} ${on || skipped ? styles.checkDone : ''}`}>
-                        {i.time && <span className={styles.time}>{i.time}</span>}
-                        {i.label}{i.core && <span className={styles.core}>core</span>}
-                        {i.detail && <span className={styles.time} style={{ marginTop: 2 }}>{i.detail}</span>}
-                        {i.skippable && (
-                          <span className={styles.rowWrap} style={{ marginTop: 8 }} onClick={e => e.stopPropagation()}>
-                            {skipped ? (
-                              <>
-                                <span className={styles.small}>Skipped tonight. That’s okay.</span>
-                                <button className={styles.tab} onClick={() => skip(i.id, false)}>Undo</button>
-                              </>
-                            ) : (
-                              <>
-                                <button className={`${styles.tab} ${on ? styles.tabOn : ''}`} onClick={() => toggle(i.id, !on)}>Done</button>
-                                <button className={styles.tab} onClick={() => skip(i.id, true)}>Not feeling it</button>
-                              </>
-                            )}
-                          </span>
-                        )}
-                      </div>
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Today’s top 3</p>
+            {!editingTop && top.some(t => t.trim()) ? (
+              <>
+                {labels.map((l, i) => top[i].trim() ? (
+                  <div key={l} className={styles.check} onClick={() => { const d = [0, 1, 2].map(k => !!b.day.top3[k]?.done); d[i] = !d[i]; saveTop(top, d) }}>
+                    <div className={`${styles.box} ${b.day.top3[i]?.done ? styles.boxOn : ''}`}>{b.day.top3[i]?.done ? '✓' : ''}</div>
+                    <div className={`${styles.checkText} ${b.day.top3[i]?.done ? styles.checkDone : ''}`}>
+                      <span className={styles.time}>{l}</span>{top[i]}
                     </div>
-                  )
-                })}
-              </div>
+                  </div>
+                ) : null)}
+                <button className={styles.tab} style={{ marginTop: 10 }} onClick={() => setEditingTop(true)}>Edit my top 3</button>
+              </>
+            ) : (
+              <>
+                {b.carryover.length > 0 && top.every(t => !t) && (
+                  <p className={styles.note}>From yesterday, not finished: {b.carryover.join(' · ')}.</p>
+                )}
+                {b.tomorrowFirst && top[0] === '' && (
+                  <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ margin: '8px 0' }}
+                    onClick={() => { const n = [...top]; n[0] = b.tomorrowFirst; setTop(n) }}>
+                    Use last night’s first priority: {b.tomorrowFirst}
+                  </button>
+                )}
+                {labels.map((l, i) => (
+                  <div key={l} style={{ marginTop: i ? 10 : 0 }}>
+                    <span className={styles.time}>{i + 1}. {l}</span>
+                    <input className={styles.input} value={top[i]} placeholder="What matters most here?"
+                      onChange={e => { const n = [...top]; n[i] = e.target.value; setTop(n) }} />
+                  </div>
+                ))}
+                <button className={styles.btn} style={{ marginTop: 12 }} disabled={!top.some(t => t.trim())}
+                  onClick={async () => { await saveTop(top); setEditingTop(false) }}>Save my top 3</button>
+              </>
             )}
           </section>
-        )
-      })}
 
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Tonight: {b.theme.block}</p>
-        <p className={styles.detail}>DONE means: {b.theme.done}</p>
-        <PlanList b={b} noteKey="plan_block" label="My checklist for tonight" placeholder="Add your own" send={send} suggestions={b.theme.options} />
-      </section>
+          {b.fridayPrompt && <FridayAsk send={send} text={b.fridayPrompt} />}
 
-      <Quick b={b} send={send} />
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>The day at a glance</p>
+            {parts.map(p => {
+              const c = count(p)
+              if (c.total === 0) return null
+              return (
+                <button key={p} className={styles.check} style={{ width: '100%', background: 'none', borderLeft: 0, borderRight: 0, borderBottom: 0, color: 'inherit', textAlign: 'left' }}
+                  onClick={() => setSub(p)}>
+                  <div className={styles.checkText}>{PART_LABEL[p]}</div>
+                  <span className={styles.small}>{c.done}/{c.total}</span>
+                </button>
+              )
+            })}
+            <p className={styles.note}>Tap a part of the day to open its checklist.</p>
+          </section>
 
-      {isNight || more ? <NightWrap b={b} send={send} /> : (
-        <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginTop: 14, width: '100%' }} onClick={() => setMore(true)}>
-          Plan tomorrow + night journal
-        </button>
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Tonight: {b.theme.block}</p>
+            <p className={styles.detail}>DONE means: {b.theme.done}</p>
+          </section>
+
+          <Unusual b={b} send={send} />
+          <SectionNotes b={b} noteKey="note_overview" send={send} label="Notes for today" />
+        </>
       )}
 
-      <Unusual b={b} send={send} />
+      {sub === 'morning' && (
+        <>
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Gym this morning?</p>
+            <div className={styles.seg}>
+              <button className={`${styles.segBtn} ${b.day.gymToday === true ? styles.segOn : ''}`} onClick={() => send({ action: 'gym', value: true })}>Yes</button>
+              <button className={`${styles.segBtn} ${b.day.gymToday === false ? styles.segOn : ''}`} onClick={() => send({ action: 'gym', value: false })}>No</button>
+            </div>
+          </section>
+          <PartChecklist b={b} part="morning" title="Morning" toggle={toggle} skip={skip} send={send} />
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Plan the outfit</p>
+            <PlanList b={b} noteKey="plan_outfit" label="" placeholder="Cream knit, black trousers, gold hoops" send={send} />
+          </section>
+          <Quick b={b} send={send} show={['outfit', 'win']} />
+        </>
+      )}
+
+      {sub === 'work' && (
+        <PartChecklist b={b} part="work" title="Workday" toggle={toggle} skip={skip} send={send} />
+      )}
+
+      {sub === 'after' && (
+        <>
+          <PartChecklist b={b} part="after" title="After work" toggle={toggle} skip={skip} send={send} />
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Tonight: {b.theme.block}</p>
+            <p className={styles.detail}>DONE means: {b.theme.done}</p>
+            <PlanList b={b} noteKey="plan_block" label="My checklist for tonight" placeholder="Add your own" send={send} suggestions={b.theme.options} />
+          </section>
+          <section className={styles.card}>
+            <p className={styles.cardTitle}>Plan the rest</p>
+            <PlanList b={b} noteKey="plan_content" label="Content to capture" placeholder="Coffee pour, sunset, outfit in the mirror" send={send} />
+            <PlanList b={b} noteKey="plan_creative" label="Creative block" placeholder="45 minutes on the flash sheet" send={send} />
+            <PlanList b={b} noteKey="plan_errands" label="Errands + life admin" placeholder="Return package, groceries" send={send} />
+          </section>
+          <Quick b={b} send={send} show={['content']} />
+        </>
+      )}
+
+      {sub === 'night' && (
+        <>
+          <PartChecklist b={b} part="night" title="Night" toggle={toggle} skip={skip} send={send} />
+          <NightWrap b={b} send={send} mode="journal" />
+          <Quick b={b} send={send} show={['outfit', 'win']} />
+        </>
+      )}
+
+      {sub === 'tomorrow' && <NightWrap b={b} send={send} mode="tomorrow" />}
     </>
   )
 }
@@ -382,7 +459,7 @@ function Stepper({ label, value, onChange }: { label: string; value: number; onC
   )
 }
 
-function Quick({ b, send }: { b: Bundle; send: Send }) {
+function Quick({ b, send, show }: { b: Bundle; send: Send; show: ('content' | 'outfit' | 'win')[] }) {
   const s = b.day.stats
   const [fav, setFav] = useState(b.day.notes.outfit_fav ?? '')
   const [wrong, setWrong] = useState(b.day.notes.outfit_wrong ?? '')
@@ -390,7 +467,7 @@ function Quick({ b, send }: { b: Bundle; send: Send }) {
   const rating = s.outfit_rating ?? 0
   return (
     <>
-      <section className={styles.card}>
+      {show.includes('content') && (<section className={styles.card}>
         <p className={styles.cardTitle}>Reflect: content today</p>
         <div className={styles.grid2}>
           <Stepper label="Clips" value={s.clips ?? 0} onChange={n => send({ action: 'stat', key: 'clips', set: n })} />
@@ -399,9 +476,9 @@ function Quick({ b, send }: { b: Bundle; send: Send }) {
           <Stepper label="Ideas" value={s.ideas ?? 0} onChange={n => send({ action: 'stat', key: 'ideas', set: n })} />
         </div>
         <p className={styles.note}>Capture is not edit is not post. You do not have to publish everything.</p>
-      </section>
+      </section>)}
 
-      <section className={styles.card}>
+      {show.includes('outfit') && (<section className={styles.card}>
         <p className={styles.cardTitle}>Reflect: how the outfit felt</p>
         <div className={styles.rowWrap}>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
@@ -420,19 +497,19 @@ function Quick({ b, send }: { b: Bundle; send: Send }) {
           ))}
         </div>
         <p className={styles.note}>Getting ready is for you. This is your style data, not an audition.</p>
-      </section>
+      </section>)}
 
-      <section className={styles.card}>
+      {show.includes('win') && (<section className={styles.card}>
         <p className={styles.cardTitle}>One private win</p>
         <input className={styles.input} value={win} onChange={e => setWin(e.target.value)}
           onBlur={() => win.trim() && send({ action: 'note', key: 'private_win', value: win.trim() })}
           placeholder="Something only you will know" />
-      </section>
+      </section>)}
     </>
   )
 }
 
-function NightWrap({ b, send }: { b: Bundle; send: Send }) {
+function NightWrap({ b, send, mode }: { b: Bundle; send: Send; mode: 'tomorrow' | 'journal' }) {
   const tomorrow = useMemo(() => {
     const [y, m, d] = b.dateKey.split('-').map(Number)
     return new Date(Date.UTC(y, m - 1, d + 1, 12)).toISOString().slice(0, 10)
@@ -443,18 +520,91 @@ function NightWrap({ b, send }: { b: Bundle; send: Send }) {
   const [eod, setEod] = useState(b.day.notes.eod_summary ?? '')
   const [tb, setTb] = useState<Bundle | null>(null)
   const [gymTom, setGymTom] = useState<boolean | null>(null)
+  const [gymSaved, setGymSaved] = useState(false)
+  const touched = useRef(false)
+
   useEffect(() => {
+    if (mode !== 'tomorrow') return
     let live = true
     fetch(`/api/thirty?date=${tomorrow}`, { cache: 'no-store' })
       .then(r => (r.ok ? r.json() : null))
-      .then(d => { if (live && d && !d.setupNeeded) { setTb(d); setGymTom(d.day.gymToday ?? null) } })
+      .then(d => {
+        if (!live || !d || d.setupNeeded) return
+        setTb(d)
+        // Never let a slow load overwrite what was just tapped.
+        if (!touched.current) setGymTom(d.day.gymToday ?? null)
+        setT(prev => (prev.every(x => !x) ? [0, 1, 2].map(i => d.day.top3?.[i]?.text ?? '') : prev))
+      })
       .catch(() => {})
     return () => { live = false }
-  }, [tomorrow])
+  }, [tomorrow, mode])
+
+  const chooseGym = async (v: boolean) => {
+    touched.current = true
+    setGymTom(v)
+    setGymSaved(false)
+    await send({ action: 'gym', value: v }, tomorrow)
+    setGymSaved(true)
+  }
+
+  if (mode === 'journal') {
+    return (
+      <>
+        <section className={styles.card}>
+          <p className={styles.cardTitle}>End of workday</p>
+          <textarea className={styles.area} value={eod} onChange={e => setEod(e.target.value)}
+            onBlur={() => send({ action: 'note', key: 'eod_summary', value: eod })} placeholder="EOD summary" />
+        </section>
+        <section className={styles.card}>
+          <p className={styles.cardTitle}>Night journal</p>
+          {NIGHT_JOURNAL_PROMPTS.map((p, i) => (
+            <div key={p} style={{ marginTop: i ? 12 : 0 }}>
+              <span className={styles.time}>{i + 1}. {p}</span>
+              <textarea className={styles.area} value={ans[i]} onChange={e => { const n = [...ans]; n[i] = e.target.value; setAns(n) }}
+                onBlur={() => send({ action: 'note', key: `journal_${i}`, value: ans[i] })} />
+            </div>
+          ))}
+        </section>
+        <SectionNotes b={b} noteKey="note_night_extra" send={send} label="More notes" />
+      </>
+    )
+  }
+
   return (
     <>
       <section className={styles.card}>
-        <p className={styles.cardTitle}>Plan tomorrow, then check it off tomorrow</p>
+        <p className={styles.cardTitle}>Gym tomorrow morning?</p>
+        <div className={styles.rowWrap}>
+          <button type="button" aria-pressed={gymTom === true}
+            className={`${styles.btn} ${gymTom === true ? '' : styles.btnQuiet}`} style={{ flex: 1 }}
+            onClick={() => chooseGym(true)}>Yes</button>
+          <button type="button" aria-pressed={gymTom === false}
+            className={`${styles.btn} ${gymTom === false ? '' : styles.btnQuiet}`} style={{ flex: 1 }}
+            onClick={() => chooseGym(false)}>No</button>
+        </div>
+        {gymTom !== null && (
+          <p className={styles.note}>
+            {gymTom ? 'Gym tomorrow: wake at 6:00, out the door at 8:15.' : 'No gym tomorrow: wake at 6:30 and take it slow.'}
+            {gymSaved ? ' Saved.' : ''}
+          </p>
+        )}
+      </section>
+
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Tomorrow’s priorities</p>
+        <span className={styles.time}>First work priority</span>
+        <input className={styles.input} value={first} onChange={e => setFirst(e.target.value)}
+          onBlur={() => send({ action: 'note', key: 'tomorrow_first_priority', value: first })} placeholder="The first thing at 9" />
+        <span className={styles.time} style={{ marginTop: 12 }}>Top 3</span>
+        {t.map((v, i) => (
+          <input key={i} className={styles.input} style={{ marginTop: 6 }} value={v} placeholder={['Work / money', 'Personal / life', 'Creative / growth'][i]}
+            onChange={e => { const n = [...t]; n[i] = e.target.value; setT(n) }}
+            onBlur={() => send({ action: 'top3', value: t.map(text => ({ text })) }, tomorrow)} />
+        ))}
+      </section>
+
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Plan it now, check it off tomorrow</p>
         {tb ? (
           <>
             <PlanList b={tb} date={tomorrow} noteKey="plan_outfit" label="Outfit" placeholder="What are you wearing?" send={send} />
@@ -463,47 +613,10 @@ function NightWrap({ b, send }: { b: Bundle; send: Send }) {
             <PlanList b={tb} date={tomorrow} noteKey="plan_errands" label="Errands + life admin" placeholder="Anything to handle" send={send} />
           </>
         ) : <p className={styles.sub}>Loading tomorrow…</p>}
-      </section>
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Prepare tomorrow</p>
-        <p className={styles.sub}>Gym tomorrow morning?</p>
-        <div className={styles.seg} style={{ margin: '8px 0 12px' }}>
-          <button className={`${styles.segBtn} ${gymTom === true ? styles.segOn : ''}`}
-            onClick={() => { setGymTom(true); send({ action: 'gym', value: true }, tomorrow) }}>Yes</button>
-          <button className={`${styles.segBtn} ${gymTom === false ? styles.segOn : ''}`}
-            onClick={() => { setGymTom(false); send({ action: 'gym', value: false }, tomorrow) }}>No</button>
-        </div>
-        {gymTom !== null && (
-          <p className={styles.note} style={{ margin: '0 0 12px' }}>
-            {gymTom ? 'Tomorrow starts with the gym: wake at 6:00, out the door at 8:15.' : 'No gym tomorrow: wake at 6:30 and take it slow.'}
-          </p>
-        )}
-        <span className={styles.time}>Tomorrow’s first work priority</span>
-        <input className={styles.input} value={first} onChange={e => setFirst(e.target.value)}
-          onBlur={() => send({ action: 'note', key: 'tomorrow_first_priority', value: first })} placeholder="The first thing at 9" />
-        <span className={styles.time} style={{ marginTop: 12 }}>Tomorrow’s top 3</span>
-        {t.map((v, i) => (
-          <input key={i} className={styles.input} style={{ marginTop: 6 }} value={v} placeholder={['Work / money', 'Personal / life', 'Creative / growth'][i]}
-            onChange={e => { const n = [...t]; n[i] = e.target.value; setT(n) }}
-            onBlur={() => send({ action: 'top3', value: t.map(text => ({ text })) }, tomorrow)} />
-        ))}
         <p className={styles.note}>Also settle: {NIGHT_ASKS.slice(1).join(' · ')}</p>
       </section>
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>End of workday</p>
-        <textarea className={styles.area} value={eod} onChange={e => setEod(e.target.value)}
-          onBlur={() => send({ action: 'note', key: 'eod_summary', value: eod })} placeholder="EOD summary" />
-      </section>
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Night journal</p>
-        {NIGHT_JOURNAL_PROMPTS.map((p, i) => (
-          <div key={p} style={{ marginTop: i ? 12 : 0 }}>
-            <span className={styles.time}>{i + 1}. {p}</span>
-            <textarea className={styles.area} value={ans[i]} onChange={e => { const n = [...ans]; n[i] = e.target.value; setAns(n) }}
-              onBlur={() => send({ action: 'note', key: `journal_${i}`, value: ans[i] })} />
-          </div>
-        ))}
-      </section>
+
+      {tb && <SectionNotes b={tb} noteKey="note_tomorrow" send={send} date={tomorrow} label="Notes for tomorrow" />}
     </>
   )
 }
