@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
   BRAND_IDEA_KINDS, CLOSET_QUESTIONS, CORE_PHRASE, HOBBY_CATEGORIES, NIGHT_ASKS, NIGHT_JOURNAL_PROMPTS,
@@ -294,7 +294,7 @@ function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part
       <section className={styles.card}>
         <p className={styles.cardTitle}>Tonight: {b.theme.block}</p>
         <p className={styles.detail}>DONE means: {b.theme.done}</p>
-        {b.theme.options.length > 0 && <p className={styles.small}>{b.theme.options.join(' · ')}</p>}
+        <PlanList b={b} noteKey="plan_block" label="My checklist for tonight" placeholder="Add your own" send={send} suggestions={b.theme.options} />
       </section>
 
       <Quick b={b} send={send} />
@@ -310,13 +310,15 @@ function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part
   )
 }
 
-function PlanList({ b, noteKey, label, placeholder, send, date }: {
-  b: Bundle; noteKey: string; label: string; placeholder: string; send: Send; date?: string
+function PlanList({ b, noteKey, label, placeholder, send, date, suggestions }: {
+  b: Bundle; noteKey: string; label: string; placeholder: string; send: Send; date?: string; suggestions?: string[]
 }) {
   type Row = { t: string; d: boolean }
   const parse = (raw?: string): Row[] => { try { const v = JSON.parse(raw ?? '[]'); return Array.isArray(v) ? v : [] } catch { return [] } }
   const [rows, setRows] = useState<Row[]>(() => parse(b.day.notes[noteKey]))
   const [text, setText] = useState('')
+  const [editing, setEditing] = useState<number | null>(null)
+  const [draft, setDraft] = useState('')
   const save = (next: Row[]) => {
     setRows(next)
     send({ action: 'note', key: noteKey, value: JSON.stringify(next) }, date)
@@ -328,10 +330,24 @@ function PlanList({ b, noteKey, label, placeholder, send, date }: {
       {rows.map((r, i) => (
         <div key={i} className={styles.check} style={{ padding: '8px 0' }}>
           <div className={`${styles.box} ${r.d ? styles.boxOn : ''}`} onClick={() => save(rows.map((x, k) => (k === i ? { ...x, d: !x.d } : x)))}>{r.d ? '✓' : ''}</div>
-          <div className={`${styles.checkText} ${r.d ? styles.checkDone : ''}`} onClick={() => save(rows.map((x, k) => (k === i ? { ...x, d: !x.d } : x)))}>{r.t}</div>
+          {editing === i ? (
+            <input className={styles.input} autoFocus value={draft} onChange={e => setDraft(e.target.value)}
+              onBlur={() => { if (draft.trim()) save(rows.map((x, k) => (k === i ? { ...x, t: draft.trim() } : x))); setEditing(null) }}
+              onKeyDown={e => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
+          ) : (
+            <div className={`${styles.checkText} ${r.d ? styles.checkDone : ''}`} onClick={() => save(rows.map((x, k) => (k === i ? { ...x, d: !x.d } : x)))}>{r.t}</div>
+          )}
+          <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} aria-label="Edit" onClick={() => { setDraft(r.t); setEditing(i) }}>Edit</button>
           <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} aria-label="Remove" onClick={() => save(rows.filter((_, k) => k !== i))}>✕</button>
         </div>
       ))}
+      {suggestions && suggestions.filter(x => !rows.some(r => r.t === x)).length > 0 && (
+        <div className={styles.rowWrap} style={{ marginTop: 8 }}>
+          {suggestions.filter(x => !rows.some(r => r.t === x)).map(x => (
+            <button key={x} className={styles.tab} onClick={() => save([...rows, { t: x, d: false }])}>+ {x}</button>
+          ))}
+        </div>
+      )}
       <div className={styles.row} style={{ marginTop: 6 }}>
         <input className={styles.input} value={text} placeholder={placeholder} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
         <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={add}>Add</button>
@@ -978,29 +994,65 @@ const ZONE_TASKS = ['Declutter', 'Clear and clean surfaces', 'Put everything bac
 
 function Home({ b, toggle, send }: { b: Bundle; toggle: Toggle; send: Send }) {
   const [t, setT] = useState('')
+  const [newTask, setNewTask] = useState('')
+  const [editId, setEditId] = useState<string | null>(null)
+  const [draft, setDraft] = useState('')
+  const seeded = useRef<number | null>(null)
   const logs = b.items.filter(i => i.kind === 'home')
+  const tasks = b.items.filter(i => i.kind === 'home_task' && i.data.week === b.home.week && typeof i.data.text === 'string')
   const on = !!b.day.checks.home_reset
+
+  // First visit each week: drop in the starter list once, then it is hers to edit.
+  useEffect(() => {
+    if (tasks.length > 0 || seeded.current === b.home.week) return
+    seeded.current = b.home.week
+    ;(async () => {
+      for (const text of ZONE_TASKS) {
+        await fetch('/api/thirty', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'item_add', kind: 'home_task', data: { week: b.home.week, text, done: false } }),
+        }).catch(() => {})
+      }
+      await send({ action: 'noop' })
+    })()
+  }, [tasks.length, b.home.week, send])
+
+  const doneCount = tasks.filter(x => x.data.done === true).length
   return (
     <>
       <section className={styles.card}>
         <p className={styles.cardTitle}>Week {b.home.week} zone</p>
         <p className={styles.big} style={{ margin: 0 }}>{b.home.zone}</p>
         <p className={styles.sub}>{b.home.focus}</p>
-        <p className={styles.note}>Declutter · clean surfaces · fresh sheets · clothes put away · good scent · good lighting · release anything that feels like old energy.</p>
       </section>
       <section className={styles.card}>
-        <p className={styles.cardTitle}>{b.home.zone} checklist</p>
-        {ZONE_TASKS.map((t, i) => {
-          const it = b.items.find(x => x.kind === 'home_task' && x.data.week === b.home.week && x.data.idx === i)
+        <p className={styles.cardTitle}>{b.home.zone} checklist · {doneCount}/{tasks.length}</p>
+        {tasks.map(it => {
+          const done = it.data.done === true
           return (
-            <div key={t} className={styles.check} onClick={() => it
-              ? send({ action: 'item_delete', id: it.id })
-              : send({ action: 'item_add', kind: 'home_task', data: { week: b.home.week, idx: i } })}>
-              <div className={`${styles.box} ${it ? styles.boxOn : ''}`}>{it ? '✓' : ''}</div>
-              <div className={`${styles.checkText} ${it ? styles.checkDone : ''}`}>{t}</div>
+            <div key={it.id} className={styles.check}>
+              <div className={`${styles.box} ${done ? styles.boxOn : ''}`}
+                onClick={() => send({ action: 'item_update', id: it.id, data: { done: !done } })}>{done ? '✓' : ''}</div>
+              {editId === it.id ? (
+                <input className={styles.input} autoFocus value={draft} onChange={e => setDraft(e.target.value)}
+                  onBlur={() => { if (draft.trim()) send({ action: 'item_update', id: it.id, data: { text: draft.trim() } }); setEditId(null) }}
+                  onKeyDown={e => e.key === 'Enter' && (e.target as HTMLInputElement).blur()} />
+              ) : (
+                <div className={`${styles.checkText} ${done ? styles.checkDone : ''}`}
+                  onClick={() => send({ action: 'item_update', id: it.id, data: { done: !done } })}>{String(it.data.text)}</div>
+              )}
+              <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} onClick={() => { setDraft(String(it.data.text)); setEditId(it.id) }}>Edit</button>
+              <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} aria-label="Remove" onClick={() => send({ action: 'item_delete', id: it.id })}>✕</button>
             </div>
           )
         })}
+        <div className={styles.row} style={{ marginTop: 10 }}>
+          <input className={styles.input} value={newTask} onChange={e => setNewTask(e.target.value)} placeholder="Add something for this zone"
+            onKeyDown={e => { if (e.key === 'Enter' && newTask.trim()) { send({ action: 'item_add', kind: 'home_task', data: { week: b.home.week, text: newTask.trim(), done: false } }); setNewTask('') } }} />
+          <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => {
+            if (newTask.trim()) { send({ action: 'item_add', kind: 'home_task', data: { week: b.home.week, text: newTask.trim(), done: false } }); setNewTask('') }
+          }}>Add</button>
+        </div>
       </section>
       <section className={styles.card}>
         <p className={styles.cardTitle}>Daily 10–20 minute reset</p>
