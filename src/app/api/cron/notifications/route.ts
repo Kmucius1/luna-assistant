@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { localDateKey, localHour } from '@/lib/luna/dailyCache'
 import { sendPushToUser, alreadySentToday, markSentToday } from '@/lib/luna/pushNotifications'
 import { mondayKeyOf, todayKey } from '@/lib/luna/today'
-import { WORK_CHECKINS, dayNumber, themeFor, weekdayOf } from '@/lib/luna/thirtyDay'
+import { NUDGE_HOURS, nudgeFor, type NudgeContext } from '@/lib/luna/thirtyNudges'
 
 const ZOE_USER_ID = OWNER_USER_ID
 const ZOE_TIMEZONE = 'America/New_York'
@@ -79,37 +79,20 @@ const SLOTS: Slot[] = [
   },
 ]
 
-// 30-day program reminders. They only fire on weekdays for work check-ins and
-// only while the program is active, so the older slots above are untouched.
-function thirtyDayActive(): boolean {
-  const n = dayNumber(todayKey())
-  return n >= 1 && n <= 30
-}
-const isWeekday = () => { const d = weekdayOf(todayKey()); return d >= 1 && d <= 5 }
-
-const THIRTY_SLOTS: Slot[] = [
-  ...WORK_CHECKINS.map(c => ({
-    key: `thirty_work_${c.key}`,
-    hour: c.hour,
-    build: async () => (thirtyDayActive() && isWeekday() ? { title: c.title, body: c.body, url: '/thirty' } : null),
-  })),
-  {
-    key: 'thirty_evening_focus',
-    hour: 18,
-    build: async () => {
-      if (!thirtyDayActive()) return null
-      const t = themeFor(todayKey())
-      return { title: `Tonight: ${t.block}`, body: `Your evening has a purpose. DONE means: ${t.done}`, url: '/thirty' }
-    },
+// 30-day program nudges: work check-ins, focus-on-me reminders, affirmations and
+// astrology lines, from the same schedule the in-app pop-up uses. They only
+// exist while the program is active; the older slots above are untouched.
+const THIRTY_SLOTS: Slot[] = NUDGE_HOURS.map(hour => ({
+  key: `thirty_h${hour}`,
+  hour,
+  build: async (db) => {
+    const dateKey = todayKey()
+    const { data } = await db.from('daily_generation_cache')
+      .select('payload').eq('user_id', ZOE_USER_ID).eq('date_key', dateKey).eq('generation_type', 'daily_guidance').maybeSingle()
+    const n = nudgeFor(hour, { dateKey, guidance: (data?.payload as NudgeContext['guidance']) ?? null })
+    return n ? { title: n.title, body: n.body, url: n.url } : null
   },
-  {
-    key: 'thirty_close_day',
-    hour: 21,
-    build: async () => (thirtyDayActive()
-      ? { title: 'Close the day', body: 'Gym tomorrow? Outfit, bag, Top 3. Then journal and rest.', url: '/thirty' }
-      : null),
-  },
-]
+}))
 
 async function handle(req: NextRequest) {
   if (!isCronAuthorized(req)) {

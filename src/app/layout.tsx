@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from '@/lib/theme'
 import { PlanningGate } from '@/components/luna/PlanningGate'
+import { ThirtyNudgePopup } from '@/components/luna/ThirtyNudgePopup'
 import './globals.css'
 import './luna-home-polish.css'
 
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full">
         <ThemeProvider>
           <PlanningGate>{children}</PlanningGate>
+          <ThirtyNudgePopup />
         </ThemeProvider>
       </body>
     </html>
