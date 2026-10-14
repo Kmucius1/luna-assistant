@@ -16,6 +16,35 @@ interface SynastryResult {
   note: string
 }
 
+interface DayReading {
+  day: string
+  verdict: { label: string; key: string }
+  ratings: {
+    communication: { level: string; why: string[] }
+    closeness: { level: string; why: string[] }
+    space: { level: string; needsSpace: boolean; why: string[] }
+  }
+  moonUncertain: boolean
+  mercuryRetrograde: boolean
+  connections: { text: string; strength: string }[]
+  reading: {
+    summary?: string; communication?: string; closeness?: string; space?: string; how_they_may_feel?: string
+    how_to_approach?: string[]; what_to_say?: string[]; avoid?: string[]; if_it_goes_sideways?: string
+  }
+}
+
+const LEVEL_LABEL: Record<string, string> = { great: 'Great', good: 'Good', neutral: 'Neutral', careful: 'Careful' }
+
+function dayChips(): { iso: string; label: string }[] {
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() + i)
+    return {
+      iso: new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d),
+      label: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(d),
+    }
+  })
+}
+
 const CATEGORY_LABELS: Record<keyof SynastryResult['categories'], string> = {
   emotionalConnection: 'Emotional Connection',
   communication: 'Communication',
@@ -28,6 +57,9 @@ export function AstrologyConnections() {
   const [mode, setMode] = useState<'list' | 'add' | 'view'>('list')
   const [activePerson, setActivePerson] = useState<SavedPerson | null>(null)
   const [synastry, setSynastry] = useState<SynastryResult | null>(null)
+  const [dayIso, setDayIso] = useState<string>(dayChips()[0].iso)
+  const [dayReading, setDayReading] = useState<DayReading | null>(null)
+  const [dayState, setDayState] = useState<'idle' | 'loading' | 'error'>('idle')
   const [form, setForm] = useState({ name: '', relationship: 'Romantic' as SavedPerson['relationship'], birthDate: '', birthTime: '', birthLocation: '', unknownTime: false })
 
   useEffect(() => { setPeople(getSavedPeople()) }, [])
@@ -47,10 +79,26 @@ export function AstrologyConnections() {
     setMode('list')
   }
 
+  async function loadDay(person: SavedPerson, iso: string, refresh = false) {
+    setDayIso(iso)
+    setDayReading(null)
+    setDayState('loading')
+    try {
+      const res = await fetch('/api/astrology/connection-day', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: person.name, relationship: person.relationship, birthDate: person.birthDate, birthTime: person.birthTime, day: iso, refresh }),
+      })
+      if (!res.ok) throw new Error()
+      setDayReading(await res.json())
+      setDayState('idle')
+    } catch { setDayState('error') }
+  }
+
   async function openPerson(person: SavedPerson) {
     setActivePerson(person)
     setMode('view')
     setSynastry(null)
+    loadDay(person, dayChips()[0].iso)
     try {
       const res = await fetch('/api/astrology/synastry', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -94,6 +142,62 @@ export function AstrologyConnections() {
           <div className={styles.avatar} style={{ margin: '0 auto 8px', width: 52, height: 52, fontSize: 18 }}>{activePerson.name[0]}</div>
           <strong style={{ fontSize: 15, color: 'var(--astro-text)' }}>{activePerson.name}</strong>
           <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}</p>
+        </div>
+
+        <div className={styles.dayCard}>
+          <p className={styles.dayTitle}>How to navigate {activePerson.name} on…</p>
+          <div className={styles.dayChips}>
+            {dayChips().map(c => (
+              <button key={c.iso} type="button" className={`${styles.dayChip} ${dayIso === c.iso ? styles.dayChipOn : ''}`}
+                onClick={() => loadDay(activePerson, c.iso)}>{c.label}</button>
+            ))}
+          </div>
+
+          {dayState === 'loading' && <p className={styles.dayNote}>Reading the sky for {activePerson.name} on that day…</p>}
+          {dayState === 'error' && (
+            <p className={styles.dayNote}>Couldn’t load this day. <button type="button" className={styles.dayRetry} onClick={() => loadDay(activePerson, dayIso, true)}>Try again</button></p>
+          )}
+
+          {dayReading && (
+            <>
+              <p className={styles.dayVerdict}>{dayReading.verdict.label}</p>
+              <div className={styles.dayRatings}>
+                <div><span>Communicate</span><strong>{LEVEL_LABEL[dayReading.ratings.communication.level]}</strong></div>
+                <div><span>Be close</span><strong>{LEVEL_LABEL[dayReading.ratings.closeness.level]}</strong></div>
+                <div><span>Space</span><strong>{dayReading.ratings.space.needsSpace ? 'Give some' : 'Not needed'}</strong></div>
+              </div>
+
+              {dayReading.reading.summary && <p className={styles.dayBody}><strong>{dayReading.reading.summary}</strong></p>}
+              {dayReading.reading.communication && (<><p className={styles.dayHead}>Reaching out</p><p className={styles.dayBody}>{dayReading.reading.communication}</p></>)}
+              {dayReading.reading.closeness && (<><p className={styles.dayHead}>Being close</p><p className={styles.dayBody}>{dayReading.reading.closeness}</p></>)}
+              {dayReading.reading.space && (<><p className={styles.dayHead}>Space</p><p className={styles.dayBody}>{dayReading.reading.space}</p></>)}
+              {dayReading.reading.how_they_may_feel && (<><p className={styles.dayHead}>How {activePerson.name} may feel</p><p className={styles.dayBody}>{dayReading.reading.how_they_may_feel}</p></>)}
+              {dayReading.reading.how_to_approach && dayReading.reading.how_to_approach.length > 0 && (
+                <><p className={styles.dayHead}>How to approach them</p>
+                  {dayReading.reading.how_to_approach.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}</>
+              )}
+              {dayReading.reading.what_to_say && dayReading.reading.what_to_say.length > 0 && (
+                <><p className={styles.dayHead}>What you could say</p>
+                  {dayReading.reading.what_to_say.map((x, i) => <p key={i} className={styles.dayBody}>{x}</p>)}</>
+              )}
+              {dayReading.reading.avoid && dayReading.reading.avoid.length > 0 && (
+                <><p className={styles.dayHead}>Avoid</p>
+                  {dayReading.reading.avoid.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}</>
+              )}
+              {dayReading.reading.if_it_goes_sideways && (<><p className={styles.dayHead}>If it gets tense</p><p className={styles.dayBody}>{dayReading.reading.if_it_goes_sideways}</p></>)}
+
+              {dayReading.connections.length > 0 && (
+                <>
+                  <p className={styles.dayHead}>The sky details behind this</p>
+                  {dayReading.connections.map((c, i) => <p key={i} className={styles.dayBody}>• {c.text} ({c.strength})</p>)}
+                </>
+              )}
+              <p className={styles.dayNote}>
+                The ratings come from real planet positions that day. The explanation is an interpretation, a tendency and not a guarantee.
+                {dayReading.moonUncertain ? ` ${activePerson.name}’s Moon sign may be off without a confirmed birth time.` : ''}
+              </p>
+            </>
+          )}
         </div>
         {!synastry && <p style={{ fontSize: 12, color: 'var(--astro-muted)', textAlign: 'center', padding: 16 }}>Calculating real chart comparison…</p>}
         {synastry && (

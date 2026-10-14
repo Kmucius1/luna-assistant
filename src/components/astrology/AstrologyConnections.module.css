@@ -40,3 +40,18 @@
 .aspectDetailHeader span:first-child { font-size: 10.5px; font-weight: 700; text-transform: uppercase; color: var(--astro-gold, #5C4530); }
 .aspectDetailStrength { margin-left: auto; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--astro-muted); flex-shrink: 0; }
 .aspectDetailBody { font-size: 12px; line-height: 1.5; color: var(--astro-text); }
+
+.dayCard { margin-top: 14px; padding: 16px; border-radius: 20px; background: var(--astro-card); border: 1px solid var(--astro-border); box-shadow: var(--astro-shadow); }
+.dayTitle { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--astro-muted); margin: 0 0 10px; }
+.dayChips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+.dayChip { flex: 0 0 auto; padding: 9px 14px; border-radius: 999px; border: 1px solid var(--astro-border); background: transparent; color: var(--astro-text); font-size: 13px; cursor: pointer; min-height: 40px; }
+.dayChipOn { background: var(--astro-gold); border-color: var(--astro-gold); color: #fff; font-weight: 700; }
+.dayVerdict { font-size: 20px; font-weight: 600; margin: 14px 0 10px; color: var(--astro-text); }
+.dayRatings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.dayRatings div { padding: 10px 6px; border-radius: 14px; background: var(--astro-gold-soft); text-align: center; }
+.dayRatings span { display: block; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--astro-muted); }
+.dayRatings strong { display: block; font-size: 14px; margin-top: 3px; color: var(--astro-text); }
+.dayHead { font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--astro-muted); margin: 14px 0 4px; }
+.dayBody { font-size: 14px; line-height: 1.6; margin: 0 0 6px; color: var(--astro-text); }
+.dayNote { font-size: 12px; line-height: 1.5; color: var(--astro-muted); margin: 12px 0 0; }
+.dayRetry { background: none; border: none; color: var(--astro-gold); font-weight: 700; padding: 0; cursor: pointer; }
