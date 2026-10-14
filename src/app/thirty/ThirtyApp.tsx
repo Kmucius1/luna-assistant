@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import {
   BRAND_IDEA_KINDS, CLOSET_QUESTIONS, CORE_PHRASE, HOBBY_CATEGORIES, NIGHT_ASKS, NIGHT_JOURNAL_PROMPTS,
-  SPIRAL_QUESTIONS, SPIRAL_REMINDERS, STUCK_STEPS, STYLE_WORDS, SUNDAY_RESET, WEEKLY_REFLECTION,
+  SPIRAL_QUESTIONS, SPIRAL_REMINDERS, STUCK_MESSAGES, STUCK_STEPS, STYLE_WORDS, SUNDAY_RESET, WEEKLY_REFLECTION,
   type Energy, type Mode, type Part, type PlanItem, type Progress,
 } from '@/lib/luna/thirtyDay'
 import styles from './thirty.module.css'
@@ -17,7 +17,7 @@ interface Bundle {
   theme: { name: string; block: string; done: string; options: string[] }
   day: {
     energy: Energy; mode: Mode; gymToday: boolean | null; gymTomorrow: boolean | null
-    top3: { text: string; done?: boolean }[]; checks: Record<string, boolean>
+    top3: { text: string; done?: boolean }[]; checks: Record<string, boolean>; skips: Record<string, boolean>
     stats: Record<string, number>; notes: Record<string, string>
     overrides: { offDay?: boolean; workUntil?: number; customEvening?: string; skipIds?: string[] }
   }
@@ -83,6 +83,11 @@ export function ThirtyApp() {
     send({ action: 'check', id, value })
   }, [send])
 
+  const skip = useCallback((id: string, value: boolean) => {
+    setB(prev => prev ? { ...prev, day: { ...prev.day, skips: { ...prev.day.skips, [id]: value }, checks: value ? { ...prev.day.checks, [id]: false } : prev.day.checks } } : prev)
+    send({ action: 'skip', id, value })
+  }, [send])
+
   if (err && !b) return <Shell><p className={styles.sub}>{err}</p></Shell>
   if (!b) return <Shell><p className={styles.sub}>Opening your day…</p></Shell>
   if (b.setupNeeded) {
@@ -113,7 +118,7 @@ export function ThirtyApp() {
         ))}
       </nav>
 
-      {tab === 'today' && <Today key={b.dateKey} b={b} open={open} setOpen={setOpen} toggle={toggle} send={send} />}
+      {tab === 'today' && <Today key={b.dateKey} b={b} open={open} setOpen={setOpen} toggle={toggle} skip={skip} send={send} />}
       {tab === 'week' && <Week b={b} toggle={toggle} send={send} />}
       {tab === 'closet' && <Closet b={b} send={send} />}
       {tab === 'style' && <Style b={b} send={send} />}
@@ -135,7 +140,7 @@ type Toggle = (id: string, v: boolean) => void
 
 // ---------------------------------------------------------------- TODAY
 
-function Today({ b, open, setOpen, toggle, send }: { b: Bundle; open: Part; setOpen: (p: Part) => void; toggle: Toggle; send: Send }) {
+function Today({ b, open, setOpen, toggle, skip, send }: { b: Bundle; open: Part; setOpen: (p: Part) => void; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send }) {
   const [top, setTop] = useState<string[]>(() => [0, 1, 2].map(i => b.day.top3[i]?.text ?? ''))
   const [more, setMore] = useState(false)
 
@@ -164,7 +169,12 @@ function Today({ b, open, setOpen, toggle, send }: { b: Bundle; open: Part; setO
           <>
             <p className={styles.next}>{b.next.label}</p>
             {b.next.detail && <p className={styles.detail}>{b.next.detail}</p>}
-            <button className={styles.btn} onClick={() => toggle(b.next!.id, true)}>Done</button>
+            <div className={styles.rowWrap}>
+              <button className={styles.btn} onClick={() => toggle(b.next!.id, true)}>Done</button>
+              {b.next.skippable && (
+                <button className={`${styles.btn} ${styles.btnQuiet}`} onClick={() => skip(b.next!.id, true)}>Not feeling it</button>
+              )}
+            </div>
           </>
         ) : <p className={styles.next}>Everything for today is done. Rest is part of the plan.</p>}
         <div className={styles.rowWrap} style={{ marginTop: 14 }}>
@@ -224,13 +234,29 @@ function Today({ b, open, setOpen, toggle, send }: { b: Bundle; open: Part; setO
               <div style={{ marginTop: 8 }}>
                 {list.map(i => {
                   const on = !!b.day.checks[i.id]
+                  const skipped = !!b.day.skips[i.id]
                   return (
-                    <div key={i.id} className={styles.check} onClick={() => toggle(i.id, !on)}>
+                    <div key={i.id} className={styles.check} onClick={() => !skipped && toggle(i.id, !on)}>
                       <div className={`${styles.box} ${on ? styles.boxOn : ''}`}>{on ? '✓' : ''}</div>
-                      <div className={`${styles.checkText} ${on ? styles.checkDone : ''}`}>
+                      <div className={`${styles.checkText} ${on || skipped ? styles.checkDone : ''}`}>
                         {i.time && <span className={styles.time}>{i.time}</span>}
                         {i.label}{i.core && <span className={styles.core}>core</span>}
                         {i.detail && <span className={styles.time} style={{ marginTop: 2 }}>{i.detail}</span>}
+                        {i.skippable && (
+                          <span className={styles.rowWrap} style={{ marginTop: 8 }} onClick={e => e.stopPropagation()}>
+                            {skipped ? (
+                              <>
+                                <span className={styles.small}>Skipped tonight. That’s okay.</span>
+                                <button className={styles.tab} onClick={() => skip(i.id, false)}>Undo</button>
+                              </>
+                            ) : (
+                              <>
+                                <button className={`${styles.tab} ${on ? styles.tabOn : ''}`} onClick={() => toggle(i.id, !on)}>Done</button>
+                                <button className={styles.tab} onClick={() => skip(i.id, true)}>Not feeling it</button>
+                              </>
+                            )}
+                          </span>
+                        )}
                       </div>
                     </div>
                   )
@@ -407,16 +433,55 @@ function Unusual({ b, send }: { b: Bundle; send: Send }) {
 
 // ---------------------------------------------------------------- MODES
 
+function ModeNote({ mode, text, setText, saved, onSave }: { mode: 'stuck' | 'spiral'; text: string; setText: (t: string) => void; saved: boolean; onSave: () => void }) {
+  return (
+    <section className={styles.card}>
+      <p className={styles.cardTitle}>Write it out, if you want</p>
+      <textarea className={styles.area} value={text} onChange={e => setText(e.target.value)}
+        placeholder={mode === 'stuck' ? 'What’s making this heavy right now?' : 'Get it out of your head and onto the page.'} />
+      <div className={styles.row} style={{ marginTop: 10 }}>
+        <button className={`${styles.btn} ${styles.btnQuiet}`} disabled={!text.trim()} onClick={onSave}>Save note</button>
+        {saved && <span className={styles.small}>Saved.</span>}
+      </div>
+    </section>
+  )
+}
+
+function useModeNote(mode: 'stuck' | 'spiral', extra?: () => string) {
+  const [text, setText] = useState('')
+  const [saved, setSaved] = useState(false)
+  const save = async (): Promise<void> => {
+    const body = [text.trim(), extra?.() ?? ''].filter(Boolean).join('\n\n')
+    if (!body) return
+    try {
+      await fetch('/api/thirty', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'item_add', kind: 'mode_note', data: { mode, text: body } }),
+      })
+      setSaved(true)
+      setText('')
+    } catch { /* the note stays in the box so nothing is lost */ }
+  }
+  return { text, setText, saved, save }
+}
+
 function Stuck({ onExit }: { onExit: () => void }) {
   const [i, setI] = useState(0)
+  const [msg] = useState(() => STUCK_MESSAGES[Math.floor(Math.random() * STUCK_MESSAGES.length)])
+  const note = useModeNote('stuck')
   const last = i >= STUCK_STEPS.length - 1
+  const leave = async () => { await note.save(); onExit() }
   return (
-    <div style={{ minHeight: '70dvh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <div style={{ paddingTop: 12 }}>
       <p className={styles.eyebrow}>Step {i + 1}</p>
       <p className={styles.big}>{STUCK_STEPS[i]}</p>
-      <button className={styles.btn} onClick={() => (last ? onExit() : setI(i + 1))}>{last ? 'Back to my day' : 'Done'}</button>
-      <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginTop: 10 }} onClick={onExit}>I’m okay, show my day</button>
-      <p className={styles.note}>One thing at a time. Starting is the whole job.</p>
+      <button className={styles.btn} onClick={() => (last ? leave() : setI(i + 1))}>{last ? 'Back to my day' : 'Done'}</button>
+      <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginLeft: 10 }} onClick={leave}>Show my day</button>
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>For you</p>
+        <p className={styles.big} style={{ margin: 0, fontSize: 19 }}>{msg}</p>
+      </section>
+      <ModeNote mode="stuck" {...note} onSave={note.save} />
     </div>
   )
 }
@@ -426,9 +491,12 @@ function Spiral({ onExit }: { onExit: () => void }) {
   const [ans, setAns] = useState<string[]>(['', '', '', ''])
   const q = SPIRAL_QUESTIONS
   const [reminder] = useState(() => SPIRAL_REMINDERS[Math.floor(Math.random() * SPIRAL_REMINDERS.length)])
+  const answers = () => q.map((question, k) => (ans[k].trim() ? `${question} ${ans[k].trim()}` : '')).filter(Boolean).join('\n')
+  const note = useModeNote('spiral', answers)
   const done = i >= q.length
+  const leave = async () => { await note.save(); onExit() }
   return (
-    <div style={{ minHeight: '70dvh', paddingTop: 12 }}>
+    <div style={{ paddingTop: 12 }}>
       <p className={styles.eyebrow}>Facts first. Story second.</p>
       {!done ? (
         <>
@@ -440,10 +508,15 @@ function Spiral({ onExit }: { onExit: () => void }) {
         <>
           <p className={styles.big}>{reminder}</p>
           <p className={styles.sub}>You do not need to solve this right now.</p>
-          <button className={styles.btn} style={{ marginTop: 16 }} onClick={onExit}>Back to your life</button>
+          <button className={styles.btn} style={{ marginTop: 16 }} onClick={leave}>Back to your life</button>
         </>
       )}
-      <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginTop: 10 }} onClick={onExit}>Skip, show my day</button>
+      <button className={`${styles.btn} ${styles.btnQuiet}`} style={{ marginTop: 10 }} onClick={leave}>Skip, show my day</button>
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>For you</p>
+        <p className={styles.big} style={{ margin: 0, fontSize: 19 }}>{reminder}</p>
+      </section>
+      <ModeNote mode="spiral" {...note} onSave={note.save} />
     </div>
   )
 }
@@ -832,6 +905,17 @@ function ProgressTab({ b }: { b: Bundle }) {
           </div>
         ))}
       </section>
+      {b.items.some(i => i.kind === 'mode_note') && (
+        <section className={styles.card}>
+          <p className={styles.cardTitle}>Notes you wrote</p>
+          {b.items.filter(i => i.kind === 'mode_note').slice(0, 10).map(n => (
+            <div key={n.id} className={styles.item}>
+              <span className={styles.time}>{n.date_key} · {String(n.data.mode)}</span>
+              <span style={{ whiteSpace: 'pre-wrap' }}>{String(n.data.text)}</span>
+            </div>
+          ))}
+        </section>
+      )}
       <section className={styles.card}>
         <p className={styles.cardTitle}>Totals</p>
         <div className={styles.row}>

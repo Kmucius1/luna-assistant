@@ -20,6 +20,7 @@ export interface PlanItem {
   detail?: string
   part: Part
   core?: boolean      // non-negotiable
+  skippable?: boolean // can be marked "not feeling it" without counting as failure
 }
 
 export interface DayOverrides {
@@ -250,6 +251,9 @@ export function nightPlan(): PlanItem[] {
   ]
 }
 
+// Things she can honestly say "not feeling it" to and move on.
+const SKIPPABLE = new Set(['gym', 'move_am', 'move_pm', 'transition', 'body_food', 'main_block', 'home_reset', 'capture_am', 'capture_pm'])
+
 export function buildDay(input: DayInput): Record<Part, PlanItem[]> {
   const o = input.overrides ?? {}
   const skip = new Set(o.skipIds ?? [])
@@ -264,7 +268,9 @@ export function buildDay(input: DayInput): Record<Part, PlanItem[]> {
     // Low energy trims, it never removes the core care.
     day.morning = day.morning.filter(i => i.core || i.id === 'wake' || i.id === 'leave')
   }
-  for (const k of Object.keys(day) as Part[]) day[k] = day[k].filter(i => !skip.has(i.id))
+  for (const k of Object.keys(day) as Part[]) {
+    day[k] = day[k].filter(i => !skip.has(i.id)).map(i => (SKIPPABLE.has(i.id) ? { ...i, skippable: true } : i))
+  }
   return day
 }
 
@@ -284,6 +290,15 @@ export const STUCK_STEPS: string[] = [
   'Open the window or step outside for one minute.',
   'Pick up one thing you can see. Put it where it goes.',
   'Now: what is the next action?',
+]
+
+export const STUCK_MESSAGES: string[] = [
+  'You do not have to feel ready. You only have to do the next small thing.',
+  'Tired is not the same as failing. Go slowly, but go.',
+  'You are not behind. You are returning, and returning counts.',
+  'One tiny action is enough to change the day. Just the next one.',
+  'Be gentle with yourself and keep moving anyway.',
+  'Nobody is grading this morning. It is just you and the next step.',
 ]
 
 export const SPIRAL_QUESTIONS: string[] = [

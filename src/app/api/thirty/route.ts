@@ -72,6 +72,9 @@ export async function GET(req: NextRequest) {
   const gymToday = (row?.gym_today as boolean | null | undefined) ?? null
   const checks = (row?.checks ?? {}) as Record<string, boolean>
   const plan = buildDay({ dateKey, energy, gymToday, overrides })
+  const notes = (row?.notes ?? {}) as Record<string, string>
+  const skips: Record<string, boolean> = {}
+  for (const [k, v] of Object.entries(notes)) if (k.startsWith('skip_') && v === '1') skips[k.slice(5)] = true
   const n = dayNumber(dateKey, start)
 
   // Rollover: read yesterday, never touch it.
@@ -99,10 +102,10 @@ export async function GET(req: NextRequest) {
     theme: themeFor(dateKey),
     day: {
       energy, mode: row?.mode ?? 'normal', gymToday, gymTomorrow: row?.gym_tomorrow ?? null,
-      top3: row?.top3 ?? [], checks, stats: row?.stats ?? {}, notes: row?.notes ?? {}, overrides,
+      top3: row?.top3 ?? [], checks, skips, stats: row?.stats ?? {}, notes, overrides,
     },
     plan, nonNegotiables: nonNegotiables(plan).map(i => i.id),
-    next: nextAction(plan, checks, Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date())) % 24),
+    next: nextAction(plan, { ...checks, ...skips }, Number(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hour: 'numeric', hour12: false }).format(new Date())) % 24),
     carryover, tomorrowFirst,
     progress: computeProgress(days),
     history: days.map(d => ({ date_key: d.date_key, energy: d.energy, checks: d.checks, stats: d.stats, notes: d.notes })),
@@ -149,6 +152,15 @@ export async function POST(req: NextRequest) {
       if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
       const checks = merge('checks'); if (body.value) checks[id] = true; else delete checks[id]
       res = await upsertDay(db, userId, dateKey, { checks }); break
+    }
+    case 'skip': {
+      const id = String(body.id ?? '').slice(0, 60)
+      if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+      const notes = merge('notes')
+      if (body.value) notes[`skip_${id}`] = '1'; else delete notes[`skip_${id}`]
+      // Skipping and completing are mutually exclusive.
+      const checks = merge('checks'); if (body.value) delete checks[id]
+      res = await upsertDay(db, userId, dateKey, { notes, checks }); break
     }
     case 'stat': {
       const key = String(body.key ?? '').slice(0, 40)
