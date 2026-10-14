@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import Link from 'next/link'
+import { BackLink } from '@/components/ui/BackLink'
 import { ArrowLeft, Zap, Sparkles, PenLine, Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { SmartInput } from '@/components/ui/SmartInput'
 import { plainAspectPhrase } from '@/lib/astrology'
@@ -245,12 +246,12 @@ export default function TransitsPage() {
     <div className="min-h-screen" style={THEME_VARS}>
       <AppLayout>
         <div className="flex items-center gap-3 mb-5 pt-2">
-          <Link href="/astrology">
+          <BackLink href="/astrology/timing">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center"
               style={{ background: 'var(--surface)', border: '1px solid var(--surface-border)' }}>
               <ArrowLeft className="h-4 w-4" style={{ color: 'var(--text-3)' }} />
             </div>
-          </Link>
+          </BackLink>
           <div className="flex-1">
             <h1 className="font-display text-xl font-bold" style={{ color: '#F5EFE3' }}>Daily Transits</h1>
             <p className="text-xs" style={{ color: 'var(--text-4)' }}>Current sky · tap any transit to reflect</p>

@@ -748,3 +748,8 @@ html, body {
 .content-enter > *:nth-child(3) { animation-delay: 0.14s; }
 .content-enter > *:nth-child(4) { animation-delay: 0.19s; }
 .content-enter > *:nth-child(5) { animation-delay: 0.24s; }
+
+/* Soft page-to-page fade. Opacity only, so fixed docks and sheets are unaffected. */
+@keyframes luna-page-in { from { opacity: 0; } to { opacity: 1; } }
+.luna-page-enter { animation: luna-page-in 180ms ease-out both; height: 100%; }
+@media (prefers-reduced-motion: reduce) { .luna-page-enter { animation: none; } }

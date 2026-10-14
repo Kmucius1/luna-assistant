@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import Link from 'next/link'
+import { BackLink } from '@/components/ui/BackLink'
 import { ArrowLeft, Calendar, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
 import { useLocation } from '@/hooks/useLocation'
 import type { WeeklyForecast, DayForecast } from '@/app/api/astrology/weekly-forecast/route'
@@ -138,9 +139,9 @@ export default function ForecastsPage() {
           <div style={{ padding: '20px 20px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Link href="/astrology" style={{ width: 32, height: 32, borderRadius: 11, background: 'rgba(180,150,100,0.06)', border: '1px solid rgba(180,150,100,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                <BackLink href="/astrology/timing" style={{ width: 32, height: 32, borderRadius: 11, background: 'rgba(180,150,100,0.06)', border: '1px solid rgba(180,150,100,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                   <ArrowLeft className="h-4 w-4" style={{ color: 'rgba(16,12,30,0.45)' }} />
-                </Link>
+                </BackLink>
                 <div>
                   <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: '#F5EFE3' }}>Forecasts</h1>
                   <p style={{ fontSize: 11, color: 'rgba(16,12,30,0.38)' }}>Your cosmic outlook — day by day</p>

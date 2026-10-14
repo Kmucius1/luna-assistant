@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { BackLink } from '@/components/ui/BackLink'
 import { ArrowLeft, Archive } from 'lucide-react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { BottomSheet } from '@/components/ui/BottomSheet'
@@ -33,7 +34,7 @@ export default function SavedReadingsArchive() {
     <AppLayout noPad>
       <div className={styles.page}>
         <div className={styles.topBar}>
-          <Link href="/astrology/more" className={styles.backButton} aria-label="Back"><ArrowLeft size={16} /></Link>
+          <BackLink href="/astrology/more" className={styles.backButton} aria-label="Back"><ArrowLeft size={16} /></BackLink>
           <h1>Saved Readings</h1>
         </div>
 
