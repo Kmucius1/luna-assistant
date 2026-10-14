@@ -7,6 +7,7 @@ import {
   SPIRAL_QUESTIONS, SPIRAL_REMINDERS, STUCK_MESSAGES, STUCK_STEPS, STYLE_WORDS, SUNDAY_RESET, WEEKLY_REFLECTION,
   type Energy, type Mode, type Part, type PlanItem, type Progress,
 } from '@/lib/luna/thirtyDay'
+import { suggestions, type SuggestCtx, type SuggestKind } from '@/lib/luna/thirtySuggestions'
 import styles from './thirty.module.css'
 
 interface Item { id: string; kind: string; status: string | null; amount: number | null; data: Record<string, unknown>; date_key: string | null }
@@ -294,10 +295,14 @@ function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id
                   </button>
                 )}
                 {labels.map((l, i) => (
-                  <div key={l} style={{ marginTop: i ? 10 : 0 }}>
+                  <div key={l} style={{ marginTop: i ? 14 : 0 }}>
                     <span className={styles.time}>{i + 1}. {l}</span>
                     <input className={styles.input} value={top[i]} placeholder="What matters most here?"
                       onChange={e => { const n = [...top]; n[i] = e.target.value; setTop(n) }} />
+                    {!top[i].trim() && (
+                      <SuggestChips b={b} kind={(['top_work', 'top_life', 'top_create'] as SuggestKind[])[i]} exclude={top}
+                        onPick={t => { const n = [...top]; n[i] = t; setTop(n) }} />
+                    )}
                   </div>
                 ))}
                 <button className={styles.btn} style={{ marginTop: 12 }} disabled={!top.some(t => t.trim())}
@@ -346,7 +351,7 @@ function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id
           <PartChecklist b={b} part="morning" title="Morning" toggle={toggle} skip={skip} send={send} />
           <section className={styles.card}>
             <p className={styles.cardTitle}>Plan the outfit</p>
-            <PlanList b={b} noteKey="plan_outfit" label="" placeholder="Cream knit, black trousers, gold hoops" send={send} />
+            <PlanList b={b} noteKey="plan_outfit" label="" placeholder="Cream knit, black trousers, gold hoops" send={send} kind="outfit" />
           </section>
           <Quick b={b} send={send} show={['outfit', 'win']} />
         </>
@@ -362,13 +367,13 @@ function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id
           <section className={styles.card}>
             <p className={styles.cardTitle}>Tonight: {b.theme.block}</p>
             <p className={styles.detail}>DONE means: {b.theme.done}</p>
-            <PlanList b={b} noteKey="plan_block" label="My checklist for tonight" placeholder="Add your own" send={send} suggestions={b.theme.options} />
+            <PlanList b={b} noteKey="plan_block" label="My checklist for tonight" placeholder="Add your own" send={send} kind="block" />
           </section>
           <section className={styles.card}>
             <p className={styles.cardTitle}>Plan the rest</p>
-            <PlanList b={b} noteKey="plan_content" label="Content to capture" placeholder="Coffee pour, sunset, outfit in the mirror" send={send} />
-            <PlanList b={b} noteKey="plan_creative" label="Creative block" placeholder="45 minutes on the flash sheet" send={send} />
-            <PlanList b={b} noteKey="plan_errands" label="Errands + life admin" placeholder="Return package, groceries" send={send} />
+            <PlanList b={b} noteKey="plan_content" label="Content to capture" placeholder="Coffee pour, sunset, outfit in the mirror" send={send} kind="content" when="pm" />
+            <PlanList b={b} noteKey="plan_creative" label="Creative block" placeholder="45 minutes on the flash sheet" send={send} kind="creative" />
+            <PlanList b={b} noteKey="plan_errands" label="Errands + life admin" placeholder="Return package, groceries" send={send} kind="errands" when="pm" />
           </section>
           <Quick b={b} send={send} show={['content']} />
         </>
@@ -387,8 +392,42 @@ function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id
   )
 }
 
-function PlanList({ b, noteKey, label, placeholder, send, date, suggestions }: {
-  b: Bundle; noteKey: string; label: string; placeholder: string; send: Send; date?: string; suggestions?: string[]
+function suggestCtx(b: Bundle): SuggestCtx {
+  const keptPieces = b.items.filter(i => i.kind === 'closet' && i.status === 'keep').map(i => String(i.data.name ?? '')).filter(Boolean)
+  const savedCombos = b.items.filter(i => i.kind === 'outfit_combo').map(i => String(i.data.text ?? '')).filter(Boolean)
+  const repeatOutfits = b.history
+    .filter(h => (h.stats?.outfit_rating ?? 0) >= 8 && h.notes?.outfit_fav)
+    .map(h => String(h.notes!.outfit_fav))
+  return { dateKey: b.dateKey, energy: b.day.energy, themeOptions: b.theme.options, keptPieces, savedCombos, repeatOutfits }
+}
+
+// Tappable ideas for a list. Refresh brings a different, still-logical set.
+function SuggestChips({ b, kind, when = 'any', exclude, onPick }: {
+  b: Bundle; kind: SuggestKind; when?: 'am' | 'pm' | 'any'; exclude: string[]; onPick: (t: string) => void
+}) {
+  const [seed, setSeed] = useState(0)
+  const list = useMemo(
+    () => suggestions(kind, suggestCtx(b), seed, exclude, 4, when),
+    [b, kind, seed, exclude, when],
+  )
+  if (list.length === 0) return null
+  return (
+    <div style={{ marginTop: 10 }}>
+      <span className={styles.time}>Ideas for you</span>
+      <div className={styles.rowWrap}>
+        {list.map(t => (
+          <button key={t} type="button" className={styles.tab}
+            style={{ whiteSpace: 'normal', textAlign: 'left', borderRadius: 16, lineHeight: 1.3, height: 'auto', padding: '10px 14px' }}
+            onClick={() => onPick(t)}>+ {t}</button>
+        ))}
+      </div>
+      <button type="button" className={styles.tab} style={{ marginTop: 8 }} onClick={() => setSeed(x => x + 1)}>Refresh ideas</button>
+    </div>
+  )
+}
+
+function PlanList({ b, noteKey, label, placeholder, send, date, kind, when }: {
+  b: Bundle; noteKey: string; label: string; placeholder: string; send: Send; date?: string; kind?: SuggestKind; when?: 'am' | 'pm' | 'any'
 }) {
   type Row = { t: string; d: boolean }
   const parse = (raw?: string): Row[] => { try { const v = JSON.parse(raw ?? '[]'); return Array.isArray(v) ? v : [] } catch { return [] } }
@@ -418,12 +457,9 @@ function PlanList({ b, noteKey, label, placeholder, send, date, suggestions }: {
           <button className={styles.tab} style={{ minHeight: 36, padding: '4px 10px' }} aria-label="Remove" onClick={() => save(rows.filter((_, k) => k !== i))}>✕</button>
         </div>
       ))}
-      {suggestions && suggestions.filter(x => !rows.some(r => r.t === x)).length > 0 && (
-        <div className={styles.rowWrap} style={{ marginTop: 8 }}>
-          {suggestions.filter(x => !rows.some(r => r.t === x)).map(x => (
-            <button key={x} className={styles.tab} onClick={() => save([...rows, { t: x, d: false }])}>+ {x}</button>
-          ))}
-        </div>
+      {kind && (
+        <SuggestChips b={b} kind={kind} when={when} exclude={rows.map(r => r.t)}
+          onPick={t => save([...rows, { t, d: false }])} />
       )}
       <div className={styles.row} style={{ marginTop: 6 }}>
         <input className={styles.input} value={text} placeholder={placeholder} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === 'Enter' && add()} />
@@ -597,9 +633,15 @@ function NightWrap({ b, send, mode }: { b: Bundle; send: Send; mode: 'tomorrow' 
           onBlur={() => send({ action: 'note', key: 'tomorrow_first_priority', value: first })} placeholder="The first thing at 9" />
         <span className={styles.time} style={{ marginTop: 12 }}>Top 3</span>
         {t.map((v, i) => (
-          <input key={i} className={styles.input} style={{ marginTop: 6 }} value={v} placeholder={['Work / money', 'Personal / life', 'Creative / growth'][i]}
-            onChange={e => { const n = [...t]; n[i] = e.target.value; setT(n) }}
-            onBlur={() => send({ action: 'top3', value: t.map(text => ({ text })) }, tomorrow)} />
+          <div key={i} style={{ marginTop: 8 }}>
+            <input className={styles.input} value={v} placeholder={['Work / money', 'Personal / life', 'Creative / growth'][i]}
+              onChange={e => { const n = [...t]; n[i] = e.target.value; setT(n) }}
+              onBlur={() => send({ action: 'top3', value: t.map(text => ({ text })) }, tomorrow)} />
+            {tb && !v.trim() && (
+              <SuggestChips b={tb} kind={(['top_work', 'top_life', 'top_create'] as SuggestKind[])[i]} exclude={t}
+                onPick={x => { const n = [...t]; n[i] = x; setT(n); send({ action: 'top3', value: n.map(text => ({ text })) }, tomorrow) }} />
+            )}
+          </div>
         ))}
       </section>
 
@@ -607,10 +649,10 @@ function NightWrap({ b, send, mode }: { b: Bundle; send: Send; mode: 'tomorrow' 
         <p className={styles.cardTitle}>Plan it now, check it off tomorrow</p>
         {tb ? (
           <>
-            <PlanList b={tb} date={tomorrow} noteKey="plan_outfit" label="Outfit" placeholder="What are you wearing?" send={send} />
-            <PlanList b={tb} date={tomorrow} noteKey="plan_content" label="Content to capture" placeholder="Shots you want tomorrow" send={send} />
-            <PlanList b={tb} date={tomorrow} noteKey="plan_creative" label="Creative block" placeholder="What are you making?" send={send} />
-            <PlanList b={tb} date={tomorrow} noteKey="plan_errands" label="Errands + life admin" placeholder="Anything to handle" send={send} />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_outfit" label="Outfit" placeholder="What are you wearing?" send={send} kind="outfit" />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_content" label="Content to capture" placeholder="Shots you want tomorrow" send={send} kind="content" when="am" />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_creative" label="Creative block" placeholder="What are you making?" send={send} kind="creative" />
+            <PlanList b={tb} date={tomorrow} noteKey="plan_errands" label="Errands + life admin" placeholder="Anything to handle" send={send} kind="errands" when="am" />
           </>
         ) : <p className={styles.sub}>Loading tomorrow…</p>}
         <p className={styles.note}>Also settle: {NIGHT_ASKS.slice(1).join(' · ')}</p>
