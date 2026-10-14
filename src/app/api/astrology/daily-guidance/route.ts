@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
-import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
+import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
 
@@ -229,12 +229,12 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
   "main_focus": "1-2 sentences: the single most important thing to put her energy toward today, and briefly why today's sky makes that the priority.",
   "highest_self": "5-6 sentences connecting her Human Design (Self-Projected Projector, 4/6) with her birth chart to guide her toward her highest state today. Speak to her role-model 6th line transition, her need for invitation not initiation, her clarity-through-speaking. Ground it in today's sky, and give her one concrete way to actually practice this today.",
   "affirmation": "One powerful affirmation written in first person, specific to today's energy. Not generic — written as if she is declaring it from her Scorpio Sun depth."
-}${LIFE_LANGUAGE_RULES}`
+}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
 
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance',
+      generationType: 'daily_guidance_v2',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

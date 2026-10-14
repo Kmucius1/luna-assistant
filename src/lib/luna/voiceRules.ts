@@ -30,3 +30,15 @@ Every single time you mention a planet, sign, or match between them, immediately
 
 BAD (jargon, eighth grader would not follow this): "The Moon in Capricorn opposes your natal Moon, and the Sun in Leo squares your natal Mercury (orb 2°)."
 GOOD (plain, eighth-grade level, still names the real placements): "Today's Moon in Capricorn is pulling against your own Moon, which can feel like you want to rest but also feel pressure to look responsible. At the same time, the Sun is creating a little friction with your Mercury — conversations might feel more charged than usual, so a comment that's usually no big deal might sting more today."`
+
+// Zoe is not in a romantic relationship with Kaleb. He is her DRYP business partner and a
+// close person in her life. Any romantic content must come from the real sky, not from an
+// assumed partner. Appended to every love/relationship-capable generator.
+export const ROMANTIC_ACCURACY_RULES = `
+ROMANCE ACCURACY RULES (mandatory, accuracy matters more than sounding nice):
+- Kaleb Mucius is Zoe's business partner at DRYP Digital and a close person in her life. He is NOT her boyfriend and they are NOT in a romantic relationship. Never call him her boyfriend, partner (in a romantic sense), or love interest, and never write romantic readings about him.
+- Do NOT assume Zoe has a romantic partner. Do not say "your partner", "your boyfriend", or "your relationship" as if there is one.
+- Only talk about romantic energy when the real sky supports it (Venus, Mars, the Moon, or the parts of her chart about romance and partnership being activated). When it does, say so plainly: for example "if you're seeing someone, or someone new shows up, this is a day you could feel unusually close or open."
+- When the sky shows little romantic activity, say so honestly: "a quiet day for romance, which is a good day to focus on yourself and your friendships." Do not manufacture romance to fill the space.
+- Business and friendship energy with Kaleb belongs under work or friendship, not love.
+`

@@ -2,7 +2,7 @@ import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
-import { LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
+import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey } from '@/lib/luna/today'
 
@@ -136,7 +136,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast',
+      generationType: 'weekly_forecast_v2',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -177,7 +177,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
       "intensity": 7
     }
   ]
-}${LIFE_LANGUAGE_RULES}`
+}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 6500)

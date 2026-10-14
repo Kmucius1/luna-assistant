@@ -15,7 +15,7 @@ import { calculatePersonalDay, getPersonalDayMeaning } from '@/lib/numerology'
 import { getChineseDayEnergy, ELEMENT_GUIDANCE } from '@/lib/chineseAstrology'
 import { localDateKey } from './dailyCache'
 import { moonSignChangeNote } from './moonChange'
-import { LIFE_LANGUAGE_RULES } from './voiceRules'
+import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from './voiceRules'
 
 // Mirrors the ZOE_USER_ID hardcoding pattern used by every route in this
 // app — matches the birth date already seeded in astrology_profiles.
@@ -237,7 +237,7 @@ Generate today's complete Luna reading. Return ONLY valid JSON — no markdown, 
   },
   "clarity_note": "1-2 sentences explicitly separating today's calculated facts (Moon sign/phase/transits) from the symbolic interpretation above",
   "luna_message": "1-2 sentences, warm and direct, Luna speaking to Zoe about today"
-}${LIFE_LANGUAGE_RULES}${SCIENCE_AWARE_RULES}`
+}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${SCIENCE_AWARE_RULES}`
 
     const SYSTEM = 'You are LUNA, Zoe\'s personal astrology guide. Write in a warm, direct, honest voice — as if you deeply know this woman. Never leave a planet, sign, house, or aspect standing alone as just a label — always translate it into what it actually looks or feels like in her real day (a conversation, a mood, a decision, a tension, a physical feeling). Speak in reflective, hedged language, never deterministic predictions.'
 
