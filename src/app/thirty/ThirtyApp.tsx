@@ -603,66 +603,98 @@ function Spiral({ onExit }: { onExit: () => void }) {
   )
 }
 
+// A saved list row that can be checked off. `done` lives on the item's data.
+function DoneRow({ it, send, children }: { it: Item; send: Send; children: React.ReactNode }) {
+  const done = it.data.done === true
+  return (
+    <div className={styles.check} onClick={() => send({ action: 'item_update', id: it.id, data: { done: !done } })}>
+      <div className={`${styles.box} ${done ? styles.boxOn : ''}`}>{done ? '✓' : ''}</div>
+      <div className={`${styles.checkText} ${done ? styles.checkDone : ''}`}>{children}</div>
+    </div>
+  )
+}
+
 // ---------------------------------------------------------------- WEEK
 
-function Week({ b, toggle, send }: { b: Bundle; toggle: Toggle; send: Send }) {
+function Week({ b, send }: { b: Bundle; toggle: Toggle; send: Send }) {
   const isSunday = new Date(b.dateKey + 'T12:00:00Z').getUTCDay() === 0
   const [ans, setAns] = useState<string[]>(WEEKLY_REFLECTION.map((_, i) => b.day.notes[`refl_${i}`] ?? ''))
+  const dateOf = (offset: number) => {
+    const [y, m, d] = b.week.start.split('-').map(Number)
+    return new Date(Date.UTC(y, m - 1, d + offset, 12)).toISOString().slice(0, 10)
+  }
   const week = [
     ['Monday', 'Create', 'Artist Zoe'], ['Tuesday', 'Closet + Money', 'Style / Sell / Finances'], ['Wednesday', 'Content + Brand', 'Content Zoe'],
     ['Thursday', 'Body + Beauty', 'Body / Beauty Zoe'], ['Friday', 'Social + Fun', 'Life Zoe'], ['Saturday', 'Explore + Create', 'Explore Zoe'], ['Sunday', 'Full Reset', 'Reset'],
   ]
   const fridays = b.items.filter(i => i.kind === 'social' && i.data.friday === true)
+  const dayDone = (date: string) => b.items.find(i => i.kind === 'day_done' && i.data.date === date)
+  const hobby = (cat: string) => b.items.find(i => i.kind === 'hobby' && i.data.category === cat && (i.date_key ?? '') >= b.week.start && (i.date_key ?? '') <= b.week.end)
+  const reset = (idx: number) => b.items.find(i => i.kind === 'reset' && i.data.week === b.week.start && i.data.idx === idx)
+  const resetDone = SUNDAY_RESET.filter((_, i) => reset(i)).length
   return (
     <>
       <section className={styles.card}>
-        <p className={styles.cardTitle}>Weekly rotation</p>
-        {week.map(([d, n, blk]) => (
-          <div key={d} className={styles.item}><b>{d}</b> · {n}<span className={styles.time}>{blk}</span></div>
-        ))}
+        <p className={styles.cardTitle}>This week’s main blocks</p>
+        {week.map(([d, n, blk], i) => {
+          const date = dateOf(i)
+          const it = dayDone(date)
+          return (
+            <div key={d} className={styles.check} onClick={() => it
+              ? send({ action: 'item_delete', id: it.id })
+              : send({ action: 'item_add', kind: 'day_done', data: { date } }, date)}>
+              <div className={`${styles.box} ${it ? styles.boxOn : ''}`}>{it ? '✓' : ''}</div>
+              <div className={`${styles.checkText} ${it ? styles.checkDone : ''}`}>
+                <b>{d}</b> · {n}<span className={styles.time}>{blk}{date === b.dateKey ? ' · today' : ''}</span>
+              </div>
+            </div>
+          )
+        })}
         {fridays[0] && <p className={styles.note}>Friday plan: {String(fridays[0].data.plan ?? '')}</p>}
       </section>
 
       <section className={styles.card}>
         <p className={styles.cardTitle}>This week’s balance</p>
-        {HOBBY_CATEGORIES.map(h => (
-          <div key={h.id} className={styles.check} onClick={() => {
-            if (!b.weekHits[h.id]) send({ action: 'item_add', kind: 'hobby', data: { category: h.id } })
-          }}>
-            <div className={`${styles.box} ${b.weekHits[h.id] ? styles.boxOn : ''}`}>{b.weekHits[h.id] ? '✓' : ''}</div>
-            <div className={styles.checkText}>{h.label}<span className={styles.time}>{h.ideas}</span></div>
-          </div>
-        ))}
-        <p className={styles.note}>Tap a category when you’ve done it this week.</p>
-      </section>
-
-      <section className={styles.card}>
-        <p className={styles.cardTitle}>Sunday reset{isSunday ? ' · today' : ''}</p>
-        {SUNDAY_RESET.map((t, i) => {
-          const id = `reset_${i}`
-          const on = !!b.day.checks[id]
+        {HOBBY_CATEGORIES.map(h => {
+          const hit = hobby(h.id)
           return (
-            <div key={id} className={styles.check} onClick={() => isSunday && toggle(id, !on)} style={{ opacity: isSunday ? 1 : 0.6 }}>
-              <div className={`${styles.box} ${on ? styles.boxOn : ''}`}>{on ? '✓' : ''}</div>
-              <div className={`${styles.checkText} ${on ? styles.checkDone : ''}`}>{t}</div>
+            <div key={h.id} className={styles.check} onClick={() => hit
+              ? send({ action: 'item_delete', id: hit.id })
+              : send({ action: 'item_add', kind: 'hobby', data: { category: h.id } })}>
+              <div className={`${styles.box} ${hit ? styles.boxOn : ''}`}>{hit ? '✓' : ''}</div>
+              <div className={`${styles.checkText} ${hit ? styles.checkDone : ''}`}>{h.label}<span className={styles.time}>{h.ideas}</span></div>
             </div>
           )
         })}
-        {!isSunday && <p className={styles.note}>This checklist unlocks on Sunday.</p>}
+        <p className={styles.note}>Tap to check off when you’ve done it. Tap again to undo.</p>
       </section>
 
-      {isSunday && (
-        <section className={styles.card}>
-          <p className={styles.cardTitle}>Weekly reflection</p>
-          {WEEKLY_REFLECTION.map((q, i) => (
-            <div key={q} style={{ marginTop: i ? 10 : 0 }}>
-              <span className={styles.time}>{q}</span>
-              <input className={styles.input} value={ans[i]} onChange={e => { const n = [...ans]; n[i] = e.target.value; setAns(n) }}
-                onBlur={() => send({ action: 'note', key: `refl_${i}`, value: ans[i] })} />
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Sunday reset · {resetDone}/{SUNDAY_RESET.length}{isSunday ? ' · today' : ''}</p>
+        {SUNDAY_RESET.map((t, i) => {
+          const it = reset(i)
+          return (
+            <div key={t} className={styles.check} onClick={() => it
+              ? send({ action: 'item_delete', id: it.id })
+              : send({ action: 'item_add', kind: 'reset', data: { week: b.week.start, idx: i } })}>
+              <div className={`${styles.box} ${it ? styles.boxOn : ''}`}>{it ? '✓' : ''}</div>
+              <div className={`${styles.checkText} ${it ? styles.checkDone : ''}`}>{t}</div>
             </div>
-          ))}
-        </section>
-      )}
+          )
+        })}
+        <p className={styles.note}>Check things off any day this week. It starts fresh each week.</p>
+      </section>
+
+      <section className={styles.card}>
+        <p className={styles.cardTitle}>Weekly reflection</p>
+        {WEEKLY_REFLECTION.map((q, i) => (
+          <div key={q} style={{ marginTop: i ? 10 : 0 }}>
+            <span className={styles.time}>{q}</span>
+            <input className={styles.input} value={ans[i]} onChange={e => { const n = [...ans]; n[i] = e.target.value; setAns(n) }}
+              onBlur={() => send({ action: 'note', key: `refl_${i}`, value: ans[i] }, b.week.end)} />
+          </div>
+        ))}
+      </section>
     </>
   )
 }
@@ -673,10 +705,58 @@ const CLOSET_FLOW: { id: string; label: string }[] = [
   { id: 'keep', label: 'Keep' }, { id: 'sell', label: 'Sell' }, { id: 'donate', label: 'Donate' }, { id: 'maybe', label: 'Maybe' },
 ]
 
+// Shrinks a camera/library photo to a small JPEG so it stays light to store and load.
+async function shrinkImage(file: File, max = 720, quality = 0.72): Promise<string> {
+  const url = URL.createObjectURL(file)
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image()
+      i.onload = () => res(i)
+      i.onerror = () => rej(new Error('image'))
+      i.src = url
+    })
+    const scale = Math.min(1, max / Math.max(img.width, img.height))
+    const c = document.createElement('canvas')
+    c.width = Math.round(img.width * scale)
+    c.height = Math.round(img.height * scale)
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height)
+    return c.toDataURL('image/jpeg', quality)
+  } finally { URL.revokeObjectURL(url) }
+}
+
 function Closet({ b, send }: { b: Bundle; send: Send }) {
   const [name, setName] = useState('')
   const [price, setPrice] = useState<Record<string, string>>({})
   const items = b.items.filter(i => i.kind === 'closet')
+  const [busy, setBusy] = useState(false)
+  const [photoMsg, setPhotoMsg] = useState('')
+  const addPhotos = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setBusy(true); setPhotoMsg('')
+    let ok = 0
+    for (const f of Array.from(files).slice(0, 12)) {
+      try {
+        const photo = await shrinkImage(f)
+        const r = await fetch('/api/thirty', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'item_add', kind: 'closet', status: 'maybe', data: { name: name.trim() || 'New piece', photo } }),
+        })
+        if (r.ok) ok++
+      } catch { /* skip this one */ }
+    }
+    setName('')
+    setBusy(false)
+    setPhotoMsg(ok ? `Added ${ok} piece${ok === 1 ? '' : 's'} with photos.` : 'Could not add that photo. Try again.')
+    await send({ action: 'noop' }).catch(() => {})
+  }
+  const addPhotoTo = async (id: string, file: File | undefined) => {
+    if (!file) return
+    setBusy(true)
+    try {
+      const photo = await shrinkImage(file)
+      await send({ action: 'item_photo', id, photo })
+    } finally { setBusy(false) }
+  }
   const add = () => {
     if (!name.trim()) return
     send({ action: 'item_add', kind: 'closet', status: 'maybe', data: { name: name.trim() } })
@@ -701,6 +781,19 @@ function Closet({ b, send }: { b: Bundle; send: Send }) {
             onKeyDown={e => e.key === 'Enter' && add()} />
           <button className={styles.btn} onClick={add}>Add</button>
         </div>
+        <div className={styles.rowWrap} style={{ marginTop: 12 }}>
+          <label className={`${styles.btn} ${styles.btnQuiet}`} style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+            Take photo
+            <input type="file" accept="image/*" capture="environment" hidden disabled={busy}
+              onChange={e => { addPhotos(e.target.files); e.target.value = '' }} />
+          </label>
+          <label className={`${styles.btn} ${styles.btnQuiet}`} style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer' }}>
+            Upload photos
+            <input type="file" accept="image/*" multiple hidden disabled={busy}
+              onChange={e => { addPhotos(e.target.files); e.target.value = '' }} />
+          </label>
+        </div>
+        <p className={styles.note}>{busy ? 'Saving photos…' : photoMsg || 'Add a name first if you like, or just snap the photo. Pick several to add a batch.'}</p>
       </section>
       <section className={styles.card}>
         <p className={styles.cardTitle}>{items.length ? 'Your pieces' : 'Nothing sorted yet'}</p>
@@ -708,10 +801,20 @@ function Closet({ b, send }: { b: Bundle; send: Send }) {
           const st = it.status ?? 'maybe'
           return (
             <div key={it.id} className={styles.item}>
-              <div className={styles.row} style={{ justifyContent: 'space-between' }}>
-                <b>{String(it.data.name ?? 'Piece')}</b><span className={styles.pill}>{st}{st === 'sold' && it.amount ? ` · ${usd(Number(it.amount))}` : ''}</span>
+              <div className={styles.row} style={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                {it.data.hasPhoto === true && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={`/api/thirty/photo?id=${it.id}`} alt={String(it.data.name ?? 'Piece')}
+                    style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 14, flex: 'none' }} />
+                )}
+                <b style={{ flex: 1 }}>{String(it.data.name ?? 'Piece')}</b><span className={styles.pill}>{st}{st === 'sold' && it.amount ? ` · ${usd(Number(it.amount))}` : ''}</span>
               </div>
               <div className={styles.rowWrap} style={{ marginTop: 8 }}>
+                <label className={styles.tab} style={{ cursor: 'pointer' }}>
+                  {it.data.hasPhoto === true ? 'New photo' : 'Add photo'}
+                  <input type="file" accept="image/*" capture="environment" hidden
+                    onChange={e => { addPhotoTo(it.id, e.target.files?.[0]); e.target.value = '' }} />
+                </label>
                 {CLOSET_FLOW.map(f => (
                   <button key={f.id} className={`${styles.tab} ${st === f.id ? styles.tabOn : ''}`}
                     onClick={() => send({ action: 'item_update', id: it.id, status: f.id })}>{f.label}</button>
@@ -774,7 +877,7 @@ function Style({ b, send }: { b: Bundle; send: Send }) {
           <input className={styles.input} value={combo} onChange={e => setCombo(e.target.value)} placeholder="Cream knit + black trousers + gold hoops" />
           <button className={styles.btn} onClick={() => { if (combo.trim()) { send({ action: 'item_add', kind: 'outfit_combo', data: { text: combo.trim() } }); setCombo('') } }}>Save</button>
         </div>
-        {combos.map(c => <div key={c.id} className={styles.item}>{String(c.data.text)}</div>)}
+        {combos.map(c => <DoneRow key={c.id} it={c} send={send}>{String(c.data.text)}</DoneRow>)}
       </section>
       <section className={styles.card}>
         <p className={styles.cardTitle}>Words for my evolving style</p>
@@ -811,7 +914,7 @@ function Content({ b, send }: { b: Bundle; send: Send }) {
           <input className={styles.input} value={idea} onChange={e => setIdea(e.target.value)} placeholder="Hook, series, shot idea" />
           <button className={styles.btn} onClick={() => { if (idea.trim()) { send({ action: 'item_add', kind: 'content_idea', data: { text: idea.trim() } }); send({ action: 'stat', key: 'ideas', delta: 1 }); setIdea('') } }}>Save</button>
         </div>
-        {ideas.map(i => <div key={i.id} className={styles.item}>{String(i.data.text)}</div>)}
+        {ideas.map(i => <DoneRow key={i.id} it={i} send={send}>{String(i.data.text)}</DoneRow>)}
       </section>
     </>
   )
@@ -863,13 +966,15 @@ function Money({ b, send }: { b: Bundle; send: Send }) {
           <input className={styles.input} value={note} onChange={e => setNote(e.target.value)} placeholder="Night shots came out grainy" />
           <button className={styles.btn} onClick={() => { if (note.trim()) { send({ action: 'item_add', kind: 'camera_note', data: { text: note.trim() } }); setNote('') } }}>Save</button>
         </div>
-        {notes.map(n => <div key={n.id} className={styles.item}>{String(n.data.text)}</div>)}
+        {notes.map(n => <DoneRow key={n.id} it={n} send={send}>{String(n.data.text)}</DoneRow>)}
       </section>
     </>
   )
 }
 
 // ---------------------------------------------------------------- HOME
+
+const ZONE_TASKS = ['Declutter', 'Clear and clean surfaces', 'Put everything back where it belongs', 'Fresh linens or towels', 'Scent and lighting', 'Release anything that feels like old energy']
 
 function Home({ b, toggle, send }: { b: Bundle; toggle: Toggle; send: Send }) {
   const [t, setT] = useState('')
@@ -884,6 +989,20 @@ function Home({ b, toggle, send }: { b: Bundle; toggle: Toggle; send: Send }) {
         <p className={styles.note}>Declutter · clean surfaces · fresh sheets · clothes put away · good scent · good lighting · release anything that feels like old energy.</p>
       </section>
       <section className={styles.card}>
+        <p className={styles.cardTitle}>{b.home.zone} checklist</p>
+        {ZONE_TASKS.map((t, i) => {
+          const it = b.items.find(x => x.kind === 'home_task' && x.data.week === b.home.week && x.data.idx === i)
+          return (
+            <div key={t} className={styles.check} onClick={() => it
+              ? send({ action: 'item_delete', id: it.id })
+              : send({ action: 'item_add', kind: 'home_task', data: { week: b.home.week, idx: i } })}>
+              <div className={`${styles.box} ${it ? styles.boxOn : ''}`}>{it ? '✓' : ''}</div>
+              <div className={`${styles.checkText} ${it ? styles.checkDone : ''}`}>{t}</div>
+            </div>
+          )
+        })}
+      </section>
+      <section className={styles.card}>
         <p className={styles.cardTitle}>Daily 10–20 minute reset</p>
         <div className={styles.check} onClick={() => toggle('home_reset', !on)}>
           <div className={`${styles.box} ${on ? styles.boxOn : ''}`}>{on ? '✓' : ''}</div>
@@ -896,7 +1015,7 @@ function Home({ b, toggle, send }: { b: Bundle; toggle: Toggle; send: Send }) {
           <input className={styles.input} value={t} onChange={e => setT(e.target.value)} placeholder="Cleared nightstand, new sheets" />
           <button className={styles.btn} onClick={() => { if (t.trim()) { send({ action: 'item_add', kind: 'home', data: { text: t.trim(), zone: b.home.zone } }); setT('') } }}>Log</button>
         </div>
-        {logs.slice(0, 15).map(l => <div key={l.id} className={styles.item}>{String(l.data.text)}<span className={styles.time}>{l.date_key} · {String(l.data.zone ?? '')}</span></div>)}
+        {logs.slice(0, 15).map(l => <DoneRow key={l.id} it={l} send={send}>{String(l.data.text)}<span className={styles.time}>{l.date_key} · {String(l.data.zone ?? '')}</span></DoneRow>)}
       </section>
     </>
   )
@@ -934,11 +1053,9 @@ function Brand({ b, send }: { b: Bundle; send: Send }) {
           <section key={k.id} className={styles.card}>
             <p className={styles.cardTitle}>{k.label}</p>
             {list.map(i => (
-              <div key={i.id} className={styles.item}>
-                <div className={styles.row} style={{ justifyContent: 'space-between' }}>
-                  <span>{String(i.data.text)}</span>
-                  <button className={`${styles.tab}`} onClick={() => send({ action: 'item_delete', id: i.id })}>Remove</button>
-                </div>
+              <div key={i.id} className={styles.row} style={{ justifyContent: 'space-between' }}>
+                <div style={{ flex: 1 }}><DoneRow it={i} send={send}>{String(i.data.text)}</DoneRow></div>
+                <button className={`${styles.tab}`} onClick={() => send({ action: 'item_delete', id: i.id })}>Remove</button>
               </div>
             ))}
           </section>

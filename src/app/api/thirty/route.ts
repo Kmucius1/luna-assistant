@@ -109,7 +109,12 @@ export async function GET(req: NextRequest) {
     carryover, tomorrowFirst,
     progress: computeProgress(days),
     history: days.map(d => ({ date_key: d.date_key, energy: d.energy, checks: d.checks, stats: d.stats, notes: d.notes })),
-    items, closet,
+    // Photos are served by /api/thirty/photo; keep them out of the list payload.
+    items: items.map(i => {
+      const { photo, ...rest } = i.data as Record<string, unknown>
+      return { ...i, data: { ...rest, hasPhoto: typeof photo === 'string' && photo.length > 0 } }
+    }),
+    closet,
     funds: { camera, upgrade, cameraTarget: program!.camera_target },
     weekHits: weekHits(items, wk.start, wk.end), week: wk,
     home: homeZone(n),
@@ -153,6 +158,8 @@ export async function POST(req: NextRequest) {
       const checks = merge('checks'); if (body.value) checks[id] = true; else delete checks[id]
       res = await upsertDay(db, userId, dateKey, { checks }); break
     }
+    case 'noop':
+      break
     case 'skip': {
       const id = String(body.id ?? '').slice(0, 60)
       if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
@@ -192,18 +199,40 @@ export async function POST(req: NextRequest) {
     case 'item_add': {
       const kind = String(body.kind ?? '').slice(0, 30)
       if (!kind) return NextResponse.json({ error: 'kind required' }, { status: 400 })
+      const addData = (typeof body.data === 'object' && body.data ? body.data : {}) as Record<string, unknown>
+      if (typeof addData.photo === 'string' && (!/^data:image\/(jpeg|png|webp);base64,/.test(addData.photo) || addData.photo.length > 600_000)) {
+        return NextResponse.json({ error: 'bad photo' }, { status: 400 })
+      }
       res = await db.from('luna_30d_items').insert({
         user_id: userId, kind, status: body.status ? String(body.status).slice(0, 30) : null,
         amount: typeof body.amount === 'number' ? body.amount : null,
-        data: typeof body.data === 'object' && body.data ? body.data : {}, date_key: dateKey,
+        data: addData, date_key: dateKey,
       }); break
+    }
+    case 'item_photo': {
+      const id = String(body.id ?? '')
+      const photo = String(body.photo ?? '')
+      if (!/^data:image\/(jpeg|png|webp);base64,/.test(photo) || photo.length > 600_000) {
+        return NextResponse.json({ error: 'bad photo' }, { status: 400 })
+      }
+      const cur = await db.from('luna_30d_items').select('data, status').eq('id', id).eq('user_id', userId).maybeSingle()
+      if (!cur.data) return NextResponse.json({ error: 'not found' }, { status: 404 })
+      const patch: Record<string, unknown> = { data: { ...(cur.data.data as object), photo }, updated_at: new Date().toISOString() }
+      if (cur.data.status === 'sell') patch.status = 'photographed'
+      res = await db.from('luna_30d_items').update(patch).eq('id', id).eq('user_id', userId); break
     }
     case 'item_update': {
       const id = String(body.id ?? '')
       const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
       if (body.status !== undefined) patch.status = body.status ? String(body.status).slice(0, 30) : null
       if (typeof body.amount === 'number') patch.amount = body.amount
-      if (typeof body.data === 'object' && body.data) patch.data = body.data
+      if (typeof body.data === 'object' && body.data) {
+        // Merge, so toggling a flag never wipes the rest of the row (e.g. a photo).
+        const { photo: _ignored, ...incoming } = body.data as Record<string, unknown>
+        void _ignored
+        const cur = await db.from('luna_30d_items').select('data').eq('id', id).eq('user_id', userId).maybeSingle()
+        patch.data = { ...((cur.data?.data as object) ?? {}), ...incoming }
+      }
       res = await db.from('luna_30d_items').update(patch).eq('id', id).eq('user_id', userId); break
     }
     case 'item_delete': {
