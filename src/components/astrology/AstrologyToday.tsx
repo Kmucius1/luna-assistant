@@ -43,6 +43,9 @@ interface TransitData {
 }
 
 interface DailyGuidance {
+  in_plain_words?: string
+  transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
+  real_advice?: { situation: string; do: string }[]
   horoscope: string; energy: string; do_today: string[]; dont_today: string[]
   career: string; love: string; sex: string; money: string; friendship: string; family: string
   self_reflection: string; main_focus: string; highest_self: string; affirmation: string
@@ -83,7 +86,18 @@ export function AstrologyToday() {
     const localDate = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date())
     const localTime = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
     fetch(`/api/astrology/daily-guidance?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(localDate)}&time=${encodeURIComponent(localTime)}`)
-      .then(r => r.json()).then(setGuidance).catch(() => {})
+      .then(r => r.json())
+      .then((g: DailyGuidance) => {
+        setGuidance(g)
+        // Readings cached before the plain-words format existed get one fresh rewrite.
+        let tried = false
+        try { tried = sessionStorage.getItem('luna-reading-upgraded') === localDate; sessionStorage.setItem('luna-reading-upgraded', localDate) } catch { /* ignore */ }
+        if (g && !g.in_plain_words && !('error' in g) && !tried) {
+          fetch(`/api/astrology/daily-guidance?refresh=1&tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(localDate)}&time=${encodeURIComponent(localTime)}`)
+            .then(r => r.json()).then((fresh: DailyGuidance) => { if (fresh?.horoscope) setGuidance(fresh) }).catch(() => {})
+        }
+      })
+      .catch(() => {})
   }, [])
 
   const topTransit = transits?.aspects?.[0]
@@ -109,7 +123,36 @@ export function AstrologyToday() {
         {guidance ? (
           <>
             <p className={styles.themeQuote}>{guidance.affirmation.replace(/\.$/, '')}</p>
-            <p className={styles.themeBody}>{guidance.horoscope}</p>
+            {guidance.in_plain_words && (
+              <>
+                <div className={styles.themeEnergyLabel}>Today In Plain Words</div>
+                <p className={styles.themeBody} style={{ fontWeight: 500 }}>{guidance.in_plain_words}</p>
+              </>
+            )}
+            <p className={styles.themeBody} style={{ whiteSpace: 'pre-line' }}>{guidance.horoscope}</p>
+            {guidance.transit_breakdown && guidance.transit_breakdown.length > 0 && (
+              <>
+                <div className={styles.themeEnergyLabel}>What’s Going On In The Sky</div>
+                {guidance.transit_breakdown.map((t, i) => (
+                  <div key={i} style={{ margin: '10px 0 14px' }}>
+                    <p className={styles.themeBody} style={{ fontWeight: 600, margin: 0 }}>{t.sky}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What it feels like:</strong> {t.feels_like}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What to do:</strong> {t.what_to_do}</p>
+                  </div>
+                ))}
+              </>
+            )}
+            {guidance.real_advice && guidance.real_advice.length > 0 && (
+              <>
+                <div className={styles.themeEnergyLabel}>Real Advice For Today</div>
+                {guidance.real_advice.map((a, i) => (
+                  <div key={i} style={{ margin: '10px 0 14px' }}>
+                    <p className={styles.themeBody} style={{ fontWeight: 600, margin: 0 }}>{a.situation}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}>{a.do}</p>
+                  </div>
+                ))}
+              </>
+            )}
             <div className={styles.themeEnergyLabel}>How Today Feels</div>
             <p className={styles.themeEnergyBody}>{guidance.energy}</p>
           </>

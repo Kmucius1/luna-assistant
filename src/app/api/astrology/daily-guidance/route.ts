@@ -95,7 +95,21 @@ function buildFallback(planets: PlanetPosition[], transits: TransitAspect[], dat
   }
 }
 
+export interface TransitBreakdown {
+  sky:        string  // what the sky is doing, in plain words
+  feels_like: string  // what that will actually feel/look like in her day
+  what_to_do: string  // the concrete move to make about it
+}
+
+export interface RealAdvice {
+  situation: string   // "If a client pushes back on a price…"
+  do:        string   // the exact thing to do or say
+}
+
 export interface DailyGuidance {
+  in_plain_words?:     string          // 3-4 short sentences, the whole day in everyday language
+  transit_breakdown?:  TransitBreakdown[]
+  real_advice?:        RealAdvice[]
   horoscope:       string
   energy:          string
   do_today:        string[]
@@ -183,9 +197,24 @@ Profile: 4/6 — Opportunist / Role Model
 - She does NOT like to type — she is voice-first and intuitive. She processes through speaking.
 - She is deeply relational, spiritually aware, and results-driven but needs to follow her energy, not grind.
 
+ADVICE QUALITY RULES (mandatory):
+- Explain, do not just describe. After every sky detail say "which means..." and then say what to do.
+- transit_breakdown: exactly 3 items, one for each of the 3 strongest transits listed above, in order. Do not invent transits that are not listed.
+- real_advice: exactly 5 items. Each is a specific situation + the exact thing to do or say. Cover work/money, relationships, her body and energy, content/creative, and one for if the day goes sideways.
+- The horoscope string must have three short paragraphs separated by a blank line (\n\n): Morning, Midday, Evening. Start each with that word and a colon.
+- Be direct and kind. Say the real thing, including a hard truth if the sky points to one. No filler, no repeating the same idea in different words, no fortune-cookie lines.
+- Everything must be grounded in the sky, transits and Human Design data above. Never invent events that will happen to her.
+
 Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdown, no prose outside the JSON. The JSON must exactly match this schema:
 
 {
+  "in_plain_words": "3-4 SHORT sentences, written like a smart best friend talking. What kind of day is this, why, and what is the single best move? Zero astrology vocabulary she would have to look up. If you must name a planet, say right away what it means for her day.",
+  "transit_breakdown": [
+    { "sky": "What the sky is doing, in plain words (e.g. 'Mercury is lining up with your Sun')", "feels_like": "What that will actually feel or look like in her real day, in 2 sentences, with a specific example (a conversation, a mood, a decision, a body feeling).", "what_to_do": "The concrete move: one clear thing to do about it, 1-2 sentences." }
+  ],
+  "real_advice": [
+    { "situation": "A realistic situation that could come up today for HER (client, content, money, relationship, energy, body)", "do": "The exact thing to do or say. Give actual wording she could use when it helps, e.g. 'Tell them: I'll get back to you by 3.' No vague advice like 'trust the process'." }
+  ],
   "horoscope": "8-10 sentence personalized daily horoscope — the main thing she reads, and it should feel like a genuinely full read, not a summary. Walk through the day in real terms: how the morning might feel, what could come up midday, and what the evening might ask of her. Reference current planets and transits by name, but every single one must be immediately translated into what it actually looks or feels like in her real day: a kind of conversation, a mood, a tension, a decision, a physical feeling. Never leave a planet/sign/aspect standing alone as just a label — see the PLAIN-ENGLISH LIFE RULE below.",
   "energy": "3-4 sentences: what the day's energy FEELS like in her body and emotional field right now, and how that might shift from morning to evening. Visceral, honest, specific — not just a mood word, but where she might feel it physically and what it might make her want to do.",
   "do_today": ["6 specific practical things she should actually do today — personal, actionable, grounded in her life and today's transits. Each one should be a full sentence explaining not just what to do but why today's sky makes it worth doing. If you reference a placement (like her North Node or a house), explain in plain words what to actually pay attention to — never just name the placement and stop there."],
@@ -219,7 +248,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
             'highest_self','affirmation',
           ]
 
-          let raw = await callAI(SYSTEM, userPrompt, 3600)
+          let raw = await callAI(SYSTEM, userPrompt, 6000)
           let lastError = ''
           for (let attempt = 0; attempt < 2; attempt++) {
             try {
@@ -232,7 +261,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
               lastError = e instanceof Error ? e.message : 'invalid JSON'
             }
             if (attempt === 0) {
-              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 3600)
+              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 6000)
             }
           }
           throw new Error(lastError)
