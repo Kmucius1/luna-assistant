@@ -5,6 +5,7 @@ import { Plus, ChevronLeft } from 'lucide-react'
 
 import { getSavedPeople, addSavedPerson, updateSavedPerson, type SavedPerson } from '@/lib/luna/savedPeople'
 import { BIRTH_ZONES } from '@/lib/luna/birthTime'
+import { KALEB_KNOWN } from '@/lib/luna/knownPeople'
 import { plainAspectPhrase } from '@/lib/astrology'
 import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyConnections.module.css'
@@ -102,7 +103,7 @@ export function AstrologyConnections() {
     try {
       const res = await fetch('/api/astrology/connection-day', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: person.name, relationship: person.relationship, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, day: iso, refresh }),
+        body: JSON.stringify({ name: person.name, relationship: person.relationship, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, knownMoonSign: person.knownMoonSign, day: iso, refresh }),
       })
       if (!res.ok) throw new Error()
       setDayReading(await res.json())
@@ -117,7 +118,7 @@ export function AstrologyConnections() {
     setOutlook(null)
     fetch('/api/astrology/connection-outlook', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: person.name, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, days: 30 }),
+      body: JSON.stringify({ name: person.name, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, knownMoonSign: person.knownMoonSign, days: 30 }),
     }).then(r => (r.ok ? r.json() : null)).then(d => { if (d) setOutlook(d) }).catch(() => {})
     loadDay(person, dayChips()[0].iso)
     try {
@@ -170,7 +171,7 @@ export function AstrologyConnections() {
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <div className={styles.avatar} style={{ margin: '0 auto 8px', width: 52, height: 52, fontSize: 18 }}>{activePerson.name[0]}</div>
           <strong style={{ fontSize: 15, color: 'var(--astro-text)' }}>{activePerson.name}</strong>
-          <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}{activePerson.birthTime ? ` at ${activePerson.birthTime}` : ' (time unknown)'}</p>
+          <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}{activePerson.birthTimeRange ? `, between ${activePerson.birthTimeRange}` : activePerson.birthTime ? ` at ${activePerson.birthTime}` : ' (time unknown)'}{activePerson.birthLocation ? ` · ${activePerson.birthLocation}` : ''}</p>
           {activePerson.birthTime && (
             <label style={{ display: 'block', fontSize: 11.5, color: 'var(--astro-muted)', marginTop: 6 }}>
               Birth time zone:{' '}
@@ -361,6 +362,26 @@ export function AstrologyConnections() {
   return (
     <>
       <AstrologyHero image="/images/astrology/connections.jpg" label="Connections" title="Compatibility & Synastry" subtitle="See how your chart moves with the people in your life." />
+
+      {(() => {
+        const existing = people.find(p => /kaleb/i.test(p.name))
+        const needs = !existing || !existing.birthTimeRange || !existing.birthTimezone || existing.birthDate !== KALEB_KNOWN.birthDate
+        if (!needs) return null
+        return (
+          <div className={styles.dayCard} style={{ marginTop: 0, marginBottom: 12 }}>
+            <p className={styles.dayTitle}>Details you gave me for Kaleb</p>
+            <p className={styles.dayBody}>
+              Born Sept 16, 2000, between 3:06 and 4:30 PM (the Moon enters Taurus at 3:06, matching your Taurus Moon), Long Island, NY.
+              His Rising is Capricorn across that whole window.
+            </p>
+            <button type="button" className={styles.saveButton} onClick={() => {
+              if (existing) updateSavedPerson(existing.id, { ...KALEB_KNOWN })
+              else addSavedPerson({ ...KALEB_KNOWN })
+              setPeople(getSavedPeople())
+            }}>{existing ? 'Update Kaleb with these details' : 'Add Kaleb with these details'}</button>
+          </div>
+        )
+      })()}
 
       {people.length === 0 ? (
         <div className={styles.emptyState}>

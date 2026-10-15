@@ -10,6 +10,10 @@ export interface SavedPerson {
   birthLocation?: string
   /** IANA zone the birth time was recorded in. Missing = Eastern, the app's assumption. */
   birthTimezone?: string
+  /** Display only: the window she knows, e.g. '3:06–4:30 PM'. `birthTime` holds its midpoint. */
+  birthTimeRange?: string
+  /** A Moon sign she is sure of; used to confirm the calculated Moon instead of flagging it uncertain. */
+  knownMoonSign?: string
   timeAccuracy: 'exact' | 'approximate' | 'unknown'
 }
 

@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic'
 // that day, compared against THEIR chart and HERS, scored deterministically, then
 // explained in plain language. The ratings come from real aspects, not the AI.
 
-interface Body { birthTimezone?: string; name: string; relationship: string; birthDate: string; birthTime?: string; day?: string; refresh?: boolean }
+interface Body { knownMoonSign?: string; birthTimezone?: string; name: string; relationship: string; birthDate: string; birthTime?: string; day?: string; refresh?: boolean }
 
 export async function POST(req: NextRequest) {
   let body: Body
@@ -79,7 +79,9 @@ export async function POST(req: NextRequest) {
   // Their Moon moves ~13 degrees a day, so without a confirmed birth time it can
   // sit in the wrong sign. Say so instead of presenting it as certain.
   const tm = theirNatal.Moon
-  const moonUncertain = !body.birthTime || (tm && (tm.degree <= 3 || tm.degree >= 27))
+  const moonConfirmed = !!body.knownMoonSign && !!tm && tm.sign.toLowerCase() === body.knownMoonSign.toLowerCase()
+  const moonMismatch = !!body.knownMoonSign && !!tm && !moonConfirmed
+  const moonUncertain = !moonConfirmed && (moonMismatch || !body.birthTime || (tm && (tm.degree <= 3 || tm.degree >= 27)))
 
   const style = (p: string) => {
     const s = theirNatal[p]?.sign
@@ -92,7 +94,7 @@ export async function POST(req: NextRequest) {
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.birthTimezone ?? 'ny'}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_v8_${cacheId}`,
+    generationType: `connection_day_v9_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {
@@ -161,6 +163,7 @@ RULES:
     ratings,
     bestDay: { day: bestDay.day, label: bestDay.label },
     moonUncertain,
+    moonConfirmed,
     mercuryRetrograde: mercuryRetro,
     connections: hits.slice(0, 6).map(h => ({
       text: `${h.transiting} is ${plainAspectPhrase(h.type)} ${h.chart === 'theirs' ? `${body.name}'s` : 'your'} ${h.point}`,

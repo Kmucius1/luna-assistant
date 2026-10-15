@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 // talk, and which days call for care. Fully calculated, no AI, so it is fast and
 // never contradicts the daily readings (they use the same scoring).
 
-interface Body { birthTimezone?: string; name: string; birthDate: string; birthTime?: string; days?: number }
+interface Body { knownMoonSign?: string; birthTimezone?: string; name: string; birthDate: string; birthTime?: string; days?: number }
 
 const LVL: Record<string, number> = { great: 2, good: 1, neutral: 0, careful: -2 }
 
@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
     .sort((a, b) => a.iso.localeCompare(b.iso))
 
   const moonDeg = theirNatal.Moon ? theirNatal.Moon.lon % 30 : 15
-  const moonUncertain = !body.birthTime || moonDeg <= 3 || moonDeg >= 27
+  const moonConfirmed = !!body.knownMoonSign && !!theirNatal.Moon && theirNatal.Moon.sign.toLowerCase() === body.knownMoonSign.toLowerCase()
+  const moonUncertain = !moonConfirmed && (!body.birthTime || moonDeg <= 3 || moonDeg >= 27)
 
   return NextResponse.json({
     name: body.name,

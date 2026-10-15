@@ -290,7 +290,7 @@ export default function ForecastsPage() {
       try {
         const r = await fetch('/api/astrology/connection-day', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: kaleb.name, relationship: kaleb.relationship, birthDate: kaleb.birthDate, birthTime: kaleb.birthTime, birthTimezone: kaleb.birthTimezone, day: day.iso }),
+          body: JSON.stringify({ name: kaleb.name, relationship: kaleb.relationship, birthDate: kaleb.birthDate, birthTime: kaleb.birthTime, birthTimezone: kaleb.birthTimezone, knownMoonSign: kaleb.knownMoonSign, day: day.iso }),
         })
         if (!r.ok) throw new Error()
         const d = await r.json()
@@ -460,7 +460,7 @@ export default function ForecastsPage() {
                         if (!kaleb) {
                           return (
                             <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.55)', lineHeight: 1.55, marginTop: 14 }}>
-                              Add Kaleb in Astrology → Connections (with his birth date) to see exactly what to say to him each day here.
+                              Add Kaleb in Astrology → Connections (tap "Add Kaleb with these details") to see exactly what to say to him each day here.
                             </p>
                           )
                         }
