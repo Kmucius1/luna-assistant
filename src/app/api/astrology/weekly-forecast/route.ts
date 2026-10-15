@@ -132,7 +132,7 @@ ${t}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v8',
+      generationType: 'weekly_forecast_v9',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -169,7 +169,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED:
   "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day, from the sky" } ]
 }
 
-Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
+Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. NEVER refer to the past ("last weekend", "last week", "earlier this week"); this is the coming seven days only. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 8000)

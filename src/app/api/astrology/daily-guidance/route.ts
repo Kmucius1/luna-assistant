@@ -175,6 +175,7 @@ function qualityIssues(g: DailyGuidance, dayName: string): string[] {
     ...(g.best_move ? Object.values(g.best_move) : []),
   ].filter((x): x is string => typeof x === 'string')
   if (strings.some(t => /\b(tomorrow|yesterday)\b/i.test(t))) out.push('uses the words tomorrow or yesterday; refer to days by weekday name only')
+  if (strings.some(t => /\b(last (weekend|week|night|month)|earlier this week|over the weekend)\b/i.test(t))) out.push('refers to the past (last weekend, last week); write only about this day and ahead')
   if (strings.some(t => new RegExp(`\\b(plan|schedule|reschedule|save)\\b[^.]{0,40}\\b(for|until|till)\\s+${dayName}\\b`, 'i').test(t))) out.push(`tells her to plan something for ${dayName}, but ${dayName} is today`)
   for (const a of g.real_advice ?? []) {
     const issue = adviceIssue(a, dayName)
@@ -299,6 +300,7 @@ ADVICE QUALITY RULES (mandatory):
 - transit_breakdown: exactly 3 items, one for each of the 3 strongest transits listed above, in order. Do not invent transits that are not listed.
 - real_advice: exactly 5 items. Each situation starts with "If" and names a type of situation, plus the exact thing to do or say. Cover work/money, relationships, her body and energy, content/creative, and one for if the day goes sideways.
 - NEVER state an invented event as if it is happening (no "Kaleb texts you", "a client asks", "your budget review"). Use "If ..." for anything that might happen. NEVER invent specific meetings, deadlines, numbers, budgets, times or names. Only name a person or task that appears in the REAL DAY section or in the profile above.
+- NEVER refer to the past: no "last weekend", "last week", "yesterday", "earlier this week" or "last night". Write only about this day and what is ahead.
 - TIME RULES: this reading is for ${dayName}, and in this reading that day IS today. Never write "tomorrow" or "yesterday". Never tell her to plan, schedule or save something "for ${dayName}" or "until ${dayName}", because that is today. Refer to other days only by their weekday name.
 - The horoscope string must have three short paragraphs separated by a blank line (\n\n): Morning, Midday, Evening. Start each with that word and a colon.
 - Be direct and kind. Say the real thing, including a hard truth if the sky points to one. No filler, no repeating the same idea in different words, no fortune-cookie lines.
@@ -357,7 +359,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v9',
+      generationType: 'daily_guidance_v10',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.birthTimezone ?? 'ny'}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_v7_${cacheId}`,
+    generationType: `connection_day_v8_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {

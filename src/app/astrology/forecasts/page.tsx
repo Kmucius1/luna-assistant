@@ -330,6 +330,30 @@ export default function ForecastsPage() {
 
           <div style={{ padding: '0 16px' }}>
 
+            {/* Real dates, for confirmation */}
+            {sky.length > 0 && (
+              <div style={{ ...GLASS, padding: 16, marginBottom: 14 }}>
+                <Label text="This forecast is for" color="#5C4530" />
+                <p style={{ fontSize: 17, fontWeight: 700, color: '#100C1E', margin: '0 0 2px' }}>
+                  {sky[0].weekday}, {sky[0].dateLabel} → {sky[sky.length - 1].weekday}, {sky[sky.length - 1].dateLabel}, {sky[0].iso.slice(0, 4)}
+                </p>
+                <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.5)', margin: '0 0 10px' }}>
+                  Seven days starting today. Nothing here is about the past.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+                  {sky.map((d, i) => (
+                    <button key={d.iso} onClick={() => setSel(i)}
+                      style={{ padding: '6px 0', borderRadius: 10, border: sel === i ? '1px solid #5C4530' : '1px solid rgba(180,150,100,0.2)',
+                        background: sel === i ? 'rgba(92,69,48,0.12)' : 'transparent', cursor: 'pointer', textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: 10, color: 'rgba(16,12,30,0.55)' }}>{d.weekday.slice(0, 3)}</span>
+                      <span style={{ display: 'block', fontSize: 11.5, fontWeight: 700, color: '#100C1E' }}>{d.dateLabel.replace(/^[A-Za-z]+ /, '')}</span>
+                      <span style={{ display: 'block', fontSize: 9, color: 'rgba(16,12,30,0.45)' }}>{d.dateLabel.slice(0, 3)}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Week overview card */}
             {!loading && forecast && (
               <div style={{ ...GLASS, padding: 18, marginBottom: 16, background: 'linear-gradient(135deg, rgba(247,238,220,0.95), rgba(240,228,198,0.92))' }}>
