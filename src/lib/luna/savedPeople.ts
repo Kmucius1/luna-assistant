@@ -8,6 +8,8 @@ export interface SavedPerson {
   birthDate: string
   birthTime?: string
   birthLocation?: string
+  /** IANA zone the birth time was recorded in. Missing = Eastern, the app's assumption. */
+  birthTimezone?: string
   timeAccuracy: 'exact' | 'approximate' | 'unknown'
 }
 
@@ -23,6 +25,10 @@ export function addSavedPerson(person: Omit<SavedPerson, 'id'>): SavedPerson {
   const next = [...getSavedPeople(), withId]
   localStorage.setItem(KEY, JSON.stringify(next))
   return withId
+}
+
+export function updateSavedPerson(id: string, patch: Partial<Omit<SavedPerson, 'id'>>): void {
+  localStorage.setItem(KEY, JSON.stringify(getSavedPeople().map(p => (p.id === id ? { ...p, ...patch } : p))))
 }
 
 export function removeSavedPerson(id: string): void {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { localBirthToUTC } from '@/lib/luna/birthTime'
 import { getCurrentPlanets, getAspect, getSynastryAspectMeaning, ZOE_NATAL, angleBetween as _angleBetween } from '@/lib/astrology'
 
 // Real synastry: the other person's planetary positions at their birth
@@ -9,7 +10,7 @@ import { getCurrentPlanets, getAspect, getSynastryAspectMeaning, ZOE_NATAL, angl
 // real aspect list.
 export const dynamic = 'force-dynamic'
 
-interface SynastryBody { birthDate: string; birthTime?: string }
+interface SynastryBody { birthDate: string; birthTime?: string; birthTimezone?: string }
 
 interface ScoredAspect { a: string; b: string; type: string; orb: number; interpretation: string }
 
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     const body: SynastryBody = await req.json()
     if (!body.birthDate) return NextResponse.json({ error: 'birthDate required' }, { status: 400 })
 
-    const dateTime = new Date(`${body.birthDate}T${body.birthTime || '12:00'}:00Z`)
+    const dateTime = localBirthToUTC(body.birthDate, body.birthTime, body.birthTimezone)
     if (isNaN(dateTime.getTime())) return NextResponse.json({ error: 'invalid date' }, { status: 400 })
 
     const theirPlanets = getCurrentPlanets(dateTime)

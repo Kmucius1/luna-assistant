@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Plus, ChevronLeft } from 'lucide-react'
 
-import { getSavedPeople, addSavedPerson, type SavedPerson } from '@/lib/luna/savedPeople'
+import { getSavedPeople, addSavedPerson, updateSavedPerson, type SavedPerson } from '@/lib/luna/savedPeople'
+import { BIRTH_ZONES } from '@/lib/luna/birthTime'
 import { plainAspectPhrase } from '@/lib/astrology'
 import { AstrologyHero } from './AstrologyHero'
 import styles from './AstrologyConnections.module.css'
@@ -73,7 +74,7 @@ export function AstrologyConnections() {
   const [dayReading, setDayReading] = useState<DayReading | null>(null)
   const [dayState, setDayState] = useState<'idle' | 'loading' | 'error'>('idle')
   const [outlook, setOutlook] = useState<Outlook | null>(null)
-  const [form, setForm] = useState({ name: '', relationship: 'Romantic' as SavedPerson['relationship'], birthDate: '', birthTime: '', birthLocation: '', unknownTime: false })
+  const [form, setForm] = useState({ name: '', relationship: 'Romantic' as SavedPerson['relationship'], birthDate: '', birthTime: '', birthLocation: '', birthTimezone: 'America/New_York', unknownTime: false })
 
   useEffect(() => { setPeople(getSavedPeople()) }, [])
 
@@ -85,10 +86,11 @@ export function AstrologyConnections() {
       birthDate: form.birthDate,
       birthTime: form.unknownTime ? undefined : form.birthTime,
       birthLocation: form.birthLocation.trim() || undefined,
+      birthTimezone: form.birthTimezone,
       timeAccuracy: form.unknownTime ? 'unknown' : form.birthTime ? 'exact' : 'unknown',
     })
     setPeople(getSavedPeople())
-    setForm({ name: '', relationship: 'Romantic', birthDate: '', birthTime: '', birthLocation: '', unknownTime: false })
+    setForm({ name: '', relationship: 'Romantic', birthDate: '', birthTime: '', birthLocation: '', birthTimezone: 'America/New_York', unknownTime: false })
     setMode('list')
   }
 
@@ -99,7 +101,7 @@ export function AstrologyConnections() {
     try {
       const res = await fetch('/api/astrology/connection-day', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: person.name, relationship: person.relationship, birthDate: person.birthDate, birthTime: person.birthTime, day: iso, refresh }),
+        body: JSON.stringify({ name: person.name, relationship: person.relationship, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, day: iso, refresh }),
       })
       if (!res.ok) throw new Error()
       setDayReading(await res.json())
@@ -114,13 +116,13 @@ export function AstrologyConnections() {
     setOutlook(null)
     fetch('/api/astrology/connection-outlook', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: person.name, birthDate: person.birthDate, birthTime: person.birthTime, days: 30 }),
+      body: JSON.stringify({ name: person.name, birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone, days: 30 }),
     }).then(r => (r.ok ? r.json() : null)).then(d => { if (d) setOutlook(d) }).catch(() => {})
     loadDay(person, dayChips()[0].iso)
     try {
       const res = await fetch('/api/astrology/synastry', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ birthDate: person.birthDate, birthTime: person.birthTime }),
+        body: JSON.stringify({ birthDate: person.birthDate, birthTime: person.birthTime, birthTimezone: person.birthTimezone }),
       })
       setSynastry(await res.json())
     } catch { setSynastry(null) }
@@ -144,6 +146,14 @@ export function AstrologyConnections() {
             I don&apos;t know their exact birth time
           </label>
           {!form.unknownTime && (<><label>Birth Time</label><input type="time" value={form.birthTime} onChange={e => setForm(f => ({ ...f, birthTime: e.target.value }))} /></>)}
+          {!form.unknownTime && (
+            <>
+              <label>Time zone of the birth place</label>
+              <select value={form.birthTimezone} onChange={e => setForm(f => ({ ...f, birthTimezone: e.target.value }))}>
+                {BIRTH_ZONES.map(z => <option key={z.id} value={z.id}>{z.label}</option>)}
+              </select>
+            </>
+          )}
           <label>Birth City (optional)</label>
           <input value={form.birthLocation} onChange={e => setForm(f => ({ ...f, birthLocation: e.target.value }))} placeholder="City, Country" />
           <button type="button" onClick={save} disabled={!form.name.trim() || !form.birthDate} className={styles.saveButton}>Save Person</button>
@@ -159,7 +169,23 @@ export function AstrologyConnections() {
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
           <div className={styles.avatar} style={{ margin: '0 auto 8px', width: 52, height: 52, fontSize: 18 }}>{activePerson.name[0]}</div>
           <strong style={{ fontSize: 15, color: 'var(--astro-text)' }}>{activePerson.name}</strong>
-          <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}</p>
+          <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}{activePerson.birthTime ? ` at ${activePerson.birthTime}` : ' (time unknown)'}</p>
+          {activePerson.birthTime && (
+            <label style={{ display: 'block', fontSize: 11.5, color: 'var(--astro-muted)', marginTop: 6 }}>
+              Birth time zone:{' '}
+              <select value={activePerson.birthTimezone ?? 'America/New_York'}
+                onChange={e => {
+                  const tz = e.target.value
+                  updateSavedPerson(activePerson.id, { birthTimezone: tz })
+                  const next = { ...activePerson, birthTimezone: tz }
+                  setActivePerson(next)
+                  setPeople(getSavedPeople())
+                  openPerson(next)
+                }}>
+                {BIRTH_ZONES.map(z => <option key={z.id} value={z.id}>{z.label}</option>)}
+              </select>
+            </label>
+          )}
         </div>
 
         {outlook && (

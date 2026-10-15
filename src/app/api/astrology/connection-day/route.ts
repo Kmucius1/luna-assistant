@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { localBirthToUTC } from '@/lib/luna/birthTime'
 import { OWNER_USER_ID } from '@/lib/owner'
 import { callAI } from '@/lib/ai'
 import {
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic'
 // that day, compared against THEIR chart and HERS, scored deterministically, then
 // explained in plain language. The ratings come from real aspects, not the AI.
 
-interface Body { name: string; relationship: string; birthDate: string; birthTime?: string; day?: string; refresh?: boolean }
+interface Body { birthTimezone?: string; name: string; relationship: string; birthDate: string; birthTime?: string; day?: string; refresh?: boolean }
 
 export async function POST(req: NextRequest) {
   let body: Body
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     : new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
   const at = new Date(`${dayKey}T16:00:00Z`)
 
-  const birth = new Date(`${body.birthDate}T${body.birthTime || '12:00'}:00Z`)
+  const birth = localBirthToUTC(body.birthDate, body.birthTime, body.birthTimezone)
   if (isNaN(birth.getTime())) return NextResponse.json({ error: 'invalid birth date' }, { status: 400 })
 
   const theirNatalList = getCurrentPlanets(birth)
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
   const zoeTransits = getTransitsToNatal(at).slice(0, 3).map(t => `- ${t.transiting} ${plainAspectPhrase(t.type)} her ${t.natal}`).join('\n')
 
   const isKaleb = /kaleb/i.test(body.name)
-  const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
+  const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.birthTimezone ?? 'ny'}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
     generationType: `connection_day_v5_${cacheId}`,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { localBirthToUTC } from '@/lib/luna/birthTime'
 import { ZOE_NATAL, getCurrentPlanets, isRetrograde, plainAspectPhrase, type ZodiacSign } from '@/lib/astrology'
 import { hitsFor, rate, verdict, type Hit } from '@/lib/luna/connectionSky'
 
@@ -8,7 +9,7 @@ export const dynamic = 'force-dynamic'
 // talk, and which days call for care. Fully calculated, no AI, so it is fast and
 // never contradicts the daily readings (they use the same scoring).
 
-interface Body { name: string; birthDate: string; birthTime?: string; days?: number }
+interface Body { birthTimezone?: string; name: string; birthDate: string; birthTime?: string; days?: number }
 
 const LVL: Record<string, number> = { great: 2, good: 1, neutral: 0, careful: -2 }
 
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
   try { body = await req.json() } catch { return NextResponse.json({ error: 'bad request' }, { status: 400 }) }
   if (!body.name || !body.birthDate) return NextResponse.json({ error: 'name and birthDate required' }, { status: 400 })
 
-  const birth = new Date(`${body.birthDate}T${body.birthTime || '12:00'}:00Z`)
+  const birth = localBirthToUTC(body.birthDate, body.birthTime, body.birthTimezone)
   if (isNaN(birth.getTime())) return NextResponse.json({ error: 'invalid birth date' }, { status: 400 })
 
   const theirNatal: Record<string, { lon: number; sign: ZodiacSign }> = {}
