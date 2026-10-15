@@ -38,6 +38,13 @@ interface DayReading {
   }
 }
 
+interface OutlookDay { iso: string; label: string; verdict: string; score: number; reasons: string[]; cautions: string[]; topSky: string[]; mercuryRetrograde: boolean }
+interface Outlook {
+  closer: OutlookDay[]; careful: OutlookDay[]
+  lookFor: { closer: string[]; careful: string[]; always: string[] }
+  moonUncertain: boolean; note: string
+}
+
 const LEVEL_LABEL: Record<string, string> = { great: 'Great', good: 'Good', neutral: 'Neutral', careful: 'Careful' }
 
 function dayChips(): { iso: string; label: string }[] {
@@ -65,6 +72,7 @@ export function AstrologyConnections() {
   const [dayIso, setDayIso] = useState<string>(dayChips()[0].iso)
   const [dayReading, setDayReading] = useState<DayReading | null>(null)
   const [dayState, setDayState] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [outlook, setOutlook] = useState<Outlook | null>(null)
   const [form, setForm] = useState({ name: '', relationship: 'Romantic' as SavedPerson['relationship'], birthDate: '', birthTime: '', birthLocation: '', unknownTime: false })
 
   useEffect(() => { setPeople(getSavedPeople()) }, [])
@@ -103,6 +111,11 @@ export function AstrologyConnections() {
     setActivePerson(person)
     setMode('view')
     setSynastry(null)
+    setOutlook(null)
+    fetch('/api/astrology/connection-outlook', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: person.name, birthDate: person.birthDate, birthTime: person.birthTime, days: 30 }),
+    }).then(r => (r.ok ? r.json() : null)).then(d => { if (d) setOutlook(d) }).catch(() => {})
     loadDay(person, dayChips()[0].iso)
     try {
       const res = await fetch('/api/astrology/synastry', {
@@ -148,6 +161,39 @@ export function AstrologyConnections() {
           <strong style={{ fontSize: 15, color: 'var(--astro-text)' }}>{activePerson.name}</strong>
           <p style={{ fontSize: 11.5, color: 'var(--astro-muted)', margin: '2px 0 0' }}>{activePerson.relationship} · Born {activePerson.birthDate}</p>
         </div>
+
+        {outlook && (
+          <div className={styles.dayCard}>
+            <p className={styles.dayTitle}>The next 30 days with {activePerson.name}</p>
+            <p className={styles.dayHead} style={{ marginTop: 0 }}>Days the sky favors closeness and easy talk</p>
+            {outlook.closer.length === 0 && <p className={styles.dayBody}>No standout days in the next 30. That is honest information too: steady, ordinary days are the base.</p>}
+            {outlook.closer.map(d => (
+              <button key={d.iso} type="button" className={styles.outlookRow} onClick={() => loadDay(activePerson, d.iso)}>
+                <strong>{d.label}</strong>
+                <span>{d.verdict}</span>
+                {d.reasons[0] && <span className={styles.outlookWhy}>{d.reasons[0]}</span>}
+              </button>
+            ))}
+
+            <p className={styles.dayHead}>Days to go gently</p>
+            {outlook.careful.length === 0 && <p className={styles.dayBody}>Nothing especially tense is showing in the next 30 days.</p>}
+            {outlook.careful.map(d => (
+              <button key={d.iso} type="button" className={styles.outlookRow} onClick={() => loadDay(activePerson, d.iso)}>
+                <strong>{d.label}</strong>
+                <span>{d.verdict}{d.mercuryRetrograde ? ' · Mercury moving backward' : ''}</span>
+                {(d.cautions[0] || d.topSky[0]) && <span className={styles.outlookWhy}>{d.cautions[0] ?? d.topSky[0]}</span>}
+              </button>
+            ))}
+
+            <p className={styles.dayHead}>What to look out for on the good days</p>
+            {outlook.lookFor.closer.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}
+            <p className={styles.dayHead}>What to look out for on the careful days</p>
+            {outlook.lookFor.careful.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}
+            <p className={styles.dayHead}>Always worth watching</p>
+            {outlook.lookFor.always.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}
+            <p className={styles.dayNote}>{outlook.note}{outlook.moonUncertain ? ` ${activePerson.name}’s Moon may be off without a confirmed birth time, so closeness days may shift slightly.` : ''}</p>
+          </div>
+        )}
 
         <div className={styles.dayCard}>
           <p className={styles.dayTitle}>How to navigate {activePerson.name} on…</p>
