@@ -20,6 +20,7 @@ export interface DayForecast {
   affirmation: string  // 1 first-person declaration
   intensity:  number   // 1-10 how energetically loaded this day is
   best_move?: string   // the one best thing to do this day
+  love_action?: string // what to do in love and romance this specific day
   best_window?: string // best part of the day and why
 }
 
@@ -31,6 +32,7 @@ export interface WeeklyForecast {
   love_window:  string
   power_window: string
   week_priorities?: { task: string; day: string; why: string }[]
+  love_week?: { arc: string; kaleb: string; do: string[]; watch: string }
 }
 
 // ─── Fallback generator ───────────────────────────────────────────────────────
@@ -139,7 +141,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v6',
+      generationType: 'weekly_forecast_v7',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -166,6 +168,12 @@ TIME RULES: never write "tomorrow" or "yesterday" anywhere; name days by weekday
   "rest_day": "weekday name of her best day to rest, recover, or go inward",
   "love_window": "weekday name of the day most charged for love and connection",
   "power_window": "weekday name of the day best for major decisions, visibility, or career moves",
+  "love_week": {
+    "arc": "4-5 plain sentences: the shape of the week for love and romance. Which days open, which are quiet or tense, and why (real planets only).",
+    "kaleb": "3-4 sentences on how the week may feel in the Kaleb situation (a real romantic connection that is not committed): when closeness is favored, when to give space, and when a clear honest conversation fits. Never predict commitment.",
+    "do": ["4 specific things to do for her heart this week, each naming the best weekday for it"],
+    "watch": "2-3 sentences: what to watch for this week in love, in him and in herself."
+  },
   "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day" } ],
   "days": [
     {
@@ -177,6 +185,7 @@ TIME RULES: never write "tomorrow" or "yesterday" anywhere; name days by weekday
       "career": "3 sentences about her work and business energy this specific day — she runs DRYP Digital, and outside that her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. Name a real kind of task, meeting, or decision the day favors.",
       "guidance": ["4 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits, each a full sentence"],
       "watch_for": "1-2 sentences: an honest warning or caution specific to this day, including what it could look like if ignored",
+      "love_action": "2 sentences: what to DO in love and romance on this specific day (reach out, wait, be open, give space, slow down), and why the sky says so. Honest and specific.",
       "best_move": "1-2 sentences: the ONE best thing for her to do this day, decisive and specific, with a one-sentence reason.",
       "best_window": "The best part of this day (morning, midday, afternoon, evening) for her most important thing, and why.",
       "affirmation": "1 powerful first-person declaration tailored to this day's energy",
@@ -186,7 +195,7 @@ TIME RULES: never write "tomorrow" or "yesterday" anywhere; name days by weekday
 }${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
-          const rawText = await callAI(SYSTEM, prompt, 6500)
+          const rawText = await callAI(SYSTEM, prompt, 8000)
           const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
           const parsed = JSON.parse(jsonText) as WeeklyForecast
           return { payload: parsed, source: 'ai' as const }

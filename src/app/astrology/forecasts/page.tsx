@@ -36,6 +36,7 @@ function IntensityPips({ value }: { value: number }) {
 
 // ─── Full day reading (the long, plain-words version for one date) ───────────
 type FullGuidance = {
+  love_deep?: { sky: string; inside_you: string; with_kaleb: string; do: string[]; say: string; avoid: string[]; reflect: string }
   best_move?: { headline: string; why: string; first: string; then: string; skip: string; best_window: string; people: string }
   in_plain_words?: string
   transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
@@ -97,6 +98,20 @@ function FullDayView({ g }: { g: FullGuidance }) {
       <H>Work + career</H><P>{g.career}</P>
       <H>Money</H><P>{g.money}</P>
       <H>Love + romance</H><P>{g.love}</P>
+      {g.love_deep && (
+        <div style={{ marginTop: 10, padding: 14, borderRadius: 16, background: 'rgba(200,120,160,0.1)', border: '1px solid rgba(200,120,160,0.22)' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgb(170,70,115)', margin: '0 0 6px' }}>Love and romance, in depth</p>
+          <H>What the sky is doing for love</H><P>{g.love_deep.sky}</P>
+          <H>What you may feel inside</H><P>{g.love_deep.inside_you}</P>
+          <H>The Kaleb situation today</H><P>{g.love_deep.with_kaleb}</P>
+          <H>What to do</H>
+          {g.love_deep.do.map((x, i) => <P key={i}>{i + 1}. {x}</P>)}
+          <H>What you could say</H><P>{g.love_deep.say}</P>
+          <H>What to avoid</H>
+          {g.love_deep.avoid.map((x, i) => <P key={i}>• {x}</P>)}
+          <H>Sit with this</H><P bold>{g.love_deep.reflect}</P>
+        </div>
+      )}
       <H>Friends</H><P>{g.friendship}</P>
       <H>Family</H><P>{g.family}</P>
       <H>Do today</H>
@@ -207,6 +222,18 @@ export default function ForecastsPage() {
                 </div>
                 <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.9)', lineHeight: 1.6, marginBottom: 14 }}>{forecast.week_theme}</p>
 
+                {forecast.love_week && (
+                  <div style={{ marginBottom: 14, padding: 14, borderRadius: 16, background: 'rgba(200,120,160,0.1)', border: '1px solid rgba(200,120,160,0.22)' }}>
+                    <Label text="Love and romance this week" color="rgb(170,70,115)" />
+                    <p style={{ fontSize: 13.5, color: 'rgba(16,12,30,0.88)', lineHeight: 1.65, margin: '0 0 8px' }}>{forecast.love_week.arc}</p>
+                    <p style={{ fontSize: 13.5, color: 'rgba(16,12,30,0.88)', lineHeight: 1.65, margin: '0 0 8px' }}><strong>The Kaleb situation:</strong> {forecast.love_week.kaleb}</p>
+                    {forecast.love_week.do?.map((x, i) => (
+                      <p key={i} style={{ fontSize: 13.5, color: 'rgba(16,12,30,0.88)', lineHeight: 1.6, margin: '0 0 4px' }}>{i + 1}. {x}</p>
+                    ))}
+                    <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.65)', lineHeight: 1.6, margin: '8px 0 0' }}><strong>Watch for:</strong> {forecast.love_week.watch}</p>
+                  </div>
+                )}
+
                 {forecast.week_priorities && forecast.week_priorities.length > 0 && (
                   <div style={{ marginBottom: 14 }}>
                     <Label text="Best day for each thing this week" color="#5C4530" />
@@ -271,6 +298,12 @@ export default function ForecastsPage() {
                       <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.45)', margin: '2px 0 8px' }}>{day.date}</p>
                       <IntensityPips value={day.intensity} />
                       <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.78)', lineHeight: 1.6, marginTop: 10 }}>{day.theme}</p>
+                      {day.love_action && (
+                        <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(200,120,160,0.1)', border: '1px solid rgba(200,120,160,0.22)' }}>
+                          <Label text="In love today" color="rgb(170,70,115)" />
+                          <p style={{ fontSize: 13.5, color: 'rgba(16,12,30,0.85)', lineHeight: 1.55, margin: 0 }}>{day.love_action}</p>
+                        </div>
+                      )}
                       {day.best_move && (
                         <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(92,69,48,0.08)', border: '1px solid rgba(92,69,48,0.2)' }}>
                           <Label text="Best move" color="#5C4530" />

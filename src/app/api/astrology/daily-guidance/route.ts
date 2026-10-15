@@ -117,7 +117,18 @@ export interface BestMove {
   people:      string  // best move with the people closest to her today
 }
 
+export interface LoveDeep {
+  sky:        string    // what is active for love today, in plain words
+  inside_you: string    // what it will feel like inside her
+  with_kaleb: string    // how it may show up in the Kaleb situation, honest and uncommitted
+  do:         string[]  // 3 specific things to do
+  say:        string    // one exact thing she could say, if it fits the day
+  avoid:      string[]  // 2 things to avoid
+  reflect:    string    // one question to sit with
+}
+
 export interface DailyGuidance {
+  love_deep?:          LoveDeep
   best_move?:          BestMove
   in_plain_words?:     string          // 3-4 short sentences, the whole day in everyday language
   transit_breakdown?:  TransitBreakdown[]
@@ -202,6 +213,15 @@ export async function GET(req: NextRequest) {
       `${p.name}: ${p.sign} ${p.degree}°${p.minutes.toString().padStart(2,'0')}'${p.retrograde ? ' (retrograde)' : ''}`
     ).join('\n')
 
+    const loveTransits = getTransitsToNatal(now).filter(t => ['Venus', 'Mars', 'Moon'].includes(t.transiting) && ['Venus', 'Mars', 'Moon', 'Sun'].includes(t.natal)).slice(0, 5)
+    const venusToday = planets.find(p => p.name === 'Venus')
+    const marsToday = planets.find(p => p.name === 'Mars')
+    const loveSky = [
+      venusToday ? `Venus is in ${venusToday.sign}${venusToday.retrograde ? ' and moving backward (a time to revisit, not start)' : ''}` : '',
+      marsToday ? `Mars is in ${marsToday.sign}${marsToday.retrograde ? ' and moving backward' : ''}` : '',
+      ...loveTransits.map(t => `${t.transiting} ${t.type} her natal ${t.natal} (orb ${t.orb}°) — ${t.interpretation}`),
+    ].filter(Boolean).join('\n') || 'No strong love transits today; a quiet day for romance'
+
     const transitLines = transits.map(t =>
       `${t.transiting} ${t.type} natal ${t.natal} (${t.natalSign} ${t.natalDegree}°) — orb ${t.orb}° — ${t.interpretation}`
     ).join('\n')
@@ -224,6 +244,9 @@ ${planetLines}${moonChange}
 
 === ZOE'S TOP TRANSITS TODAY ===
 ${transitLines}
+
+=== LOVE SKY TODAY (calculated; use only these for love_deep) ===
+${loveSky}
 
 ${realLife ? `=== ZOE'S REAL DAY (facts from her calendar, lists and plan; cite these by name when the sky relates to them) ===\n${realLife}\n\n` : ''}=== ZOE'S NATAL CHART ===
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
@@ -273,6 +296,15 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     "best_window": "The best part of the day (morning, midday, afternoon or evening) for her most important thing, and why.",
     "people": "The best move with the people closest to her today: who to reach out to, who to give space, and how. If it involves Kaleb, follow the romance rules: honest, no predicting commitment."
   },
+  "love_deep": {
+    "sky": "3-4 plain sentences: exactly what is active for love and romance today. Use ONLY the LOVE SKY facts given above. Say what each planet's position means for how connection and desire tend to feel today.",
+    "inside_you": "3-4 sentences: what she may feel inside today about love, closeness and desire, and what that feeling may be asking her for.",
+    "with_kaleb": "3-4 sentences about how today's sky may show up in the Kaleb situation (a real romantic connection that is not committed). Honest and steady: what the day tends to favor (closeness, distance, clear talk, patience), never predicting what he will decide or that he will commit.",
+    "do": ["3 specific things to do today for her love life and her heart, in order of importance"],
+    "say": "One exact, honest, calm thing she could say to him or about her feelings today if the moment fits, in quotes. If today is not a day for that conversation, say what to hold off on instead.",
+    "avoid": ["2 specific things to avoid today in love, with what it would look like"],
+    "reflect": "One honest question about love and what she wants for her to sit with today."
+  },
   "in_plain_words": "3-4 SHORT sentences, written like a smart best friend talking. What kind of day is this, why, and what is the single best move? Zero astrology vocabulary she would have to look up. If you must name a planet, say right away what it means for her day.",
   "transit_breakdown": [
     { "sky": "What the sky is doing, in plain words (e.g. 'Mercury is lining up with your Sun')", "feels_like": "What that will actually feel or look like in her real day, in 2 sentences, with a specific example (a conversation, a mood, a decision, a body feeling).", "what_to_do": "The concrete move: one clear thing to do about it, 1-2 sentences." }
@@ -299,7 +331,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v7',
+      generationType: 'daily_guidance_v8',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -313,7 +345,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
             'highest_self','affirmation',
           ]
 
-          let raw = await callAI(SYSTEM, userPrompt, 6000)
+          let raw = await callAI(SYSTEM, userPrompt, 7500)
           let lastError = ''
           for (let attempt = 0; attempt < 2; attempt++) {
             try {
@@ -336,7 +368,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
               lastError = e instanceof Error ? e.message : 'invalid JSON'
             }
             if (attempt === 0) {
-              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 6000)
+              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 7500)
             }
           }
           throw new Error(lastError)

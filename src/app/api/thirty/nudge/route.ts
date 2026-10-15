@@ -22,7 +22,7 @@ export async function GET() {
   try {
     const db = createAdminClient()
     const { data } = await db.from('daily_generation_cache').select('payload')
-      .eq('user_id', userId).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v7').maybeSingle()
+      .eq('user_id', userId).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v8').maybeSingle()
     guidance = (data?.payload as NudgeContext['guidance']) ?? null
   } catch { /* astrology lines simply fall back */ }
 
