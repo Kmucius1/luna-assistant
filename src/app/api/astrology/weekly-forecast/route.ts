@@ -136,7 +136,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v2',
+      generationType: 'weekly_forecast_v3',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

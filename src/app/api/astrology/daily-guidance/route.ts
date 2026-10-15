@@ -249,7 +249,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v3',
+      generationType: 'daily_guidance_v4',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

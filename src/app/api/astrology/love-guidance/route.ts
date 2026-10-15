@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
 
     const { payload: guidance } = await getOrCreateDailyContent<LoveGuidance>({
       userId: ZOE_USER_ID,
-      generationType: 'love_guidance_v2',
+      generationType: 'love_guidance_v3',
       timezone: clientTz,
       forceRegenerate: refresh,
       generate: async () => {

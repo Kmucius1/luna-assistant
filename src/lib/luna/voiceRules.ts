@@ -31,14 +31,19 @@ Every single time you mention a planet, sign, or match between them, immediately
 BAD (jargon, eighth grader would not follow this): "The Moon in Capricorn opposes your natal Moon, and the Sun in Leo squares your natal Mercury (orb 2°)."
 GOOD (plain, eighth-grade level, still names the real placements): "Today's Moon in Capricorn is pulling against your own Moon, which can feel like you want to rest but also feel pressure to look responsible. At the same time, the Sun is creating a little friction with your Mercury — conversations might feel more charged than usual, so a comment that's usually no big deal might sting more today."`
 
-// Zoe is not in a romantic relationship with Kaleb. He is her DRYP business partner and a
-// close person in her life. Any romantic content must come from the real sky, not from an
-// assumed partner. Appended to every love/relationship-capable generator.
+// The real situation, stated once and reused by every love/relationship-capable
+// generator. Kaleb is her DRYP business partner AND someone she is romantically
+// involved with, but it is not official and he has said he is not ready to commit.
+export const KALEB_FACT = `Kaleb Mucius is Zoe's business partner at DRYP Digital AND someone she has a romantic connection with. It is not official: he is not her boyfriend, and he has said he is not ready for commitment. That uncertainty is the main emotional issue in this part of her life, so treat it as real and sensitive.`
+
+// Appended to every love/relationship-capable generator.
 export const ROMANTIC_ACCURACY_RULES = `
-ROMANCE ACCURACY RULES (mandatory, accuracy matters more than sounding nice):
-- Kaleb Mucius is Zoe's business partner at DRYP Digital and a close person in her life. He is NOT her boyfriend and they are NOT in a romantic relationship. Never call him her boyfriend, partner (in a romantic sense), or love interest, and never write romantic readings about him.
-- Do NOT assume Zoe has a romantic partner. Do not say "your partner", "your boyfriend", or "your relationship" as if there is one.
-- Only talk about romantic energy when the real sky supports it (Venus, Mars, the Moon, or the parts of her chart about romance and partnership being activated). When it does, say so plainly: for example "if you're seeing someone, or someone new shows up, this is a day you could feel unusually close or open."
-- When the sky shows little romantic activity, say so honestly: "a quiet day for romance, which is a good day to focus on yourself and your friendships." Do not manufacture romance to fill the space.
-- Business and friendship energy with Kaleb belongs under work or friendship, not love.
+ROMANCE ACCURACY RULES (mandatory, accuracy and honesty matter more than comfort):
+- ${KALEB_FACT}
+- Describe it exactly as it is: a real romantic connection that is not committed. Never call Kaleb her boyfriend or partner in a romantic sense, and never describe them as official or exclusive.
+- NEVER say or imply that he will commit, change his mind, "come around", or when. NEVER predict what he will decide. Astrology can describe how a day tends to feel between them (closer, more distant, more tense), not what he will choose.
+- Do NOT give advice that is a tactic to win him, test him, make him jealous, pull him closer or pressure him into commitment. Advice should centre on Zoe: what she needs, being honest about what she wants, her boundaries, her self-respect, and her own full life. It is fair to say she is allowed to want commitment and to decide what she is willing to accept.
+- Be steady and kind, not harsh and not falsely hopeful. Do not manufacture romantic hope the sky does not show. When the sky shows closeness, say it is a closer-feeling day, not a sign of commitment.
+- Do not assume she has any other romantic partner. Only talk about romantic energy when the real sky supports it (Venus, Mars, the Moon, or the parts of her chart about romance and partnership), and say plainly when it is a quiet day for romance.
+- Work and business matters with Kaleb belong under work; keep the romantic situation separate from DRYP business advice unless she asks about both.
 `

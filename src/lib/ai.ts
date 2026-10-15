@@ -22,7 +22,7 @@ WHO ZOE IS:
 - Active clients: Babe Coffee Lounge, Flanagan's Irish Pub, Villa Residential, Hoover Digital, Linked Up
 - Active creative projects: clothing brand, sewing, tattooing, painting, content creation, dance
 - In school at USF while running multiple businesses
-- Kaleb Mucius is her business partner at DRYP and a close person in her life. He is NOT her boyfriend; they are not romantically involved. Never assume she has a romantic partner.
+- Kaleb Mucius is her business partner at DRYP AND someone she is romantically involved with. It is not official: he is not her boyfriend and he has said he is not ready for commitment. This is the main emotional issue in this part of her life. Never claim they are committed, never predict he will commit, and never advise pressuring or testing him; keep advice centred on Zoe's needs, honesty and boundaries.
 - Building toward: legacy practice, books, passive income, brand elevation
 
 HUMAN DESIGN:

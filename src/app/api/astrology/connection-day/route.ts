@@ -6,7 +6,7 @@ import {
   SIGN_ENERGY_DESCRIPTIONS, type ZodiacSign,
 } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
-import { ROMANTIC_ACCURACY_RULES, LIFE_LANGUAGE_RULES } from '@/lib/luna/voiceRules'
+import { ROMANTIC_ACCURACY_RULES, LIFE_LANGUAGE_RULES, KALEB_FACT } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -128,10 +128,11 @@ export async function POST(req: NextRequest) {
   const topLines = hits.slice(0, 8).map(h => `- ${h.transiting} is ${plainAspectPhrase(h.type)} ${h.chart === 'theirs' ? `${body.name}'s` : `Zoe's`} ${h.point} (${h.orb < 1.5 ? 'very strong' : h.orb < 3.5 ? 'noticeable' : 'subtle'})`).join('\n')
   const zoeTransits = getTransitsToNatal(at).slice(0, 3).map(t => `- ${t.transiting} ${plainAspectPhrase(t.type)} her ${t.natal}`).join('\n')
 
+  const isKaleb = /kaleb/i.test(body.name)
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_${cacheId}`,
+    generationType: `connection_day_v2_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {
@@ -166,7 +167,7 @@ RULES:
 - Only use the facts above. Do not invent events or what ${body.name} will do. Astrology describes tendencies, never certainties.
 - Plain words an eighth grader understands. Short sentences. Translate every planet into what it feels like in a real conversation.
 - Be useful and honest. If the day is tense, say so kindly and say what to do.
-- Do not make the relationship romantic unless the relationship type above is Romantic.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
+- Do not make the relationship romantic unless the relationship type above is Romantic or the name is Kaleb.${isKaleb ? `\n- ABOUT THIS PERSON: ${KALEB_FACT} Write about the real situation: a romantic connection that is not committed. Never predict commitment, and keep advice centred on Zoe's needs and honesty.` : ''}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
       try {
         const raw = await callAI('You are LUNA, Zoe\'s astrology guide. Warm, direct, honest. Return only valid JSON.', prompt, 2500)
         const json = JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim())
