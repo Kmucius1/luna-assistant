@@ -4,7 +4,7 @@ import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { realLifeBlock } from '@/lib/luna/realLife'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
-import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from '@/lib/luna/voiceRules'
+import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 import { moonSignChangeNote } from '@/lib/luna/moonChange'
 
@@ -107,7 +107,18 @@ export interface RealAdvice {
   do:        string   // the exact thing to do or say
 }
 
+export interface BestMove {
+  headline:    string  // the one best thing to do today
+  why:         string
+  first:       string  // do this first
+  then:        string  // then this
+  skip:        string  // put this off or skip it
+  best_window: string  // the best part of the day for it and why
+  people:      string  // best move with the people closest to her today
+}
+
 export interface DailyGuidance {
+  best_move?:          BestMove
   in_plain_words?:     string          // 3-4 short sentences, the whole day in everyday language
   transit_breakdown?:  TransitBreakdown[]
   real_advice?:        RealAdvice[]
@@ -223,6 +234,15 @@ ADVICE QUALITY RULES (mandatory):
 Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdown, no prose outside the JSON. The JSON must exactly match this schema:
 
 {
+  "best_move": {
+    "headline": "ONE sentence: the single best thing for Zoe to do today. Specific and decisive.",
+    "why": "ONE sentence: why this is the best move given today's sky.",
+    "first": "The first thing to do today, with a concrete action.",
+    "then": "The next best thing to do after that.",
+    "skip": "One specific thing to put off or skip today and why.",
+    "best_window": "The best part of the day (morning, midday, afternoon or evening) for her most important thing, and why.",
+    "people": "The best move with the people closest to her today: who to reach out to, who to give space, and how. If it involves Kaleb, follow the romance rules: honest, no predicting commitment."
+  },
   "in_plain_words": "3-4 SHORT sentences, written like a smart best friend talking. What kind of day is this, why, and what is the single best move? Zero astrology vocabulary she would have to look up. If you must name a planet, say right away what it means for her day.",
   "transit_breakdown": [
     { "sky": "What the sky is doing, in plain words (e.g. 'Mercury is lining up with your Sun')", "feels_like": "What that will actually feel or look like in her real day, in 2 sentences, with a specific example (a conversation, a mood, a decision, a body feeling).", "what_to_do": "The concrete move: one clear thing to do about it, 1-2 sentences." }
@@ -244,12 +264,12 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
   "main_focus": "1-2 sentences: the single most important thing to put her energy toward today, and briefly why today's sky makes that the priority.",
   "highest_self": "5-6 sentences connecting her Human Design (Self-Projected Projector, 4/6) with her birth chart to guide her toward her highest state today. Speak to her role-model 6th line transition, her need for invitation not initiation, her clarity-through-speaking. Ground it in today's sky, and give her one concrete way to actually practice this today.",
   "affirmation": "One powerful affirmation written in first person, specific to today's energy. Not generic — written as if she is declaring it from her Scorpio Sun depth."
-}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
+}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v4',
+      generationType: 'daily_guidance_v5',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

@@ -2,7 +2,7 @@ import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
-import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES } from '@/lib/luna/voiceRules'
+import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey } from '@/lib/luna/today'
 
@@ -19,6 +19,8 @@ export interface DayForecast {
   watch_for:  string   // 1 warning
   affirmation: string  // 1 first-person declaration
   intensity:  number   // 1-10 how energetically loaded this day is
+  best_move?: string   // the one best thing to do this day
+  best_window?: string // best part of the day and why
 }
 
 export interface WeeklyForecast {
@@ -28,6 +30,7 @@ export interface WeeklyForecast {
   rest_day:     string
   love_window:  string
   power_window: string
+  week_priorities?: { task: string; day: string; why: string }[]
 }
 
 // ─── Fallback generator ───────────────────────────────────────────────────────
@@ -136,7 +139,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v3',
+      generationType: 'weekly_forecast_v4',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -155,7 +158,7 @@ HUMAN DESIGN: Self-Projected Projector · 4/6 Profile
 PLANETARY DATA FOR EACH DAY:
 ${dayLines}
 
-Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Write as if you personally know Zoe — warm, direct, deeply specific to her chart:
+Include exactly 4 items in week_priorities. Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Write as if you personally know Zoe — warm, direct, deeply specific to her chart:
 
 {
   "week_theme": "1-2 sentences: the overarching energy and message for this week for Zoe specifically",
@@ -163,6 +166,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
   "rest_day": "weekday name of her best day to rest, recover, or go inward",
   "love_window": "weekday name of the day most charged for love and connection",
   "power_window": "weekday name of the day best for major decisions, visibility, or career moves",
+  "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day" } ],
   "days": [
     {
       "date": "weekday, Month Day (e.g. Monday, June 23)",
@@ -173,11 +177,13 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Writ
       "career": "3 sentences about her work and business energy this specific day — she runs DRYP Digital, and outside that her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. Name a real kind of task, meeting, or decision the day favors.",
       "guidance": ["4 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits, each a full sentence"],
       "watch_for": "1-2 sentences: an honest warning or caution specific to this day, including what it could look like if ignored",
+      "best_move": "1-2 sentences: the ONE best thing for her to do this day, decisive and specific, with a one-sentence reason.",
+      "best_window": "The best part of this day (morning, midday, afternoon, evening) for her most important thing, and why.",
       "affirmation": "1 powerful first-person declaration tailored to this day's energy",
       "intensity": 7
     }
   ]
-}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
+}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 6500)

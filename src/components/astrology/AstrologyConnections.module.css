@@ -55,3 +55,5 @@
 .dayBody { font-size: 14px; line-height: 1.6; margin: 0 0 6px; color: var(--astro-text); }
 .dayNote { font-size: 12px; line-height: 1.5; color: var(--astro-muted); margin: 12px 0 0; }
 .dayRetry { background: none; border: none; color: var(--astro-gold); font-weight: 700; padding: 0; cursor: pointer; }
+
+.bestMove { margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; background: var(--astro-gold-soft); border: 1px solid var(--astro-border); }

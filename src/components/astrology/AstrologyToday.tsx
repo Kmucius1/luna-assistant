@@ -42,7 +42,9 @@ interface TransitData {
   moon_house_meaning: string | null
 }
 
+interface BestMoveT { headline: string; why: string; first: string; then: string; skip: string; best_window: string; people: string }
 interface DailyGuidance {
+  best_move?: BestMoveT
   in_plain_words?: string
   transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
   real_advice?: { situation: string; do: string }[]
@@ -123,6 +125,18 @@ export function AstrologyToday() {
         {guidance ? (
           <>
             <p className={styles.themeQuote}>{guidance.affirmation.replace(/\.$/, '')}</p>
+            {guidance.best_move && (
+              <div style={{ margin: '14px 0', padding: 14, borderRadius: 16, background: 'var(--astro-gold-soft)', border: '1px solid var(--astro-border)' }}>
+                <div className={styles.themeEnergyLabel} style={{ marginTop: 0 }}>Your Best Move Today</div>
+                <p className={styles.themeBody} style={{ fontWeight: 700, margin: '4px 0' }}>{guidance.best_move.headline}</p>
+                <p className={styles.themeBody} style={{ margin: '0 0 8px' }}>{guidance.best_move.why}</p>
+                <p className={styles.themeBody} style={{ margin: '0 0 4px' }}><strong>Do first:</strong> {guidance.best_move.first}</p>
+                <p className={styles.themeBody} style={{ margin: '0 0 4px' }}><strong>Then:</strong> {guidance.best_move.then}</p>
+                <p className={styles.themeBody} style={{ margin: '0 0 4px' }}><strong>Skip or put off:</strong> {guidance.best_move.skip}</p>
+                <p className={styles.themeBody} style={{ margin: '0 0 4px' }}><strong>Best time:</strong> {guidance.best_move.best_window}</p>
+                <p className={styles.themeBody} style={{ margin: 0 }}><strong>With the people closest to you:</strong> {guidance.best_move.people}</p>
+              </div>
+            )}
             {guidance.in_plain_words && (
               <>
                 <div className={styles.themeEnergyLabel}>Today In Plain Words</div>

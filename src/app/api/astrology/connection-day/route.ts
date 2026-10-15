@@ -6,7 +6,7 @@ import {
   SIGN_ENERGY_DESCRIPTIONS, type ZodiacSign,
 } from '@/lib/astrology'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
-import { ROMANTIC_ACCURACY_RULES, LIFE_LANGUAGE_RULES, KALEB_FACT } from '@/lib/luna/voiceRules'
+import { ROMANTIC_ACCURACY_RULES, LIFE_LANGUAGE_RULES, KALEB_FACT, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_v2_${cacheId}`,
+    generationType: `connection_day_v3_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {
@@ -152,6 +152,7 @@ ${zoeTransits}
 
 Return ONLY valid JSON:
 {
+  "best_move": { "decision": "exactly one of: reach_out, wait, give_space, be_close, keep_light", "headline": "ONE decisive sentence: the best move with ${body.name} today.", "when": "The best time of day to do it and why, or when to wait until.", "how": "How to do it in 1-2 sentences, concrete." },
   "summary": "3-4 short sentences in plain words: what kind of day this is between Zoe and ${body.name}, and the single best move.",
   "communication": "2-3 sentences: should she reach out or wait, how, and what kind of conversation works today. Explain why using the facts above.",
   "closeness": "2-3 sentences: is today good for being close or doing something together, and what that should look like.",
@@ -167,7 +168,7 @@ RULES:
 - Only use the facts above. Do not invent events or what ${body.name} will do. Astrology describes tendencies, never certainties.
 - Plain words an eighth grader understands. Short sentences. Translate every planet into what it feels like in a real conversation.
 - Be useful and honest. If the day is tense, say so kindly and say what to do.
-- Do not make the relationship romantic unless the relationship type above is Romantic or the name is Kaleb.${isKaleb ? `\n- ABOUT THIS PERSON: ${KALEB_FACT} Write about the real situation: a romantic connection that is not committed. Never predict commitment, and keep advice centred on Zoe's needs and honesty.` : ''}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}`
+- Do not make the relationship romantic unless the relationship type above is Romantic or the name is Kaleb.${isKaleb ? `\n- ABOUT THIS PERSON: ${KALEB_FACT} Write about the real situation: a romantic connection that is not committed. Never predict commitment, and keep advice centred on Zoe's needs and honesty.` : ''}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
       try {
         const raw = await callAI('You are LUNA, Zoe\'s astrology guide. Warm, direct, honest. Return only valid JSON.', prompt, 2500)
         const json = JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim())

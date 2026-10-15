@@ -47,3 +47,13 @@ ROMANCE ACCURACY RULES (mandatory, accuracy and honesty matter more than comfort
 - Do not assume she has any other romantic partner. Only talk about romantic energy when the real sky supports it (Venus, Mars, the Moon, or the parts of her chart about romance and partnership), and say plainly when it is a quiet day for romance.
 - Work and business matters with Kaleb belong under work; keep the romantic situation separate from DRYP business advice unless she asks about both.
 `
+
+// Readings are for deciding, not just for reading. Appended to every reading generator.
+export const DECISIVE_GUIDANCE_RULES = `
+BE DECISIVE (mandatory): Zoe needs to know what is BEST to do, not just what is happening.
+- Always name ONE best move for the day, and say why in one sentence. Then the next best thing, and one thing to skip.
+- Give a concrete time window when it matters (morning, midday, afternoon, evening) and why that window.
+- If the day is mixed, say what to protect and what to put off. Never end on "it depends" or "trust your intuition" without a specific action.
+- Prefer a clear choice between options (reach out OR wait, say yes OR hold off) over listing possibilities.
+- Tie the move to things on her real day when they are listed. Never invent events, and never promise outcomes.
+`

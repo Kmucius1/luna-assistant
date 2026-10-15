@@ -28,6 +28,7 @@ interface DayReading {
   mercuryRetrograde: boolean
   connections: { text: string; strength: string }[]
   reading: {
+    best_move?: { decision: string; headline: string; when: string; how: string }
     summary?: string; communication?: string; closeness?: string; space?: string; how_they_may_feel?: string
     how_to_approach?: string[]; what_to_say?: string[]; avoid?: string[]; if_it_goes_sideways?: string
   }
@@ -161,6 +162,14 @@ export function AstrologyConnections() {
           {dayReading && (
             <>
               <p className={styles.dayVerdict}>{dayReading.verdict.label}</p>
+              {dayReading.reading.best_move && (
+                <div className={styles.bestMove}>
+                  <p className={styles.dayHead} style={{ marginTop: 0 }}>Best move today</p>
+                  <p className={styles.dayBody}><strong>{dayReading.reading.best_move.headline}</strong></p>
+                  <p className={styles.dayBody}><strong>When:</strong> {dayReading.reading.best_move.when}</p>
+                  <p className={styles.dayBody}><strong>How:</strong> {dayReading.reading.best_move.how}</p>
+                </div>
+              )}
               <div className={styles.dayRatings}>
                 <div><span>Communicate</span><strong>{LEVEL_LABEL[dayReading.ratings.communication.level]}</strong></div>
                 <div><span>Be close</span><strong>{LEVEL_LABEL[dayReading.ratings.closeness.level]}</strong></div>

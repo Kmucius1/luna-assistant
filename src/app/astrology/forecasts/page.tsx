@@ -36,6 +36,7 @@ function IntensityPips({ value }: { value: number }) {
 
 // ─── Full day reading (the long, plain-words version for one date) ───────────
 type FullGuidance = {
+  best_move?: { headline: string; why: string; first: string; then: string; skip: string; best_window: string; people: string }
   in_plain_words?: string
   transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
   real_advice?: { situation: string; do: string }[]
@@ -54,6 +55,18 @@ const P = ({ children, bold }: { children: React.ReactNode; bold?: boolean }) =>
 function FullDayView({ g }: { g: FullGuidance }) {
   return (
     <div>
+      {g.best_move && (
+        <div style={{ marginTop: 12, padding: 14, borderRadius: 16, background: 'rgba(201,169,110,0.12)', border: '1px solid rgba(201,169,110,0.3)' }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#5C4530', margin: '0 0 6px' }}>Best move this day</p>
+          <P bold>{g.best_move.headline}</P>
+          <P>{g.best_move.why}</P>
+          <P><strong>Do first:</strong> {g.best_move.first}</P>
+          <P><strong>Then:</strong> {g.best_move.then}</P>
+          <P><strong>Skip or put off:</strong> {g.best_move.skip}</P>
+          <P><strong>Best time:</strong> {g.best_move.best_window}</P>
+          <P><strong>With the people closest to you:</strong> {g.best_move.people}</P>
+        </div>
+      )}
       {g.in_plain_words && (<><H>In plain words</H><P bold>{g.in_plain_words}</P></>)}
       <H>The day, morning to evening</H><P>{g.horoscope}</P>
       <H>How it feels</H><P>{g.energy}</P>
@@ -194,6 +207,18 @@ export default function ForecastsPage() {
                 </div>
                 <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.9)', lineHeight: 1.6, marginBottom: 14 }}>{forecast.week_theme}</p>
 
+                {forecast.week_priorities && forecast.week_priorities.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <Label text="Best day for each thing this week" color="#5C4530" />
+                    {forecast.week_priorities.map((w, i) => (
+                      <div key={i} style={{ padding: '8px 0', borderTop: i ? '1px solid rgba(180,150,100,0.15)' : 'none' }}>
+                        <p style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(16,12,30,0.88)', margin: 0 }}>{w.day}: {w.task}</p>
+                        <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.6)', lineHeight: 1.5, margin: '2px 0 0' }}>{w.why}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                   {[
                     { label: 'Power Day',   value: forecast.power_window, color: '#5C4530' },
@@ -246,6 +271,13 @@ export default function ForecastsPage() {
                       <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.45)', margin: '2px 0 8px' }}>{day.date}</p>
                       <IntensityPips value={day.intensity} />
                       <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.78)', lineHeight: 1.6, marginTop: 10 }}>{day.theme}</p>
+                      {day.best_move && (
+                        <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(92,69,48,0.08)', border: '1px solid rgba(92,69,48,0.2)' }}>
+                          <Label text="Best move" color="#5C4530" />
+                          <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(16,12,30,0.88)', lineHeight: 1.55, margin: 0 }}>{day.best_move}</p>
+                          {day.best_window && <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.6)', lineHeight: 1.5, margin: '6px 0 0' }}>{day.best_window}</p>}
+                        </div>
+                      )}
                       {day.watch_for && (
                         <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)' }}>
                           <Label text="Watch for" color="#5C4530" />

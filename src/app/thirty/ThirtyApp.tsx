@@ -214,6 +214,32 @@ function PartChecklist({ b, part, title, toggle, skip, send }: {
   )
 }
 
+// Today's astrology guidance, compact: the one best move for the day.
+function GuideCard() {
+  const [g, setG] = useState<{ headline: string; first: string; skip: string; best_window: string } | null>(null)
+  useEffect(() => {
+    let live = true
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const date = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date())
+    const time = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
+    fetch(`/api/astrology/daily-guidance?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => { if (live && d?.best_move) setG(d.best_move) })
+      .catch(() => {})
+    return () => { live = false }
+  }, [])
+  if (!g) return null
+  return (
+    <section className={styles.card}>
+      <p className={styles.cardTitle}>The sky says: your best move</p>
+      <p className={styles.next}>{g.headline}</p>
+      <p className={styles.detail}><strong>First:</strong> {g.first}</p>
+      <p className={styles.detail}><strong>Skip:</strong> {g.skip}</p>
+      <p className={styles.small}>{g.best_window}</p>
+    </section>
+  )
+}
+
 function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id: string, v: boolean) => void; send: Send }) {
   const [sub, setSub] = useState<Sub>('overview')
   const [top, setTop] = useState<string[]>(() => [0, 1, 2].map(i => b.day.top3[i]?.text ?? ''))
@@ -248,6 +274,8 @@ function Today({ b, toggle, skip, send }: { b: Bundle; toggle: Toggle; skip: (id
             </div>
             {b.day.energy === 'low' && <p className={styles.note}>Low-energy day: the plan is trimmed to the essentials. It still counts.</p>}
           </section>
+
+          <GuideCard />
 
           <section className={styles.card}>
             <p className={styles.cardTitle}>What is Zoe doing next?</p>
