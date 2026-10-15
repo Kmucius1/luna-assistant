@@ -32,7 +32,8 @@ interface DayReading {
   reading: {
     best_move?: { decision: string; headline: string; when: string; how: string }
     feeling_today?: string; feeling_clues?: string[]
-    exact_words?: { situation: string; say: string }[]
+    exact_words?: { situation: string; say: string; why_it_works?: string; if_he_responds?: string }[]
+    conversation_plan?: string[]
     healthy_outcome?: string; deeper_talk?: string
     summary?: string; communication?: string; closeness?: string; space?: string; how_they_may_feel?: string
     how_to_approach?: string[]; what_to_say?: string[]; avoid?: string[]; if_it_goes_sideways?: string
@@ -267,6 +268,13 @@ export function AstrologyConnections() {
                 </>
               )}
 
+              {dayReading.reading.conversation_plan && dayReading.reading.conversation_plan.length > 0 && (
+                <>
+                  <p className={styles.dayHead}>How the conversation should go</p>
+                  {dayReading.reading.conversation_plan.map((x, i) => <p key={i} className={styles.dayBody}>{i + 1}. {x}</p>)}
+                </>
+              )}
+
               {dayReading.reading.exact_words && dayReading.reading.exact_words.length > 0 && (
                 <>
                   <p className={styles.dayHead}>Exactly what to say</p>
@@ -274,6 +282,8 @@ export function AstrologyConnections() {
                     <div key={i} className={styles.sayCard}>
                       <p className={styles.daySituation}>{w.situation}</p>
                       <p className={styles.dayBody}>“{w.say}”</p>
+                      {w.why_it_works && <p className={styles.dayBody}><strong>Why it works:</strong> {w.why_it_works}</p>}
+                      {w.if_he_responds && <p className={styles.dayBody}><strong>If he responds:</strong> {w.if_he_responds}</p>}
                     </div>
                   ))}
                 </>

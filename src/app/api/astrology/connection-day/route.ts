@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.birthTimezone ?? 'ny'}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_v6_${cacheId}`,
+    generationType: `connection_day_v7_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {
@@ -116,11 +116,13 @@ Return ONLY valid JSON:
   "best_move": { "decision": "exactly one of: reach_out, wait, give_space, be_close, keep_light", "headline": "ONE decisive sentence: the best move with ${body.name} today.", "when": "The best time of day to do it and why, or when to wait until.", "how": "How to do it in 1-2 sentences, concrete." },
   "feeling_today": "3-4 sentences describing what ${body.name} is most likely feeling today and underneath it (his need or fear), based on his placements, today's sky${isKaleb ? ', and the fact that he has said he is not ready for commitment' : ''}. Hedged: 'is likely', 'may', 'tends to'. Not certain, never mind-reading.",
   "feeling_clues": ["2-3 observable signs that would suggest he is feeling that way today (behaviors she can notice), phrased as possibilities"],
+  "conversation_plan": ["4 short steps for how the conversation should go today, in order (for example: open warmly, say one true thing, ask one clear question, close kindly). Each step is one sentence."],
   "exact_words": [
-    { "situation": "e.g. 'If you text him today'", "say": "The exact words to say or send, in first person, 1-3 sentences, calm and honest." },
-    { "situation": "e.g. 'If you talk in person or on a call'", "say": "Exact words." },
-    { "situation": "e.g. 'If he pulls away or goes quiet'", "say": "Exact words." },
-    { "situation": "e.g. 'If he says he is not ready'", "say": "Exact words that stay honest and keep her dignity, without pressure." }
+    { "situation": "e.g. 'Your opening message or first line'", "say": "The exact words, first person, 1-3 sentences, calm and honest.", "why_it_works": "1-2 sentences: why these words work for him and for her, based on his placements and today's sky.", "if_he_responds": "1-2 sentences: what a warm response versus a distant or deflecting response could look like, and the next thing to say." },
+    { "situation": "e.g. 'Saying what you feel and want'", "say": "Exact words.", "why_it_works": "Why.", "if_he_responds": "What to say next." },
+    { "situation": "e.g. 'Asking where he stands, without pressure'", "say": "Exact words.", "why_it_works": "Why.", "if_he_responds": "What to say next." },
+    { "situation": "e.g. 'If he pulls away or goes quiet'", "say": "Exact words.", "why_it_works": "Why.", "if_he_responds": "What to say next." },
+    { "situation": "e.g. 'If he says he is not ready'", "say": "Exact words that stay honest and keep her dignity, without pressure.", "why_it_works": "Why.", "if_he_responds": "What to say next." }
   ],
   "healthy_outcome": "3-4 sentences: what a healthy outcome looks like between them, what to look for in his actions (not just words) over time, and the boundary she can keep for her own sake. Honest that commitment is one possible outcome and clarity or stepping back is another.",
   "deeper_talk": "1-2 sentences: today is or is not the day for a deeper conversation; if not, say that ${bestDay.day} is the best day this week for it and why, and what to do today instead.",
@@ -143,7 +145,7 @@ RULES:
 - Be useful and honest. If the day is tense, say so kindly and say what to do.
 - Do not make the relationship romantic unless the relationship type above is Romantic or the name is Kaleb.${isKaleb ? `\n- ABOUT THIS PERSON: ${KALEB_FACT} Write about the real situation: a romantic connection that is not committed. Never predict commitment, and keep advice centred on Zoe's needs and honesty.` : ''}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
       try {
-        const raw = await callAI('You are LUNA, Zoe\'s astrology guide. Warm, direct, honest. Return only valid JSON.', prompt, 4200)
+        const raw = await callAI('You are LUNA, Zoe\'s astrology guide. Warm, direct, honest. Return only valid JSON.', prompt, 6000)
         const json = JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim())
         return { payload: json as Record<string, unknown>, source: 'ai' as const }
       } catch (e) {

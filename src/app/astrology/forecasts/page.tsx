@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { BackLink } from '@/components/ui/BackLink'
 import { ArrowLeft, Calendar, Sparkles, RefreshCw } from 'lucide-react'
 import { useLocation } from '@/hooks/useLocation'
+import { getSavedPeople, type SavedPerson } from '@/lib/luna/savedPeople'
 import type { WeeklyForecast } from '@/app/api/astrology/weekly-forecast/route'
 import type { SkyDay } from '@/lib/luna/weekSky'
 
@@ -31,6 +32,68 @@ function IntensityPips({ value }: { value: number }) {
       {Array.from({ length: 10 }, (_, i) => (
         <div key={i} style={{ width: 12, height: 3, borderRadius: 2, background: i < value ? 'rgba(201,169,110,0.8)' : 'rgba(180,150,100,0.18)' }} />
       ))}
+    </div>
+  )
+}
+
+// ─── What to say to Kaleb that day ──────────────────────────────────────────
+interface KalebReading {
+  verdict: { label: string }
+  ratings: { communication: { level: string }; closeness: { level: string }; space: { needsSpace: boolean } }
+  bestDay?: { day: string }
+  moonUncertain?: boolean
+  reading: {
+    best_move?: { headline: string; when: string; how: string }
+    summary?: string; feeling_today?: string; feeling_clues?: string[]
+    conversation_plan?: string[]
+    exact_words?: { situation: string; say: string; why_it_works?: string; if_he_responds?: string }[]
+    deeper_talk?: string; healthy_outcome?: string; avoid?: string[]; if_it_goes_sideways?: string
+  }
+}
+
+function KalebDay({ k, name }: { k: KalebReading; name: string }) {
+  const r = k.reading
+  const lvl = (l: string) => l[0].toUpperCase() + l.slice(1)
+  return (
+    <div style={{ marginTop: 14, padding: 14, borderRadius: 16, background: 'rgba(120,100,160,0.08)', border: '1px solid rgba(120,100,160,0.2)' }}>
+      <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#4b3f72', margin: '0 0 6px' }}>What to say to {name} this day</p>
+      <p style={{ fontSize: 17, fontWeight: 700, color: '#100C1E', margin: '0 0 8px' }}>{k.verdict.label}</p>
+      <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.6)', margin: '0 0 8px' }}>
+        Communicate: {lvl(k.ratings.communication.level)} · Be close: {lvl(k.ratings.closeness.level)} · Space: {k.ratings.space.needsSpace ? 'give some' : 'not needed'}
+      </p>
+      {r.best_move && (
+        <>
+          <P bold>{r.best_move.headline}</P>
+          <P><strong>When:</strong> {r.best_move.when}</P>
+          <P><strong>How:</strong> {r.best_move.how}</P>
+        </>
+      )}
+      {r.feeling_today && (<><H>What {name} is most likely feeling</H><P>{r.feeling_today}</P></>)}
+      {r.feeling_clues && r.feeling_clues.length > 0 && (<><H>What you might notice</H>{r.feeling_clues.map((x, i) => <P key={i}>• {x}</P>)}</>)}
+      {r.conversation_plan && r.conversation_plan.length > 0 && (
+        <><H>How the conversation should go</H>{r.conversation_plan.map((x, i) => <P key={i}>{i + 1}. {x}</P>)}</>
+      )}
+      {r.exact_words && r.exact_words.length > 0 && (
+        <>
+          <H>Exactly what to say</H>
+          {r.exact_words.map((w, i) => (
+            <div key={i} style={{ marginBottom: 12, padding: 12, borderRadius: 14, background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(120,100,160,0.15)' }}>
+              <p style={{ fontSize: 11.5, fontWeight: 700, color: 'rgba(16,12,30,0.5)', margin: '0 0 4px' }}>{w.situation}</p>
+              <P bold>“{w.say}”</P>
+              {w.why_it_works && <P><strong>Why it works:</strong> {w.why_it_works}</P>}
+              {w.if_he_responds && <P><strong>If he responds:</strong> {w.if_he_responds}</P>}
+            </div>
+          ))}
+        </>
+      )}
+      {r.deeper_talk && (<><H>Is this the day for the deeper conversation?</H><P>{r.deeper_talk}</P></>)}
+      {r.avoid && r.avoid.length > 0 && (<><H>Avoid</H>{r.avoid.map((x, i) => <P key={i}>• {x}</P>)}</>)}
+      {r.if_it_goes_sideways && (<><H>If it gets tense</H><P>{r.if_it_goes_sideways}</P></>)}
+      {r.healthy_outcome && (<><H>What a healthy outcome looks like</H><P>{r.healthy_outcome}</P></>)}
+      <p style={{ fontSize: 11.5, color: 'rgba(16,12,30,0.5)', lineHeight: 1.5, margin: '10px 0 0' }}>
+        The ratings are calculated from real planet positions. The explanation is an interpretation and a tendency, not a guarantee.
+        {k.moonUncertain ? ` ${name}'s Moon may be off without a confirmed birth time.` : ''}
+      </p>
     </div>
   )
 }
@@ -145,6 +208,8 @@ export default function ForecastsPage() {
   const location = useLocation()
   const [forecast, setForecast] = useState<WeeklyForecast | null>(null)
   const [sky, setSky] = useState<SkyDay[]>([])
+  const [kaleb, setKaleb] = useState<SavedPerson | null>(null)
+  const [kalebDays, setKalebDays] = useState<Record<string, KalebReading | 'loading' | 'error'>>({})
   const [loading,  setLoading]  = useState(true)
   const [sel, setSel] = useState(0)
   const [readings, setReadings] = useState<Record<string, FullGuidance | 'error' | 'loading'>>({})
@@ -204,6 +269,37 @@ export default function ForecastsPage() {
     const timers = order.map((i, n) => setTimeout(() => loadDay(i), n === 0 ? 0 : 4000 + (n - 1) * 5000))
     return () => timers.forEach(clearTimeout)
   }, [sky, sel, loadDay])
+
+  // Kaleb's saved birth details live on this device; look him up once.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      const k = getSavedPeople().find(p => /kaleb/i.test(p.name)) ?? null
+      setKaleb(k)
+    }, 0)
+    return () => clearTimeout(t)
+  }, [])
+
+  // The selected day's "what to say" for Kaleb.
+  useEffect(() => {
+    const day = sky[sel]
+    if (!kaleb || !day) return
+    if (kalebDays[day.iso] && kalebDays[day.iso] !== 'error') return
+    let live = true
+    const t = setTimeout(async () => {
+      setKalebDays(prev => ({ ...prev, [day.iso]: 'loading' }))
+      try {
+        const r = await fetch('/api/astrology/connection-day', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: kaleb.name, relationship: kaleb.relationship, birthDate: kaleb.birthDate, birthTime: kaleb.birthTime, birthTimezone: kaleb.birthTimezone, day: day.iso }),
+        })
+        if (!r.ok) throw new Error()
+        const d = await r.json()
+        if (live) setKalebDays(prev => ({ ...prev, [day.iso]: d }))
+      } catch { if (live) setKalebDays(prev => ({ ...prev, [day.iso]: 'error' })) }
+    }, 400)
+    return () => { live = false; clearTimeout(t) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kaleb, sky, sel])
 
   useEffect(() => {
     if (location.localTime) loadWeekly()
@@ -335,6 +431,20 @@ export default function ForecastsPage() {
                           </div>
                         ))}
                       </div>
+
+                      {(() => {
+                        if (!kaleb) {
+                          return (
+                            <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.55)', lineHeight: 1.55, marginTop: 14 }}>
+                              Add Kaleb in Astrology → Connections (with his birth date) to see exactly what to say to him each day here.
+                            </p>
+                          )
+                        }
+                        const k = kalebDays[day.iso]
+                        if (!k || k === 'loading') return <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.5)', marginTop: 14 }}>Writing what to say to {kaleb.name} on {day.weekday}…</p>
+                        if (k === 'error') return <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.5)', marginTop: 14 }}>Couldn’t load the {kaleb.name} reading for this day. Switch days and come back to retry.</p>
+                        return <KalebDay k={k} name={kaleb.name} />
+                      })()}
 
                       <div style={{ borderTop: '1px solid rgba(180,150,100,0.15)', marginTop: 14 }}>
                         {!g || g === 'loading' ? (
