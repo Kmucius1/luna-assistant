@@ -139,7 +139,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v5',
+      generationType: 'weekly_forecast_v6',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -149,7 +149,7 @@ ${tLines}`
 
 ZOE'S NATAL CHART:
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
-Mercury: Scorpio 3° | Venus: Sagittarius 29° | Mars: Libra 6°
+Mercury: Scorpio 3° | Venus: Capricorn 2° | Mars: Libra 6°
 Jupiter: Gemini 7° | Saturn: Taurus 27° | North Node: Cancer 17°
 Chiron: Sagittarius 15° | Midheaven: Virgo 12°
 

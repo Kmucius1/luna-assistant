@@ -153,7 +153,7 @@ const HD_CHART = {
     { label: 'Rising',     value: 'Gemini',    note: 'Quick, expressive, multi-faceted energy — you think and speak fast, and adapt to whoever is in the room' },
     { label: 'North Node', value: 'Cancer',    note: 'Destiny: emotional wisdom, creating safety for others, building home (literal and metaphorical)' },
     { label: 'Midheaven',  value: 'Virgo',     note: 'Career through service, precision, systems — your legacy grows when chaos becomes clean structure' },
-    { label: 'Venus',      value: 'Sagittarius', note: 'Love through freedom, honesty, and shared adventure, right at the Capricorn cusp — you need a partner who can keep up and still build something real with you' },
+    { label: 'Venus',      value: 'Capricorn', note: 'Love through loyalty, steadiness and slow-building commitment — you value quality and what lasts, and you show love through consistent actions' },
     { label: 'Mercury',    value: 'Scorpio',   note: 'Strategic, investigative communication — you speak to excavate truth, not fill silence' },
     { label: 'Mars',       value: 'Libra',     note: 'Acts best through balance and relational clarity — tone and communication matter before you move' },
     { label: 'Saturn',     value: 'Taurus',    note: 'Life lesson: self-worth before production, slow wealth, embodiment — you are valuable before you earn' },

@@ -227,7 +227,7 @@ ${transitLines}
 
 ${realLife ? `=== ZOE'S REAL DAY (facts from her calendar, lists and plan; cite these by name when the sky relates to them) ===\n${realLife}\n\n` : ''}=== ZOE'S NATAL CHART ===
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
-Mercury: Scorpio 3° | Venus: Sagittarius 29° | Mars: Libra 6°
+Mercury: Scorpio 3° | Venus: Capricorn 2° | Mars: Libra 6°
 Jupiter: Gemini 7° | Saturn: Taurus 27° | North Node: Cancer 17°
 Chiron: Sagittarius 15° | Midheaven: Virgo 12°
 
@@ -299,7 +299,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v6',
+      generationType: 'daily_guidance_v7',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

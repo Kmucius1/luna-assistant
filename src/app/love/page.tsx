@@ -41,7 +41,7 @@ function Shimmer({ h = 80 }: { h?: number }) {
 
 // ─── Compatibility chart ──────────────────────────────────────────────────────
 const COMPATIBILITY = [
-  { signs: 'Aries · Leo · Sagittarius', match: 'High', emoji: '🔥', why: 'Fire energy matches your Sag Venus — bold, honest, adventurous love. They keep up with your spirit.' },
+  { signs: 'Taurus · Virgo · Capricorn', match: 'High', emoji: '🌱', why: 'Earth energy matches your Capricorn Venus — steady, loyal, quality-minded love. They build slowly and mean it.' },
   { signs: 'Gemini · Aquarius',         match: 'High', emoji: '💨', why: 'Air feeds your Gemini Rising — mental stimulation, wit, and a sense of freedom. Your mind ignites first.' },
   { signs: 'Libra · Taurus',            match: 'Good', emoji: '✨', why: 'Venus-ruled partners speak your Mars in Libra language — beauty, fairness, and relational harmony.' },
   { signs: 'Scorpio · Cancer · Pisces', match: 'Deep', emoji: '🌊', why: 'Water signs reach your Scorpio Sun depth. These bonds go soul-level. Intense but transformative.' },
@@ -50,7 +50,7 @@ const COMPATIBILITY = [
 
 // ─── What you need ────────────────────────────────────────────────────────────
 const LOVE_NEEDS = [
-  { icon: '🦋', title: 'Freedom to grow',    text: 'Your Sag Venus 29° cannot be caged. Love must expand you, not contain you.' },
+  { icon: '🦋', title: 'Freedom to grow',    text: 'Your Capricorn Venus loves seriously and for the long run. You need steadiness you can trust, shown through actions over time.' },
   { icon: '🧠', title: 'Mental connection',   text: 'Gemini Rising means you fall in love through conversation and ideas first.' },
   { icon: '🌊', title: 'Emotional honesty',   text: 'Cancer Moon needs to feel safe. You open only when you trust completely.' },
   { icon: '🔥', title: 'Real depth',          text: 'Scorpio Sun requires authenticity. Shallow connections drain you quickly.' },
@@ -107,7 +107,7 @@ export default function LovePage() {
                   Your love life, read through the stars — transits, compatibility, and how to navigate it all.
                 </p>
                 <div style={{ display: 'flex', gap: 6, marginTop: 12, flexWrap: 'wrap' }}>
-                  <LoveBadge text="Venus: Sagittarius 29°" />
+                  <LoveBadge text="Venus: Capricorn 2°" />
                   <LoveBadge text="Mars: Libra 6°" />
                   <LoveBadge text="7th House: Sagittarius" />
                 </div>
@@ -233,8 +233,8 @@ export default function LovePage() {
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
                     <div style={{ padding: 14, borderRadius: 16, background: 'rgba(255,255,255,0.5)' }}>
                       <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(170,70,115,0.9)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>♀ Venus · How You Love</p>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Sagittarius 29°</p>
-                      <p style={{ fontSize: 11, color: '#5E5474', lineHeight: 1.5 }}>Freedom-seeking, all-or-nothing, adventurous. You love with your full spirit. Cannot stay where love feels like a cage.</p>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: '#100C1E', marginBottom: 4 }}>Capricorn 2°</p>
+                      <p style={{ fontSize: 11, color: '#5E5474', lineHeight: 1.5 }}>Loyal, steady, quality-minded. You are guarded at first and deeply committed once you open up. You show love through consistent actions and need the same back.</p>
                     </div>
                     <div style={{ padding: 14, borderRadius: 16, background: 'rgba(255,255,255,0.5)' }}>
                       <p style={{ fontSize: 10, fontWeight: 700, color: 'rgba(201,169,110,0.9)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>♂ Mars · How You Pursue</p>

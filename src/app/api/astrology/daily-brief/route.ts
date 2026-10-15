@@ -43,7 +43,7 @@ ZOE'S NATAL CHART (confirmed):
 - Moon: Cancer
 - Rising: Gemini
 - Mercury: Scorpio
-- Venus: Sagittarius (29°, right at the Capricorn cusp)
+- Venus: Capricorn (2°)
 - Mars: Libra
 - Human Design: Self-Projected Projector, Profile 4/6, Self-Projected Authority
 

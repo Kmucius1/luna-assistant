@@ -26,7 +26,7 @@ const PLANETS_DATA = [
   {
     name: 'Venus', emoji: '♀', rules: 'Taurus & Libra · 2nd & 7th Houses', keyword: 'Love · beauty · values · pleasure · attraction',
     body: 'Venus governs what you love, what you find beautiful, what you value, and how you relate in close partnerships. It rules your aesthetic sense, your relationship to money and pleasure, and the way you attract and are attracted to others. Venus sign shows your love language, style preferences, and values in relationship. Venus house shows the life area where you seek beauty and connection most naturally.',
-    inYourChart: 'Your Venus in Sagittarius 29° (cusp Capricorn) makes you a freedom-loving, adventure-attracted, philosophically romantic soul. You are drawn to people who expand your mind. You love beauty as an experience — travel, ideas, creativity, bold aesthetics. The Capricorn cusp adds capacity for building serious, lasting love over time.',
+    inYourChart: 'Your Venus in Capricorn makes you a loyal, steady, quality-minded lover. You are guarded at first and then deeply committed. You are drawn to people you can trust and respect, and you show love through consistent actions. In style, you value pieces and people that last.',
   },
   {
     name: 'Mars', emoji: '♂', rules: 'Aries · 1st House', keyword: 'Drive · action · desire · anger · passion',

@@ -14,7 +14,7 @@ const RETROGRADE_MEANINGS: Record<string, {
     theme: 'Love, values, beauty, money, and attraction go inward for review.',
     do: ['Revisit your relationship with self-worth','Review financial choices','Reconnect with past creative projects','Ask what you truly value right now'],
     avoid: ['Starting new relationships from scarcity','Overspending from emotional lack','Drastic appearance changes'],
-    luna: 'Venus retrograde with your Venus in Sagittarius asks: are you free within your relationships and creative expression? What do you actually want?',
+    luna: 'Venus retrograde with your Venus in Capricorn asks: what do you actually value in love and in your style, and are you holding to standards that are really yours?',
   },
   Mars: {
     theme: 'Drive, motivation, anger, and action need rerouting.',

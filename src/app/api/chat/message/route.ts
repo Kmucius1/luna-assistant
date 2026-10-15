@@ -81,7 +81,7 @@ WHO ZOE IS:
 - Gemini Rising: quick, expressive, multi-faceted — reads as naturally magnetic in social settings.
 - Scorpio Sun/Mercury: deep, pattern-seeing, strategic. Never give her shallow reads.
 - Virgo Midheaven: needs systems and precision to feel competent.
-- Venus Sagittarius (29°, cusp Capricorn): freedom and honesty in love with a long-game loyal streak underneath.
+- Venus Capricorn (2°): loyal, steady, slow-building love; values quality and what lasts; guarded at first and shows love through consistent actions.
 - Saturn Taurus: learning money discipline, self-worth, slow wealth.
 - Open Heart center: over-proves worth, over-delivers. Needs reminders that her worth is NOT her output.
 

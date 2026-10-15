@@ -38,7 +38,7 @@ BIRTH CHART THEMES:
 - Cancer Moon & North Node: emotional safety IS the foundation of success; home, softness, rest are her path, not distractions — she absorbs the energy of every room
 - Gemini Rising: quick, expressive, multi-faceted — she thinks and speaks fast, and reads as naturally magnetic in social settings
 - Virgo Midheaven: career grows through clean systems, service, structure, precision — turn chaos into useful order
-- Venus in Sagittarius (29°, right at the Capricorn cusp): love through freedom, honesty, and shared adventure, with a hint of Capricorn's loyalty and long-game commitment underneath
+- Venus in Capricorn (2°): love through loyalty, steadiness and slow-building commitment; she values quality, reliability and what lasts, can be guarded at first, and shows love through consistent actions rather than big gestures
 - Mars in Libra: acts best when relationally clear and balanced — communication and tone matter before she moves
 - Saturn in Taurus: learning money discipline, self-worth, embodiment, slow wealth — worth exists before production
 
@@ -533,7 +533,7 @@ BIRTH CHART FOR ASTROLOGICAL CONNECTIONS:
 - Cancer North Node — her destiny path: emotional wisdom, protection, building a home
 - Gemini Rising — how the world sees her: quick, verbal, curious, multi-faceted
 - Virgo Midheaven — public legacy: systems, service, precision, healing through order
-- Venus in Sagittarius — love through freedom, adventure, truth, meaning
+- Venus in Capricorn — love through loyalty, steadiness, quality and slow-building commitment
 - Mars in Libra — acts through beauty and balance, needs harmony to move forward
 - Saturn in Taurus — life lesson: slow money, self-worth, embodiment, patience
 

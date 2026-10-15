@@ -71,21 +71,21 @@ function buildFallbackLoveGuidance(planets: PlanetPosition[], transits: TransitA
     loveTransits[0] ? `${loveTransits[0].transiting} is ${plainAspectPhrase(loveTransits[0].type)} your ${loveTransits[0].natal}: ${loveTransits[0].interpretation}` : 'Trust your intuition in love today — it is reliable.',
     moon ? `Moon in ${moon.sign}: ${moonMsg}` : '',
     venus ? `Venus in ${venus.sign} amplifies your magnetic pull. ${venusMsg}` : '',
-    'Your Venus in Sagittarius 29° craves honesty, freedom, and expansive connection. If it feels constricting, it is not the one.',
+    'Your Venus in Capricorn values steadiness, honesty shown through actions, and quality. If it is inconsistent or all talk, it is not what you need.',
     'Your Mars in Libra seeks fairness and beauty. You move toward love through creating harmony, not through force.',
   ].filter(Boolean)
 
   return {
-    daily_message: `${venus ? `Venus in ${venus.sign} lights up your love field today.` : 'The sky holds space for love today.'} ${venusMsg} Your own Venus sits at the very last degree of Sagittarius — the most intense spot a planet can be in that sign — which means you love with your whole spirit or not at all. Half-measures do not work for you. ${transitMsg}`,
+    daily_message: `${venus ? `Venus in ${venus.sign} lights up your love field today.` : 'The sky holds space for love today.'} ${venusMsg} Your own Venus is in Capricorn, which means you love seriously and for the long run. You are guarded at first and loyal once you commit your heart. Half-measures and mixed signals do not work for you. ${transitMsg}`,
     love_energy:   `${moonMsg} ${loveTransits.length > 0 ? `Real shifts are touching your love planets right now — ${loveTransits.map(t => `${t.transiting} ${plainAspectPhrase(t.type)} your ${t.natal}`).join(', ')}.` : 'The cosmic field around love is calm today.'}`,
-    venus_influence: `Your own Venus sits at the very last degree of Sagittarius, which means your capacity for love is both fierce and free. You love without restraint when it feels right — and you cannot stay where love feels like a cage. ${venus ? `Today's Venus in ${venus.sign} ${venus.retrograde ? '(moving backward for a while — a time to review and reconnect, not to start something new)' : ''} adds ${VENUS_SIGN_LOVE[venus.sign] ?? 'an additional layer of magnetism'} to your natural pull.` : ''}`,
+    venus_influence: `Your own Venus is in Capricorn, which means your love is steady, loyal and built to last. You take a while to open up, and you show love through consistent actions. You need the same back, shown over time, not just said. ${venus ? `Today's Venus in ${venus.sign} ${venus.retrograde ? '(moving backward for a while — a time to review and reconnect, not to start something new)' : ''} adds ${VENUS_SIGN_LOVE[venus.sign] ?? 'an additional layer of magnetism'} to your natural pull.` : ''}`,
     attract_energy: `Your Gemini Rising makes you incredibly charming and mentally magnetic — people are drawn to your mind and your way of connecting. Your Scorpio Sun adds depth and mystique beneath that surface sparkle. Today you attract best through: honest conversation, genuine curiosity about the other person, and being unapologetically yourself. Do not perform or over-give to be liked.`,
     watch_out: loveTransits.some(t => ['square', 'opposition'].includes(t.type))
       ? `Watch for: ${loveTransits.filter(t => ['square', 'opposition'].includes(t.type)).map(t => t.interpretation).join(' ')} Your Cancer Moon may feel this tension more intensely — give yourself space before reacting.`
       : `Watch for: Giving more than you receive (Mars in Libra can over-accommodate to keep the peace). Your Scorpio Sun knows when something is off — trust that knowing even when it is uncomfortable.`,
     love_ritual: `Light a pink or white candle. Write down: what you genuinely want in love right now — not what you think you should want, what is actually true. Your Self-Projected Projector nature means you know what you feel by speaking or writing it out loud. Let the truth surface. Then burn or fold the paper and say: "I am magnetic to what is genuinely aligned with me."`,
     affirmation: `I love freely, deeply, and without apology. I attract connections that match my full depth. I do not shrink for love — I expand into it.`,
-    compatibility_now: `Right now, you are most magnetically aligned with: ${sun ? `people whose energy harmonizes with the ${sun.sign} Sun in the sky` : 'fire and air energy'}. Your Venus in Sagittarius craves intellectual fire (Aries, Leo, Sagittarius energy), expansive conversations (Gemini, Aquarius), and raw honesty. Your Mars in Libra is attracted to beauty, wit, and fairness. People who challenge you to grow — and give you room to breathe — are your people.`,
+    compatibility_now: `Right now, you are most magnetically aligned with: ${sun ? `people whose energy harmonizes with the ${sun.sign} Sun in the sky` : 'fire and air energy'}. Your Venus in Capricorn values steadiness and substance (Taurus, Virgo, Capricorn energy), plus honest, grown-up conversation. Your Mars in Libra is attracted to beauty, wit, and fairness. People who challenge you to grow — and give you room to breathe — are your people.`,
     navigate_now: navigateNow,
   }
 }
@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
 
     const { payload: guidance } = await getOrCreateDailyContent<LoveGuidance>({
       userId: ZOE_USER_ID,
-      generationType: 'love_guidance_v3',
+      generationType: 'love_guidance_v4',
       timezone: clientTz,
       forceRegenerate: refresh,
       generate: async () => {
@@ -135,7 +135,7 @@ ZOE'S LOVE-RELATED TRANSITS TODAY:
 ${transitLines || 'No major love transits active right now — quiet field.'}
 
 ZOE'S NATAL LOVE PLANETS:
-- Venus: Sagittarius 29° (anaretic degree — fierce, freedom-seeking, all-or-nothing love. Cusp Capricorn energy)
+- Venus: Capricorn 2° (loyal, steady, slow-building love; values quality and consistency shown through actions)
 - Mars: Libra 6° (pursues through harmony, fairness, beauty. Conflict-careful but deeply value-driven)
 - Moon: Cancer 4° (emotionally cyclical, needs emotional safety, deeply intuitive, very feeling-sensitive)
 - 7th House: Sagittarius (her partnership house — she needs expansive, adventurous, honest partnerships)
@@ -153,7 +153,7 @@ Generate a complete love energy reading for today. Return ONLY valid JSON matchi
 {
   "daily_message": "3-sentence love message for today. Reference actual transits and how they affect her love energy. Warm, honest, and deeply personal to Zoe.",
   "love_energy": "2 sentences: what the love field feels like in her body and energy today. What is available? What is she radiating?",
-  "venus_influence": "2-3 sentences about how today's Venus position interacts with her natal Venus in Sagittarius 29°. What does this mean for her magnetism and what she attracts?",
+  "venus_influence": "2-3 sentences about how today's Venus position interacts with her natal Venus in Capricorn 2°. What does this mean for her magnetism and what she attracts?",
   "attract_energy": "2 sentences about what she is attracting today and how to let that attraction work for her.",
   "watch_out": "2 sentences: one honest warning about love energy today. What is the shadow or the trap she should navigate around?",
   "love_ritual": "A specific, doable ritual or practice for her love energy today. Something she can actually do in 5-10 minutes.",

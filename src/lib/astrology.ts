@@ -158,8 +158,9 @@ export function getRetrogradePlanets(date: Date): PlanetPosition[] {
 // Born: November 14 2000, 7:04 PM EST (= UTC+0 00:04 Nov 15)
 // Place: Sellersville PA (40.3382°N, 75.3077°W)
 // Signs confirmed by Zoe. Computed degrees via astronomy-engine.
-// Note: Venus computed at 272° (0°Capricorn cusp) — Zoe's chart confirms Sagittarius.
-// This is a known cusp position; natal placements here use Zoe's stated signs.
+// Note: Venus is Capricorn 2°17' (272.29°), the astronomy-engine result for the birth
+// moment. An earlier version of the data file had Sagittarius 29°55' instead; Zoe chose
+// the calculated position on 2026-10-14. Every other placement matches the computation.
 
 export const ZOE_NATAL = natalZoeData as unknown as Record<string, { sign: ZodiacSign; degree: number; minutes: number; lon: number; notes?: string }>
 

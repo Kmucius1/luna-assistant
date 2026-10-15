@@ -268,7 +268,7 @@ export default function ProfilePage() {
             <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--violet)' }}>My Design (fixed)</p>
             <p className="text-sm font-semibold" style={{ color: 'var(--depth)' }}>Self-Projected Projector · 4/6 Profile</p>
             <p className="text-xs mt-1" style={{ color: 'var(--mid)' }}>Scorpio Sun · Cancer Moon · Gemini Rising · Virgo Midheaven</p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--mid)' }}>Venus Sagittarius · Mars Libra · Saturn Taurus · North Node Cancer</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--mid)' }}>Venus Capricorn · Mars Libra · Saturn Taurus · North Node Cancer</p>
           </div>
 
           {/* ── COMMUNICATION ── */}

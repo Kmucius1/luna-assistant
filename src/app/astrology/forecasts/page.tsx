@@ -323,7 +323,7 @@ export default function ForecastsPage() {
               <div style={{ ...GLASS, padding: 14, marginTop: 16, background: 'rgba(244,235,212,0.9)', border: '1px solid rgba(201,169,110,0.35)' }}>
                 <p style={{ fontSize: 10, fontWeight: 700, color: '#5C4530', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Reading personalized to your chart</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                  {[['☀️','Scorpio 22°'],['🌙','Cancer 4°'],['✨','Gemini Rising'],['♀','Sag Venus 29°'],['♂','Libra Mars 6°'],['☊','Cancer N.Node']].map(([e, v]) => (
+                  {[['☀️','Scorpio 22°'],['🌙','Cancer 4°'],['✨','Gemini Rising'],['♀','Cap Venus 2°'],['♂','Libra Mars 6°'],['☊','Cancer N.Node']].map(([e, v]) => (
                     <span key={v} style={{ padding: '3px 10px', borderRadius: 20, fontSize: 10, background: 'rgba(201,169,110,0.15)', color: 'rgba(201,169,110,0.8)', border: '1px solid rgba(201,169,110,0.2)' }}>{e} {v}</span>
                   ))}
                 </div>

@@ -32,7 +32,7 @@ const SLOTS: Slot[] = [
     build: async (db) => {
       const dateKey = localDateKey(new Date(), ZOE_TIMEZONE)
       const { data } = await db.from('daily_generation_cache')
-        .select('payload').eq('user_id', ZOE_USER_ID).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v6').maybeSingle()
+        .select('payload').eq('user_id', ZOE_USER_ID).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v7').maybeSingle()
       const horoscope = (data?.payload as { horoscope?: string } | undefined)?.horoscope
       if (!horoscope) return null
       return {
@@ -88,7 +88,7 @@ const THIRTY_SLOTS: Slot[] = NUDGE_HOURS.map(hour => ({
   build: async (db) => {
     const dateKey = todayKey()
     const { data } = await db.from('daily_generation_cache')
-      .select('payload').eq('user_id', ZOE_USER_ID).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v6').maybeSingle()
+      .select('payload').eq('user_id', ZOE_USER_ID).eq('date_key', dateKey).eq('generation_type', 'daily_guidance_v7').maybeSingle()
     const n = nudgeFor(hour, { dateKey, guidance: (data?.payload as NudgeContext['guidance']) ?? null })
     return n ? { title: n.title, body: n.body, url: n.url } : null
   },
