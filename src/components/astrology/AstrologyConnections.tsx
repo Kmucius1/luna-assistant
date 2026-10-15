@@ -26,9 +26,13 @@ interface DayReading {
   }
   moonUncertain: boolean
   mercuryRetrograde: boolean
+  bestDay?: { day: string; label: string }
   connections: { text: string; strength: string }[]
   reading: {
     best_move?: { decision: string; headline: string; when: string; how: string }
+    feeling_today?: string; feeling_clues?: string[]
+    exact_words?: { situation: string; say: string }[]
+    healthy_outcome?: string; deeper_talk?: string
     summary?: string; communication?: string; closeness?: string; space?: string; how_they_may_feel?: string
     how_to_approach?: string[]; what_to_say?: string[]; avoid?: string[]; if_it_goes_sideways?: string
   }
@@ -177,6 +181,35 @@ export function AstrologyConnections() {
               </div>
 
               {dayReading.reading.summary && <p className={styles.dayBody}><strong>{dayReading.reading.summary}</strong></p>}
+
+              {dayReading.reading.feeling_today && (
+                <>
+                  <p className={styles.dayHead}>What {activePerson.name} is most likely feeling</p>
+                  <p className={styles.dayBody}>{dayReading.reading.feeling_today}</p>
+                  {dayReading.reading.feeling_clues && dayReading.reading.feeling_clues.length > 0 && (
+                    <>
+                      <p className={styles.dayHead}>What you might notice</p>
+                      {dayReading.reading.feeling_clues.map((x, i) => <p key={i} className={styles.dayBody}>• {x}</p>)}
+                    </>
+                  )}
+                </>
+              )}
+
+              {dayReading.reading.exact_words && dayReading.reading.exact_words.length > 0 && (
+                <>
+                  <p className={styles.dayHead}>Exactly what to say</p>
+                  {dayReading.reading.exact_words.map((w, i) => (
+                    <div key={i} className={styles.sayCard}>
+                      <p className={styles.daySituation}>{w.situation}</p>
+                      <p className={styles.dayBody}>“{w.say}”</p>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {dayReading.reading.deeper_talk && (<><p className={styles.dayHead}>Is today the day for the deeper conversation?</p><p className={styles.dayBody}>{dayReading.reading.deeper_talk}</p></>)}
+              {dayReading.reading.healthy_outcome && (<><p className={styles.dayHead}>What a healthy outcome looks like</p><p className={styles.dayBody}>{dayReading.reading.healthy_outcome}</p></>)}
+
               {dayReading.reading.communication && (<><p className={styles.dayHead}>Reaching out</p><p className={styles.dayBody}>{dayReading.reading.communication}</p></>)}
               {dayReading.reading.closeness && (<><p className={styles.dayHead}>Being close</p><p className={styles.dayBody}>{dayReading.reading.closeness}</p></>)}
               {dayReading.reading.space && (<><p className={styles.dayHead}>Space</p><p className={styles.dayBody}>{dayReading.reading.space}</p></>)}
