@@ -139,7 +139,7 @@ ${tLines}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v4',
+      generationType: 'weekly_forecast_v5',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -158,7 +158,7 @@ HUMAN DESIGN: Self-Projected Projector · 4/6 Profile
 PLANETARY DATA FOR EACH DAY:
 ${dayLines}
 
-Include exactly 4 items in week_priorities. Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Write as if you personally know Zoe — warm, direct, deeply specific to her chart:
+TIME RULES: never write "tomorrow" or "yesterday" anywhere; name days by weekday only. A day's advice must never tell her to plan or save something for that same day. Never state an invented event as fact (no "Kaleb texts you" or "a client asks"); use "if" for things that might happen, and never invent meetings, deadlines, numbers or names. Include exactly 4 items in week_priorities. Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Write as if you personally know Zoe — warm, direct, deeply specific to her chart:
 
 {
   "week_theme": "1-2 sentences: the overarching energy and message for this week for Zoe specifically",

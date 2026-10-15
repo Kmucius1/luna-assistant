@@ -138,6 +138,32 @@ export interface DailyGuidance {
   affirmation:     string
 }
 
+// Catches the specific mistakes that made readings wrong: invented events stated as
+// fact, and wrong-day wording ("tomorrow", or "plan for Friday" on Friday itself).
+function adviceIssue(a: { situation?: string; do?: string }, dayName: string): string | null {
+  const text = `${a.situation ?? ''} ${a.do ?? ''}`
+  if (!/^\s*if\b/i.test(a.situation ?? '')) return 'situation does not start with "If"'
+  if (/\b(tomorrow|yesterday)\b/i.test(text)) return 'uses tomorrow/yesterday'
+  if (new RegExp(`\\b(plan|schedule|reschedule|save|wait|push)\\b[^.]{0,40}\\b(for|until|till|to)\\s+${dayName}\\b`, 'i').test(text)) return `tells her to plan for ${dayName}, which is today`
+  return null
+}
+
+function qualityIssues(g: DailyGuidance, dayName: string): string[] {
+  const out: string[] = []
+  const strings: string[] = [
+    g.horoscope, g.energy, g.career, g.love, g.money, g.main_focus,
+    ...(g.do_today ?? []), ...(g.dont_today ?? []),
+    ...(g.best_move ? Object.values(g.best_move) : []),
+  ].filter((x): x is string => typeof x === 'string')
+  if (strings.some(t => /\b(tomorrow|yesterday)\b/i.test(t))) out.push('uses the words tomorrow or yesterday; refer to days by weekday name only')
+  if (strings.some(t => new RegExp(`\\b(plan|schedule|reschedule|save)\\b[^.]{0,40}\\b(for|until|till)\\s+${dayName}\\b`, 'i').test(t))) out.push(`tells her to plan something for ${dayName}, but ${dayName} is today`)
+  for (const a of g.real_advice ?? []) {
+    const issue = adviceIssue(a, dayName)
+    if (issue) out.push(`real_advice item "${(a.situation ?? '').slice(0, 50)}": ${issue}`)
+  }
+  return Array.from(new Set(out))
+}
+
 // ─── Route ────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
   try {
@@ -189,6 +215,8 @@ export async function GET(req: NextRequest) {
     }).format(now)
 
     // ── Prompt ─────────────────────────────────────────────────────────────
+    const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: clientTz }).format(now)
+
     const userPrompt = `${forDay ? `This reading is for ${dateStr}, a day in the coming week (write it as that day, covering the whole day from morning to evening).` : `Today is ${dateStr} at ${timeStr}.`}
 
 === CURRENT SKY ===
@@ -223,7 +251,9 @@ Profile: 4/6 — Opportunist / Role Model
 ADVICE QUALITY RULES (mandatory):
 - Explain, do not just describe. After every sky detail say "which means..." and then say what to do.
 - transit_breakdown: exactly 3 items, one for each of the 3 strongest transits listed above, in order. Do not invent transits that are not listed.
-- real_advice: exactly 5 items. Each is a specific situation + the exact thing to do or say. Cover work/money, relationships, her body and energy, content/creative, and one for if the day goes sideways.
+- real_advice: exactly 5 items. Each situation starts with "If" and names a type of situation, plus the exact thing to do or say. Cover work/money, relationships, her body and energy, content/creative, and one for if the day goes sideways.
+- NEVER state an invented event as if it is happening (no "Kaleb texts you", "a client asks", "your budget review"). Use "If ..." for anything that might happen. NEVER invent specific meetings, deadlines, numbers, budgets, times or names. Only name a person or task that appears in the REAL DAY section or in the profile above.
+- TIME RULES: this reading is for ${dayName}, and in this reading that day IS today. Never write "tomorrow" or "yesterday". Never tell her to plan, schedule or save something "for ${dayName}" or "until ${dayName}", because that is today. Refer to other days only by their weekday name.
 - The horoscope string must have three short paragraphs separated by a blank line (\n\n): Morning, Midday, Evening. Start each with that word and a colon.
 - Be direct and kind. Say the real thing, including a hard truth if the sky points to one. No filler, no repeating the same idea in different words, no fortune-cookie lines.
 - Everything must be grounded in the sky, transits and Human Design data above. Never invent events that will happen to her.
@@ -248,7 +278,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     { "sky": "What the sky is doing, in plain words (e.g. 'Mercury is lining up with your Sun')", "feels_like": "What that will actually feel or look like in her real day, in 2 sentences, with a specific example (a conversation, a mood, a decision, a body feeling).", "what_to_do": "The concrete move: one clear thing to do about it, 1-2 sentences." }
   ],
   "real_advice": [
-    { "situation": "A realistic situation that could come up today for HER (client, content, money, relationship, energy, body)", "do": "The exact thing to do or say. Give actual wording she could use when it helps, e.g. 'Tell them: I'll get back to you by 3.' No vague advice like 'trust the process'." }
+    { "situation": "MUST start with the word 'If'. A TYPE of situation that could come up for her today (work, content, money, people, energy, body). Never state it as something that is actually happening.", "do": "The exact thing to do or say, with actual wording she could use when it helps. No vague advice like 'trust the process'." }
   ],
   "horoscope": "8-10 sentence personalized daily horoscope — the main thing she reads, and it should feel like a genuinely full read, not a summary. Walk through the day in real terms: how the morning might feel, what could come up midday, and what the evening might ask of her. Reference current planets and transits by name, but every single one must be immediately translated into what it actually looks or feels like in her real day: a kind of conversation, a mood, a tension, a decision, a physical feeling. Never leave a planet/sign/aspect standing alone as just a label — see the PLAIN-ENGLISH LIFE RULE below.",
   "energy": "3-4 sentences: what the day's energy FEELS like in her body and emotional field right now, and how that might shift from morning to evening. Visceral, honest, specific — not just a mood word, but where she might feel it physically and what it might make her want to do.",
@@ -269,7 +299,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v5',
+      generationType: 'daily_guidance_v6',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -290,8 +320,18 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
               const jsonText = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
               const parsed = JSON.parse(jsonText) as DailyGuidance
               const missing = required.filter(f => parsed[f] === undefined)
-              if (missing.length === 0) return { payload: parsed, source: 'ai' as const }
-              lastError = `missing fields: ${missing.join(', ')}`
+              if (missing.length === 0) {
+                const issues = qualityIssues(parsed, dayName)
+                if (issues.length === 0) return { payload: parsed, source: 'ai' as const }
+                if (attempt === 1) {
+                  // Second try still has problems: drop only the offending advice items.
+                  parsed.real_advice = (parsed.real_advice ?? []).filter(a => !adviceIssue(a, dayName))
+                  return { payload: parsed, source: 'ai' as const }
+                }
+                lastError = `quality problems to fix: ${issues.join('; ')}`
+              } else {
+                lastError = `missing fields: ${missing.join(', ')}`
+              }
             } catch (e) {
               lastError = e instanceof Error ? e.message : 'invalid JSON'
             }

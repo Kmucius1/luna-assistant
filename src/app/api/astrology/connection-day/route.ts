@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
   const cacheId = `${body.name}|${body.birthDate}|${body.birthTime ?? ''}|${body.relationship}`.toLowerCase().replace(/[^a-z0-9|]/g, '').slice(0, 80)
   const { payload } = await getOrCreateDailyContent<Record<string, unknown>>({
     userId,
-    generationType: `connection_day_v4_${cacheId}`,
+    generationType: `connection_day_v5_${cacheId}`,
     dateKey: dayKey,
     forceRegenerate: !!body.refresh,
     generate: async () => {
@@ -199,6 +199,8 @@ Return ONLY valid JSON:
 }
 
 RULES:
+- This reading is for ${new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'America/New_York' }).format(at)} and that day IS today in this reading. Never write "tomorrow" or "yesterday", and never suggest saving something for that same weekday. Name other days by weekday only.
+- Never state an invented event as fact (he "texts you", "says"). Scripts are for "if" situations.
 - Only use the facts above. Do not invent events or what ${body.name} will do. Astrology describes tendencies, never certainties.
 - Plain words an eighth grader understands. Short sentences. Translate every planet into what it feels like in a real conversation.
 - Be useful and honest. If the day is tense, say so kindly and say what to do.
