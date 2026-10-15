@@ -47,8 +47,8 @@ export function ThirtyNudgePopup() {
       style={{
         position: 'fixed', left: 12, right: 12, bottom: 'calc(env(safe-area-inset-bottom, 0px) + 96px)', zIndex: 60,
         maxWidth: 520, margin: '0 auto', padding: '16px 18px', borderRadius: 24,
-        background: 'var(--surface-strong, rgba(255,255,255,0.96))', border: '1px solid var(--surface-border, rgba(140,107,74,0.16))',
-        boxShadow: '0 8px 30px rgba(60,40,20,0.14)', color: 'var(--text-1, #100C1E)',
+        background: '#FFFBF5', border: '1px solid rgba(140,107,74,0.28)',
+        boxShadow: '0 12px 36px rgba(60,40,20,0.22)', color: '#100C1E',
       }}
     >
       <div style={{ fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-4, #9188A0)', fontWeight: 600 }}>{nudge.title}</div>
