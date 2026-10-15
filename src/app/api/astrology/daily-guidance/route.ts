@@ -1,7 +1,7 @@
 import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { getCurrentPlanets, getTransitsToNatal, getNatalAspects, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { realLifeBlock } from '@/lib/luna/realLife'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
@@ -127,7 +127,15 @@ export interface LoveDeep {
   reflect:    string    // one question to sit with
 }
 
+export interface TensionRoot {
+  where: string   // where the tension may show up today
+  root:  string   // where it comes from (chart pattern or today's sky), plain words
+  needs: string   // what that part of her actually needs
+  helps: string   // one concrete thing that helps today
+}
+
 export interface DailyGuidance {
+  tension_roots?:      TensionRoot[]
   love_deep?:          LoveDeep
   best_move?:          BestMove
   in_plain_words?:     string          // 3-4 short sentences, the whole day in everyday language
@@ -222,6 +230,18 @@ export async function GET(req: NextRequest) {
       ...loveTransits.map(t => `${t.transiting} ${t.type} her natal ${t.natal} (orb ${t.orb}°) — ${t.interpretation}`),
     ].filter(Boolean).join('\n') || 'No strong love transits today; a quiet day for romance'
 
+    const tensionToday = getTransitsToNatal(now)
+      .filter(t => ['square', 'opposition', 'conjunction'].includes(t.type) && ['Mars', 'Saturn', 'Mercury', 'Moon', 'Sun'].includes(t.transiting) && ['Moon', 'Venus', 'Sun', 'Mercury'].includes(t.natal))
+      .slice(0, 4)
+    const natalTension = getNatalAspects()
+      .filter(a => ['square', 'opposition'].includes(a.type) && (['Moon', 'Venus', 'Sun', 'Mercury'].includes(a.a) || ['Moon', 'Venus', 'Sun', 'Mercury'].includes(a.b)) && a.orb <= 5)
+      .slice(0, 4)
+    const tensionSources = [
+      ...tensionToday.map(t => `Today: ${t.transiting} is ${plainAspectPhrase(t.type)} her ${t.natal} (orb ${t.orb}°) — ${t.interpretation}`),
+      ...natalTension.map(a => `Built into her chart: her ${a.a} and ${a.b} are ${plainAspectPhrase(a.type)} each other — ${a.interpretation}`),
+      'Ongoing in her life: the romantic connection with Kaleb is real but not committed, which is a standing source of emotional tension (do not predict how it resolves).',
+    ].join('\n')
+
     const transitLines = transits.map(t =>
       `${t.transiting} ${t.type} natal ${t.natal} (${t.natalSign} ${t.natalDegree}°) — orb ${t.orb}° — ${t.interpretation}`
     ).join('\n')
@@ -241,6 +261,9 @@ export async function GET(req: NextRequest) {
 
 === CURRENT SKY ===
 ${planetLines}${moonChange}
+
+=== TENSION SOURCES (calculated; use only these for tension_roots) ===
+${tensionSources}
 
 === ZOE'S TOP TRANSITS TODAY ===
 ${transitLines}
@@ -296,6 +319,9 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     "best_window": "The best part of the day (morning, midday, afternoon or evening) for her most important thing, and why.",
     "people": "The best move with the people closest to her today: who to reach out to, who to give space, and how. If it involves Kaleb, follow the romance rules: honest, no predicting commitment."
   },
+  "tension_roots": [
+    { "where": "Where emotional tension may show up for her today (a feeling or kind of situation).", "root": "Where it comes from: name the real chart pattern or today's sky from TENSION SOURCES, translated into plain words, and how that pattern tends to work in her.", "needs": "What that part of her actually needs, in one or two sentences.", "helps": "One concrete thing that helps today." }
+  ],
   "love_deep": {
     "sky": "3-4 plain sentences: exactly what is active for love and romance today. Use ONLY the LOVE SKY facts given above. Say what each planet's position means for how connection and desire tend to feel today.",
     "inside_you": "3-4 sentences: what she may feel inside today about love, closeness and desire, and what that feeling may be asking her for.",
@@ -331,7 +357,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v8',
+      generationType: 'daily_guidance_v9',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -345,7 +371,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
             'highest_self','affirmation',
           ]
 
-          let raw = await callAI(SYSTEM, userPrompt, 7500)
+          let raw = await callAI(SYSTEM, userPrompt, 8500)
           let lastError = ''
           for (let attempt = 0; attempt < 2; attempt++) {
             try {
@@ -368,7 +394,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
               lastError = e instanceof Error ? e.message : 'invalid JSON'
             }
             if (attempt === 0) {
-              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 7500)
+              raw = await callAI(SYSTEM, `Your previous JSON response had a problem: ${lastError}. Here is what you returned:\n${raw}\n\nReturn the corrected, complete, VALID JSON in the exact same shape as before. Double-check every string value is properly escaped and every array/object is properly closed.`, 8500)
             }
           }
           throw new Error(lastError)

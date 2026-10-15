@@ -44,6 +44,7 @@ interface TransitData {
 
 interface BestMoveT { headline: string; why: string; first: string; then: string; skip: string; best_window: string; people: string }
 interface DailyGuidance {
+  tension_roots?: { where: string; root: string; needs: string; helps: string }[]
   best_move?: BestMoveT
   in_plain_words?: string
   transit_breakdown?: { sky: string; feels_like: string; what_to_do: string }[]
@@ -152,6 +153,19 @@ export function AstrologyToday() {
                     <p className={styles.themeBody} style={{ fontWeight: 600, margin: 0 }}>{t.sky}</p>
                     <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What it feels like:</strong> {t.feels_like}</p>
                     <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What to do:</strong> {t.what_to_do}</p>
+                  </div>
+                ))}
+              </>
+            )}
+            {guidance.tension_roots && guidance.tension_roots.length > 0 && (
+              <>
+                <div className={styles.themeEnergyLabel}>Where Emotional Tension May Come From</div>
+                {guidance.tension_roots.map((t, i) => (
+                  <div key={i} style={{ margin: '10px 0 14px' }}>
+                    <p className={styles.themeBody} style={{ fontWeight: 600, margin: 0 }}>{t.where}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>Where it comes from:</strong> {t.root}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What you need:</strong> {t.needs}</p>
+                    <p className={styles.themeBody} style={{ margin: '4px 0 0' }}><strong>What helps today:</strong> {t.helps}</p>
                   </div>
                 ))}
               </>

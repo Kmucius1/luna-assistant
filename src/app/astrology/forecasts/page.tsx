@@ -36,6 +36,7 @@ function IntensityPips({ value }: { value: number }) {
 
 // ─── Full day reading (the long, plain-words version for one date) ───────────
 type FullGuidance = {
+  tension_roots?: { where: string; root: string; needs: string; helps: string }[]
   love_deep?: { sky: string; inside_you: string; with_kaleb: string; do: string[]; say: string; avoid: string[]; reflect: string }
   best_move?: { headline: string; why: string; first: string; then: string; skip: string; best_window: string; people: string }
   in_plain_words?: string
@@ -79,6 +80,19 @@ function FullDayView({ g }: { g: FullGuidance }) {
               <P bold>{t.sky}</P>
               <P><strong>What it feels like:</strong> {t.feels_like}</P>
               <P><strong>What to do:</strong> {t.what_to_do}</P>
+            </div>
+          ))}
+        </>
+      )}
+      {g.tension_roots && g.tension_roots.length > 0 && (
+        <>
+          <H>Where emotional tension may come from</H>
+          {g.tension_roots.map((t, i) => (
+            <div key={i} style={{ marginBottom: 12, padding: 12, borderRadius: 14, background: 'rgba(120,100,160,0.08)', border: '1px solid rgba(120,100,160,0.18)' }}>
+              <P bold>{t.where}</P>
+              <P><strong>Where it comes from:</strong> {t.root}</P>
+              <P><strong>What you need:</strong> {t.needs}</P>
+              <P><strong>What helps today:</strong> {t.helps}</P>
             </div>
           ))}
         </>
