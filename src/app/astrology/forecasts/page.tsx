@@ -5,6 +5,7 @@ import { BackLink } from '@/components/ui/BackLink'
 import { ArrowLeft, Calendar, Sparkles, RefreshCw } from 'lucide-react'
 import { useLocation } from '@/hooks/useLocation'
 import type { WeeklyForecast } from '@/app/api/astrology/weekly-forecast/route'
+import type { SkyDay } from '@/lib/luna/weekSky'
 
 // ─── Design ──────────────────────────────────────────────────────────────────
 const GLASS: React.CSSProperties = {
@@ -143,31 +144,36 @@ function FullDayView({ g }: { g: FullGuidance }) {
 export default function ForecastsPage() {
   const location = useLocation()
   const [forecast, setForecast] = useState<WeeklyForecast | null>(null)
+  const [sky, setSky] = useState<SkyDay[]>([])
   const [loading,  setLoading]  = useState(true)
   const [sel, setSel] = useState(0)
   const [readings, setReadings] = useState<Record<string, FullGuidance | 'error' | 'loading'>>({})
 
   const loadWeekly = useCallback(async (forceRefresh = false) => {
     setLoading(true)
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    const date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    const iso = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+    // The real days and sky are calculated, so they load fast and never depend on the AI.
     try {
-      const tz   = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-      const url  = `/api/astrology/weekly-forecast?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}${forceRefresh ? '&refresh=1' : ''}`
-      const res  = await fetch(url)
+      const r = await fetch(`/api/astrology/week-sky?start=${iso}`)
+      if (r.ok) setSky((await r.json()).days ?? [])
+    } catch { /* keep previous */ }
+    try {
+      const url = `/api/astrology/weekly-forecast?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}${forceRefresh ? '&refresh=1' : ''}`
+      const res = await fetch(url)
       if (!res.ok) throw new Error()
       setForecast(await res.json())
     } catch { /* keep previous */ }
     setLoading(false)
   }, [])
 
-  const isoFor = (i: number) => {
-    const d = new Date(); d.setDate(d.getDate() + i)
-    return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(d)
-  }
+  const isoFor = (i: number) => sky[i]?.iso ?? ''
 
   // Load one day's full reading (today uses the exact same reading as Astrology Today).
   const loadDay = useCallback(async (i: number, force = false) => {
     const iso = isoFor(i)
+    if (!iso) return
     let skip = false
     setReadings(prev => {
       if (!force && (prev[iso] === 'loading' || (prev[iso] && prev[iso] !== 'error'))) skip = true
@@ -188,15 +194,16 @@ export default function ForecastsPage() {
     } catch {
       setReadings(prev => ({ ...prev, [iso]: 'error' }))
     }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sky])
 
   // Open the selected day's reading, then quietly prepare the rest one by one.
   useEffect(() => {
-    if (!forecast) return
+    if (sky.length === 0) return
     const order = [sel, ...[0, 1, 2, 3, 4, 5, 6].filter(i => i !== sel)]
     const timers = order.map((i, n) => setTimeout(() => loadDay(i), n === 0 ? 0 : 4000 + (n - 1) * 5000))
     return () => timers.forEach(clearTimeout)
-  }, [forecast, sel, loadDay])
+  }, [sky, sel, loadDay])
 
   useEffect(() => {
     if (location.localTime) loadWeekly()
@@ -276,26 +283,25 @@ export default function ForecastsPage() {
               </div>
             )}
 
-            {/* Day tabs */}
-            {loading ? (
+            {/* Day tabs: real weekdays and dates, calculated */}
+            {sky.length === 0 && loading ? (
               <><Shimmer h={60} /><Shimmer h={300} /></>
-            ) : forecast ? (
+            ) : sky.length > 0 ? (
               <div>
                 <div style={{ display: 'flex', gap: 8, overflowX: 'auto', padding: '2px 0 10px', scrollbarWidth: 'none' }}>
-                  {forecast.days.map((day, i) => {
-                    const d = new Date(); d.setDate(d.getDate() + i)
-                    const wk = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(d)
+                  {sky.map((d, i) => {
                     const on = sel === i
-                    const ready = readings[isoFor(i)] && readings[isoFor(i)] !== 'loading' && readings[isoFor(i)] !== 'error'
+                    const r = readings[d.iso]
+                    const ready = r && r !== 'loading' && r !== 'error'
                     return (
-                      <button key={day.date} onClick={() => setSel(i)}
+                      <button key={d.iso} onClick={() => setSel(i)}
                         style={{
-                          flex: '0 0 auto', minWidth: 68, padding: '10px 12px', borderRadius: 16, cursor: 'pointer', textAlign: 'center',
+                          flex: '0 0 auto', minWidth: 72, padding: '10px 12px', borderRadius: 16, cursor: 'pointer', textAlign: 'center',
                           border: on ? '1px solid #5C4530' : '1px solid rgba(180,150,100,0.25)',
                           background: on ? '#5C4530' : 'rgba(255,255,255,0.6)', color: on ? '#fff' : '#32284A',
                         }}>
-                        <span style={{ display: 'block', fontSize: 11, opacity: 0.75 }}>{i === 0 ? 'Today' : wk}</span>
-                        <span style={{ display: 'block', fontSize: 18, fontWeight: 700 }}>{d.getDate()}</span>
+                        <span style={{ display: 'block', fontSize: 11, opacity: 0.8 }}>{d.isToday ? 'Today' : d.weekday.slice(0, 3)}</span>
+                        <span style={{ display: 'block', fontSize: 18, fontWeight: 700 }}>{d.iso.slice(8)}</span>
                         <span style={{ display: 'block', fontSize: 9, opacity: 0.7 }}>{ready ? 'ready' : ' '}</span>
                       </button>
                     )
@@ -303,37 +309,36 @@ export default function ForecastsPage() {
                 </div>
 
                 {(() => {
-                  const day = forecast.days[sel]
+                  const day = sky[sel]
                   if (!day) return null
-                  const g = readings[isoFor(sel)]
+                  const g = readings[day.iso]
+                  const headline = forecast?.day_headlines?.find(h => h.weekday === day.weekday)?.headline
                   return (
                     <div style={{ ...GLASS, padding: 18 }}>
-                      <p style={{ fontSize: 18, fontWeight: 700, color: '#100C1E', margin: 0 }}>{day.dayLabel}</p>
-                      <p style={{ fontSize: 12, color: 'rgba(16,12,30,0.45)', margin: '2px 0 8px' }}>{day.date}</p>
+                      <p style={{ fontSize: 22, fontWeight: 700, color: '#100C1E', margin: 0 }}>{day.weekday}</p>
+                      <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.5)', margin: '2px 0 10px' }}>{day.dateLabel}{day.isToday ? ' · today' : ''}</p>
                       <IntensityPips value={day.intensity} />
-                      <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.78)', lineHeight: 1.6, marginTop: 10 }}>{day.theme}</p>
-                      {day.love_action && (
-                        <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(200,120,160,0.1)', border: '1px solid rgba(200,120,160,0.22)' }}>
-                          <Label text="In love today" color="rgb(170,70,115)" />
-                          <p style={{ fontSize: 13.5, color: 'rgba(16,12,30,0.85)', lineHeight: 1.55, margin: 0 }}>{day.love_action}</p>
-                        </div>
-                      )}
-                      {day.best_move && (
-                        <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(92,69,48,0.08)', border: '1px solid rgba(92,69,48,0.2)' }}>
-                          <Label text="Best move" color="#5C4530" />
-                          <p style={{ fontSize: 14, fontWeight: 600, color: 'rgba(16,12,30,0.88)', lineHeight: 1.55, margin: 0 }}>{day.best_move}</p>
-                          {day.best_window && <p style={{ fontSize: 12.5, color: 'rgba(16,12,30,0.6)', lineHeight: 1.5, margin: '6px 0 0' }}>{day.best_window}</p>}
-                        </div>
-                      )}
-                      {day.watch_for && (
-                        <div style={{ marginTop: 10, padding: 12, borderRadius: 14, background: 'rgba(201,169,110,0.1)', border: '1px solid rgba(201,169,110,0.25)' }}>
-                          <Label text="Watch for" color="#5C4530" />
-                          <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.8)', lineHeight: 1.55, margin: 0 }}>{day.watch_for}</p>
-                        </div>
-                      )}
+                      <p style={{ fontSize: 11.5, color: 'rgba(16,12,30,0.5)', margin: '6px 0 0' }}>
+                        Moon in {day.moon.sign}{day.moon.changesSign ? ' (just arrived)' : ''} · {day.moon.phase}{day.mercuryRetrograde ? ' · Mercury moving backward' : ''}
+                      </p>
+                      {headline && <p style={{ fontSize: 15, fontWeight: 600, color: 'rgba(16,12,30,0.88)', lineHeight: 1.55, marginTop: 12 }}>{headline}</p>}
+
+                      <div style={{ marginTop: 14 }}>
+                        <Label text="The sky that day, in plain words" color="#5C4530" />
+                        {day.transits.length === 0 && <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.6)' }}>No strong personal transits. A steadier day.</p>}
+                        {day.transits.map((t, i) => (
+                          <div key={i} style={{ padding: '8px 0', borderTop: i ? '1px solid rgba(180,150,100,0.15)' : 'none' }}>
+                            <p style={{ fontSize: 13.5, fontWeight: 600, color: 'rgba(16,12,30,0.88)', margin: 0 }}>
+                              {t.text} <span style={{ fontWeight: 400, color: 'rgba(16,12,30,0.45)' }}>({t.strength}, {t.kind})</span>
+                            </p>
+                            <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.7)', lineHeight: 1.55, margin: '2px 0 0' }}>{t.meaning}</p>
+                          </div>
+                        ))}
+                      </div>
+
                       <div style={{ borderTop: '1px solid rgba(180,150,100,0.15)', marginTop: 14 }}>
                         {!g || g === 'loading' ? (
-                          <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.5)', padding: '16px 0' }}>Luna is writing the full reading for {day.dayLabel}. It takes a moment…</p>
+                          <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.5)', padding: '16px 0' }}>Luna is writing the full reading for {day.weekday}. It takes a moment…</p>
                         ) : g === 'error' ? (
                           <div style={{ padding: '16px 0' }}>
                             <p style={{ fontSize: 13, color: 'rgba(16,12,30,0.55)' }}>Couldn’t load this day’s reading.</p>
@@ -352,8 +357,8 @@ export default function ForecastsPage() {
                     style={{ flex: 1, padding: 13, borderRadius: 14, border: '1px solid rgba(180,150,100,0.25)', background: 'rgba(255,255,255,0.6)', color: '#32284A', fontWeight: 600, opacity: sel === 0 ? 0.4 : 1, cursor: 'pointer' }}>
                     ← Previous day
                   </button>
-                  <button disabled={sel >= forecast.days.length - 1} onClick={() => setSel(v => Math.min(forecast.days.length - 1, v + 1))}
-                    style={{ flex: 1, padding: 13, borderRadius: 14, border: '1px solid rgba(180,150,100,0.25)', background: 'rgba(255,255,255,0.6)', color: '#32284A', fontWeight: 600, opacity: sel >= forecast.days.length - 1 ? 0.4 : 1, cursor: 'pointer' }}>
+                  <button disabled={sel >= sky.length - 1} onClick={() => setSel(v => Math.min(sky.length - 1, v + 1))}
+                    style={{ flex: 1, padding: 13, borderRadius: 14, border: '1px solid rgba(180,150,100,0.25)', background: 'rgba(255,255,255,0.6)', color: '#32284A', fontWeight: 600, opacity: sel >= sky.length - 1 ? 0.4 : 1, cursor: 'pointer' }}>
                     Next day →
                   </button>
                 </div>
@@ -361,7 +366,7 @@ export default function ForecastsPage() {
             ) : (
               <div style={{ ...GLASS, padding: 24, textAlign: 'center' }}>
                 <Calendar className="h-8 w-8" style={{ color: 'rgba(16,12,30,0.2)', margin: '0 auto 12px' }} />
-                <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.4)' }}>Tap ↻ to generate your 7-day forecast</p>
+                <p style={{ fontSize: 14, color: 'rgba(16,12,30,0.4)' }}>Tap ↻ to load your week</p>
               </div>
             )}
 

@@ -5,6 +5,7 @@ import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey } from '@/lib/luna/today'
+import { buildWeekSky } from '@/lib/luna/weekSky'
 
 const ZOE_USER_ID = OWNER_USER_ID
 
@@ -26,7 +27,8 @@ export interface DayForecast {
 
 export interface WeeklyForecast {
   week_theme:   string
-  days:         DayForecast[]
+  days?:        DayForecast[]
+  day_headlines?: { weekday: string; headline: string }[]
   best_day:     string
   rest_day:     string
   love_window:  string
@@ -114,40 +116,29 @@ export async function GET(req: NextRequest) {
     const now = new Date()
     const dateKey = `weekly_${localDate.replace(/[^a-zA-Z0-9]/g, '_') || todayKey(now, clientTz)}`
 
-    // Build per-day planet data for all 7 days
-    const dayData = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(now)
-      d.setDate(d.getDate() + i)
-      const planets  = getCurrentPlanets(d)
-      const transits = getTransitsToNatal(d).slice(0, 5)
-      const moon     = planets.find(p => p.name === 'Moon')
-      const sun      = planets.find(p => p.name === 'Sun')
-      const venus    = planets.find(p => p.name === 'Venus')
-      return { d, i, planets, transits, moon, sun, venus }
-    })
-
-    const fmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: clientTz })
-    const shortFmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: clientTz })
-
-    const dayLines = dayData.map(({ d, i, moon, sun, venus, transits }) => {
-      const lbl    = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : shortFmt.format(d)
-      const date   = fmt.format(d)
-      const tLines = transits.map(t => `  - ${t.transiting} ${t.type} natal ${t.natal} (${t.interpretation.slice(0, 80)}...)`).join('\n') || '  - No major transits active'
-      return `${lbl} (${date}):
-  Sun: ${sun?.sign ?? '?'} | Moon: ${moon?.sign ?? '?'} | Venus: ${venus?.sign ?? '?'}${venus?.retrograde ? ' Rx' : ''}
-  Top Transits:
-${tLines}`
+    // The week, calculated: real weekdays/dates, Moon, Venus/Mars, Mercury status and
+    // the transits active against her chart on each day. The AI only interprets this.
+    const sky = buildWeekSky(todayKey(now, clientTz), 7)
+    const dayLines = sky.map(d => {
+      const t = d.transits.map(x => `  - ${x.text} (${x.strength}, ${x.kind}): ${x.meaning}`).join('\n') || '  - No strong personal transits'
+      return `${d.weekday}, ${d.dateLabel}${d.isToday ? ' (TODAY)' : ''}:
+  Moon in ${d.moon.sign} ${d.moon.degree}°${d.moon.changesSign ? ' (just moved into this sign)' : ''}, ${d.moon.phase} (${d.moon.illumination}% lit)
+  Venus in ${d.venus.sign}${d.venus.retrograde ? ' (moving backward)' : ''} | Mars in ${d.mars.sign}${d.mars.retrograde ? ' (moving backward)' : ''}${d.mercuryRetrograde ? ' | Mercury moving backward' : ''}
+  Calculated intensity: ${d.intensity}/10
+  Active against her chart:
+${t}`
     }).join('\n\n')
+    const weekdays = sky.map(d => d.weekday)
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v7',
+      generationType: 'weekly_forecast_v8',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
       generate: async () => {
         try {
-          const prompt = `Generate a detailed 7-day horoscope for Zoe for the upcoming week.
+          const prompt = `Write the week-level guidance for Zoe's upcoming 7 days, using ONLY the calculated sky below. Each day also has its own full written reading elsewhere, so here you give the big picture, the best days for things, and a short headline per day.
 
 ZOE'S NATAL CHART:
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
@@ -157,42 +148,28 @@ Chiron: Sagittarius 15° | Midheaven: Virgo 12°
 
 HUMAN DESIGN: Self-Projected Projector · 4/6 Profile
 
-PLANETARY DATA FOR EACH DAY:
+THE CALCULATED WEEK (real weekdays and dates; do not contradict):
 ${dayLines}
 
-TIME RULES: never write "tomorrow" or "yesterday" anywhere; name days by weekday only. A day's advice must never tell her to plan or save something for that same day. Never state an invented event as fact (no "Kaleb texts you" or "a client asks"); use "if" for things that might happen, and never invent meetings, deadlines, numbers or names. Include exactly 4 items in week_priorities. Return ONLY valid JSON matching this exact schema. Every field is REQUIRED. Write as if you personally know Zoe — warm, direct, deeply specific to her chart:
+Return ONLY valid JSON matching this exact schema. Every field is REQUIRED:
 
 {
-  "week_theme": "1-2 sentences: the overarching energy and message for this week for Zoe specifically",
-  "best_day": "weekday name of her most powerful or high-energy day this week",
-  "rest_day": "weekday name of her best day to rest, recover, or go inward",
-  "love_window": "weekday name of the day most charged for love and connection",
-  "power_window": "weekday name of the day best for major decisions, visibility, or career moves",
+  "week_theme": "3-4 plain sentences: the shape of the whole week for Zoe, which days are strongest, which are heavy, and why, using the calculated facts above.",
+  "best_day": "weekday name from: ${weekdays.join(', ')}",
+  "rest_day": "weekday name, her best day to rest or go inward",
+  "love_window": "weekday name most open for love and connection",
+  "power_window": "weekday name best for decisions, visibility or career moves",
+  "day_headlines": [ { "weekday": "one of the weekday names above, in order", "headline": "1-2 sentences: what this day is about and the single best use of it, from the calculated sky for that day." } ],
   "love_week": {
     "arc": "4-5 plain sentences: the shape of the week for love and romance. Which days open, which are quiet or tense, and why (real planets only).",
     "kaleb": "3-4 sentences on how the week may feel in the Kaleb situation (a real romantic connection that is not committed): when closeness is favored, when to give space, and when a clear honest conversation fits. Never predict commitment.",
     "do": ["4 specific things to do for her heart this week, each naming the best weekday for it"],
     "watch": "2-3 sentences: what to watch for this week in love, in him and in herself."
   },
-  "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day" } ],
-  "days": [
-    {
-      "date": "weekday, Month Day (e.g. Monday, June 23)",
-      "dayLabel": "Today / Tomorrow / Monday / etc",
-      "theme": "1-2 sentences: the central theme or gift of this day for Zoe",
-      "energy": "3-4 sentences of what this day FEELS like in her body and life, from morning to evening. Visceral and real — no generic astro talk. Reference the transits and Moon sign.",
-      "love": "3 sentences about her love and connection energy this specific day — a real moment or feeling, not just a mood word",
-      "career": "3 sentences about her work and business energy this specific day — she runs DRYP Digital, and outside that her own focus is modeling, tattooing, TikTok/content creation, painting, and fashion. Name a real kind of task, meeting, or decision the day favors.",
-      "guidance": ["4 specific, actionable things she should do or know on this specific day — practical, personal, grounded in her transits, each a full sentence"],
-      "watch_for": "1-2 sentences: an honest warning or caution specific to this day, including what it could look like if ignored",
-      "love_action": "2 sentences: what to DO in love and romance on this specific day (reach out, wait, be open, give space, slow down), and why the sky says so. Honest and specific.",
-      "best_move": "1-2 sentences: the ONE best thing for her to do this day, decisive and specific, with a one-sentence reason.",
-      "best_window": "The best part of this day (morning, midday, afternoon, evening) for her most important thing, and why.",
-      "affirmation": "1 powerful first-person declaration tailored to this day's energy",
-      "intensity": 7
-    }
-  ]
-}${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
+  "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day, from the sky" } ]
+}
+
+Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 8000)
