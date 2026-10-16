@@ -21,6 +21,8 @@ interface WhatCanIEatOption { type: string; title: string; minutes: number; step
 interface LogEntry { id: string; meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'; source: 'planned' | 'custom'; title: string; calories: number; protein_g: number }
 interface CookedLeftover { id: string; meal_name: string; cooked_at: string; safe_until: string; isPastSafeWindow: boolean }
 
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const
+
 const MOODS = ['Just hungry', 'Tired', 'Overwhelmed', "Don't feel like cooking"] as const
 
 function todayWeekdayName(): string {
@@ -32,6 +34,7 @@ export function MealPlanView() {
   const [planLoading, setPlanLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [genError, setGenError] = useState<string | null>(null)
+  const [selectedDay, setSelectedDay] = useState<string>(todayWeekdayName())
 
   const mealScrollerRef = useRef<HTMLDivElement>(null)
   const [mealIndex, setMealIndex] = useState(0)
@@ -94,6 +97,7 @@ export function MealPlanView() {
   }, [])
 
   async function generatePlan() {
+    if (plan && !window.confirm('Replace this week\'s plan with a new one? Your current plan will be overwritten.')) return
     setGenerating(true)
     setGenError(null)
     try {
@@ -130,18 +134,19 @@ export function MealPlanView() {
   }
 
   const todayName = todayWeekdayName()
+  const isToday = selectedDay === todayName
   const todaysMeals = useMemo(() => {
     if (!plan) return []
     const p = plan.plan_json
     const items: { id: string; label: string; title: string; description: string; calories: number; proteinG: number }[] = []
-    const b = p.breakfasts?.find(m => m.day === todayName)
+    const b = p.breakfasts?.find(m => m.day === selectedDay)
     if (b) items.push({ id: 'breakfast', label: 'Breakfast', title: b.meal, description: b.prep_note, calories: b.calories ?? 0, proteinG: b.protein_g ?? 0 })
-    const l = p.lunches?.find(m => m.day === todayName)
+    const l = p.lunches?.find(m => m.day === selectedDay)
     if (l) items.push({ id: 'lunch', label: 'Lunch', title: l.meal, description: l.prep_note, calories: l.calories ?? 0, proteinG: l.protein_g ?? 0 })
-    const d = p.dinners?.find(m => m.day === todayName)
+    const d = p.dinners?.find(m => m.day === selectedDay)
     if (d) items.push({ id: 'dinner', label: 'Dinner', title: d.meal, description: d.prep_note, calories: d.calories ?? 0, proteinG: d.protein_g ?? 0 })
     return items
-  }, [plan, todayName])
+  }, [plan, selectedDay])
 
   // Nutrition goals track what's actually been logged today, not just what's
   // planned — a planned meal she skips (or swaps for something off-plan)
@@ -189,6 +194,12 @@ export function MealPlanView() {
     setMealIndex(Math.round(el.scrollLeft / el.clientWidth))
   }
 
+  function pickDay(day: string) {
+    setSelectedDay(day)
+    setMealIndex(0)
+    mealScrollerRef.current?.scrollTo({ left: 0 })
+  }
+
   function goToMeal(i: number) {
     const el = mealScrollerRef.current
     if (!el) return
@@ -209,11 +220,27 @@ export function MealPlanView() {
           </button>
           {genError && <p className={styles.errorText}>{genError}</p>}
         </div>
-      ) : todaysMeals.length === 0 ? (
-        <div className={styles.comingSoon}>No meals planned for today. Check Groceries, or generate a new week.</div>
       ) : (
         <>
-          <div className={styles.sectionHeader}>Today&apos;s Meals</div>
+          <div className={styles.wceMoodRow} role="tablist" aria-label="Pick a day">
+            {WEEKDAYS.map(day => (
+              <button
+                key={day}
+                type="button"
+                role="tab"
+                aria-selected={day === selectedDay}
+                className={`${styles.wceMoodChip} ${day === selectedDay ? styles.wceMoodChipActive : ''}`}
+                onClick={() => pickDay(day)}
+              >
+                {day.slice(0, 3)}{day === todayName ? ' •' : ''}
+              </button>
+            ))}
+          </div>
+          {todaysMeals.length === 0 ? (
+            <div className={styles.comingSoon}>No meals planned for {isToday ? 'today' : selectedDay}. Check Groceries, or generate a new week.</div>
+          ) : (
+          <>
+          <div className={styles.sectionHeader}>{isToday ? "Today's Meals" : `${selectedDay}'s Meals`}</div>
           <div className={styles.mealPager} ref={mealScrollerRef} onScroll={handleMealScroll}>
             {todaysMeals.map(meal => {
               const isLogged = loggedPlanned.has(meal.id)
@@ -222,7 +249,7 @@ export function MealPlanView() {
                   <div className={`${styles.card} ${styles.mealCard}`}>
                     <div className={styles.mealPhoto}>
                       <Image src={imageForMeal(meal.title)} alt={meal.title} fill sizes="(max-width: 640px) 90vw, 400px" />
-                      <button
+                      {isToday && <button
                         type="button"
                         className={`${styles.mealCheckButton} ${isLogged ? styles.mealCheckButtonDone : ''}`}
                         onClick={() => toggleMealLogged(meal)}
@@ -230,7 +257,7 @@ export function MealPlanView() {
                         aria-label={isLogged ? `Unmark ${meal.label} as eaten` : `Mark ${meal.label} as eaten`}
                       >
                         {isLogged ? <CheckCircle2 size={16} /> : <Circle size={16} />} {isLogged ? 'Eaten' : 'Mark eaten'}
-                      </button>
+                      </button>}
                     </div>
                     <div className={styles.mealLabel}>{meal.label}</div>
                     <h3 className={styles.mealTitle}>{meal.title}</h3>
@@ -242,7 +269,7 @@ export function MealPlanView() {
                     <button type="button" className={styles.makeThisButton} onClick={() => setMakeThisMeal({ title: meal.title, prepNote: meal.description })}>
                       <ChefHat size={14} /> Make This
                     </button>
-                    {meal.id !== 'breakfast' && (
+                    {isToday && meal.id !== 'breakfast' && (
                       <button type="button" className={styles.makeThisButton} onClick={() => saveLeftover(meal)} disabled={savingLeftover === meal.id}>
                         <Soup size={14} /> {savingLeftover === meal.id ? 'Saving…' : 'Save leftovers (safe 4 days)'}
                       </button>
@@ -307,6 +334,8 @@ export function MealPlanView() {
             {generating && <Loader2 size={14} className="animate-spin" />}
             {generating ? 'Regenerating…' : 'Regenerate this week'}
           </button>
+          </>
+          )}
         </>
       )}
 
