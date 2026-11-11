@@ -5,7 +5,7 @@ import { natalChartPromptBlock, getCurrentPlanets, getTransitsToNatal, plainAspe
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey, mondayKeyOf } from '@/lib/luna/today'
-import { buildWeekSky } from '@/lib/luna/weekSky'
+import { buildWeekSky, pickWeekWindows } from '@/lib/luna/weekSky'
 
 const ZOE_USER_ID = OWNER_USER_ID
 
@@ -95,6 +95,7 @@ function buildFallbackWeekly(startDate: Date, tz: string, todayIso: string): Wee
 
   const best  = days.reduce((a, b) => (a.intensity > b.intensity ? a : b))
   const rest  = days.reduce((a, b) => (a.intensity < b.intensity ? a : b))
+  // (best_day / rest_day / love_window / power_window are replaced by the calculated picks in sanitizeForecast)
 
   return {
     week_theme:   'You are in a season of momentum — follow what energizes you without forcing what does not.',
@@ -104,6 +105,29 @@ function buildFallbackWeekly(startDate: Date, tz: string, todayIso: string): Wee
     love_window:  days.find(d => d.love.includes('Venus') || d.love.includes('magnetic'))?.dayLabel ?? days[2].dayLabel,
     power_window: best.dayLabel,
   }
+}
+
+// The AI interprets the week; it does not get to contradict the calculated one. Any day it
+// names must be a real weekday of this week that is today or later, otherwise the
+// calculated pick from the real transits is used instead.
+function sanitizeForecast(f: WeeklyForecast, sky: ReturnType<typeof buildWeekSky>): WeeklyForecast {
+  const todayIdx = sky.findIndex(d => d.isToday)
+  const upcoming = new Set(sky.filter((_, i) => todayIdx < 0 || i >= todayIdx).map(d => d.weekday))
+  const calc = pickWeekWindows(sky)
+  const ok = (v: unknown): v is string => typeof v === 'string' && upcoming.has(v.trim())
+  const out: WeeklyForecast = { ...f }
+  out.best_day = ok(f.best_day) ? f.best_day.trim() : calc.best_day
+  out.rest_day = ok(f.rest_day) ? f.rest_day.trim() : calc.rest_day
+  out.love_window = ok(f.love_window) ? f.love_window.trim() : calc.love_window
+  out.power_window = ok(f.power_window) ? f.power_window.trim() : calc.power_window
+  if (Array.isArray(f.week_priorities)) {
+    out.week_priorities = f.week_priorities.map(p => ({ ...p, day: ok(p?.day) ? p.day.trim() : calc.power_window }))
+  }
+  if (Array.isArray(f.day_headlines)) {
+    const names = new Set(sky.map(d => d.weekday))
+    out.day_headlines = f.day_headlines.filter(h => names.has(h?.weekday))
+  }
+  return out
 }
 
 export async function GET(req: NextRequest) {
@@ -125,7 +149,7 @@ export async function GET(req: NextRequest) {
     const sky = buildWeekSky(weekStart, 7)
     const dayLines = sky.map(d => {
       const t = d.transits.map(x => `  - ${x.text} (${x.strength}, ${x.kind}): ${x.meaning}`).join('\n') || '  - No strong personal transits'
-      return `${d.weekday}, ${d.dateLabel}${d.isToday ? ' (TODAY)' : ''}:
+      return `${d.weekday}, ${d.dateLabel}${d.isToday ? ' (TODAY)' : d.iso < todayIso ? ' (ALREADY PASSED)' : ''}:
   Moon in ${d.moon.sign} ${d.moon.degree}°${d.moon.changesSign ? ' (just moved into this sign)' : ''}, ${d.moon.phase} (${d.moon.illumination}% lit)
   Venus in ${d.venus.sign}${d.venus.retrograde ? ' (moving backward)' : ''} | Mars in ${d.mars.sign}${d.mars.retrograde ? ' (moving backward)' : ''}${d.mercuryRetrograde ? ' | Mercury moving backward' : ''}
   Calculated intensity: ${d.intensity}/10
@@ -136,7 +160,7 @@ ${t}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v10',
+      generationType: 'weekly_forecast_v11',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
@@ -170,7 +194,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED:
   "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day, from the sky" } ]
 }
 
-Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. NEVER refer to the past ("last weekend", "last week", "earlier this week"); this is the Monday-to-Sunday calendar week; for days before today, describe the sky but give no forward advice. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
+Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. NEVER refer to the past ("last weekend", "last week", "earlier this week"); this is the Monday-to-Sunday calendar week; for days before today, describe the sky but give no forward advice. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above. Never recommend, schedule or name a best day for anything on a day marked ALREADY PASSED; only TODAY or later days can be recommended.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 8000)
@@ -184,7 +208,7 @@ Rules: exactly one headline per day, in order (${weekdays.length} items). Exactl
       },
     })
 
-    return NextResponse.json(forecast)
+    return NextResponse.json(sanitizeForecast(forecast, sky))
   } catch (err) {
     console.error('[weekly-forecast] error:', err)
     return NextResponse.json({ error: 'Failed to generate weekly forecast.' }, { status: 500 })

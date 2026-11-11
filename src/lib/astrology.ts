@@ -314,18 +314,18 @@ const PHASE_DESCRIPTIONS: Record<string, string> = {
   'Waning Crescent': 'Rest, reflect, and restore. The cycle ends here.',
 }
 
-// Phase boundaries use 22.5° mid-points (not 45°) so e.g. 88° reads as First
-// Quarter, not Waxing Crescent.
+// New/Full/Quarter are only named within about one day (12°) of the exact moment;
+// everything between is a crescent or gibbous. (A 33%-lit Moon is not a "First Quarter".)
 function getPhaseNameAndEmoji(angle: number): { name: string; emoji: string } {
   const a = ((angle % 360) + 360) % 360
-  if (a < 22.5 || a >= 337.5) return { name: 'New Moon',        emoji: '🌑' }
-  if (a < 67.5)                return { name: 'Waxing Crescent', emoji: '🌒' }
-  if (a < 112.5)               return { name: 'First Quarter',   emoji: '🌓' }
-  if (a < 157.5)               return { name: 'Waxing Gibbous',  emoji: '🌔' }
-  if (a < 202.5)               return { name: 'Full Moon',       emoji: '🌕' }
-  if (a < 247.5)               return { name: 'Waning Gibbous',  emoji: '🌖' }
-  if (a < 292.5)               return { name: 'Last Quarter',    emoji: '🌗' }
-  return                              { name: 'Waning Crescent', emoji: '🌘' }
+  if (a < 12 || a >= 348) return { name: 'New Moon',        emoji: '🌑' }
+  if (a < 78)             return { name: 'Waxing Crescent', emoji: '🌒' }
+  if (a < 102)            return { name: 'First Quarter',   emoji: '🌓' }
+  if (a < 168)            return { name: 'Waxing Gibbous',  emoji: '🌔' }
+  if (a < 192)            return { name: 'Full Moon',       emoji: '🌕' }
+  if (a < 258)            return { name: 'Waning Gibbous',  emoji: '🌖' }
+  if (a < 282)            return { name: 'Last Quarter',    emoji: '🌗' }
+  return                         { name: 'Waning Crescent', emoji: '🌘' }
 }
 
 export function getMoonPhase(date: Date): MoonPhaseInfo {

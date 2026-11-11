@@ -103,3 +103,22 @@ export function buildWeekSky(startIso: string = isoToday(), count = 7): SkyDay[]
   for (const d of days) d.intensity = hi - lo < 0.01 ? 5 : Math.round(3 + (6 * (d.intensity - lo)) / (hi - lo))
   return days
 }
+
+
+// Best/rest/love/power days, computed from the real transits (never from the AI), and
+// only among days that are today or later: a day that has already passed is never "best".
+export function pickWeekWindows(sky: SkyDay[]): { best_day: string; rest_day: string; love_window: string; power_window: string } {
+  const up = sky.filter(d => d.isToday || d.iso > (sky.find(x => x.isToday)?.iso ?? ''))
+  const days = up.length ? up : sky
+  const w = (t: SkyTransit) => (t.strength === 'very strong' ? 1.4 : t.strength === 'strong' ? 1 : 0.5)
+  const val = (t: SkyTransit) => (t.kind === 'supportive' ? 1 : t.kind === 'tense' ? -1.5 : 0) * w(t)
+  const score = (d: SkyDay, natal?: string[]) => d.transits.filter(t => !natal || natal.includes(t.natal)).reduce((n, t) => n + val(t), 0)
+  const top = (fn: (d: SkyDay) => number, dir: 1 | -1 = 1) =>
+    days.reduce((a, b) => (dir * fn(b) > dir * fn(a) ? b : a)).weekday
+  return {
+    best_day: top(d => score(d) - d.intensity * 0.15),
+    rest_day: top(d => d.intensity, 1),
+    love_window: top(d => score(d, ['Venus', 'Moon', 'Mars', 'Sun', 'NNode'])),
+    power_window: top(d => score(d, ['Sun', 'Saturn', 'Midheaven', 'Jupiter', 'Mars'])),
+  }
+}
