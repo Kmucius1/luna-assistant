@@ -1,7 +1,7 @@
 import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal, getNatalAspects, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
+import { natalChartPromptBlock, getCurrentPlanets, getTransitsToNatal, getNatalAspects, SIGN_ENERGY_DESCRIPTIONS, plainAspectPhrase, type PlanetPosition, type TransitAspect } from '@/lib/astrology'
 import { realLifeBlock } from '@/lib/luna/realLife'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
@@ -200,17 +200,18 @@ export async function GET(req: NextRequest) {
     const forDay   = dayParam && /^\d{4}-\d{2}-\d{2}$/.test(dayParam) ? dayParam : null
 
     const now    = forDay ? new Date(`${forDay}T16:00:00Z`) : new Date()
-    // Use client's local date as cache key so the reading resets at midnight for Zoe, not at UTC midnight
-    const dateKey = forDay
-      ? `day_${forDay}`
-      : localDate
-        ? localDate.replace(/[^a-zA-Z0-9]/g, '_')
-        : new Intl.DateTimeFormat('en-US', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+    // ONE cache key per calendar day (Zoe's local day), however the reading is asked for.
+    // This used to differ by caller (a text date, a numeric date, or an ISO day), so the
+    // same day could be generated and cached separately for each screen and read differently.
+    const todayIso = new Intl.DateTimeFormat('en-CA', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+    const dayIso   = forDay ?? todayIso
+    const isPastDay = dayIso < todayIso
+    const dateKey  = `day_${dayIso}`
 
     const userId = await resolveUserId()
     const realLife = await realLifeBlock(
       userId,
-      forDay ?? new Intl.DateTimeFormat('en-CA', { timeZone: clientTz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now),
+      dayIso,
     )
 
     // ── Build astronomical context ──────────────────────────────────────────
@@ -258,7 +259,7 @@ export async function GET(req: NextRequest) {
     // ── Prompt ─────────────────────────────────────────────────────────────
     const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: clientTz }).format(now)
 
-    const userPrompt = `${forDay ? `This reading is for ${dateStr}, a day in the coming week (write it as that day, covering the whole day from morning to evening).` : `Today is ${dateStr} at ${timeStr}.`}
+    const userPrompt = `${forDay ? `This reading is for ${dateStr}, ${isPastDay ? 'a day earlier this week that has already passed, so describe what that day held without giving forward advice' : 'a day in the coming week'} (write it as that day, covering the whole day from morning to evening).` : `Today is ${dateStr} at ${timeStr}.`}
 
 === CURRENT SKY ===
 ${planetLines}${moonChange}
@@ -273,10 +274,7 @@ ${transitLines}
 ${loveSky}
 
 ${realLife ? `=== ZOE'S REAL DAY (facts from her calendar, lists and plan; cite these by name when the sky relates to them) ===\n${realLife}\n\n` : ''}=== ZOE'S NATAL CHART ===
-Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
-Mercury: Scorpio 3° | Venus: Capricorn 2° | Mars: Libra 6°
-Jupiter: Gemini 7° | Saturn: Taurus 27° | North Node: Cancer 17°
-Chiron: Sagittarius 15° | Midheaven: Virgo 12°
+${natalChartPromptBlock()}
 
 === ZOE'S HUMAN DESIGN ===
 Type: Self-Projected Projector
@@ -359,7 +357,7 @@ Generate a complete daily reading for Zoe. Return ONLY valid JSON — no markdow
     // ── Generate (or serve from the real Supabase daily cache) ──────────────
     const { payload: guidance } = await getOrCreateDailyContent<DailyGuidance>({
       userId,
-      generationType: 'daily_guidance_v10',
+      generationType: 'daily_guidance_v11',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,

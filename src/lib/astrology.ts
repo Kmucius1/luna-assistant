@@ -164,6 +164,17 @@ export function getRetrogradePlanets(date: Date): PlanetPosition[] {
 
 export const ZOE_NATAL = natalZoeData as unknown as Record<string, { sign: ZodiacSign; degree: number; minutes: number; lon: number; notes?: string }>
 
+/** The natal chart as prompt text, built from natal-zoe.json so prompts can never drift from the data. */
+export function natalChartPromptBlock(): string {
+  const f = (k: string, label = k) => { const p = ZOE_NATAL[k]; return p ? `${label}: ${p.sign} ${p.degree}°` : '' }
+  return [
+    [f('Sun'), f('Moon'), f('Rising')].filter(Boolean).join(' | '),
+    [f('Mercury'), f('Venus'), f('Mars')].filter(Boolean).join(' | '),
+    [f('Jupiter'), f('Saturn'), f('NNode', 'North Node')].filter(Boolean).join(' | '),
+    [f('Chiron'), f('Midheaven')].filter(Boolean).join(' | '),
+  ].join('\n')
+}
+
 // ─── Transit-to-Natal aspects ────────────────────────────────
 
 export type TransitAspect = Aspect & {

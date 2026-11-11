@@ -1,7 +1,7 @@
 import { OWNER_USER_ID } from '@/lib/owner'
 import { NextRequest, NextResponse } from 'next/server'
 import { callAI } from '@/lib/ai'
-import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
+import { natalChartPromptBlock, getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
 import { todayKey, mondayKeyOf } from '@/lib/luna/today'
@@ -145,10 +145,7 @@ ${t}`
           const prompt = `Write the week-level guidance for Zoe's calendar week (Monday through Sunday; days before today are already past, so frame those as context and focus advice on today onward), using ONLY the calculated sky below. Each day also has its own full written reading elsewhere, so here you give the big picture, the best days for things, and a short headline per day.
 
 ZOE'S NATAL CHART:
-Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
-Mercury: Scorpio 3° | Venus: Capricorn 2° | Mars: Libra 6°
-Jupiter: Gemini 7° | Saturn: Taurus 27° | North Node: Cancer 17°
-Chiron: Sagittarius 15° | Midheaven: Virgo 12°
+${natalChartPromptBlock()}
 
 HUMAN DESIGN: Self-Projected Projector · 4/6 Profile
 
