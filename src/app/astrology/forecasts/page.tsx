@@ -7,6 +7,7 @@ import { useLocation } from '@/hooks/useLocation'
 import { getSavedPeople, type SavedPerson } from '@/lib/luna/savedPeople'
 import type { WeeklyForecast } from '@/app/api/astrology/weekly-forecast/route'
 import type { SkyDay } from '@/lib/luna/weekSky'
+import { mondayKeyOf } from '@/lib/luna/today'
 
 // ─── Design ──────────────────────────────────────────────────────────────────
 const GLASS: React.CSSProperties = {
@@ -218,11 +219,16 @@ export default function ForecastsPage() {
     setLoading(true)
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
     const date = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-    const iso = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+    const iso = mondayKeyOf(new Date(), tz) // the real Monday-to-Sunday week, not a rolling 7 days
     // The real days and sky are calculated, so they load fast and never depend on the AI.
     try {
       const r = await fetch(`/api/astrology/week-sky?start=${iso}`)
-      if (r.ok) setSky((await r.json()).days ?? [])
+      if (r.ok) {
+        const days: SkyDay[] = (await r.json()).days ?? []
+        setSky(days)
+        const t = days.findIndex(d => d.isToday)
+        if (t >= 0) setSel(t)
+      }
     } catch { /* keep previous */ }
     try {
       const url = `/api/astrology/weekly-forecast?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(date)}${forceRefresh ? '&refresh=1' : ''}`
@@ -248,7 +254,7 @@ export default function ForecastsPage() {
     try {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
       let url = `/api/astrology/daily-guidance?day=${iso}&tz=${encodeURIComponent(tz)}${force ? '&refresh=1' : ''}`
-      if (i === 0) {
+      if (sky[i]?.isToday) {
         const localDate = new Intl.DateTimeFormat('en-US', { timeZone: tz, weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date())
         const localTime = new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(new Date())
         url = `/api/astrology/daily-guidance?tz=${encodeURIComponent(tz)}&date=${encodeURIComponent(localDate)}&time=${encodeURIComponent(localTime)}${force ? '&refresh=1' : ''}`

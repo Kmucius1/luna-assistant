@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Beef, CheckCircle2, ChefHat, Circle, Clock, Droplet, Flame, Loader2, PlusCircle, Soup, Sparkles, X } from 'lucide-react'
+import Link from 'next/link'
+import { Beef, CheckCircle2, ChefHat, Circle, Clock, Droplet, Flame, Loader2, PlusCircle, ShoppingCart, Soup, Sparkles, X } from 'lucide-react'
 
 import { NUTRITION_GOALS } from '@/lib/luna/todayMeals'
 import { imageForMeal } from '@/lib/luna/mealImages'
@@ -364,6 +365,11 @@ export function MealPlanView() {
           <PlusCircle size={14} /> Log meal
         </button>
       </div>
+      {plan && (
+        <Link href="/food/groceries" className={styles.wceToggle}>
+          <ShoppingCart size={14} /> Grocery list for this week
+        </Link>
+      )}
 
       {wceOpen && (
         <div className={styles.card}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Check, ShoppingCart } from 'lucide-react'
 import styles from './FoodViews.module.css'
 import { ZOE_PANTRY_STAPLES } from '@/lib/luna/pantryStaples'
@@ -65,12 +66,20 @@ export function GroceriesView() {
       <div>
         <ShoppingCart size={22} style={{ marginBottom: 8 }} />
         <p>Generate a meal plan first — your grocery list is built from it.</p>
+        <Link href="/food" className={styles.generateButton}>Go to Meal Plan</Link>
       </div>
     </div>
   )
 
+  const allKeys = (Object.keys(plan.plan_json.grocery_list ?? {}) as (keyof GroceryList)[])
+    .flatMap(cat => (plan.plan_json.grocery_list[cat] ?? []).map(g => `${cat}:${g.item}`))
+  const leftCount = allKeys.filter(k => !plan.checked_items.includes(k)).length
+
   return (
     <>
+      <div className={styles.sectionHeader}>
+        {allKeys.length === 0 ? 'Grocery List' : leftCount === 0 ? 'All done — everything is checked off' : `${leftCount} of ${allKeys.length} items left`}
+      </div>
       {(Object.keys(plan.plan_json.grocery_list ?? {}) as (keyof GroceryList)[]).map(cat => {
         const list = plan.plan_json.grocery_list[cat]
         if (!list?.length) return null

@@ -4,7 +4,7 @@ import { callAI } from '@/lib/ai'
 import { getCurrentPlanets, getTransitsToNatal, plainAspectPhrase } from '@/lib/astrology'
 import { LIFE_LANGUAGE_RULES, ROMANTIC_ACCURACY_RULES, DECISIVE_GUIDANCE_RULES } from '@/lib/luna/voiceRules'
 import { getOrCreateDailyContent } from '@/lib/luna/dailyCache'
-import { todayKey } from '@/lib/luna/today'
+import { todayKey, mondayKeyOf } from '@/lib/luna/today'
 import { buildWeekSky } from '@/lib/luna/weekSky'
 
 const ZOE_USER_ID = OWNER_USER_ID
@@ -53,21 +53,21 @@ const SIGN_ENERGY: Record<string, { keyword: string; feel: string; do: string }>
   Pisces:      { keyword: 'Intuition',     feel: 'dreamy, fluid, empathic',    do: 'Rest, create, meditate, trust your gut' },
 }
 
-function buildFallbackWeekly(startDate: Date, tz: string): WeeklyForecast {
+function buildFallbackWeekly(startDate: Date, tz: string, todayIso: string): WeeklyForecast {
   const days: DayForecast[] = []
   const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: tz })
   const shortDay  = new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: tz })
 
   for (let i = 0; i < 7; i++) {
-    const d = new Date(startDate)
-    d.setDate(d.getDate() + i)
+    const d = new Date(startDate.getTime() + i * 86400000)
     const planets  = getCurrentPlanets(d)
     const transits = getTransitsToNatal(d).slice(0, 4)
     const moon     = planets.find(p => p.name === 'Moon')
     const moonData = moon ? SIGN_ENERGY[moon.sign] : null
     const topT     = transits[0]
     const dayStr   = formatter.format(d)
-    const label    = i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : shortDay.format(d)
+    const isoD     = todayKey(d, tz)
+    const label    = isoD === todayIso ? 'Today' : shortDay.format(d)
     const intensity = Math.min(10, Math.max(1, transits.filter(t => ['conjunction','square','opposition'].includes(t.type)).length * 3 + 4))
 
     days.push({
@@ -118,7 +118,11 @@ export async function GET(req: NextRequest) {
 
     // The week, calculated: real weekdays/dates, Moon, Venus/Mars, Mercury status and
     // the transits active against her chart on each day. The AI only interprets this.
-    const sky = buildWeekSky(todayKey(now, clientTz), 7)
+    // A real calendar week (Monday to Sunday), not a rolling 7 days from today.
+    const todayIso = todayKey(now, clientTz)
+    const weekStart = mondayKeyOf(now, clientTz)
+    const weekStartDate = new Date(`${weekStart}T16:00:00Z`)
+    const sky = buildWeekSky(weekStart, 7)
     const dayLines = sky.map(d => {
       const t = d.transits.map(x => `  - ${x.text} (${x.strength}, ${x.kind}): ${x.meaning}`).join('\n') || '  - No strong personal transits'
       return `${d.weekday}, ${d.dateLabel}${d.isToday ? ' (TODAY)' : ''}:
@@ -132,13 +136,13 @@ ${t}`
 
     const { payload: forecast } = await getOrCreateDailyContent<WeeklyForecast>({
       userId: ZOE_USER_ID,
-      generationType: 'weekly_forecast_v9',
+      generationType: 'weekly_forecast_v10',
       timezone: clientTz,
       dateKey,
       forceRegenerate: refresh,
       generate: async () => {
         try {
-          const prompt = `Write the week-level guidance for Zoe's upcoming 7 days, using ONLY the calculated sky below. Each day also has its own full written reading elsewhere, so here you give the big picture, the best days for things, and a short headline per day.
+          const prompt = `Write the week-level guidance for Zoe's calendar week (Monday through Sunday; days before today are already past, so frame those as context and focus advice on today onward), using ONLY the calculated sky below. Each day also has its own full written reading elsewhere, so here you give the big picture, the best days for things, and a short headline per day.
 
 ZOE'S NATAL CHART:
 Sun: Scorpio 22° | Moon: Cancer 4° | Rising: Gemini 12°
@@ -169,7 +173,7 @@ Return ONLY valid JSON matching this exact schema. Every field is REQUIRED:
   "week_priorities": [ { "task": "A specific kind of thing she should get done this week", "day": "the weekday that is best for it", "why": "one sentence why that day, from the sky" } ]
 }
 
-Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. NEVER refer to the past ("last weekend", "last week", "earlier this week"); this is the coming seven days only. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
+Rules: exactly one headline per day, in order (${weekdays.length} items). Exactly 4 week_priorities. TIME RULES: never write "tomorrow" or "yesterday"; name days by weekday only. NEVER refer to the past ("last weekend", "last week", "earlier this week"); this is the Monday-to-Sunday calendar week; for days before today, describe the sky but give no forward advice. Never invent events, meetings, deadlines, numbers or names; use "if" for things that might happen. Use only weekdays listed above.${LIFE_LANGUAGE_RULES}${ROMANTIC_ACCURACY_RULES}${DECISIVE_GUIDANCE_RULES}`
 
           const SYSTEM = "You are LUNA, Zoe's personal astrology guide. Generate detailed, specific, personalized daily readings — not generic horoscope content. Reference her actual chart placements and today's real transits. Be honest, warm, and deeply personal. Return ONLY valid JSON — no markdown fences."
           const rawText = await callAI(SYSTEM, prompt, 8000)
@@ -178,7 +182,7 @@ Rules: exactly one headline per day, in order (${weekdays.length} items). Exactl
           return { payload: parsed, source: 'ai' as const }
         } catch {
           // Fallback: transit-based generation (always accurate)
-          return { payload: buildFallbackWeekly(now, clientTz), source: 'fallback' as const }
+          return { payload: buildFallbackWeekly(weekStartDate, clientTz, todayIso), source: 'fallback' as const }
         }
       },
     })
